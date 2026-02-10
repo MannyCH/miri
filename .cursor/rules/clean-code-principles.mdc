@@ -1,0 +1,127 @@
+---
+description: Clean code principles and best practices for writing maintainable code
+alwaysApply: true
+---
+
+# Clean Code Principles
+
+Write code that is functional, easy to read, and adheres to best practices.
+
+## Core Principles
+
+### 1. Avoid Hard-Coded Numbers
+
+Use named constants instead of magic numbers:
+
+```python
+# ❌ BAD
+discount = price * 0.1
+
+# ✅ GOOD
+TEN_PERCENT_DISCOUNT = 0.1
+discount = price * TEN_PERCENT_DISCOUNT
+```
+
+### 2. Use Meaningful Names
+
+Choose names that reveal intent and purpose:
+
+```python
+# ❌ BAD
+def calc(p):
+    return p * 0.9
+
+# ✅ GOOD
+def calculate_discounted_price(product_price):
+    return product_price * DISCOUNT_RATE
+```
+
+### 3. Comment Wisely
+
+Comment the "why", not the "what". Avoid redundant comments:
+
+```python
+# ❌ BAD: Redundant comment
+# This function groups users by id
+def group_users_by_id(user_id):
+    pass
+
+# ✅ GOOD: Explains behavior and edge cases
+def group_users_by_id(user_id):
+    """Groups users by id to a specific category (1-9).
+    Warning: Certain characters might not be handled correctly.
+    """
+    pass
+```
+
+### 4. Single Responsibility
+
+Functions should do one thing and do it well:
+
+```python
+# ❌ BAD
+def process_data(data):
+    # validates, calculates, and formats
+    pass
+
+# ✅ GOOD
+def validate_user(data):
+    pass
+
+def calculate_values(data):
+    pass
+
+def format_output(data):
+    pass
+```
+
+### 5. DRY (Don't Repeat Yourself)
+
+Reuse code through functions, classes, and modules:
+
+```python
+# ❌ BAD
+def calculate_book_price(quantity, price):
+    return quantity * price
+
+def calculate_laptop_price(quantity, price):
+    return quantity * price
+
+# ✅ GOOD
+def calculate_product_price(quantity, price):
+    return quantity * price
+```
+
+### 6. Encapsulate Nested Conditionals
+
+Extract complex logic into well-named functions:
+
+```python
+# ❌ BAD
+def calculate_discount(price):
+    if price > 100:
+        discount = price * 0.1
+    elif price > 50:
+        discount = price * 0.05
+    else:
+        discount = 0
+    return price - discount
+
+# ✅ GOOD
+def calculate_discount(price):
+    discount_rate = get_discount_rate(price)
+    return price * (1 - discount_rate)
+
+def get_discount_rate(price):
+    if price > 100:
+        return 0.1
+    elif price > 50:
+        return 0.05
+    return 0
+```
+
+## Additional Guidelines
+
+- **Refactor continuously**: Leave code cleaner than you found it
+- **Follow established standards**: Adhere to language-specific conventions (PEP 8, Google Style Guide, etc.)
+- **Use version control**: Track changes and collaborate effectively

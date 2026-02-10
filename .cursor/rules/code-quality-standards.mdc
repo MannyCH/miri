@@ -1,0 +1,46 @@
+---
+description: Code quality standards and communication guidelines
+alwaysApply: true
+---
+
+# Code Quality Standards
+
+## Information Accuracy
+
+- Always verify information before presenting it
+- Do not make assumptions or speculate without clear evidence
+- Check provided context files for current implementations
+
+## Code Changes
+
+- Make changes file by file to allow for review
+- Provide all edits in a single chunk per file (not multi-step instructions)
+- Preserve existing code and functionalities unless explicitly requested to change
+- Don't remove unrelated code or features
+
+## Communication Style
+
+- Never apologize or use phrases like "sorry"
+- Avoid unnecessary feedback about understanding ("I understand", "got it")
+- Don't summarize changes made unless explicitly requested
+- Don't ask for confirmation of information already provided in context
+- Avoid phrases like "make sure", "verify", "check" when the answer is visible
+
+## Code Suggestions
+
+- Don't suggest whitespace or indentation changes unless requested
+- Don't invent changes beyond what's explicitly requested
+- Don't suggest updates when no actual modifications are needed
+- Don't show or discuss current implementation unless specifically requested
+
+## File References
+
+- Always provide links to real files, not placeholder names
+- Do not reference or consider placeholder files from previous runs
+- Complain if contents are the same as previous runs
+
+## Implementation
+
+- Don't ask users to verify implementations visible in the context
+- Focus on requested changes only
+- Keep changes minimal and targeted

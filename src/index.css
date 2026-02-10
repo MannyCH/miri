@@ -1,0 +1,23 @@
+/* Base UI Required Styles */
+
+/* Creates isolated stacking context for portals (Dialog, Popover, etc.) */
+.root {
+  isolation: isolate;
+}
+
+/* Required for iOS 26+ Safari backdrop positioning */
+body {
+  position: relative;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Basic focus visibility - required for accessibility */
+:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}

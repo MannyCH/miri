@@ -1,0 +1,306 @@
+---
+description: Base UI React component library best practices and patterns
+globs: "**/*.{tsx,jsx}"
+alwaysApply: false
+---
+
+# Base UI Best Practices
+
+Best practices for building accessible, composable UI components with Base UI React.
+
+## Installation & Setup
+
+```bash
+npm install @base-ui/react
+```
+
+### Required Global Styles
+
+Add to your application root layout:
+
+```css
+/* For portals to appear above page content */
+.root {
+  isolation: isolate;
+}
+
+/* For iOS 26+ Safari backdrop support */
+body {
+  position: relative;
+}
+```
+
+## Component Composition
+
+### Use render Prop for Custom Components
+
+```tsx
+// ✅ GOOD: Using render prop
+}>
+  Open menu
+
+
+// ❌ BAD: Not composable
+ Open menu
+```
+
+### Always Forward Refs and Spread Props
+
+```tsx
+// ✅ GOOD
+const CustomButton = React.forwardRef((props, ref) => {
+  return ;
+});
+
+// ❌ BAD: Missing ref forwarding or props spreading
+const CustomButton = (props) => {
+  return ;
+};
+```
+
+## Styling Patterns
+
+### Use Data Attributes for State Styling
+
+```css
+/* ✅ GOOD: State-based styling */
+.Switch[data-checked] { background: green; }
+.Switch[data-disabled] { opacity: 0.5; }
+.Popup[data-starting-style] { opacity: 0; }
+```
+
+### Leverage CSS Variables
+
+```css
+/* ✅ GOOD: Using exposed CSS variables */
+.Popup {
+  max-height: var(--available-height);
+  width: var(--anchor-width);
+}
+```
+
+### className Can Be a Function
+
+```tsx
+// ✅ GOOD: Dynamic classes based on state
+ (state.checked ? 'bg-green' : 'bg-gray')}
+/>
+
+// Also works with style prop
+ ({ color: state.checked ? 'green' : 'gray' })}
+/>
+```
+
+## Forms & Validation
+
+### Always Use Field for Labeling
+
+```tsx
+// ✅ GOOD: Proper labeling with Field
+ 
+  Username
+  Must be 3+ characters
+  
+
+
+// ❌ BAD: No accessible label
+ 
+```
+
+### Use name Prop for Form Submission
+
+```tsx
+// ✅ GOOD: Will be included in form data
+
+
+// ❌ BAD: Won't be submitted with form
+
+```
+
+### Position Hidden Inputs for Validation Bubbles
+
+```tsx
+// ✅ GOOD: Wrapper with relative positioning
+ 
+  Apple
+  
+  
+
+
+// ❌ BAD: Validation bubble may point to wrong location
+ Apple 
+```
+
+### Validation Patterns
+
+```tsx
+// Native validation
+ 
+
+// Custom validation
+ {
+  if (value.length < 3) return 'Too short';
+  if (await checkAvailability(value) === false) {
+    return 'Username taken';
+  }
+  return null; // Valid
+}}
+  validationMode="onChange"
+  validationDebounceTime={300}
+>
+
+
+// Server-side errors
+ setErrors(response.errors)}>
+  
+```
+
+## Component Events
+
+### Use Base UI Events, Not Native Events
+
+```tsx
+// ✅ GOOD: Use onOpenChange, onValueChange, onPressedChange
+ {
+  console.log(open, eventDetails.reason);
+  if (eventDetails.reason === 'escape-key') {
+    eventDetails.allowPropagation();
+  }
+}}
+>
+
+// ❌ BAD: Don't rely solely on native onClick for state changes
+ {}}> // Won't capture all state changes
+```
+
+### Canceling Events
+
+```tsx
+// Prevent state change
+ {
+  if (eventDetails.reason === 'trigger-press') {
+    eventDetails.cancel(); // Stops internal state update
+  }
+}}
+>
+```
+
+## Control vs Uncontrolled
+
+### Components Are Uncontrolled by Default
+
+```tsx
+// ✅ Uncontrolled - manages own state
+ 
+
+// ✅ Controlled - you manage state
+const [open, setOpen] = useState(false);
+ 
+```
+
+## Accessibility
+
+### Focus Visibility Required
+
+```css
+/* ✅ GOOD: Always style focus states */
+.Button:focus-visible {
+  outline: 2px solid blue;
+  outline-offset: 2px;
+}
+
+/* ❌ BAD: No focus indicator */
+.Button { outline: none; }
+```
+
+### Use Fieldset for Groups
+
+```tsx
+// ✅ GOOD: Fieldset for radio/checkbox groups
+}>
+  Storage type
+  
+    
+      SSD
+    
+    
+      HDD
+    
+  
+
+
+// ❌ BAD: No semantic grouping
+ 
+   SSD
+   HDD
+
+```
+
+### Test Keyboard Navigation
+
+All Base UI components support keyboard navigation per WAI-ARIA standards:
+- Arrow keys for navigation
+- Enter/Space for selection
+- Esc for closing
+- Home/End for first/last item
+
+## Component Assembly Pattern
+
+```tsx
+// ✅ GOOD: Assemble parts from Base UI
+import { Popover } from '@base-ui/react/popover';
+
+export default function MyPopover() {
+  return (
+    
+      
+      
+        
+          Notifications
+          You're all caught up!
+        
+        
+      
+    
+  );
+}
+```
+
+## Common Patterns
+
+### Multi-Component Composition
+
+```tsx
+// Nested render props for complex scenarios
+ 
+   
+    }>
+      Open menu
+    
+  }
+  />
+}
+/>
+```
+
+### Changing Default Element
+
+```tsx
+// Render as different element when needed
+}>
+  Add to Library
+
+```
+
+## Tree Shaking
+
+Base UI is tree-shakable. Only import what you use:
+
+```tsx
+// ✅ GOOD: Named imports
+import { Dialog } from '@base-ui/react/dialog';
+import { Popover } from '@base-ui/react/popover';
+
+// ❌ BAD: Importing everything
+import * as BaseUI from '@base-ui/react';
+```

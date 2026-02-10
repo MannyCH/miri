@@ -1,0 +1,50 @@
+---
+description: Conventional Commit Messages specification for all commits
+alwaysApply: true
+---
+
+# Conventional Commit Messages
+
+Use the Conventional Commit Messages specification for all commit messages.
+
+## Format
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+## Types
+
+- **fix**: Patches a bug (correlates with PATCH in Semantic Versioning)
+- **feat**: Introduces a new feature (correlates with MINOR in Semantic Versioning)
+- **BREAKING CHANGE**: Breaking API change (correlates with MAJOR in Semantic Versioning)
+- **Other types**: build, chore, ci, docs, style, refactor, perf, test
+
+## Rules
+
+1. Commits MUST be prefixed with a type (e.g., `feat`, `fix`)
+2. A scope MAY be provided after a type (e.g., `fix(parser):`)
+3. A description MUST immediately follow the colon and space
+4. A longer body MAY be provided after the description (one blank line after)
+5. Footers MAY be provided one blank line after the body
+6. Breaking changes MUST be indicated either:
+   - With `!` before the `:` (e.g., `feat!:`)
+   - As a footer `BREAKING CHANGE: description`
+
+## Examples
+
+```
+feat(parser): add ability to parse arrays
+
+fix: array parsing issue when multiple spaces were contained in string
+
+docs: update ref docs
+
+feat!: send email on user creation
+
+BREAKING CHANGE: environment variables now take precedence over config files
+```
