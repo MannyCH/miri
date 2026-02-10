@@ -27,7 +27,8 @@
     "@base-ui/react": "^1.1.0",
     "figma-console-mcp": "^1.8.0",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.1",

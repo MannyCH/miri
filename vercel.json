@@ -1,6 +1,12 @@
 {
-  "buildCommand": "npm run build-storybook",
-  "outputDirectory": "storybook-static",
-  "framework": null,
-  "installCommand": "npm install"
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "npm install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
