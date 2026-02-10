@@ -1,0 +1,14 @@
+# Don't upload these to Vercel
+node_modules
+.git
+.cursor
+.vscode
+*.log
+.DS_Store
+storybook-static
+dist
+build
+
+# Keep these for build
+!package.json
+!package-lock.json
