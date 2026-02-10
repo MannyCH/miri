@@ -1,0 +1,41 @@
+/* CalendarButton - Exact Figma Design */
+.calendar-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+/* No Background - Transparent with grey text */
+.calendar-button-no-background {
+  background: transparent;
+  color: var(--color-text-weak);
+  border-radius: 0;
+}
+
+/* Default - Light background with rounded corners and stroke */
+.calendar-button-default {
+  background: var(--color-fill-brand-weak);
+  color: var(--color-text-strong);
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-8);
+}
+
+/* Pressed - Brown solid background with white text */
+.calendar-button-pressed {
+  background: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+  border-radius: var(--corner-radius-8);
+}
+
+.calendar-button:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}

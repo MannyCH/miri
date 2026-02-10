@@ -1,0 +1,420 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Elevation" />
+
+# Elevation
+
+Elevation creates visual hierarchy through shadows and depth, helping users understand the structure and relationships between UI elements.
+
+Miri uses **3 elevation levels** based on layering and interaction states.
+
+---
+
+## Elevation Tokens
+
+### Overlay (Highest)
+
+The highest elevation for floating elements that appear above all other content.
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  marginBottom: 'var(--spacing-32)'
+}}>
+  <div style={{
+    width: '200px',
+    height: '120px',
+    background: 'var(--color-background-raised)',
+    borderRadius: 'var(--corner-radius-12)',
+    boxShadow: 'var(--elevation-overlay)',
+    padding: 'var(--spacing-16)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }}>
+    <span className="text-body-small-bold" style={{ color: 'var(--color-text-strong)' }}>
+      Overlay Elevation
+    </span>
+  </div>
+  <code style={{
+    display: 'block',
+    marginTop: 'var(--spacing-12)',
+    fontSize: '14px',
+    color: 'var(--color-text-weak)'
+  }}>
+    box-shadow: var(--elevation-overlay);
+  </code>
+  <div style={{
+    marginTop: 'var(--spacing-8)',
+    fontSize: '14px',
+    color: 'var(--color-text-weak)'
+  }}>
+    • 0px 20px 24px -4px rgba(0, 0, 0, 0.08)<br/>
+    • 0px 8px 8px -4px rgba(0, 0, 0, 0.04)
+  </div>
+</div>
+
+**Use for:**
+- Modals and dialogs
+- Dropdowns and select menus
+- Tooltips and popovers
+- Floating action buttons
+
+---
+
+### Raised (Medium)
+
+Standard elevation for interactive components and content cards.
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  marginBottom: 'var(--spacing-32)'
+}}>
+  <div style={{
+    width: '200px',
+    height: '120px',
+    background: 'var(--color-background-raised)',
+    borderRadius: 'var(--corner-radius-12)',
+    boxShadow: 'var(--elevation-raised)',
+    padding: 'var(--spacing-16)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }}>
+    <span className="text-body-small-bold" style={{ color: 'var(--color-text-strong)' }}>
+      Raised Elevation
+    </span>
+  </div>
+  <code style={{
+    display: 'block',
+    marginTop: 'var(--spacing-12)',
+    fontSize: '14px',
+    color: 'var(--color-text-weak)'
+  }}>
+    box-shadow: var(--elevation-raised);
+  </code>
+  <div style={{
+    marginTop: 'var(--spacing-8)',
+    fontSize: '14px',
+    color: 'var(--color-text-weak)'
+  }}>
+    • 0px 2px 4px -2px rgba(0, 0, 0, 0.08)<br/>
+    • 0px 4px 8px -2px rgba(0, 0, 0, 0.04)
+  </div>
+</div>
+
+**Use for:**
+- Recipe cards
+- Content cards
+- Buttons (on hover)
+- Navigation bars
+- Sidebar menus
+
+---
+
+### Sunken (Inner)
+
+Inner shadow creating an inset appearance for pressed or focused states.
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  marginBottom: 'var(--spacing-32)'
+}}>
+  <div style={{
+    width: '200px',
+    height: '120px',
+    background: 'var(--color-background-sunken)',
+    borderRadius: 'var(--corner-radius-12)',
+    boxShadow: 'var(--elevation-sunken)',
+    padding: 'var(--spacing-16)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }}>
+    <span className="text-body-small-bold" style={{ color: 'var(--color-text-strong)' }}>
+      Sunken Elevation
+    </span>
+  </div>
+  <code style={{
+    display: 'block',
+    marginTop: 'var(--spacing-12)',
+    fontSize: '14px',
+    color: 'var(--color-text-weak)'
+  }}>
+    box-shadow: var(--elevation-sunken);
+  </code>
+  <div style={{
+    marginTop: 'var(--spacing-8)',
+    fontSize: '14px',
+    color: 'var(--color-text-weak)'
+  }}>
+    • inset 0px 1px 4px 0px rgba(0, 0, 0, 0.08)
+  </div>
+</div>
+
+**Use for:**
+- Input fields (focus state)
+- Pressed buttons
+- Selected items
+- Recessed panels
+
+---
+
+## Interactive Elevation
+
+Elevation can change based on user interaction to provide feedback.
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  display: 'flex',
+  gap: 'var(--spacing-24)',
+  flexWrap: 'wrap'
+}}>
+  <div>
+    <div 
+      className="elevation-interactive"
+      style={{
+        width: '160px',
+        height: '120px',
+        background: 'var(--color-background-raised)',
+        borderRadius: 'var(--corner-radius-12)',
+        padding: 'var(--spacing-16)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      <span className="text-body-small-bold" style={{ color: 'var(--color-text-strong)' }}>
+        Hover Me
+      </span>
+    </div>
+    <code style={{
+      display: 'block',
+      marginTop: 'var(--spacing-8)',
+      fontSize: '12px',
+      color: 'var(--color-text-weak)'
+    }}>
+      .elevation-interactive
+    </code>
+  </div>
+</div>
+
+---
+
+## Usage Examples
+
+### Recipe Card with Elevation
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  padding: 'var(--spacing-24)',
+  background: 'var(--color-background-sunken)',
+  borderRadius: 'var(--corner-radius-16)'
+}}>
+  <div style={{
+    background: 'var(--color-background-raised)',
+    padding: 'var(--spacing-24)',
+    borderRadius: 'var(--corner-radius-16)',
+    boxShadow: 'var(--elevation-raised)',
+    maxWidth: '320px'
+  }}>
+    <h3 className="text-h4-bold" style={{ 
+      margin: '0 0 var(--spacing-8) 0',
+      color: 'var(--color-text-strong)'
+    }}>
+      Spaghetti Carbonara
+    </h3>
+    
+    <div style={{
+      display: 'flex',
+      gap: 'var(--spacing-8)',
+      marginBottom: 'var(--spacing-16)'
+    }}>
+      <span className="text-body-small-regular" style={{
+        padding: 'var(--spacing-4) var(--spacing-8)',
+        background: 'var(--color-fill-brand-weak)',
+        borderRadius: 'var(--corner-radius-4)',
+        color: 'var(--color-text-brand)'
+      }}>
+        30 min
+      </span>
+      <span className="text-body-small-regular" style={{
+        padding: 'var(--spacing-4) var(--spacing-8)',
+        background: 'var(--color-fill-brand-weak)',
+        borderRadius: 'var(--corner-radius-4)',
+        color: 'var(--color-text-brand)'
+      }}>
+        4 servings
+      </span>
+    </div>
+    
+    <p className="text-body-small-regular" style={{
+      margin: '0 0 var(--spacing-16) 0',
+      color: 'var(--color-text-weak)'
+    }}>
+      Classic Italian pasta with eggs, cheese, and pancetta.
+    </p>
+    
+    <button 
+      className="text-body-small-bold elevation-interactive"
+      style={{
+        width: '100%',
+        padding: 'var(--spacing-12) var(--spacing-24)',
+        background: 'var(--color-fill-brand-strong)',
+        color: 'var(--color-text-inverted)',
+        border: 'none',
+        borderRadius: 'var(--corner-radius-8)',
+        cursor: 'pointer',
+        lineHeight: '1'
+      }}>
+      View Recipe
+    </button>
+  </div>
+</div>
+
+---
+
+## Code Examples
+
+### Using CSS Variables
+
+```css
+/* Card with raised elevation */
+.recipe-card {
+  background: var(--color-background-raised);
+  padding: var(--spacing-24);
+  border-radius: var(--corner-radius-16);
+  box-shadow: var(--elevation-raised);
+}
+
+/* Modal with overlay elevation */
+.modal {
+  background: var(--color-background-raised);
+  padding: var(--spacing-32);
+  border-radius: var(--corner-radius-24);
+  box-shadow: var(--elevation-overlay);
+}
+
+/* Input field with sunken appearance */
+.input:focus {
+  box-shadow: var(--elevation-sunken);
+}
+```
+
+### Using Utility Classes
+
+```jsx
+// Card with raised elevation
+<div className="elevation-raised" style={{
+  background: 'var(--color-background-raised)',
+  padding: 'var(--spacing-24)',
+  borderRadius: 'var(--corner-radius-16)'
+}}>
+  <h3>Recipe Card</h3>
+  <p>Content here...</p>
+</div>
+
+// Interactive button with elevation
+<button className="elevation-interactive" style={{
+  padding: 'var(--spacing-12) var(--spacing-24)',
+  background: 'var(--color-fill-brand-strong)',
+  color: 'var(--color-text-inverted)',
+  borderRadius: 'var(--corner-radius-8)'
+}}>
+  Click Me
+</button>
+```
+
+### With Base UI Components
+
+```jsx
+import { Popover } from '@base-ui/react/popover';
+
+<Popover.Popup 
+  className="elevation-overlay"
+  style={{
+    background: 'var(--color-background-raised)',
+    padding: 'var(--spacing-16)',
+    borderRadius: 'var(--corner-radius-12)'
+  }}
+>
+  Popup content
+</Popover.Popup>
+```
+
+---
+
+## Elevation Hierarchy
+
+Use elevation to establish clear visual hierarchy:
+
+| Level | Token | Use Case | Z-Index Range |
+|-------|-------|----------|---------------|
+| **Base** | None | Page background, flat content | 0 |
+| **Raised** | `--elevation-raised` | Cards, buttons, navigation | 1-10 |
+| **Overlay** | `--elevation-overlay` | Modals, dropdowns, tooltips | 100-1000 |
+| **Sunken** | `--elevation-sunken` | Inputs (focus), pressed states | N/A (inner) |
+
+---
+
+## Accessibility Considerations
+
+### Don't Rely Solely on Shadows
+
+Elevation should enhance but not replace other visual cues:
+
+✅ **GOOD:** Card with shadow + border + background color  
+❌ **BAD:** Card with only shadow on white background
+
+```css
+/* Good - Multiple visual cues */
+.card {
+  background: var(--color-background-raised);
+  border: 1px solid var(--color-stroke-weak);
+  box-shadow: var(--elevation-raised);
+}
+
+/* Bad - Shadow only */
+.card-bad {
+  background: white;
+  box-shadow: var(--elevation-raised); /* Not enough contrast */
+}
+```
+
+### Reduce Motion
+
+Respect user preferences for reduced motion:
+
+```css
+.elevation-interactive {
+  box-shadow: var(--elevation-raised);
+  transition: box-shadow 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .elevation-interactive {
+    transition: none;
+  }
+}
+```
+
+---
+
+## Best Practices
+
+✅ **DO:** Use elevation consistently for similar components  
+✅ **DO:** Combine elevation with border and background color  
+✅ **DO:** Use raised elevation for interactive elements  
+✅ **DO:** Animate elevation changes smoothly (0.2s ease)  
+
+❌ **DON'T:** Use too many elevation levels on one screen  
+❌ **DON'T:** Apply overlay elevation to static content  
+❌ **DON'T:** Stack elevated elements excessively  
+❌ **DON'T:** Forget about dark mode (shadows may need adjustment)  
+
+---
+
+**Related:**
+- [Colors](?path=/docs/foundations-colors--docs)
+- [Spacing](?path=/docs/foundations-spacing--docs)

@@ -1,0 +1,5 @@
+/* RecipeList - Exact Figma Design */
+.recipe-list {
+  width: 100%;
+  background: var(--color-background-raised);
+}

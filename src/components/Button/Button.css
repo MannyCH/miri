@@ -1,0 +1,75 @@
+/* Button - Exact Figma Designs (No hover states) */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12) var(--spacing-24);
+  border-radius: var(--corner-radius-8);
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  border: none;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-text {
+  line-height: 1;
+}
+
+/* Primary - Brown solid fill, no stroke */
+.button-primary {
+  background: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+}
+
+.button-primary:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+/* Secondary - Brown 5% fill with stroke */
+.button-secondary {
+  background: var(--color-fill-brand-weak);
+  color: var(--color-text-strong);
+  border: 1px solid var(--color-stroke-weak);
+}
+
+.button-secondary:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+/* Tertiary - Transparent, text only */
+.button-tertiary {
+  background: transparent;
+  color: var(--color-text-brand);
+}
+
+.button-tertiary:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+/* Tertiary Delete - Transparent with error color text */
+.button-tertiary-delete {
+  background: transparent;
+  color: var(--color-text-error);
+}
+
+.button-tertiary-delete:focus-visible {
+  outline: 2px solid var(--color-stroke-error-strong);
+  outline-offset: 2px;
+}

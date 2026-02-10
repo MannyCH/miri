@@ -1,0 +1,10 @@
+/* NavigationBar - Exact Figma Design */
+.navigation-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-8) 0;
+  background: var(--color-background-raised);
+  border-top: 1px solid var(--color-stroke-weak);
+}

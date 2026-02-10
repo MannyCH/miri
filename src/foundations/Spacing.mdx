@@ -1,0 +1,288 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Spacing" />
+
+# Spacing & Border Radius
+
+Consistent spacing creates visual rhythm and hierarchy in the UI. Miri uses a spacing scale based on multiples of 4px.
+
+## Spacing Scale
+
+All spacing tokens follow the format `--spacing-{value}` where the value matches the pixel size.
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  {[0, 4, 8, 12, 16, 24, 32, 48, 56, 64, 80, 96, 128, 192, 256].map(size => (
+    <div key={size} style={{
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: 'var(--spacing-16)',
+      padding: 'var(--spacing-12)',
+      border: '1px solid var(--color-stroke-weak)',
+      borderRadius: 'var(--corner-radius-8)'
+    }}>
+      <div style={{ 
+        width: '120px',
+        fontFamily: 'monospace',
+        fontSize: '14px',
+        color: 'var(--color-text-strong)'
+      }}>
+        --spacing-{size}
+      </div>
+      <div style={{
+        height: '24px',
+        width: `${size}px`,
+        backgroundColor: 'var(--color-fill-brand-strong)',
+        marginRight: 'var(--spacing-12)'
+      }} />
+      <div style={{ 
+        fontSize: '14px',
+        color: 'var(--color-text-weak)'
+      }}>
+        {size}px
+      </div>
+    </div>
+  ))}
+</div>
+
+---
+
+## Usage Guidelines
+
+### Component Spacing
+
+Use the spacing scale for padding, margins, and gaps:
+
+```css
+.card {
+  padding: var(--spacing-24);
+  margin-bottom: var(--spacing-16);
+}
+
+.button-group {
+  display: flex;
+  gap: var(--spacing-8);
+}
+
+.section {
+  margin-top: var(--spacing-48);
+}
+```
+
+### Common Spacing Patterns
+
+| Use Case | Recommended Token | Value |
+|----------|------------------|-------|
+| Small gap between related items | `--spacing-8` | 8px |
+| Default gap between UI elements | `--spacing-16` | 16px |
+| Padding inside cards/containers | `--spacing-24` | 24px |
+| Section spacing | `--spacing-48` | 48px |
+| Large layout sections | `--spacing-64` or `--spacing-96` | 64px / 96px |
+| Page margins | `--spacing-24` to `--spacing-32` | 24-32px |
+
+---
+
+## Border Radius
+
+Corner radius tokens define the roundness of component edges. All tokens follow the format `--corner-radius-{value}`.
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  {[0, 4, 8, 12, 16, 24, 32].map(radius => (
+    <div key={radius} style={{
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: 'var(--spacing-16)',
+      padding: 'var(--spacing-12)',
+      border: '1px solid var(--color-stroke-weak)',
+      borderRadius: 'var(--corner-radius-8)'
+    }}>
+      <div style={{ 
+        width: '160px',
+        fontFamily: 'monospace',
+        fontSize: '14px',
+        color: 'var(--color-text-strong)'
+      }}>
+        --corner-radius-{radius}
+      </div>
+      <div style={{
+        height: '48px',
+        width: '96px',
+        backgroundColor: 'var(--color-fill-brand-weak)',
+        border: '2px solid var(--color-stroke-brand-strong)',
+        borderRadius: `${radius}px`,
+        marginRight: 'var(--spacing-12)'
+      }} />
+      <div style={{ 
+        fontSize: '14px',
+        color: 'var(--color-text-weak)'
+      }}>
+        {radius}px
+      </div>
+    </div>
+  ))}
+</div>
+
+---
+
+## Border Radius Guidelines
+
+### Component Radius Patterns
+
+| Component Type | Recommended Token | Value | Example |
+|---------------|------------------|-------|---------|
+| Buttons, pills, tags | `--corner-radius-8` | 8px | Small interactive elements |
+| Input fields | `--corner-radius-8` or `--corner-radius-12` | 8-12px | Form controls |
+| Cards, containers | `--corner-radius-16` | 16px | Medium containers |
+| Modals, large surfaces | `--corner-radius-24` | 24px | Large overlays |
+| Circular avatars/icons | `--corner-radius-32` or `50%` | 32px / 50% | Profile pictures |
+| Sharp edges | `--corner-radius-0` | 0px | No rounding |
+
+### Usage Examples
+
+```css
+/* Button */
+.button {
+  padding: var(--spacing-12) var(--spacing-24);
+  border-radius: var(--corner-radius-8);
+}
+
+/* Input field */
+.input {
+  padding: var(--spacing-12) var(--spacing-16);
+  border-radius: var(--corner-radius-12);
+}
+
+/* Card */
+.card {
+  padding: var(--spacing-24);
+  border-radius: var(--corner-radius-16);
+}
+
+/* Modal */
+.modal {
+  padding: var(--spacing-32);
+  border-radius: var(--corner-radius-24);
+}
+
+/* Avatar (circular) */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Or use --corner-radius-32 for slightly rounded square */
+}
+```
+
+---
+
+## Responsive Spacing
+
+For mobile-responsive layouts, consider adjusting spacing based on viewport:
+
+```css
+.section {
+  padding: var(--spacing-16);
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: var(--spacing-32);
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: var(--spacing-48);
+  }
+}
+```
+
+---
+
+## Interactive Example: Spacing Playground
+
+<div style={{
+  marginTop: 'var(--spacing-32)',
+  padding: 'var(--spacing-24)',
+  background: 'var(--color-background-sunken)',
+  borderRadius: 'var(--corner-radius-16)'
+}}>
+  <h3 style={{ marginBottom: 'var(--spacing-16)' }}>Recipe Card Example</h3>
+  
+  <div style={{
+    background: 'var(--color-background-raised)',
+    padding: 'var(--spacing-24)',
+    borderRadius: 'var(--corner-radius-16)',
+    border: '1px solid var(--color-stroke-weak)'
+  }}>
+    <h4 style={{ 
+      margin: '0 0 var(--spacing-8) 0',
+      color: 'var(--color-text-strong)'
+    }}>
+      Spaghetti Carbonara
+    </h4>
+    
+    <div style={{
+      display: 'flex',
+      gap: 'var(--spacing-8)',
+      marginBottom: 'var(--spacing-16)'
+    }}>
+      <span style={{
+        padding: 'var(--spacing-4) var(--spacing-8)',
+        background: 'var(--color-fill-brand-weak)',
+        borderRadius: 'var(--corner-radius-4)',
+        fontSize: '12px',
+        color: 'var(--color-text-brand)'
+      }}>
+        30 min
+      </span>
+      <span style={{
+        padding: 'var(--spacing-4) var(--spacing-8)',
+        background: 'var(--color-fill-brand-weak)',
+        borderRadius: 'var(--corner-radius-4)',
+        fontSize: '12px',
+        color: 'var(--color-text-brand)'
+      }}>
+        4 servings
+      </span>
+    </div>
+    
+    <p style={{
+      margin: '0 0 var(--spacing-16) 0',
+      color: 'var(--color-text-weak)',
+      fontSize: '14px'
+    }}>
+      Classic Italian pasta dish with eggs, cheese, and pancetta.
+    </p>
+    
+    <button style={{
+      padding: 'var(--spacing-12) var(--spacing-24)',
+      background: 'var(--color-fill-brand-strong)',
+      color: 'var(--color-text-inverted)',
+      border: 'none',
+      borderRadius: 'var(--corner-radius-8)',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      lineHeight: '1'
+    }}>
+      View Recipe
+    </button>
+  </div>
+</div>
+
+---
+
+## Best Practices
+
+✅ **DO:** Use spacing tokens consistently across all components  
+✅ **DO:** Maintain visual hierarchy with spacing (more space = more separation)  
+✅ **DO:** Use larger border radius for larger components  
+
+❌ **DON'T:** Hardcode spacing values  
+❌ **DON'T:** Use arbitrary spacing values outside the scale  
+❌ **DON'T:** Mix different corner radius values on related components  
+
+---
+
+**Related:**
+- [Colors](?path=/docs/foundations-colors--docs)
+- [Typography](?path=/docs/foundations-typography--docs)

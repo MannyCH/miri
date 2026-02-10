@@ -1,3 +1,11 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap');
+
+/* Import design tokens */
+@import './design-tokens.css';
+@import './typography-tokens.css';
+@import './elevation-tokens.css';
+
 /* Base UI Required Styles */
 
 /* Creates isolated stacking context for portals (Dialog, Popover, etc.) */

@@ -1,0 +1,55 @@
+---
+description: Storybook MCP workflow instructions for UI development
+alwaysApply: true
+---
+
+# Storybook Development Workflow
+
+## MCP Server Integration
+
+Before doing any UI, frontend or React development, **ALWAYS call the storybook MCP server** to get further instructions.
+
+The Storybook MCP server provides:
+
+1. **UI Building Instructions** - Standardized guidelines for component development
+2. **Story URL Retrieval** - Direct links to view component stories
+3. **Component Documentation** - Detailed documentation for all components
+4. **Component Discovery** - List of available UI components
+
+## When to Use Storybook MCP
+
+Call the Storybook MCP server when:
+
+- Creating new UI components
+- Modifying existing components
+- Writing component stories
+- Needing to verify component appearance
+- Looking for existing components to reuse
+- Understanding component APIs and props
+
+## Required: Storybook Must Be Running
+
+The MCP server is only available when Storybook is running:
+
+```bash
+npm run storybook
+```
+
+The server runs at: `http://localhost:6006/mcp`
+
+## Story Development Standards
+
+When creating or modifying components:
+
+1. Use CSF3 (Component Story Format 3) for stories
+2. Create stories that demonstrate key component states
+3. Link stories in component documentation
+4. Ensure stories are accessible and well-documented
+5. Use the MCP server to get story URLs for verification
+
+## Available MCP Tools
+
+- `get_ui_building_instructions` - Get component development guidelines
+- `preview-stories` - Get URLs to specific story variants
+- `list-all-documentation` - Discover available components
+- `get-documentation` - Get detailed component docs

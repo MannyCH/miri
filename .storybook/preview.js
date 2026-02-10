@@ -1,3 +1,10 @@
+// Import Google Fonts for Storybook
+import './preview.css';
+
+import '../src/design-tokens.css';
+import '../src/typography-tokens.css';
+import '../src/elevation-tokens.css';
+
 /** @type { import('@storybook/react-vite').Preview } */
 const preview = {
   parameters: {

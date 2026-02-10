@@ -1,0 +1,8 @@
+/* Divider - Exact Figma Design */
+.divider {
+  width: 100%;
+  height: 1px;
+  border: none;
+  background: var(--color-stroke-weak);
+  margin: 0;
+}

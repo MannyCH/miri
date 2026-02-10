@@ -1,0 +1,475 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Icons" />
+
+# Icons
+
+Miri uses **Feather Icons** - a collection of beautifully simple, open-source icons designed with a focus on simplicity, consistency, and flexibility.
+
+🔗 **Icon Library:** [Feather Icons](https://feathericons.com/)  
+📦 **License:** MIT (Free for commercial use)
+
+---
+
+## Why Feather Icons?
+
+✅ **Simple & Clean** - Minimalist 24x24 pixel icons  
+✅ **Consistent** - Uniform stroke width and style  
+✅ **Lightweight** - Small file sizes  
+✅ **Flexible** - Easily customizable with CSS  
+✅ **Open Source** - MIT license  
+
+---
+
+## Icon System
+
+### Icon Specifications
+
+- **Size:** 24x24px base size
+- **Stroke Width:** 2px
+- **Style:** Outlined, minimalist
+- **Color:** Inherits from parent or uses color tokens
+
+### Available Icons
+
+Feather Icons includes 280+ icons covering:
+- **UI Actions:** Check, X, Plus, Minus, Edit, Trash, Save
+- **Navigation:** Chevrons, Arrows, Menu, Home, Settings
+- **Communication:** Mail, Message, Phone, Bell
+- **Media:** Image, Video, Camera, Music, Film
+- **Files:** File, Folder, Download, Upload
+- **E-commerce:** Shopping Cart, Credit Card, Tag
+- **And more...**
+
+Browse the full collection at [feathericons.com](https://feathericons.com/)
+
+---
+
+## Installation & Usage
+
+### Option 1: NPM Package (Recommended for React)
+
+```bash
+npm install feather-icons
+# or
+npm install react-feather
+```
+
+#### With React
+
+```jsx
+import { Calendar, Check, X, ChevronRight } from 'react-feather';
+
+function MyComponent() {
+  return (
+    <div>
+      <Calendar size={24} color="var(--color-icon-neutral)" />
+      <Check size={20} color="var(--color-icon-success)" />
+      <X size={20} color="var(--color-icon-error)" />
+      <ChevronRight size={16} color="var(--color-icon-brand)" />
+    </div>
+  );
+}
+```
+
+### Option 2: SVG Sprites
+
+```html
+<!-- Include sprite -->
+<script src="https://unpkg.com/feather-icons"></script>
+
+<!-- Use icon -->
+<i data-feather="calendar"></i>
+<i data-feather="check"></i>
+
+<script>
+  feather.replace();
+</script>
+```
+
+### Option 3: Inline SVG
+
+```jsx
+<svg 
+  width="24" 
+  height="24" 
+  viewBox="0 0 24 24" 
+  fill="none" 
+  stroke="currentColor" 
+  strokeWidth="2"
+>
+  <path d="M9 11l3 3L22 4"/>
+  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+</svg>
+```
+
+---
+
+## Using with Color Tokens
+
+Combine Feather Icons with Miri's semantic color tokens:
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 'var(--spacing-24)'
+}}>
+  {/* Neutral */}
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-neutral)" strokeWidth="2">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-strong)' }}>
+      Neutral
+    </span>
+  </div>
+
+  {/* Brand */}
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-brand)" strokeWidth="2">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+      <line x1="7" y1="7" x2="7.01" y2="7"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-strong)' }}>
+      Brand
+    </span>
+  </div>
+
+  {/* Success */}
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-success)" strokeWidth="2">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-strong)' }}>
+      Success
+    </span>
+  </div>
+
+  {/* Error */}
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-error)" strokeWidth="2">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-strong)' }}>
+      Error
+    </span>
+  </div>
+
+  {/* Warning */}
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-warning)" strokeWidth="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-strong)' }}>
+      Warning
+    </span>
+  </div>
+
+  {/* Disabled */}
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-disabled)" strokeWidth="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-disabled)' }}>
+      Disabled
+    </span>
+  </div>
+</div>
+
+---
+
+## Common Use Cases
+
+### Navigation
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  display: 'flex',
+  gap: 'var(--spacing-16)',
+  padding: 'var(--spacing-16)',
+  background: 'var(--color-background-sunken)',
+  borderRadius: 'var(--corner-radius-12)'
+}}>
+  <button style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12) var(--spacing-16)',
+    background: 'var(--color-background-raised)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)',
+    cursor: 'pointer'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-neutral)" strokeWidth="2">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span className="text-body-small-bold" style={{ color: 'var(--color-text-strong)', lineHeight: '1' }}>
+      Home
+    </span>
+  </button>
+
+  <button style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12) var(--spacing-16)',
+    background: 'var(--color-background-raised)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)',
+    cursor: 'pointer'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-neutral)" strokeWidth="2">
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+      <polyline points="17 21 17 13 7 13 7 21"/>
+      <polyline points="7 3 7 8 15 8"/>
+    </svg>
+    <span className="text-body-small-bold" style={{ color: 'var(--color-text-strong)', lineHeight: '1' }}>
+      Recipes
+    </span>
+  </button>
+
+  <button style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12) var(--spacing-16)',
+    background: 'var(--color-background-raised)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)',
+    cursor: 'pointer'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-neutral)" strokeWidth="2">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+      <line x1="7" y1="7" x2="7.01" y2="7"/>
+    </svg>
+    <span className="text-body-small-bold" style={{ color: 'var(--color-text-strong)', lineHeight: '1' }}>
+      Tags
+    </span>
+  </button>
+</div>
+
+```jsx
+<nav>
+  <button>
+    <HomeIcon size={20} color="var(--color-icon-neutral)" />
+    Home
+  </button>
+  <button>
+    <BookIcon size={20} color="var(--color-icon-neutral)" />
+    Recipes
+  </button>
+  <button>
+    <TagIcon size={20} color="var(--color-icon-neutral)" />
+    Tags
+  </button>
+</nav>
+```
+
+### Status Indicators
+
+<div style={{
+  marginTop: 'var(--spacing-24)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--spacing-12)'
+}}>
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    background: 'var(--color-fill-success-weak)',
+    border: '1px solid var(--color-stroke-success-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-success)" strokeWidth="2">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-success)' }}>
+      Recipe saved successfully
+    </span>
+  </div>
+
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    background: 'var(--color-fill-error-weak)',
+    border: '1px solid var(--color-stroke-error-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-error)" strokeWidth="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-error)' }}>
+      Failed to load recipe
+    </span>
+  </div>
+
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-8)',
+    padding: 'var(--spacing-12)',
+    background: 'var(--color-fill-warning-weak)',
+    border: '1px solid var(--color-stroke-success-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon-warning)" strokeWidth="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-warning)' }}>
+      Some ingredients may not be available
+    </span>
+  </div>
+</div>
+
+---
+
+## Icon Sizes
+
+Feather Icons are designed at 24x24px but can be scaled:
+
+| Size | Use Case | Example |
+|------|----------|---------|
+| **16px** | Small buttons, dense lists | Tags, metadata |
+| **20px** | Standard buttons, navigation | Navigation items, actions |
+| **24px** | Default size, content icons | Recipe cards, headers |
+| **32px** | Large touch targets | Mobile navigation, CTAs |
+| **48px+** | Hero sections, empty states | Feature illustrations |
+
+```jsx
+// Small (16px)
+<CalendarIcon size={16} />
+
+// Standard (20px)
+<CalendarIcon size={20} />
+
+// Default (24px)
+<CalendarIcon size={24} />
+
+// Large (32px)
+<CalendarIcon size={32} />
+```
+
+---
+
+## Best Practices
+
+✅ **DO:** Use semantic color tokens with icons  
+✅ **DO:** Maintain consistent icon sizes within a component  
+✅ **DO:** Add descriptive `aria-label` for icon-only buttons  
+✅ **DO:** Use `currentColor` for flexible icon colors  
+
+❌ **DON'T:** Mix icon styles (outlined vs filled)  
+❌ **DON'T:** Use icons smaller than 16px  
+❌ **DON'T:** Forget accessibility labels  
+❌ **DON'T:** Overuse icons (text is often clearer)  
+
+---
+
+## Accessibility
+
+### Icon-Only Buttons
+
+Always provide text alternatives for icon-only buttons:
+
+```jsx
+// Good - With aria-label
+<button aria-label="Delete recipe">
+  <TrashIcon size={20} color="var(--color-icon-error)" />
+</button>
+
+// Better - With visible text
+<button>
+  <TrashIcon size={20} color="var(--color-icon-error)" />
+  <span>Delete</span>
+</button>
+
+// Best - With visually hidden text
+<button>
+  <TrashIcon size={20} color="var(--color-icon-error)" />
+  <span className="sr-only">Delete recipe</span>
+</button>
+```
+
+### Decorative Icons
+
+Mark purely decorative icons with `aria-hidden`:
+
+```jsx
+<div>
+  <CalendarIcon size={16} aria-hidden="true" />
+  <span>February 10, 2026</span>
+</div>
+```
+
+---
+
+## Resources
+
+- 🌐 **Official Website:** [feathericons.com](https://feathericons.com/)
+- 📦 **NPM Package:** [react-feather](https://www.npmjs.com/package/react-feather)
+- 📖 **GitHub:** [github.com/feathericons/feather](https://github.com/feathericons/feather)
+- 🎨 **Figma Plugin:** Search "Feather Icons" in Figma Community
+
+---
+
+**Related:**
+- [Colors](?path=/docs/foundations-colors--docs)
+- [Typography](?path=/docs/foundations-typography--docs)
+- [Elevation](?path=/docs/foundations-elevation--docs)

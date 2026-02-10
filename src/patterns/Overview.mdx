@@ -1,0 +1,118 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Patterns/Overview" />
+
+# Miri App Patterns
+
+Full-screen mobile app patterns showing how components work together in the Miri meal planning app.
+
+All patterns are exact compositions of existing components documented in the Components section.
+
+## Available Patterns
+
+### 📅 Meal Planning
+**MealPlanningView** - Calendar-based meal planning with daily meals
+
+**Components used:**
+- CalendarWeek
+- Button (Plan meals, Add meals)
+- RecipeListItem (for each meal)
+- NavigationBar
+
+**Features:**
+- Week calendar view with date selection
+- Daily meal breakdown (Breakfast, Lunch, Dinner)
+- Quick actions (refresh meal, add to shopping list)
+
+---
+
+### 🥘 Recipe Browsing
+**RecipesView** - Browse and search recipes
+
+**Components used:**
+- RecipeList
+- SearchBar
+- NavigationBar
+
+**Features:**
+- Scrollable recipe list with thumbnails
+- Search functionality
+- Direct navigation to recipe details
+
+---
+
+### 📖 Recipe Details
+**RecipeDetailView** - Complete recipe view with ingredients and cooking directions
+
+**Components used:**
+- IngredientList (interactive with checkboxes)
+- NavigationBar
+- Custom numbered directions layout
+
+**Features:**
+- Large hero image
+- Interactive ingredients list (tap to check off, swipe to delete)
+- Scrollable content with ingredients AND directions
+- Numbered cooking steps (Body small/Regular text)
+- Section headers for Ingredients and Directions
+
+---
+
+### 🛒 Shopping List
+**ShoppingListView** - Manage shopping list with two view modes
+
+**Components used:**
+- IngredientList (interactive)
+- SearchBar
+- Button (Clear list, view toggles)
+- NavigationBar
+
+**Features:**
+- **List View:** Simple flat list of all ingredients
+- **Recipe View:** Ingredients grouped by recipe
+- Interactive ingredients (tap to check, swipe to delete)
+- Clear whole list action
+- Search functionality
+
+---
+
+## Design Principles
+
+1. **Component Composition** - All patterns are built from existing components
+2. **Mobile-First** - Optimized for 390px mobile viewport
+3. **Consistent Navigation** - NavigationBar present on all screens
+4. **Interactive** - Tap, swipe, and keyboard gestures throughout
+5. **Exact Figma Implementation** - Matches design library precisely
+
+## Usage in Your App
+
+These patterns serve as templates for your meal planning app screens. Each pattern is a complete mobile screen layout showing how components work together.
+
+```jsx
+// Example: Using patterns in a React app with routing
+import { 
+  MealPlanningView,
+  RecipesView, 
+  RecipeDetailView, 
+  ShoppingListView 
+} from './patterns';
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/planning" element={<MealPlanningView />} />
+      <Route path="/recipes" element={<RecipesView />} />
+      <Route path="/recipe/:id" element={<RecipeDetailView />} />
+      <Route path="/shopping-list" element={<ShoppingListView />} />
+    </Routes>
+  );
+}
+```
+
+## Component Reusability
+
+Every pattern uses the same core components:
+- Consistent styling via design tokens
+- Same interactions across screens
+- Accessible keyboard navigation
+- Base UI foundation for reliability

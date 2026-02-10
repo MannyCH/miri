@@ -1,0 +1,254 @@
+/**
+ * Typography Tokens
+ * Exported from Figma Design Library - Smartly
+ * Auto-generated - Do not edit manually
+ */
+
+/* ============================================
+   FONT FAMILIES
+   ============================================ */
+
+:root {
+  --font-family-display: 'Baloo Bhaijaan 2', system-ui, -apple-system, sans-serif;
+  --font-family-heading: 'Baloo Bhaijaan 2', system-ui, -apple-system, sans-serif;
+  --font-family-body: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-family-tiny: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================
+   DISPLAY STYLES
+   ============================================ */
+
+.text-display-regular {
+  font-family: var(--font-family-display);
+  font-size: 56px;
+  font-weight: 400; /* Regular */
+  line-height: 64px;
+  letter-spacing: -1px;
+}
+
+.text-display-bold {
+  font-family: var(--font-family-display);
+  font-size: 56px;
+  font-weight: 600; /* SemiBold */
+  line-height: 64px;
+  letter-spacing: -1px;
+}
+
+/* ============================================
+   HEADING STYLES
+   ============================================ */
+
+/* Heading 1 */
+.text-heading-1-regular,
+.text-h1-regular {
+  font-family: var(--font-family-heading);
+  font-size: 40px;
+  font-weight: 400; /* Regular */
+  line-height: 48px;
+  letter-spacing: -0.5px;
+}
+
+.text-heading-1-bold,
+.text-h1-bold {
+  font-family: var(--font-family-heading);
+  font-size: 40px;
+  font-weight: 600; /* SemiBold */
+  line-height: 48px;
+  letter-spacing: -0.5px;
+}
+
+/* Heading 2 */
+.text-heading-2-regular,
+.text-h2-regular {
+  font-family: var(--font-family-heading);
+  font-size: 32px;
+  font-weight: 400; /* Regular */
+  line-height: 40px;
+  letter-spacing: 0;
+}
+
+.text-heading-2-bold,
+.text-h2-bold {
+  font-family: var(--font-family-heading);
+  font-size: 32px;
+  font-weight: 600; /* SemiBold */
+  line-height: 40px;
+  letter-spacing: 0;
+}
+
+/* Heading 3 */
+.text-heading-3-regular,
+.text-h3-regular {
+  font-family: var(--font-family-heading);
+  font-size: 24px;
+  font-weight: 400; /* Regular */
+  line-height: 32px;
+  letter-spacing: 0;
+}
+
+.text-heading-3-bold,
+.text-h3-bold {
+  font-family: var(--font-family-heading);
+  font-size: 24px;
+  font-weight: 600; /* SemiBold */
+  line-height: 32px;
+  letter-spacing: 0;
+}
+
+/* Heading 4 */
+.text-heading-4-regular,
+.text-h4-regular {
+  font-family: var(--font-family-heading);
+  font-size: 20px;
+  font-weight: 400; /* Regular */
+  line-height: 28px;
+  letter-spacing: 0;
+}
+
+.text-heading-4-bold,
+.text-h4-bold {
+  font-family: var(--font-family-heading);
+  font-size: 20px;
+  font-weight: 600; /* SemiBold */
+  line-height: 28px;
+  letter-spacing: 0;
+}
+
+.text-heading-4-bold-underlined,
+.text-h4-bold-underlined {
+  font-family: var(--font-family-heading);
+  font-size: 20px;
+  font-weight: 600; /* SemiBold */
+  line-height: 28px;
+  letter-spacing: 0;
+  text-decoration: underline;
+}
+
+/* ============================================
+   BODY STYLES
+   ============================================ */
+
+/* Body (16px) - Also known as "Body Base" in Figma */
+.text-body-regular,
+.text-body-base-regular,
+.text-body-base {
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 400; /* Regular */
+  line-height: 24px;
+  letter-spacing: 0;
+}
+
+.text-body-bold,
+.text-body-base-bold {
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 600; /* SemiBold */
+  line-height: 24px;
+  letter-spacing: 0;
+}
+
+.text-body-regular-underlined {
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 400; /* Regular */
+  line-height: 24px;
+  letter-spacing: 0;
+  text-decoration: underline;
+}
+
+.text-body-bold-underlined {
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 600; /* SemiBold */
+  line-height: 24px;
+  letter-spacing: 0;
+  text-decoration: underline;
+}
+
+/* Body Small (14px) */
+.text-body-small-regular {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 400; /* Regular */
+  line-height: 20px;
+  letter-spacing: 0;
+}
+
+.text-body-small-bold {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 600; /* SemiBold */
+  line-height: 20px;
+  letter-spacing: 0;
+}
+
+.text-body-small-regular-underlined {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 400; /* Regular */
+  line-height: 20px;
+  letter-spacing: 0;
+  text-decoration: underline;
+}
+
+.text-body-small-bold-underlined {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 600; /* SemiBold */
+  line-height: 20px;
+  letter-spacing: 0;
+  text-decoration: underline;
+}
+
+/* ============================================
+   ANNOTATION STYLES
+   ============================================ */
+
+.text-annotation-regular {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 400; /* Regular */
+  line-height: 150%;
+  letter-spacing: 0;
+}
+
+.text-annotation-bold {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 600; /* SemiBold */
+  line-height: 150%;
+  letter-spacing: 0;
+}
+
+/* ============================================
+   TINY STYLES
+   ============================================ */
+
+.text-tiny-regular {
+  font-family: var(--font-family-body);
+  font-size: 11px;
+  font-weight: 400; /* Regular */
+  line-height: auto;
+}
+
+.text-tiny-bold {
+  font-family: var(--font-family-body);
+  font-size: 11px;
+  font-weight: 600; /* SemiBold */
+  line-height: auto;
+}
+
+/* ============================================
+   UPPERCASE STYLE
+   ============================================ */
+
+.text-uppercase {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 600; /* SemiBold */
+  line-height: 24px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}

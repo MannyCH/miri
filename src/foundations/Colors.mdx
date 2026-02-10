@@ -1,0 +1,454 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Colors" />
+
+# Color Tokens
+
+Miri uses a semantic color system with tokens organized into categories based on their usage.
+
+All colors are available as CSS custom properties and can be used directly in your styles.
+
+## Semantic Color Categories
+
+### Text Colors
+
+Colors for text content with different emphasis levels.
+
+<ColorPalette>
+  <ColorItem
+    title="Text / Strong"
+    subtitle="Primary text color for headings and important content"
+    colors={{ Strong: 'var(--color-text-strong)' }}
+  />
+  <ColorItem
+    title="Text / Weak"
+    subtitle="Secondary text color for less emphasis"
+    colors={{ Weak: 'var(--color-text-weak)' }}
+  />
+  <ColorItem
+    title="Text / Brand"
+    subtitle="Brand color for emphasized text"
+    colors={{ Brand: 'var(--color-text-brand)' }}
+  />
+  <ColorItem
+    title="Text / Disabled"
+    subtitle="Disabled state text color"
+    colors={{ Disabled: 'var(--color-text-disabled)' }}
+  />
+  <ColorItem
+    title="Text / Inverted"
+    subtitle="Text on dark backgrounds"
+    colors={{ Inverted: 'var(--color-text-inverted)' }}
+  />
+</ColorPalette>
+
+### Status Colors
+
+Colors for error, warning, and success states.
+
+<ColorPalette>
+  <ColorItem
+    title="Text / Error"
+    subtitle="Error messages and destructive actions"
+    colors={{ Error: 'var(--color-text-error)' }}
+  />
+  <ColorItem
+    title="Text / Warning"
+    subtitle="Warning messages and caution states"
+    colors={{ Warning: 'var(--color-text-warning)' }}
+  />
+  <ColorItem
+    title="Text / Success"
+    subtitle="Success messages and positive feedback"
+    colors={{ Success: 'var(--color-text-success)' }}
+  />
+</ColorPalette>
+
+---
+
+### Background Colors
+
+Colors for page and component backgrounds.
+
+<ColorPalette>
+  <ColorItem
+    title="Background / Base"
+    subtitle="Main page background"
+    colors={{ Base: 'var(--color-background-base)' }}
+  />
+  <ColorItem
+    title="Background / Raised"
+    subtitle="Elevated components (cards, modals)"
+    colors={{ Raised: 'var(--color-background-raised)' }}
+  />
+  <ColorItem
+    title="Background / Sunken"
+    subtitle="Recessed areas (input fields)"
+    colors={{ Sunken: 'var(--color-background-sunken)' }}
+  />
+  <ColorItem
+    title="Background / Overlay"
+    subtitle="Overlay backgrounds (tooltips, popovers)"
+    colors={{ Overlay: 'var(--color-background-overlay)' }}
+  />
+  <ColorItem
+    title="Background / Alternate"
+    subtitle="Alternate row backgrounds (tables, lists)"
+    colors={{ Alternate: 'var(--color-background-alternate)' }}
+  />
+  <ColorItem
+    title="Background / Brand"
+    subtitle="Brand-colored backgrounds"
+    colors={{ Brand: 'var(--color-background-brand)' }}
+  />
+</ColorPalette>
+
+---
+
+### Stroke (Border) Colors
+
+Colors for borders and outlines.
+
+<ColorPalette>
+  <ColorItem
+    title="Stroke / Strong"
+    subtitle="Primary borders with more emphasis"
+    colors={{ Strong: 'var(--color-stroke-strong)' }}
+  />
+  <ColorItem
+    title="Stroke / Weak"
+    subtitle="Subtle borders"
+    colors={{ Weak: 'var(--color-stroke-weak)' }}
+  />
+  <ColorItem
+    title="Stroke / Focus"
+    subtitle="Focus indicator borders"
+    colors={{ Focus: 'var(--color-stroke-focus)' }}
+  />
+  <ColorItem
+    title="Stroke / Selected"
+    subtitle="Selected state borders"
+    colors={{ Selected: 'var(--color-stroke-selected)' }}
+  />
+  <ColorItem
+    title="Stroke / Disabled"
+    subtitle="Disabled state borders"
+    colors={{ Disabled: 'var(--color-stroke-disabled)' }}
+  />
+</ColorPalette>
+
+#### Stroke Variants
+
+<ColorPalette>
+  <ColorItem
+    title="Stroke / Brand"
+    subtitle="Brand-colored borders"
+    colors={{ 
+      'Brand Strong': 'var(--color-stroke-brand-strong)',
+      'Brand Weak': 'var(--color-stroke-brand-weak)'
+    }}
+  />
+  <ColorItem
+    title="Stroke / Error"
+    subtitle="Error state borders"
+    colors={{ 
+      'Error Strong': 'var(--color-stroke-error-strong)',
+      'Error Weak': 'var(--color-stroke-error-weak)'
+    }}
+  />
+  <ColorItem
+    title="Stroke / Success"
+    subtitle="Success state borders"
+    colors={{ 
+      'Success Strong': 'var(--color-stroke-success-strong)',
+      'Success Weak': 'var(--color-stroke-success-weak)'
+    }}
+  />
+</ColorPalette>
+
+---
+
+### Fill Colors
+
+Colors for interactive element fills.
+
+<ColorPalette>
+  <ColorItem
+    title="Fill / Strong"
+    subtitle="Solid fills with high contrast"
+    colors={{ Strong: 'var(--color-fill-strong)' }}
+  />
+  <ColorItem
+    title="Fill / Weak"
+    subtitle="Subtle fills with low contrast"
+    colors={{ Weak: 'var(--color-fill-weak)' }}
+  />
+  <ColorItem
+    title="Fill / Hover"
+    subtitle="Hover state fill"
+    colors={{ Hover: 'var(--color-fill-hover)' }}
+  />
+  <ColorItem
+    title="Fill / Press"
+    subtitle="Pressed/active state fill"
+    colors={{ Press: 'var(--color-fill-press)' }}
+  />
+  <ColorItem
+    title="Fill / Selected"
+    subtitle="Selected state fill"
+    colors={{ Selected: 'var(--color-fill-selected)' }}
+  />
+  <ColorItem
+    title="Fill / Disabled"
+    subtitle="Disabled state fill"
+    colors={{ Disabled: 'var(--color-fill-disabled)' }}
+  />
+  <ColorItem
+    title="Fill / Overlay"
+    subtitle="Overlay/scrim fill"
+    colors={{ Overlay: 'var(--color-fill-overlay)' }}
+  />
+  <ColorItem
+    title="Fill / White"
+    subtitle="Pure white fill"
+    colors={{ White: 'var(--color-fill-white)' }}
+  />
+</ColorPalette>
+
+#### Fill Variants
+
+<ColorPalette>
+  <ColorItem
+    title="Fill / Brand"
+    subtitle="Brand-colored fills"
+    colors={{ 
+      'Brand Strong': 'var(--color-fill-brand-strong)',
+      'Brand Weak': 'var(--color-fill-brand-weak)'
+    }}
+  />
+  <ColorItem
+    title="Fill / Error"
+    subtitle="Error state fills"
+    colors={{ 
+      'Error Strong': 'var(--color-fill-error-strong)',
+      'Error Weak': 'var(--color-fill-error-weak)'
+    }}
+  />
+  <ColorItem
+    title="Fill / Warning"
+    subtitle="Warning state fills"
+    colors={{ 
+      'Warning Strong': 'var(--color-fill-warning-strong)',
+      'Warning Weak': 'var(--color-fill-warning-weak)'
+    }}
+  />
+  <ColorItem
+    title="Fill / Success"
+    subtitle="Success state fills"
+    colors={{ 
+      'Success Strong': 'var(--color-fill-success-strong)',
+      'Success Weak': 'var(--color-fill-success-weak)'
+    }}
+  />
+</ColorPalette>
+
+---
+
+### Icon Colors
+
+Colors specifically for iconography.
+
+<ColorPalette>
+  <ColorItem
+    title="Icon / Neutral"
+    subtitle="Default icon color"
+    colors={{ Neutral: 'var(--color-icon-neutral)' }}
+  />
+  <ColorItem
+    title="Icon / Brand"
+    subtitle="Brand-colored icons"
+    colors={{ Brand: 'var(--color-icon-brand)' }}
+  />
+  <ColorItem
+    title="Icon / Disabled"
+    subtitle="Disabled state icons"
+    colors={{ Disabled: 'var(--color-icon-disabled)' }}
+  />
+  <ColorItem
+    title="Icon / Error"
+    subtitle="Error state icons"
+    colors={{ Error: 'var(--color-icon-error)' }}
+  />
+  <ColorItem
+    title="Icon / Warning"
+    subtitle="Warning state icons"
+    colors={{ Warning: 'var(--color-icon-warning)' }}
+  />
+  <ColorItem
+    title="Icon / Success"
+    subtitle="Success state icons"
+    colors={{ Success: 'var(--color-icon-success)' }}
+  />
+</ColorPalette>
+
+---
+
+## Usage Examples
+
+### Button Component
+
+```css
+.button-primary {
+  background: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+  border: 1px solid var(--color-stroke-brand-strong);
+}
+
+.button-primary:hover {
+  background: var(--color-fill-hover);
+}
+
+.button-primary:disabled {
+  background: var(--color-fill-disabled);
+  color: var(--color-text-disabled);
+  border-color: var(--color-stroke-disabled);
+}
+```
+
+### Card Component
+
+```css
+.card {
+  background: var(--color-background-raised);
+  border: 1px solid var(--color-stroke-weak);
+}
+
+.card-title {
+  color: var(--color-text-strong);
+}
+
+.card-description {
+  color: var(--color-text-weak);
+}
+```
+
+### Input Field
+
+```css
+.input {
+  background: var(--color-background-sunken);
+  border: 1px solid var(--color-stroke-weak);
+  color: var(--color-text-strong);
+}
+
+.input:focus {
+  border-color: var(--color-stroke-focus);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--color-stroke-error-strong);
+  background: var(--color-fill-error-weak);
+}
+```
+
+---
+
+## Primitive Colors
+
+For reference, here are the primitive color values that semantic colors reference:
+
+### Brand Colors
+
+<ColorPalette>
+  <ColorItem
+    title="Brown / Light"
+    colors={{
+      '1000': '#9C4722',
+      '800': '#9C4722CC',
+      '200': '#9C472233',
+      '50': '#9C47220D'
+    }}
+  />
+</ColorPalette>
+
+### Grey Scale
+
+<ColorPalette>
+  <ColorItem
+    title="Grey Slate / Light"
+    colors={{
+      '950': '#260B00F2',
+      '650': '#330F00A6',
+      '500': '#4D170080',
+      '150': '#661F0026',
+      '50': '#8026000D'
+    }}
+  />
+  <ColorItem
+    title="Grey Neutral / Light"
+    colors={{
+      '900': '#000000E5',
+      '600': '#00000099',
+      '450': '#00000073',
+      '100': '#0000001A',
+      '40': '#0000000A'
+    }}
+  />
+  <ColorItem
+    title="Grey Solid"
+    colors={{
+      '50': '#FAF3F0',
+      '0': '#FFFFFF'
+    }}
+  />
+</ColorPalette>
+
+### Semantic Primitives
+
+<ColorPalette>
+  <ColorItem
+    title="Red / Light"
+    colors={{
+      '1000': '#C62222',
+      '800': '#C62222CC',
+      '200': '#C6222233',
+      '50': '#C622220D'
+    }}
+  />
+  <ColorItem
+    title="Amber / Light"
+    colors={{
+      '1000': '#91600A',
+      '800': '#91600ACC',
+      '200': '#91600A33',
+      '50': '#91600A0D'
+    }}
+  />
+  <ColorItem
+    title="Green / Light"
+    colors={{
+      '1000': '#3E7028',
+      '800': '#3E7028CC',
+      '200': '#3E702833',
+      '50': '#3E70280D'
+    }}
+  />
+</ColorPalette>
+
+---
+
+## Best Practices
+
+✅ **DO:** Use semantic tokens (`--color-text-strong`) instead of primitive colors  
+✅ **DO:** Test color contrast for accessibility (WCAG AA minimum)  
+✅ **DO:** Use state-specific tokens for hover/focus/disabled states  
+
+❌ **DON'T:** Hardcode color values  
+❌ **DON'T:** Use primitive colors directly in components  
+❌ **DON'T:** Override semantic tokens with custom values  
+
+---
+
+**Related:**
+- [Spacing](?path=/docs/foundations-spacing--docs)
+- [Typography](?path=/docs/foundations-typography--docs)

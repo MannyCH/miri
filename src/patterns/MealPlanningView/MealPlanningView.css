@@ -1,0 +1,84 @@
+/* MealPlanningView Pattern - Exact Figma Layout */
+.meal-planning-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-background-base);
+  max-width: 390px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Main content area - matches Figma Container with itemSpacing: 0 */
+.meal-planning-content {
+  padding: var(--spacing-16);
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Figma Container has itemSpacing: 0 - spacing comes from section padding */
+  padding-bottom: calc(80px + var(--spacing-16)); /* Space for navigation bar */
+}
+
+/* Section Header: "Meal Planning" */
+.meal-planning-section-header {
+  padding-bottom: var(--spacing-16);
+}
+
+/* Date Section: Date range + buttons + calendar */
+.meal-planning-date-section {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16);
+  background: var(--color-background-raised);
+  border-radius: var(--corner-radius-12);
+  gap: var(--spacing-16);
+}
+
+.meal-planning-date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Day Section: "Monday, 23. November" + button */
+.meal-planning-day-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-16) 0;
+}
+
+/* Meal section header - direct child of content container */
+.meal-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-8) 0;
+}
+
+.meal-actions {
+  display: flex;
+  gap: var(--spacing-8);
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--corner-radius-4);
+  color: var(--color-icon-neutral);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--color-background-sunken);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}

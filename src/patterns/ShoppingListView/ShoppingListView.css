@@ -1,0 +1,110 @@
+/* ShoppingListView Pattern */
+.shopping-list-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-background-base);
+  max-width: 390px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 80px; /* Space for navigation bar */
+}
+
+.shopping-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-24) var(--spacing-16) var(--spacing-16);
+}
+
+.shopping-list-view-toggle {
+  display: flex;
+  gap: var(--spacing-4);
+}
+
+.view-toggle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-8);
+  color: var(--color-icon-neutral);
+  cursor: pointer;
+}
+
+.view-toggle-button.active {
+  background: var(--color-fill-brand-weak);
+  border-color: var(--color-stroke-weak);
+  color: var(--color-icon-brand);
+}
+
+.view-toggle-button:hover {
+  background: var(--color-background-sunken);
+}
+
+.view-toggle-button:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.shopping-list-content {
+  flex: 1;
+  padding: 0 var(--spacing-16);
+}
+
+.shopping-list-clear {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-16) 0;
+}
+
+/* Recipe-grouped view */
+.shopping-list-recipe-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.recipe-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.recipe-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon-button-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--corner-radius-4);
+  color: var(--color-icon-error);
+  cursor: pointer;
+}
+
+.icon-button-delete:hover {
+  background: var(--color-fill-error-weak);
+}
+
+.icon-button-delete:focus-visible {
+  outline: 2px solid var(--color-stroke-error-strong);
+  outline-offset: 2px;
+}
+
+.shopping-list-search {
+  padding: var(--spacing-16);
+  padding-bottom: var(--spacing-24);
+}

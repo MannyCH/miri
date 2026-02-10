@@ -1,0 +1,55 @@
+/**
+ * Elevation Tokens
+ * Exported from Figma Design Library - Smartly
+ * Auto-generated - Do not edit manually
+ */
+
+/* ============================================
+   ELEVATION / SHADOW TOKENS
+   ============================================ */
+
+:root {
+  /* Shadow/Overlay - Highest elevation for modals, dialogs, dropdowns */
+  --elevation-overlay: 
+    0px 20px 24px -4px rgba(0, 0, 0, 0.08),
+    0px 8px 8px -4px rgba(0, 0, 0, 0.04);
+  
+  /* Shadow/Raised - Medium elevation for cards, buttons, menus */
+  --elevation-raised: 
+    0px 2px 4px -2px rgba(0, 0, 0, 0.08),
+    0px 4px 8px -2px rgba(0, 0, 0, 0.04);
+  
+  /* Shadow/Sunken - Inner shadow for pressed/inset states */
+  --elevation-sunken: 
+    inset 0px 1px 4px 0px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   ELEVATION UTILITY CLASSES
+   ============================================ */
+
+.elevation-overlay {
+  box-shadow: var(--elevation-overlay);
+}
+
+.elevation-raised {
+  box-shadow: var(--elevation-raised);
+}
+
+.elevation-sunken {
+  box-shadow: var(--elevation-sunken);
+}
+
+/* Interactive elevation states */
+.elevation-interactive {
+  box-shadow: var(--elevation-raised);
+  transition: box-shadow 0.2s ease;
+}
+
+.elevation-interactive:hover {
+  box-shadow: var(--elevation-overlay);
+}
+
+.elevation-interactive:active {
+  box-shadow: var(--elevation-sunken);
+}

@@ -1,0 +1,1 @@
+export { IngredientListItem } from './IngredientListItem';

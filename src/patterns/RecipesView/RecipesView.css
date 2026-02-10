@@ -1,0 +1,26 @@
+/* RecipesView Pattern */
+.recipes-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-background-base);
+  max-width: 390px;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 80px; /* Space for navigation bar */
+}
+
+.recipes-header {
+  padding: var(--spacing-24) var(--spacing-16) var(--spacing-16);
+}
+
+.recipes-content {
+  flex: 1;
+  padding: 0 var(--spacing-16);
+  margin-bottom: var(--spacing-16);
+}
+
+.recipes-search {
+  padding: var(--spacing-16);
+  padding-bottom: var(--spacing-24);
+}

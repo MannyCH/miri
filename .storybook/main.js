@@ -11,8 +11,21 @@ const config = {
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
     "@storybook/addon-onboarding",
-    "@storybook/addon-mcp"
+    "storybook-design-token",
+    {
+      name: "@storybook/addon-mcp",
+      options: {
+        toolsets: {
+          dev: true,  // Story URL retrieval and UI building instructions
+          docs: true, // Component manifest and documentation (requires experimentalComponentsManifest)
+        },
+        experimentalFormat: "markdown", // Output format: 'markdown' or 'xml'
+      },
+    },
   ],
+  features: {
+    experimentalComponentsManifest: true,
+  },
   "framework": "@storybook/react-vite"
 };
 export default config;

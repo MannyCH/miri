@@ -1,0 +1,169 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Introduction" />
+
+# Design Foundations
+
+Welcome to the Miri design system foundations. These are the core building blocks that define the visual language of the Miri meal planning application.
+
+## What are Design Foundations?
+
+Design foundations (also called design tokens) are the smallest pieces of our design system. They define:
+
+- **Colors** - Semantic colors for text, backgrounds, strokes, fills, and icons
+- **Spacing** - Consistent spacing values for layout and components
+- **Typography** - Text styles for headings, body text, and UI elements
+- **Border Radius** - Corner radius values for component edges
+
+## Why Design Tokens?
+
+Design tokens provide:
+
+✅ **Consistency** - Use the same values across all components  
+✅ **Maintainability** - Update once, change everywhere  
+✅ **Accessibility** - Semantic names ensure proper color contrast  
+✅ **Themability** - Easy to add dark mode or alternative themes  
+
+## Token Structure
+
+All tokens are exported as CSS custom properties (CSS variables) from Figma and follow this naming convention:
+
+```css
+/* Format: --category-subcategory-variant */
+--color-text-strong: #260B00F2;
+--spacing-16: 16px;
+--corner-radius-8: 8px;
+```
+
+## Using Tokens in Code
+
+### With Base UI Components
+
+```jsx
+import { Button } from '@base-ui/react/button';
+
+// Using inline styles
+<Button.Root 
+  style={{
+    backgroundColor: 'var(--color-fill-brand-strong)',
+    padding: 'var(--spacing-16)',
+    borderRadius: 'var(--corner-radius-8)',
+  }}
+>
+  Click me
+</Button.Root>
+
+// Using CSS classes
+<Button.Root className="button-primary">
+  Click me
+</Button.Root>
+```
+
+```css
+/* In your CSS file */
+.button-primary {
+  background-color: var(--color-fill-brand-strong);
+  padding: var(--spacing-16);
+  border-radius: var(--corner-radius-8);
+}
+```
+
+### With Plain HTML/CSS
+
+```html
+<div class="card">
+  <h2 class="card-title">Recipe Card</h2>
+</div>
+```
+
+```css
+.card {
+  background: var(--color-background-raised);
+  padding: var(--spacing-24);
+  border-radius: var(--corner-radius-16);
+  border: 1px solid var(--color-stroke-weak);
+}
+
+.card-title {
+  color: var(--color-text-strong);
+  margin-bottom: var(--spacing-12);
+}
+```
+
+## Token Categories
+
+<div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+  gap: 'var(--spacing-16)',
+  marginTop: 'var(--spacing-24)'
+}}>
+  <div style={{
+    padding: 'var(--spacing-16)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <h3>🎨 Colors</h3>
+    <p>Semantic color tokens for text, backgrounds, borders, and icons</p>
+  </div>
+  
+  <div style={{
+    padding: 'var(--spacing-16)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <h3>📏 Spacing</h3>
+    <p>Consistent spacing scale from 0px to 256px</p>
+  </div>
+  
+  <div style={{
+    padding: 'var(--spacing-16)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <h3>🔠 Typography</h3>
+    <p>24 text styles for headings, body, and UI elements</p>
+  </div>
+  
+  <div style={{
+    padding: 'var(--spacing-16)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <h3>📐 Border Radius</h3>
+    <p>Corner radius values from 0px to 32px</p>
+  </div>
+  
+  <div style={{
+    padding: 'var(--spacing-16)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <h3>✨ Elevation</h3>
+    <p>3 shadow levels for depth and hierarchy</p>
+  </div>
+  
+  <div style={{
+    padding: 'var(--spacing-16)',
+    border: '1px solid var(--color-stroke-weak)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}>
+    <h3>🎯 Icons</h3>
+    <p>Feather Icons - 280+ simple, clean icons</p>
+  </div>
+</div>
+
+## Token Source
+
+All design tokens are automatically exported from our Figma Design Library and synchronized to `src/design-tokens.css`.
+
+🔗 **Figma Source:** Design Library Smartly
+
+---
+
+**Next Steps:**
+- Explore [Colors](?path=/docs/foundations-colors--docs) to see all color tokens
+- Check [Spacing](?path=/docs/foundations-spacing--docs) for layout values
+- Review [Typography](?path=/docs/foundations-typography--docs) for text styles
+- See [Elevation](?path=/docs/foundations-elevation--docs) for shadow tokens
+- Browse [Icons](?path=/docs/foundations-icons--docs) for the icon system

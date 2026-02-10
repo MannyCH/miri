@@ -1,0 +1,77 @@
+import React from 'react';
+import { IngredientList } from '../../components/IngredientList';
+import { NavigationBar } from '../../components/NavigationBar';
+import './RecipeDetailView.css';
+
+/**
+ * RecipeDetailView Pattern - Complete recipe view with ingredients and directions
+ * Composition of: IngredientList, NavigationBar, scrollable directions
+ * Combines ingredients and cooking instructions in one scrollable view
+ */
+export const RecipeDetailView = ({
+  recipe = {
+    title: 'Salmon with tomato and asparagus',
+    image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop',
+    ingredients: [],
+    directions: [],
+  },
+  checkedIngredients = {},
+  onIngredientCheck,
+  onIngredientDelete,
+  ...props
+}) => {
+  return (
+    <div className="recipe-detail-view" {...props}>
+      {/* Scrollable Content Area */}
+      <div className="recipe-detail-content">
+        {/* Recipe Title */}
+        <h1 className="text-h1-bold recipe-detail-title">{recipe.title}</h1>
+
+        {/* Hero Image */}
+        <div className="recipe-detail-image">
+          <img src={recipe.image} alt={recipe.title} />
+        </div>
+
+        {/* Ingredients Section */}
+        <div className="recipe-detail-section">
+          <h2 className="text-annotation-bold recipe-detail-section-title">
+            INGREDIENTS
+          </h2>
+          
+          <IngredientList
+            ingredients={recipe.ingredients}
+            checkedItems={checkedIngredients}
+            onCheckedChange={onIngredientCheck}
+            onDelete={onIngredientDelete}
+          />
+        </div>
+
+        {/* Directions Section */}
+        <div className="recipe-detail-section">
+          <h2 className="text-annotation-bold recipe-detail-section-title">
+            DIRECTIONS
+          </h2>
+          
+          {/* Numbered instruction steps */}
+          <ol className="recipe-directions-list">
+            {recipe.directions.map((direction, index) => (
+              <li key={index} className="recipe-direction-item">
+                <span className="recipe-direction-number text-body-small-regular">
+                  {index + 1}
+                </span>
+                <p className="recipe-direction-text text-body-small-regular">
+                  {direction}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+
+      {/* Bottom Navigation */}
+      <NavigationBar activeItem="recipes" />
+    </div>
+  );
+};
+
+RecipeDetailView.displayName = 'RecipeDetailView';

@@ -1,0 +1,98 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Components/Overview" />
+
+# Miri Component Library
+
+A collection of React components for the Miri meal planning app, built with Base UI and designed in Figma.
+
+## Available Components
+
+All components are implemented exactly as designed in Figma, with no additional behaviors or variants added.
+
+### Core Components
+
+- **Button** - 4 variants: Primary, Secondary, Tertiary, Tertiary Delete (Base UI)
+- **Badge** - Notification badge with count (Native HTML)
+- **Divider** - Horizontal line separator (Native HTML)
+
+### Form Components
+
+- **SearchBar** - Search input with trailing icon (Base UI Field)
+
+### Navigation Components
+
+- **NavItem** - Navigation item with icon and text, 2 states (Base UI Button)
+- **NavigationBar** - Bottom navigation with 4 items (Uses NavItem)
+
+### Calendar Components
+
+- **CalendarButton** - Date button, 3 states (Base UI Button)
+- **CalendarWeek** - Week view with 7 calendar buttons (Uses CalendarButton)
+
+### List Components
+
+- **IngredientListItem** - Single ingredient item with optional dividers (Base UI Button)
+- **IngredientList** - Container for ingredient list items (Uses IngredientListItem)
+- **RecipeListItem** - Recipe item with thumbnail and title (Base UI Button)
+- **RecipeList** - Container for recipe list items (Uses RecipeListItem)
+
+## Base UI Integration
+
+**10 out of 12 components** use Base UI primitives for better accessibility and React integration:
+
+✅ **Using Base UI:**
+- Button
+- CalendarButton
+- SearchBar (Field)
+- NavItem
+- IngredientListItem
+- RecipeListItem
+
+✅ **Composite Components (using Base UI):**
+- NavigationBar
+- CalendarWeek
+- IngredientList
+- RecipeList
+
+❌ **Native HTML (no Base UI equivalent):**
+- Badge (`<span>`)
+- Divider (`<hr>`)
+
+## Benefits
+
+1. **Accessibility** - ARIA attributes, keyboard navigation, and focus management built-in
+2. **Consistent Behavior** - All interactive elements work the same way
+3. **React Best Practices** - Proper React components, not just styled HTML
+4. **Future-Proof** - Built on a maintained component library
+
+## Design Principles
+
+1. **Exact Figma Implementation** - All components match the Figma designs precisely
+2. **Design Token Usage** - All styling uses CSS variables from `design-tokens.css`
+3. **Base UI First** - Interactive components use Base UI for accessibility
+4. **No Extra Features** - Components only include behaviors and states documented in Figma
+
+## Usage
+
+Import components from the central export file:
+
+```jsx
+import { 
+  Button, 
+  Badge, 
+  SearchBar, 
+  NavigationBar,
+  RecipeList 
+} from './components';
+```
+
+All interactive components are wrapped in Base UI primitives, providing:
+- Keyboard navigation (Tab, Enter, Space)
+- Screen reader support
+- Focus indicators
+- Proper semantic HTML
+
+## Component Documentation
+
+Each component has detailed Storybook stories showing all variants and states as they appear in Figma.

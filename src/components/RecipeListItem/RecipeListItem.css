@@ -1,0 +1,47 @@
+/* RecipeListItem - Exact Figma Design */
+.recipe-list-item {
+  width: 100%;
+}
+
+.recipe-list-item-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-16);
+  padding: var(--spacing-8) 0;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recipe-list-item-thumbnail {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: var(--corner-radius-8);
+  overflow: hidden;
+  background: var(--color-background-sunken);
+}
+
+.recipe-list-item-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-list-item-title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--color-text-strong);
+}
+
+.recipe-list-item-content:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}

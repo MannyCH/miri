@@ -1,0 +1,589 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Typography" />
+
+# Typography
+
+Typography establishes visual hierarchy and readability in the Miri meal planning application.
+
+Miri uses **24 text styles** across 6 categories, combining two font families:
+- **Baloo Bhaijaan 2** - Friendly, rounded font for display and headings
+- **IBM Plex Sans** - Clean, professional font for body text and UI elements
+
+---
+
+## Font Families
+
+```css
+--font-family-display: 'Baloo Bhaijaan 2', system-ui, -apple-system, sans-serif;
+--font-family-heading: 'Baloo Bhaijaan 2', system-ui, -apple-system, sans-serif;
+--font-family-body: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+--font-family-tiny: 'Inter', system-ui, -apple-system, sans-serif;
+```
+
+---
+
+## Display Styles
+
+Large, attention-grabbing text for hero sections and major page titles.
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <div className="text-display-regular" style={{ 
+    marginBottom: 'var(--spacing-16)',
+    color: 'var(--color-text-strong)'
+  }}>
+    Display Regular
+  </div>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-32)'
+  }}>
+    .text-display-regular • Baloo Bhaijaan 2 Regular • 56px / 64px • -1px tracking
+  </code>
+
+  <div className="text-display-bold" style={{ 
+    marginBottom: 'var(--spacing-16)',
+    color: 'var(--color-text-strong)'
+  }}>
+    Display Bold
+  </div>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-display-bold • Baloo Bhaijaan 2 SemiBold • 56px / 64px • -1px tracking
+  </code>
+</div>
+
+---
+
+## Heading Styles
+
+Structured hierarchy for section headings and content organization.
+
+### Heading 1
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <h1 className="text-h1-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 1 Regular
+  </h1>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-h1-regular • Baloo Bhaijaan 2 Regular • 40px / 48px • -0.5px tracking
+  </code>
+
+  <h1 className="text-h1-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 1 Bold
+  </h1>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-h1-bold • Baloo Bhaijaan 2 SemiBold • 40px / 48px • -0.5px tracking
+  </code>
+</div>
+
+### Heading 2
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <h2 className="text-h2-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 2 Regular
+  </h2>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-h2-regular • Baloo Bhaijaan 2 Regular • 32px / 40px
+  </code>
+
+  <h2 className="text-h2-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 2 Bold
+  </h2>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-h2-bold • Baloo Bhaijaan 2 SemiBold • 32px / 40px
+  </code>
+</div>
+
+### Heading 3
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <h3 className="text-h3-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 3 Regular
+  </h3>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-h3-regular • Baloo Bhaijaan 2 Regular • 24px / 32px
+  </code>
+
+  <h3 className="text-h3-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 3 Bold
+  </h3>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-h3-bold • Baloo Bhaijaan 2 SemiBold • 24px / 32px
+  </code>
+</div>
+
+### Heading 4
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <h4 className="text-h4-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 4 Regular
+  </h4>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-h4-regular • Baloo Bhaijaan 2 Regular • 20px / 28px
+  </code>
+
+  <h4 className="text-h4-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 4 Bold
+  </h4>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-h4-bold • Baloo Bhaijaan 2 SemiBold • 20px / 28px
+  </code>
+
+  <h4 className="text-h4-bold-underlined" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Heading 4 Bold Underlined
+  </h4>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-h4-bold-underlined • Baloo Bhaijaan 2 SemiBold • 20px / 28px • Underlined
+  </code>
+</div>
+
+---
+
+## Body Styles
+
+Main content text with regular and small variants.
+
+### Body (16px)
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <p className="text-body-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Body Regular - Main paragraph text for content sections and descriptions. This is the primary text style for most content.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-body-regular • IBM Plex Sans Regular • 16px / 24px
+  </code>
+
+  <p className="text-body-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Body Bold - For emphasis within body text and important callouts.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-body-bold • IBM Plex Sans SemiBold • 16px / 24px
+  </code>
+
+  <p className="text-body-regular-underlined" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-brand)'
+  }}>
+    Body Regular Underlined - For links and interactive text.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-body-regular-underlined • IBM Plex Sans Regular • 16px / 24px • Underlined
+  </code>
+
+  <p className="text-body-bold-underlined" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-brand)'
+  }}>
+    Body Bold Underlined - For emphasized links.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-body-bold-underlined • IBM Plex Sans SemiBold • 16px / 24px • Underlined
+  </code>
+</div>
+
+### Body Small (14px)
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <p className="text-body-small-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Body Small Regular - Secondary content, captions, and supporting text.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-body-small-regular • IBM Plex Sans Regular • 14px / 20px
+  </code>
+
+  <p className="text-body-small-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Body Small Bold - Emphasized secondary text.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-body-small-bold • IBM Plex Sans SemiBold • 14px / 20px
+  </code>
+
+  <p className="text-body-small-regular-underlined" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-brand)'
+  }}>
+    Body Small Regular Underlined - Secondary links.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-body-small-regular-underlined • IBM Plex Sans Regular • 14px / 20px • Underlined
+  </code>
+
+  <p className="text-body-small-bold-underlined" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-brand)'
+  }}>
+    Body Small Bold Underlined - Emphasized secondary links.
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-body-small-bold-underlined • IBM Plex Sans SemiBold • 14px / 20px • Underlined
+  </code>
+</div>
+
+---
+
+## Annotation Styles
+
+Metadata, timestamps, and supporting information.
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <p className="text-annotation-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-weak)'
+  }}>
+    Annotation Regular - Timestamps, metadata, helper text
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-annotation-regular • IBM Plex Sans Regular • 14px / 150%
+  </code>
+
+  <p className="text-annotation-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-weak)'
+  }}>
+    Annotation Bold - Emphasized metadata and labels
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-annotation-bold • IBM Plex Sans SemiBold • 14px / 150%
+  </code>
+</div>
+
+---
+
+## Tiny Styles
+
+Very small text for dense UI elements and fine print.
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <p className="text-tiny-regular" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-weak)'
+  }}>
+    Tiny Regular - Dense information, fine print
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block',
+    marginBottom: 'var(--spacing-24)'
+  }}>
+    .text-tiny-regular • IBM Plex Sans Regular • 11px / auto
+  </code>
+
+  <p className="text-tiny-bold" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-weak)'
+  }}>
+    Tiny Bold - Emphasized dense text
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-tiny-bold • IBM Plex Sans SemiBold • 11px / auto
+  </code>
+</div>
+
+---
+
+## Special Styles
+
+### Uppercase
+
+<div style={{ marginTop: 'var(--spacing-24)' }}>
+  <p className="text-uppercase" style={{ 
+    margin: '0 0 var(--spacing-8) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Uppercase Text
+  </p>
+  <code style={{ 
+    fontSize: '14px', 
+    color: 'var(--color-text-weak)',
+    display: 'block'
+  }}>
+    .text-uppercase • IBM Plex Sans SemiBold • 14px / 24px • 2px tracking • UPPERCASE
+  </code>
+</div>
+
+---
+
+## Combining with Color Tokens
+
+Typography classes can be combined with color tokens for semantic meaning:
+
+<div style={{ 
+  marginTop: 'var(--spacing-24)',
+  padding: 'var(--spacing-24)',
+  background: 'var(--color-background-sunken)',
+  borderRadius: 'var(--corner-radius-12)'
+}}>
+  <h3 className="text-h3-bold" style={{ 
+    margin: '0 0 var(--spacing-16) 0',
+    color: 'var(--color-text-brand)'
+  }}>
+    Recipe of the Day
+  </h3>
+  
+  <p className="text-body-regular" style={{ 
+    margin: '0 0 var(--spacing-12) 0',
+    color: 'var(--color-text-strong)'
+  }}>
+    Classic Italian pasta dish with a creamy sauce made from eggs, cheese, pancetta, and black pepper.
+  </p>
+  
+  <div style={{ 
+    display: 'flex',
+    gap: 'var(--spacing-16)',
+    marginBottom: 'var(--spacing-16)'
+  }}>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-weak)' }}>
+      ⏱️ 30 minutes
+    </span>
+    <span className="text-body-small-regular" style={{ color: 'var(--color-text-weak)' }}>
+      🍽️ 4 servings
+    </span>
+    <span className="text-body-small-bold" style={{ color: 'var(--color-text-success)' }}>
+      ✓ Easy
+    </span>
+  </div>
+  
+  <button 
+    className="text-body-small-bold"
+    style={{
+      padding: 'var(--spacing-12) var(--spacing-24)',
+      background: 'var(--color-fill-brand-strong)',
+      color: 'var(--color-text-inverted)',
+      border: 'none',
+      borderRadius: 'var(--corner-radius-8)',
+      cursor: 'pointer',
+      lineHeight: '1'
+    }}>
+    View Recipe
+  </button>
+</div>
+
+---
+
+## Usage Examples
+
+### With CSS Classes
+
+```jsx
+// Headings
+<h1 className="text-h1-bold" style={{ color: 'var(--color-text-strong)' }}>
+  My Recipes
+</h1>
+
+<h2 className="text-h2-regular" style={{ color: 'var(--color-text-strong)' }}>
+  Dinner Ideas
+</h2>
+
+// Body text
+<p className="text-body-regular" style={{ color: 'var(--color-text-strong)' }}>
+  Browse our collection of delicious recipes.
+</p>
+
+<p className="text-body-small-regular" style={{ color: 'var(--color-text-weak)' }}>
+  Last updated: 2 hours ago
+</p>
+
+// Links
+<a href="#" className="text-body-regular-underlined" 
+   style={{ color: 'var(--color-text-brand)' }}>
+  View all recipes
+</a>
+
+// Labels
+<span className="text-uppercase" style={{ color: 'var(--color-text-weak)' }}>
+  Category
+</span>
+```
+
+### With Base UI Components
+
+```jsx
+import { Button } from '@base-ui/react/button';
+
+<Button.Root 
+  className="text-body-small-bold"
+  style={{
+    color: 'var(--color-text-inverted)',
+    backgroundColor: 'var(--color-fill-brand-strong)',
+    padding: 'var(--spacing-12) var(--spacing-24)',
+    borderRadius: 'var(--corner-radius-8)'
+  }}
+>
+  Add Recipe
+</Button.Root>
+```
+
+---
+
+## Typography Scale Summary
+
+| Style | Font Family | Size | Line Height | Weight | Use Case |
+|-------|-------------|------|-------------|--------|----------|
+| Display | Baloo Bhaijaan 2 | 56px | 64px | Regular/SemiBold | Hero sections |
+| Heading 1 | Baloo Bhaijaan 2 | 40px | 48px | Regular/SemiBold | Page titles |
+| Heading 2 | Baloo Bhaijaan 2 | 32px | 40px | Regular/SemiBold | Section titles |
+| Heading 3 | Baloo Bhaijaan 2 | 24px | 32px | Regular/SemiBold | Subsections |
+| Heading 4 | Baloo Bhaijaan 2 | 20px | 28px | Regular/SemiBold | Card titles |
+| Body | IBM Plex Sans | 16px | 24px | Regular/SemiBold | Main content |
+| Body Small | IBM Plex Sans | 14px | 20px | Regular/SemiBold | Secondary content |
+| Annotation | IBM Plex Sans | 14px | 150% | Regular/SemiBold | Metadata |
+| Tiny | IBM Plex Sans | 11px | auto | Regular/SemiBold | Dense UI |
+| Uppercase | IBM Plex Sans | 14px | 24px | SemiBold | Labels |
+
+---
+
+## Best Practices
+
+✅ **DO:** Use heading styles in hierarchical order (H1 → H2 → H3)  
+✅ **DO:** Combine typography classes with semantic color tokens  
+✅ **DO:** Use body text for main content, body small for secondary  
+✅ **DO:** Maintain consistent line-height for readability  
+
+❌ **DON'T:** Skip heading levels (e.g., H1 → H3)  
+❌ **DON'T:** Use tiny text for critical information  
+❌ **DON'T:** Hardcode font sizes or line heights  
+❌ **DON'T:** Mix too many font weights in one component  
+
+---
+
+**Related:**
+- [Colors](?path=/docs/foundations-colors--docs)
+- [Spacing](?path=/docs/foundations-spacing--docs)
