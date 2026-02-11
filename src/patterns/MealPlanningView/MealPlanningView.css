@@ -10,30 +10,44 @@
   overflow: hidden;
 }
 
-/* Main content area - matches Figma Container with itemSpacing: 0 */
+/* Fixed header area (title + calendar) */
+.meal-planning-fixed-header {
+  flex-shrink: 0;
+  background: var(--color-background-base);
+  z-index: 10;
+}
+
+/* Scrollable content area - only meals list */
 .meal-planning-content {
   flex: 1;
-  padding: var(--spacing-16);
+  overflow-y: auto;
+  padding: 0 var(--spacing-16);
   padding-bottom: calc(80px + var(--spacing-16)); /* Space for navigation bar */
   display: flex;
   flex-direction: column;
   gap: 0; /* Figma Container has itemSpacing: 0 - spacing comes from section padding */
-  overflow-y: auto;
 }
 
 /* Section Header: "Meal Planning" */
 .meal-planning-section-header {
+  padding: var(--spacing-16);
   padding-bottom: var(--spacing-16);
+}
+
+.meal-planning-section-header h1 {
+  margin: 0;
 }
 
 /* Date Section: Date range + buttons + calendar */
 .meal-planning-date-section {
   display: flex;
   flex-direction: column;
+  margin: 0 var(--spacing-16);
   padding: var(--spacing-16);
   background: var(--color-background-raised);
   border-radius: var(--corner-radius-12);
   gap: var(--spacing-16);
+  margin-bottom: var(--spacing-16);
 }
 
 .meal-planning-date-row {

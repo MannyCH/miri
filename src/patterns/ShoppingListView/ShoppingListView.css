@@ -62,7 +62,7 @@
 .shopping-list-content {
   flex: 1;
   padding: var(--spacing-16);
-  padding-bottom: 96px; /* Space for search + navigation */
+  padding-bottom: 120px; /* Extra space for search bar + navigation */
   overflow-y: auto;
 }
 
@@ -89,6 +89,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: var(--spacing-8);
+}
+
+.recipe-group-header h3 {
+  margin: 0;
+  color: var(--color-text-strong);
 }
 
 .icon-button-delete {

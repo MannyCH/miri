@@ -21,8 +21,8 @@ export const MealPlanningView = ({
 }) => {
   return (
     <div className="meal-planning-view" {...props}>
-      {/* Main Content Container - matches Figma Container with itemSpacing: 0 */}
-      <div className="meal-planning-content">
+      {/* Fixed Header: Title + Calendar */}
+      <div className="meal-planning-fixed-header">
         {/* Section Header */}
         <div className="meal-planning-section-header">
           <h1 className="text-h1-bold" style={{ color: 'var(--color-text-strong)' }}>
@@ -47,7 +47,10 @@ export const MealPlanningView = ({
             onDayClick={onDayClick}
           />
         </div>
+      </div>
 
+      {/* Scrollable Content: Meals List */}
+      <div className="meal-planning-content">
         {/* Day Section */}
         <div className="meal-planning-day-section">
           <h2 className="text-h4-regular" style={{ color: 'var(--color-text-weak)' }}>

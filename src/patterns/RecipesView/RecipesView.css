@@ -25,8 +25,8 @@
 .recipes-content {
   flex: 1;
   padding: 0 var(--spacing-16);
+  padding-bottom: 120px; /* Extra space for search bar + navigation */
   overflow-y: auto;
-  margin-bottom: 96px; /* Space for search + navigation */
 }
 
 .recipes-search {
