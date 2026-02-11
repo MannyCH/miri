@@ -11,7 +11,7 @@ import './RecipesView.css';
 export const RecipesView = ({
   recipes = [],
   searchQuery = '',
-  onSearch,
+  onSearchChange,
   onRecipeClick,
   ...props
 }) => {
@@ -24,7 +24,7 @@ export const RecipesView = ({
 
       {/* Recipe List */}
       <div className="recipes-content">
-        <RecipeList recipes={recipes} />
+        <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
       </div>
 
       {/* Search Bar */}
@@ -32,7 +32,7 @@ export const RecipesView = ({
         <SearchBar
           placeholder="Rezepte suchen..."
           value={searchQuery}
-          onChange={(e) => onSearch?.(e.target.value)}
+          onChange={(e) => onSearchChange?.(e.target.value)}
           trailingIcon={<SearchIcon />}
         />
       </div>

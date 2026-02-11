@@ -8,17 +8,19 @@ import './RecipeList.css';
  */
 export const RecipeList = ({ 
   recipes = [],
+  onRecipeClick,
   ...props 
 }) => {
   return (
     <div className="recipe-list" {...props}>
       {recipes.map((recipe, index) => (
         <RecipeListItem
-          key={index}
+          key={recipe.id || index}
           title={recipe.title}
           thumbnail={recipe.thumbnail}
           showUpperDivider={index === 0}
           showBelowDivider={index === recipes.length - 1}
+          onClick={() => onRecipeClick?.(recipe.id)}
         />
       ))}
     </div>

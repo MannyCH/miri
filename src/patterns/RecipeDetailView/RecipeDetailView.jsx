@@ -1,5 +1,6 @@
 import React from 'react';
 import { IngredientList } from '../../components/IngredientList';
+import { Button } from '../../components/Button';
 import { NavigationBar } from '../../components/NavigationBar';
 import './RecipeDetailView.css';
 
@@ -18,6 +19,7 @@ export const RecipeDetailView = ({
   checkedIngredients = {},
   onIngredientCheck,
   onIngredientDelete,
+  onAddToList,
   ...props
 }) => {
   return (
@@ -44,6 +46,15 @@ export const RecipeDetailView = ({
             onCheckedChange={onIngredientCheck}
             onDelete={onIngredientDelete}
           />
+          
+          {/* Add to Shopping List Button */}
+          {onAddToList && (
+            <div style={{ marginTop: 'var(--spacing-16)' }}>
+              <Button variant="primary" onClick={onAddToList}>
+                Add to Shopping List
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Directions Section */}
