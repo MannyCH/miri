@@ -37,23 +37,45 @@ export function ShoppingListPage() {
   }, []);
   
   // Convert shopping list items to format expected by ShoppingListView
-  const ingredients = shoppingList.map(item => ({
-    id: item.id,
-    name: item.name,
-    checked: item.checked,
+  const items = shoppingList.map(item => item.name);
+  
+  // Create checkedItems object
+  const checkedItems = {};
+  shoppingList.forEach((item, idx) => {
+    checkedItems[idx] = item.checked;
+  });
+  
+  // Convert grouped data to match ShoppingListView format
+  const recipeGroups = groupedByRecipe.map(group => ({
+    recipeName: group.recipeName,
+    recipeId: group.recipeId,
+    items: group.ingredients.map(item => item.name),
+    checkedItems: group.ingredients.reduce((acc, item, idx) => {
+      acc[idx] = item.checked;
+      return acc;
+    }, {}),
   }));
   
   return (
     <ShoppingListView
       viewMode={shoppingListViewMode}
       onViewModeChange={setShoppingListViewMode}
-      ingredients={ingredients}
-      groupedByRecipe={groupedByRecipe}
-      onIngredientCheck={(id, checked) => {
-        toggleIngredientCheck(id);
+      items={items}
+      recipeGroups={recipeGroups}
+      checkedItems={checkedItems}
+      onItemCheck={(idx, checked) => {
+        // Find the actual item by index
+        const item = shoppingList[idx];
+        if (item) {
+          toggleIngredientCheck(item.id);
+        }
       }}
-      onIngredientDelete={(id) => {
-        deleteIngredient(id);
+      onItemDelete={(idx) => {
+        // Find the actual item by index
+        const item = shoppingList[idx];
+        if (item) {
+          deleteIngredient(item.id);
+        }
       }}
       onRecipeDelete={(recipeId) => {
         deleteRecipeFromShoppingList(recipeId);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { IngredientList } from '../../components/IngredientList';
 import { Button } from '../../components/Button';
-import { NavigationBar } from '../../components/NavigationBar';
+import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './RecipeDetailView.css';
 
 /**
@@ -80,7 +80,7 @@ export const RecipeDetailView = ({
       </div>
 
       {/* Bottom Navigation */}
-      <NavigationBar activeItem="recipes" />
+      <NavigationBarConnected activeItem="recipes" />
     </div>
   );
 };

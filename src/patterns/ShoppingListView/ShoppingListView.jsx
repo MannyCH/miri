@@ -2,7 +2,7 @@ import React from 'react';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
-import { NavigationBar } from '../../components/NavigationBar';
+import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './ShoppingListView.css';
 
 /**
@@ -110,7 +110,7 @@ export const ShoppingListView = ({
       </div>
 
       {/* Bottom Navigation */}
-      <NavigationBar activeItem="shopping-list" />
+      <NavigationBarConnected activeItem="shopping-list" />
     </div>
   );
 };

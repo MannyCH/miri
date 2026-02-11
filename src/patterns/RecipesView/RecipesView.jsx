@@ -1,7 +1,7 @@
 import React from 'react';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
-import { NavigationBar } from '../../components/NavigationBar';
+import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './RecipesView.css';
 
 /**
@@ -38,7 +38,7 @@ export const RecipesView = ({
       </div>
 
       {/* Bottom Navigation */}
-      <NavigationBar activeItem="recipes" />
+      <NavigationBarConnected activeItem="recipes" />
     </div>
   );
 };

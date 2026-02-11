@@ -3,7 +3,7 @@ import { CalendarWeek } from '../../components/CalendarWeek';
 import { Button } from '../../components/Button';
 import { RecipeListItem } from '../../components/RecipeListItem';
 import { Divider } from '../../components/Divider';
-import { NavigationBar } from '../../components/NavigationBar';
+import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './MealPlanningView.css';
 
 /**
@@ -132,7 +132,7 @@ export const MealPlanningView = ({
       </div>
 
       {/* Bottom Navigation */}
-      <NavigationBar activeItem="shopping-list" />
+      <NavigationBarConnected activeItem="planning" />
     </div>
   );
 };
