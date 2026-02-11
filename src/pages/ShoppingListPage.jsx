@@ -49,11 +49,26 @@ export function ShoppingListPage() {
   const recipeGroups = groupedByRecipe.map(group => ({
     recipeName: group.recipeName,
     recipeId: group.recipeId,
-    items: group.ingredients.map(item => item.name),
+    ingredients: group.ingredients.map(item => item.name),
     checkedItems: group.ingredients.reduce((acc, item, idx) => {
       acc[idx] = item.checked;
       return acc;
     }, {}),
+    onIngredientCheck: (idx, checked) => {
+      const item = group.ingredients[idx];
+      if (item) {
+        toggleIngredientCheck(item.id);
+      }
+    },
+    onIngredientDelete: (idx) => {
+      const item = group.ingredients[idx];
+      if (item) {
+        deleteIngredient(item.id);
+      }
+    },
+    onDelete: () => {
+      deleteRecipeFromShoppingList(group.recipeId);
+    },
   }));
   
   return (

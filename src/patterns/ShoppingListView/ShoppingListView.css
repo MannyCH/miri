@@ -2,12 +2,12 @@
 .shopping-list-view {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--color-background-base);
   max-width: 390px;
   margin: 0 auto;
   position: relative;
-  padding-bottom: 80px; /* Space for navigation bar */
+  overflow: hidden;
 }
 
 .shopping-list-header {
@@ -15,6 +15,14 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-24) var(--spacing-16) var(--spacing-16);
+  flex-shrink: 0;
+  background: var(--color-background-base);
+  z-index: 10;
+}
+
+.shopping-list-header h1 {
+  margin: 0;
+  color: var(--color-text-strong);
 }
 
 .shopping-list-view-toggle {
@@ -53,7 +61,9 @@
 
 .shopping-list-content {
   flex: 1;
-  padding: 0 var(--spacing-16);
+  padding: var(--spacing-16);
+  padding-bottom: 96px; /* Space for search + navigation */
+  overflow-y: auto;
 }
 
 .shopping-list-clear {

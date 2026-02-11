@@ -2,11 +2,12 @@
 .recipe-detail-view {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--color-background-base);
   max-width: 390px;
   margin: 0 auto;
   position: relative;
+  overflow: hidden;
 }
 
 /* Scrollable content area */

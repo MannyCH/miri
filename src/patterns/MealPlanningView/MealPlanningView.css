@@ -2,20 +2,23 @@
 .meal-planning-view {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   background: var(--color-background-base);
   max-width: 390px;
   margin: 0 auto;
   position: relative;
+  overflow: hidden;
 }
 
 /* Main content area - matches Figma Container with itemSpacing: 0 */
 .meal-planning-content {
+  flex: 1;
   padding: var(--spacing-16);
+  padding-bottom: calc(80px + var(--spacing-16)); /* Space for navigation bar */
   display: flex;
   flex-direction: column;
   gap: 0; /* Figma Container has itemSpacing: 0 - spacing comes from section padding */
-  padding-bottom: calc(80px + var(--spacing-16)); /* Space for navigation bar */
+  overflow-y: auto;
 }
 
 /* Section Header: "Meal Planning" */
