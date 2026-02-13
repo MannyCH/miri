@@ -296,9 +296,128 @@ Use this checklist for every component:
 
 ---
 
+## False Positives & Safe Exceptions
+
+### 1. Color Contrast on Sticky/Fixed Elements
+
+**Error Message:**
+```
+"Element's background color could not be determined because it partially overlaps other elements"
+```
+
+**Why This Happens:**
+- Element has `position: sticky` or `position: fixed`
+- Element has explicit `background` color
+- Element has `z-index` that layers it above content
+- Automated checker can't determine what's underneath
+
+**How to Verify It's a False Positive:**
+```css
+/* Check the element has explicit background */
+.element {
+  position: sticky;
+  background: var(--color-background-base); /* Explicit white background */
+  color: var(--color-text-strong);          /* Dark text */
+  z-index: 10;
+}
+```
+
+**If both colors are design tokens with known good contrast, it's safe to ignore.**
+
+**How to Disable in Storybook:**
+```javascript
+export default {
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: 'color-contrast',
+            selector: '.recipe-detail-title',
+            enabled: false,
+          },
+        ],
+      },
+    },
+  },
+};
+```
+
+**Always document WHY you're disabling:**
+```javascript
+// Disable contrast check for sticky title (false positive)
+// Reason: Checker can't determine background due to position:sticky + z-index
+// Verified: Text #260B00F2 (dark brown) on #FFFFFF (white) = 13:1 contrast
+```
+
+---
+
+### 2. Heading Order (Skipping Levels)
+
+**Error Message:**
+```
+"Heading levels should only increase by one"
+```
+
+**Why This Happens:**
+- HTML uses h1 → h3 without an h2 in between
+- Checker expects strict sequential order (h1, h2, h3, h4...)
+- This is sometimes a valid design pattern when using headings for semantic grouping
+
+**When It's Safe to Ignore:**
+✅ **Visual hierarchy is maintained through design tokens (not heading levels)**
+```jsx
+<h1 className="text-h1-bold">Shopping list</h1>
+{/* ... */}
+<h3 className="text-body-base-bold">{group.recipeName}</h3>
+```
+In this example:
+- h1 is the page title (visually prominent)
+- h3 is used for semantic grouping (recipe names within sections)
+- Visual hierarchy comes from typography classes, not heading levels
+- Screen readers still understand the structure
+
+✅ **The component doesn't have a logical h2 level**
+- Some patterns don't need intermediate heading levels
+- h3 is used to group content within a section, not to indicate a sub-level
+
+**When You MUST Fix It:**
+❌ Don't ignore if:
+- You're creating a long-form document (blog post, article, docs)
+- The visual hierarchy suggests there should be an h2
+- Screen readers would benefit from the intermediate level
+
+**How to Disable in Storybook:**
+```javascript
+export default {
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: 'heading-order',
+            enabled: false,
+          },
+        ],
+      },
+    },
+  },
+};
+```
+
+**Always document WHY you're disabling:**
+```javascript
+// Disable heading-order check (safe to ignore for this pattern)
+// Reason: h3 is used for semantic grouping (recipe names) within sections
+// Visual hierarchy is maintained through typography tokens, not heading levels
+```
+
+---
+
 ## Resources
 
 - **Deque University Rules**: https://dequeuniversity.com/rules/axe/4.11/
 - **WCAG Quick Reference**: https://www.w3.org/WAI/WCAG21/quickref/
 - **ARIA Authoring Practices**: https://www.w3.org/WAI/ARIA/apg/
 - **Base UI Accessibility**: https://base-ui.com/accessibility
+- **WebAIM Contrast Checker**: https://webaim.org/resources/contrastchecker/ (verify false positives)

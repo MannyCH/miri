@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-8);
-  padding: var(--spacing-12) var(--spacing-24);
+  padding: var(--spacing-12) var(--spacing-12);
   border-radius: var(--corner-radius-8);
   font-family: var(--font-family-body);
   font-size: 14px;
