@@ -33,10 +33,7 @@
 .recipe-list-item-title {
   flex: 1;
   margin: 0;
-  font-family: var(--font-family-body);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
+  /* Typography is handled by text-h4-bold class */
   color: var(--color-text-strong);
 }
 

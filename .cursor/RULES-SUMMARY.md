@@ -150,6 +150,8 @@ This document maps your goals to the Cursor rules that enforce them.
 | `figma-design-consistency.mdc` | Enforce exact Figma matching with design tokens | ✅ Yes |
 | `visual-verification.mdc` | Mandatory browser testing and visual comparison | ✅ Yes |
 | `chromatic-testing.mdc` | Automated visual regression and accessibility testing | ✅ Yes |
+| `pr-failed-checks.mdc` | Systematic workflow for handling PR failed CI/CD checks | ✅ Yes |
+| `flexbox-first-layout.mdc` | Use flexbox over absolute positioning for layouts | ✅ Yes |
 | `minimal-changes.mdc` | Prevent scope creep and random additions | ✅ Yes |
 | `storybook-workflow.mdc` | Use Storybook as single source of truth | ✅ Yes |
 | `base-ui-best-practices.mdc` | Ensure accessible, composable components | No (only .tsx/.jsx) |

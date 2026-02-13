@@ -20,6 +20,20 @@ export default {
         component: 'Complete recipe view with scrollable ingredients and cooking directions.',
       },
     },
+    a11y: {
+      config: {
+        rules: [
+          {
+            // Disable contrast check for sticky title (false positive)
+            // Reason: Checker can't determine background due to position:sticky + z-index
+            // Verified: Text #260B00F2 (dark brown) on #FFFFFF (white) = 13:1 contrast
+            id: 'color-contrast',
+            selector: '.recipe-detail-title',
+            enabled: false,
+          },
+        ],
+      },
+    },
   },
   tags: ['autodocs'],
 };

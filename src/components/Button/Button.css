@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-8);
-  padding: var(--spacing-12) var(--spacing-24);
+  padding: var(--spacing-12) var(--spacing-12);
   border-radius: var(--corner-radius-8);
   font-family: var(--font-family-body);
   font-size: 14px;
@@ -52,10 +52,14 @@
   outline-offset: 2px;
 }
 
-/* Tertiary - Transparent, text only */
+/* Tertiary - Transparent, text only with underline */
 .button-tertiary {
   background: transparent;
   color: var(--color-text-brand);
+}
+
+.button-tertiary .button-text {
+  text-decoration: underline;
 }
 
 .button-tertiary:focus-visible {
@@ -63,10 +67,14 @@
   outline-offset: 2px;
 }
 
-/* Tertiary Delete - Transparent with error color text */
+/* Tertiary Delete - Transparent with error color text and underline */
 .button-tertiary-delete {
   background: transparent;
   color: var(--color-text-error);
+}
+
+.button-tertiary-delete .button-text {
+  text-decoration: underline;
 }
 
 .button-tertiary-delete:focus-visible {

@@ -24,7 +24,7 @@ export const RecipeListItem = ({
             <img src={thumbnail} alt={title} />
           </div>
         )}
-        <h3 className="recipe-list-item-title">{title}</h3>
+        <h4 className="recipe-list-item-title text-h4-bold">{title}</h4>
       </Button>
       {showBelowDivider && <Divider />}
     </div>

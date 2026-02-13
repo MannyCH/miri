@@ -23,7 +23,7 @@ export const IngredientList = ({
           onCheckedChange={(checked) => onCheckedChange?.(index, checked)}
           onDelete={() => onDelete?.(index)}
           showUpperDivider={index === 0}
-          showBelowDivider={index === ingredients.length - 1}
+          showBelowDivider={true}
         >
           {ingredient}
         </IngredientListItem>

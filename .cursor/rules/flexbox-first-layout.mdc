@@ -1,0 +1,292 @@
+---
+title: Flexbox-First Layout Approach
+tags: [css, layout, flexbox, best-practices]
+---
+
+# Flexbox-First Layout Approach
+
+Use **flexbox as the primary layout method**. Avoid `position: absolute/fixed/sticky` unless absolutely necessary.
+
+## 🎯 Golden Rule
+
+**Prefer flexbox over absolute positioning**
+
+✅ **DO:** Use flex properties to control layout
+❌ **DON'T:** Use position: fixed/absolute/sticky as primary layout method
+
+## 📐 Proper Flexbox Patterns
+
+### Pattern 1: Full-Height View with Header, Scrollable Content, and Footer
+
+```css
+/* Container - Flexbox column layout */
+.view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header - Fixed at top, natural height */
+.header {
+  flex-shrink: 0; /* Don't shrink */
+  padding: 16px;
+}
+
+/* Content - Takes remaining space, scrollable */
+.content {
+  flex: 1; /* Grow to fill space */
+  overflow-y: auto; /* Scroll when needed */
+  padding: 16px;
+}
+
+/* Search bar - Fixed above navigation */
+.search {
+  flex-shrink: 0; /* Don't shrink */
+  padding: 16px;
+  border-top: 1px solid #ccc;
+}
+
+/* Navigation - Fixed at bottom */
+.navigation {
+  flex-shrink: 0; /* Don't shrink */
+  height: 80px;
+}
+```
+
+**Result:**
+- Header stays at top naturally
+- Content scrolls in remaining space
+- Search and navigation stay at bottom naturally
+- No z-index management needed
+- No position calculations needed
+
+### Pattern 2: Sticky Title INSIDE Scroll Container
+
+```css
+/* Scrollable container */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* Title sticks to TOP OF SCROLL CONTAINER (valid use) */
+.title {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  margin: -16px; /* Offset parent padding */
+  padding: 16px;
+  margin-bottom: 16px;
+}
+```
+
+**Valid because:**
+- ✅ Sticky is relative to scroll container, not viewport
+- ✅ Creates better UX (title visible while scrolling content)
+- ✅ Cannot be achieved with flexbox alone
+
+## ❌ Common Mistakes
+
+### Mistake 1: Using Fixed Positioning for Layout
+
+```css
+/* ❌ BAD: Using fixed positioning */
+.search-bar {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  z-index: 50;
+}
+```
+
+Problems:
+- Requires manual positioning calculations
+- Needs z-index management
+- Doesn't adapt to container size changes
+- Overlaps other content
+
+```css
+/* ✅ GOOD: Using flexbox */
+.search-bar {
+  flex-shrink: 0;
+  padding: 16px;
+  border-top: 1px solid #ccc;
+}
+```
+
+Benefits:
+- No positioning calculations
+- No z-index needed
+- Automatically adapts
+- Natural stacking order
+
+### Mistake 2: Adding Extra Padding for Clearance
+
+```css
+/* ❌ BAD: Manual clearance padding */
+.content {
+  flex: 1;
+  padding-bottom: 120px; /* Space for search + nav */
+  overflow-y: auto;
+}
+```
+
+Problems:
+- Magic numbers (120px)
+- Breaks if footer sizes change
+- Content doesn't naturally fit
+
+```css
+/* ✅ GOOD: Flexbox handles spacing */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+```
+
+Benefits:
+- Content automatically fits available space
+- No manual calculations
+- Responsive to footer size changes
+
+### Mistake 3: Z-Index Hierarchy for Layering
+
+```css
+/* ❌ BAD: Managing z-index layers */
+.header {
+  z-index: 20;
+}
+.search {
+  z-index: 50;
+}
+.navigation {
+  z-index: 10;
+}
+```
+
+Problems:
+- Requires mental model of z-index values
+- Can conflict with other z-indexes
+- Hard to maintain
+
+```css
+/* ✅ GOOD: Natural stacking from flex order */
+/* No z-index needed - elements stack in DOM order */
+```
+
+Benefits:
+- Natural stacking order
+- No z-index conflicts
+- Easier to understand
+
+## ✅ When Position IS Necessary
+
+### Valid Use Case 1: Sticky Element Inside Scroll Container
+
+```css
+/* ✅ VALID: Sticky title inside scrollable content */
+.scroll-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sticky-title {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+```
+
+**Why valid:** Cannot be achieved with flexbox alone, provides better UX.
+
+### Valid Use Case 2: Overlay/Modal
+
+```css
+/* ✅ VALID: Modal overlays viewport */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+```
+
+**Why valid:** Needs to overlay entire viewport regardless of scroll position.
+
+### Valid Use Case 3: Floating Action Button
+
+```css
+/* ✅ VALID: FAB floats in corner */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+}
+```
+
+**Why valid:** Should float above content, not part of flex layout.
+
+## 🚫 When Position Is NOT Necessary
+
+### ❌ Don't Use For:
+- Layout structure (header, content, footer)
+- Stacking UI sections
+- Creating space between elements
+- Centering elements
+- Responsive layouts
+
+### ✅ Use Flexbox For:
+- Vertical stacking (`flex-direction: column`)
+- Horizontal alignment (`justify-content`, `align-items`)
+- Space distribution (`flex: 1`, `flex-shrink: 0`)
+- Content that should grow/shrink (`flex-grow`, `flex-shrink`)
+- Gap between elements (`gap`)
+
+## 📋 Refactoring Checklist
+
+When you see absolute/fixed positioning, ask:
+
+- [ ] Can this be achieved with `flex-shrink: 0`?
+- [ ] Can this be achieved with `flex: 1`?
+- [ ] Is z-index needed, or is DOM order enough?
+- [ ] Are manual padding/clearance values hiding a flex problem?
+- [ ] Would the layout break if container size changes?
+
+If you answer "yes" to any, refactor to flexbox.
+
+## 🎓 Flex Property Quick Reference
+
+```css
+/* Don't shrink or grow - use natural size */
+flex-shrink: 0;
+
+/* Take all available space */
+flex: 1;
+
+/* Equivalent to: */
+flex-grow: 1;
+flex-shrink: 1;
+flex-basis: 0%;
+```
+
+## 🔗 Related Rules
+
+- `figma-design-consistency.mdc` - Use design tokens for spacing
+- `clean-code-principles.mdc` - Avoid magic numbers
+- `code-quality-standards.mdc` - Simple, maintainable CSS
+
+## 📚 Resources
+
+- **MDN Flexbox Guide:** https://developer.mozilla.org/docs/Web/CSS/flex
+- **CSS Tricks Flexbox:** https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+- **Flexbox Froggy:** https://flexboxfroggy.com/ (interactive tutorial)
