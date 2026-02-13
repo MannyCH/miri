@@ -1,9 +1,17 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { ShoppingListView } from './ShoppingListView';
 
 export default {
   title: 'Patterns/ShoppingListView',
   component: ShoppingListView,
+  decorators: [
+    (Story) => (
+      <MemoryRouter initialEntries={['/shopping-list']}>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
   parameters: {
     layout: 'fullscreen',
     docs: {

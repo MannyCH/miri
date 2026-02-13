@@ -1,9 +1,17 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { MealPlanningView } from './MealPlanningView';
 
 export default {
   title: 'Patterns/MealPlanningView',
   component: MealPlanningView,
+  decorators: [
+    (Story) => (
+      <MemoryRouter initialEntries={['/planning']}>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
   parameters: {
     layout: 'fullscreen',
     docs: {

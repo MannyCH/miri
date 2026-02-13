@@ -1,9 +1,17 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { RecipesView } from './RecipesView';
 
 export default {
   title: 'Patterns/RecipesView',
   component: RecipesView,
+  decorators: [
+    (Story) => (
+      <MemoryRouter initialEntries={['/recipes']}>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
   parameters: {
     layout: 'fullscreen',
     docs: {
