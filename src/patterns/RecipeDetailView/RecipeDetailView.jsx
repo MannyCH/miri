@@ -24,11 +24,11 @@ export const RecipeDetailView = ({
 }) => {
   return (
     <div className="recipe-detail-view" {...props}>
+      {/* Recipe Title - Fixed at top */}
+      <h1 className="text-h1-bold recipe-detail-title">{recipe.title}</h1>
+
       {/* Scrollable Content Area */}
       <div className="recipe-detail-content">
-        {/* Recipe Title */}
-        <h1 className="text-h1-bold recipe-detail-title">{recipe.title}</h1>
-
         {/* Hero Image */}
         <div className="recipe-detail-image">
           <img src={recipe.image} alt={recipe.title} />
