@@ -22,6 +22,7 @@ const config = {
         experimentalFormat: "markdown", // Output format: 'markdown' or 'xml'
       },
     },
+    "@chromatic-com/storybook"
   ],
   features: {
     experimentalComponentsManifest: true,
