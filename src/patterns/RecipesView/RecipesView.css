@@ -11,10 +11,12 @@
 }
 
 .recipes-header {
+  position: sticky;
+  top: 0;
   padding: var(--spacing-24) var(--spacing-16) var(--spacing-16);
   flex-shrink: 0;
   background: var(--color-background-base);
-  z-index: 10;
+  z-index: 20;
 }
 
 .recipes-header h1 {

@@ -12,9 +12,11 @@
 
 /* Fixed header area (title + calendar) */
 .meal-planning-fixed-header {
+  position: sticky;
+  top: 0;
   flex-shrink: 0;
   background: var(--color-background-base);
-  z-index: 10;
+  z-index: 20;
 }
 
 /* Scrollable content area - only meals list */
