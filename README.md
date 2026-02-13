@@ -43,6 +43,13 @@ npm run storybook
 # Opens at http://localhost:6006
 ```
 
+### Visual Testing (Chromatic)
+```bash
+npm run chromatic
+# Automated visual regression + accessibility testing
+# Review results at https://www.chromatic.com
+```
+
 ### Production Build
 ```bash
 npm run build
@@ -64,6 +71,7 @@ All UI components and patterns are documented in Storybook:
 - **Base UI** - Accessible component primitives
 - **Vite** - Build tool
 - **Storybook** - Component documentation
+- **Chromatic** - Visual regression & accessibility testing
 - **CSS Variables** - Design tokens from Figma
 
 ### Project Structure
@@ -183,9 +191,35 @@ Future enhancements:
 - [ ] Meal prep instructions
 - [ ] Share meal plans
 
+## 🧪 Testing
+
+### Visual Regression & Accessibility Testing
+
+This project uses **Chromatic** for automated testing:
+
+```bash
+# Run Chromatic tests
+npm run chromatic
+```
+
+**What Chromatic Tests:**
+- ✅ **Visual Regression**: Pixel-perfect comparison with previous versions
+- ✅ **Accessibility**: WCAG 2.1 Level AA compliance, color contrast, ARIA
+- ✅ **Interactions**: Component behavior and user flows
+- ✅ **Cross-browser**: Consistent rendering across browsers
+
+**Automated Testing:**
+- Runs automatically on every push to GitHub
+- Tests only Storybook components (not web app pages)
+- Notifies you of visual changes and accessibility issues
+- Review results at: https://www.chromatic.com
+
+**Setup Guide:** See `.github/CHROMATIC_SETUP.md`
+
 ## 📚 Documentation
 
 - **Component Docs**: Run `npm run storybook`
+- **Chromatic Setup**: See `.github/CHROMATIC_SETUP.md`
 - **Development Guide**: See `DEVELOPMENT.md`
 - **Deployment Guide**: See `DEPLOYMENT.md`
 

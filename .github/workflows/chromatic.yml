@@ -1,0 +1,59 @@
+name: Chromatic Visual Testing
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Only run when Storybook components or design tokens change
+      - 'src/components/**'
+      - 'src/patterns/**'
+      - 'src/foundations/**'
+      - 'src/*-tokens.css'
+      - '.storybook/**'
+      - 'package.json'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/components/**'
+      - 'src/patterns/**'
+      - 'src/foundations/**'
+      - 'src/*-tokens.css'
+      - '.storybook/**'
+      - 'package.json'
+
+jobs:
+  chromatic:
+    name: Run Chromatic Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for Chromatic baseline comparison
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          buildScriptName: 'build-storybook'
+          onlyChanged: true  # Only test changed components
+          exitZeroOnChanges: true  # Don't fail on visual changes (review in UI)
+          exitOnceUploaded: true  # Don't wait for test results
+          
+      - name: Publish Storybook to Chromatic
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "✅ Chromatic build complete"
+          echo "📊 Review changes at: https://www.chromatic.com"

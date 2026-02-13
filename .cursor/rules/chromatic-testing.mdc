@@ -1,0 +1,228 @@
+---
+description: Chromatic visual regression and accessibility testing workflow
+alwaysApply: true
+---
+
+# Chromatic Testing Workflow
+
+Use Chromatic for automated visual regression, accessibility, and interaction testing of Storybook components.
+
+## When to Run Chromatic
+
+### Phase 1: Storybook Component Changes Only
+
+Run Chromatic after:
+- ✅ Creating new Storybook components
+- ✅ Modifying existing Storybook components
+- ✅ Updating design tokens (colors, spacing, typography)
+- ✅ Changing component styles or layout
+
+**Do NOT run for:**
+- ❌ Web app changes (src/pages, src/App.jsx)
+- ❌ Documentation-only updates
+- ❌ Non-visual code changes
+
+## Testing Workflow
+
+### Manual Testing (During Development)
+
+```bash
+# 1. Make changes to Storybook components
+# 2. Verify locally in Storybook
+npm run storybook
+
+# 3. Build Storybook
+npm run build-storybook
+
+# 4. Run Chromatic
+npm run chromatic
+
+# 5. Review results at chromatic.com
+# - Check for visual changes
+# - Review accessibility issues
+# - Approve or deny changes
+```
+
+### Automated Testing (CI/CD)
+
+Chromatic runs automatically on every push to GitHub.
+Check the GitHub Actions status for results.
+
+## What Chromatic Tests
+
+### 1. Visual Regression Testing
+
+**Detects:**
+- Unintended layout changes
+- Typography changes (font, size, weight)
+- Color changes (backgrounds, text, borders)
+- Spacing changes (padding, margin, gaps)
+- Component size/positioning changes
+
+**Example Issues Caught:**
+```
+❌ Button padding changed from 12px to 16px
+❌ Typography token update broke heading alignment
+❌ Color token change made text unreadable
+```
+
+### 2. Accessibility Testing
+
+**Detects:**
+- Color contrast violations (WCAG AA/AAA)
+- Missing alt text on images
+- Missing ARIA labels
+- Keyboard navigation issues
+- Focus indicator problems
+
+**Example Issues Caught:**
+```
+❌ Button text contrast ratio: 3.2:1 (needs 4.5:1)
+❌ Icon button missing aria-label
+❌ Form input missing associated label
+```
+
+### 3. Interaction Testing
+
+**Detects:**
+- Click/hover state issues
+- Form submission errors
+- State management bugs
+- Event handler failures
+
+**Example Issues Caught:**
+```
+❌ Checkbox doesn't toggle on click
+❌ Form validation doesn't show errors
+❌ Menu doesn't close on item select
+```
+
+## Chromatic Review Process
+
+### 1. Review Visual Changes
+
+In Chromatic UI:
+- Compare before/after screenshots
+- Check all viewport sizes (mobile, tablet, desktop)
+- Verify changes are intentional
+
+### 2. Review Accessibility Reports
+
+Check for:
+- No new violations introduced
+- Existing violations are addressed
+- All components meet WCAG standards
+
+### 3. Approve or Deny
+
+**Approve if:**
+- ✅ Changes are intentional
+- ✅ Visual output matches Figma
+- ✅ No accessibility violations
+- ✅ All interactions work correctly
+
+**Deny if:**
+- ❌ Unintended visual regression
+- ❌ Accessibility violation introduced
+- ❌ Interaction broken
+
+## Integration with Development Rules
+
+### Works with These Rules:
+
+1. **figma-design-consistency.mdc**
+   - Chromatic verifies design token usage
+   - Catches hardcoded values that break on token updates
+
+2. **visual-verification.mdc**
+   - Chromatic automates visual comparison
+   - Historical record of all visual changes
+
+3. **base-ui-best-practices.mdc**
+   - Chromatic tests accessibility compliance
+   - Ensures Base UI patterns are followed
+
+4. **minimal-changes.mdc**
+   - Chromatic shows scope of changes
+   - Prevents unintended component modifications
+
+## Notifications
+
+Configure Chromatic to notify you:
+- Email on build failure
+- Email on new accessibility violations
+- GitHub PR status checks
+- Slack notifications (optional)
+
+## Best Practices
+
+### 1. Baseline Management
+
+When intentionally changing designs:
+```bash
+# Update baselines after Figma design changes
+npm run chromatic
+# Review and approve all changes in Chromatic UI
+```
+
+### 2. Token Updates
+
+When updating design tokens:
+```bash
+# Chromatic will show impact across ALL components
+npm run chromatic
+# Review every affected component
+# Approve if all changes are expected
+```
+
+### 3. Component Refactoring
+
+When refactoring components:
+```bash
+# Visual output should be identical
+npm run chromatic
+# Should show "No visual changes detected"
+# If changes detected, investigate why
+```
+
+## Troubleshooting
+
+### Build Fails with No Visual Changes
+
+**Cause:** Accessibility or interaction test failed
+**Fix:** Check Chromatic UI for accessibility report
+
+### Too Many False Positives
+
+**Cause:** Dynamic content (dates, random data)
+**Fix:** Use static data in Storybook stories
+
+### Slow Build Times
+
+**Cause:** Too many stories or large snapshots
+**Fix:** Use `parameters.chromatic.disableSnapshot` for docs-only stories
+
+## Quick Reference
+
+```bash
+# Run Chromatic locally
+npm run chromatic
+
+# Build Storybook only (no Chromatic)
+npm run build-storybook
+
+# View Chromatic dashboard
+https://www.chromatic.com/builds?appId=your-app-id
+```
+
+## Key Principle
+
+**Chromatic is your automated guardian for Storybook components.**
+
+It ensures:
+- Visual consistency across iterations
+- Accessibility compliance
+- Interaction correctness
+- Historical audit trail
+
+Run it after every Storybook component change, review the results, and approve intentional changes.

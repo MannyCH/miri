@@ -17,7 +17,7 @@ alwaysApply: true
    Purpose: Get exact visual reference from Figma
    ```
 
-2. **Test in Storybook**
+2. **Manual Testing in Storybook**
    ```
    Run: npm run storybook
    Open: http://localhost:6006
@@ -30,6 +30,28 @@ alwaysApply: true
    - ✅ Spacing matches Figma auto-layout values
    - ✅ Border radius matches Figma corner radius
    - ✅ Component structure matches Figma layers
+
+4. **Automated Testing with Chromatic**
+   ```
+   Run: npm run chromatic
+   Purpose: Automated visual regression + accessibility testing
+   
+   Chromatic will:
+   - Capture screenshots of all components
+   - Compare with previous baseline
+   - Run accessibility audits
+   - Test interactions
+   - Report issues
+   ```
+
+5. **Review Chromatic Results**
+   ```
+   Open: https://www.chromatic.com
+   Review:
+   - Visual changes (approve if intentional)
+   - Accessibility violations (fix if found)
+   - Interaction test results
+   ```
 
 ### Phase 2: Web App Development (from Storybook)
 

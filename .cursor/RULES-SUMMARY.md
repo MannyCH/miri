@@ -147,6 +147,7 @@ This document maps your goals to the Cursor rules that enforce them.
 |------|---------|----------------|
 | `figma-design-consistency.mdc` | Enforce exact Figma matching with design tokens | ✅ Yes |
 | `visual-verification.mdc` | Mandatory browser testing and visual comparison | ✅ Yes |
+| `chromatic-testing.mdc` | Automated visual regression and accessibility testing | ✅ Yes |
 | `minimal-changes.mdc` | Prevent scope creep and random additions | ✅ Yes |
 | `storybook-workflow.mdc` | Use Storybook as single source of truth | ✅ Yes |
 | `base-ui-best-practices.mdc` | Ensure accessible, composable components | No (only .tsx/.jsx) |
@@ -184,7 +185,12 @@ This document maps your goals to the Cursor rules that enforce them.
    ├─ Compare: Storybook vs Figma screenshot
    └─ Check: Typography, colors, spacing, layout
 
-5. COMMIT
+5. RUN CHROMATIC (Automated Testing)
+   ├─ Run: npm run chromatic
+   ├─ Review: Visual changes, accessibility issues
+   └─ Approve: If changes are intentional
+
+6. COMMIT
    ├─ Use: Conventional commit format
    └─ Scope: Only requested changes
 ```
@@ -302,8 +308,10 @@ DURING:
 ✅ Document in Storybook with stories (storybook-workflow.mdc)
 
 AFTER:
-✅ Test in Storybook (visual-verification.mdc)
+✅ Test in Storybook manually (visual-verification.mdc)
 ✅ Compare with Figma screenshot (visual-verification.mdc)
+✅ Run Chromatic for automated testing (chromatic-testing.mdc)
+✅ Review visual changes and accessibility (chromatic-testing.mdc)
 ✅ Verify token usage (figma-design-consistency.mdc)
 ```
 
