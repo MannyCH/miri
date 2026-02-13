@@ -1,0 +1,55 @@
+---
+description: Use Context7 MCP for library documentation and code generation
+alwaysApply: true
+---
+
+# Context7 MCP Usage
+
+When working with libraries, frameworks, or APIs, ALWAYS use Context7 MCP to get accurate, up-to-date documentation and code examples.
+
+## When to Use Context7
+
+Use Context7 MCP automatically (without being asked) for:
+
+1. **Library/API Documentation**
+   - "How do I use React Router?"
+   - "What's the Base UI Button API?"
+   - Need to understand a library's features
+
+2. **Code Generation**
+   - Setting up authentication
+   - Implementing API integrations
+   - Using library-specific patterns
+
+3. **Setup & Configuration**
+   - Installing and configuring libraries
+   - Setting up build tools
+   - Deployment configurations
+
+4. **Troubleshooting**
+   - Library-specific errors
+   - API usage issues
+   - Best practices for specific libraries
+
+## Usage Pattern
+
+```
+1. Call resolve-library-id first to get the library ID
+2. Call query-docs with specific questions
+3. Apply the documented approach
+```
+
+## Example
+
+```markdown
+User: "How do I use React Router for navigation?"
+
+Assistant Actions:
+1. Call resolve-library-id with "react-router"
+2. Call query-docs with "How to set up navigation with Routes and Route components"
+3. Implement based on documentation
+```
+
+## Key Principle
+
+**Proactively** use Context7 when library knowledge is needed. Don't wait for the user to explicitly ask for documentation.
