@@ -141,7 +141,9 @@ This document maps your goals to the Cursor rules that enforce them.
 
 ---
 
-## All Rules & Their Purposes
+## All Rules & Skills
+
+### Rules (Automatic Enforcement)
 
 | Rule | Purpose | Always Applied |
 |------|---------|----------------|
@@ -155,6 +157,12 @@ This document maps your goals to the Cursor rules that enforce them.
 | `clean-code-principles.mdc` | DRY, single responsibility, meaningful names | ✅ Yes |
 | `git-conventional-commits.mdc` | Semantic commit messages | ✅ Yes |
 | `context7-mcp-usage.mdc` | Auto-use Context7 for library docs | ✅ Yes |
+
+### Skills (Specialized Knowledge)
+
+| Skill | Purpose | When Applied |
+|-------|---------|--------------|
+| `web-accessibility` | WCAG 2.1 Level AA compliance, catch a11y violations | Creating UI, reviewing accessibility, when a11y addon shows violations |
 
 ---
 
@@ -185,12 +193,18 @@ This document maps your goals to the Cursor rules that enforce them.
    ├─ Compare: Storybook vs Figma screenshot
    └─ Check: Typography, colors, spacing, layout
 
-5. RUN CHROMATIC (Automated Testing)
+5. CHECK ACCESSIBILITY (Required)
+   ├─ Check: Storybook a11y addon tab
+   ├─ Fix: All violations (nested controls, contrast, labels)
+   ├─ Test: Keyboard navigation
+   └─ Verify: 0 violations before proceeding
+
+6. RUN CHROMATIC (Automated Testing)
    ├─ Run: npm run chromatic
    ├─ Review: Visual changes, accessibility issues
    └─ Approve: If changes are intentional
 
-6. COMMIT
+7. COMMIT
    ├─ Use: Conventional commit format
    └─ Scope: Only requested changes
 ```
@@ -310,6 +324,7 @@ DURING:
 AFTER:
 ✅ Test in Storybook manually (visual-verification.mdc)
 ✅ Compare with Figma screenshot (visual-verification.mdc)
+✅ Check Accessibility tab - 0 violations (web-accessibility skill)
 ✅ Run Chromatic for automated testing (chromatic-testing.mdc)
 ✅ Review visual changes and accessibility (chromatic-testing.mdc)
 ✅ Verify token usage (figma-design-consistency.mdc)
