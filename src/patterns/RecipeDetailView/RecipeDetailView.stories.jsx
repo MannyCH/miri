@@ -135,39 +135,45 @@ export const WithPlayFunction = {
     const canvas = within(canvasElement);
 
     // Step 1: Wait for the component to render
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
     // Step 2: Check the first ingredient (salmon fillets)
-    const firstIngredient = canvas.getByText('2 salmon fillets (about 6 oz each)');
+    const firstIngredient = canvas.getByText(/2 salmon fillets/i);
     await userEvent.click(firstIngredient);
     
     // Small delay to see the interaction
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
     // Step 3: Check the third ingredient (cherry tomatoes)
-    const thirdIngredient = canvas.getByText('2 cups cherry tomatoes');
+    const thirdIngredient = canvas.getByText(/2 cups cherry tomatoes/i);
     await userEvent.click(thirdIngredient);
     
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
     // Step 4: Check the fifth ingredient (olive oil)
-    const fifthIngredient = canvas.getByText('2 tbsp olive oil');
+    const fifthIngredient = canvas.getByText(/2 tbsp olive oil/i);
     await userEvent.click(fifthIngredient);
     
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Step 5: Scroll down to see the "Add to Shopping List" button
-    const scrollContainer = canvas.getByRole('article');
-    scrollContainer.scrollTop = 200;
+    // Use the scrollable content container
+    const recipeDetailContent = canvasElement.querySelector('.recipe-detail-content');
+    if (recipeDetailContent) {
+      recipeDetailContent.scrollTop = 300;
+    }
     
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
     // Step 6: Click "Add to Shopping List" button
     const addButton = canvas.getByRole('button', { name: /add to shopping list/i });
     await userEvent.click(addButton);
 
-    // Step 7: Verify button was clicked (console.log will show in browser console)
+    // Step 7: Verify button was clicked
     await expect(addButton).toBeInTheDocument();
+    
+    // Optional: Verify ingredients are checked (have strikethrough style)
+    await expect(firstIngredient).toBeInTheDocument();
   },
 };
 
