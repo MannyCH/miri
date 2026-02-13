@@ -1,0 +1,122 @@
+---
+description: Enforce visual consistency with Figma designs using design tokens
+alwaysApply: true
+---
+
+# Figma Design Consistency
+
+All UI implementations must EXACTLY match the Figma design library.
+
+## Before Implementing ANY UI
+
+1. **Check Figma First** using Figma Console MCP tools
+2. **Verify exact specifications:**
+   - Typography styles (font family, size, weight, line-height)
+   - Color tokens (never hardcode colors)
+   - Spacing values (padding, margin, gaps)
+   - Border radius values
+   - Component structure and hierarchy
+
+## Design Token Requirements
+
+### NEVER Hardcode Visual Properties
+
+```css
+/* ❌ BAD: Hardcoded values */
+.button {
+  color: #9C4722;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'IBM Plex Sans';
+}
+
+/* ✅ GOOD: Use design tokens */
+.button {
+  color: var(--color-text-brand);
+  padding: var(--spacing-16);
+  border-radius: var(--corner-radius-8);
+}
+
+/* ✅ GOOD: Use typography classes */
+.button-text {
+  /* Use predefined class instead */
+}
+```
+
+### Required Token Usage
+
+**Colors:**
+- Text: `var(--color-text-strong)`, `var(--color-text-weak)`, etc.
+- Backgrounds: `var(--color-background-base)`, `var(--color-background-raised)`, etc.
+- Borders: `var(--color-stroke-weak)`, `var(--color-stroke-focus)`, etc.
+- Icons: `var(--color-icon-neutral)`, `var(--color-icon-brand)`, etc.
+
+**Spacing:**
+- Use `var(--spacing-4)`, `var(--spacing-8)`, `var(--spacing-16)`, etc.
+- NEVER use pixel values directly (e.g., `8px`, `16px`)
+
+**Border Radius:**
+- Use `var(--corner-radius-4)`, `var(--corner-radius-8)`, `var(--corner-radius-12)`, etc.
+
+**Typography:**
+- Use classes: `.text-h1-bold`, `.text-body-regular`, `.text-annotation-bold`, etc.
+- NEVER set font properties directly in CSS
+
+## Verification Process
+
+### After ANY UI Change:
+
+1. **Compare with Figma** using `figma_capture_screenshot`
+2. **Check token usage** - scan for any hardcoded values
+3. **Verify typography** - check text uses correct classes
+4. **Test in browser** - ensure visual match
+
+### Checklist for Every Component:
+
+- [ ] Uses design token CSS variables (no hardcoded colors)
+- [ ] Uses spacing tokens (no hardcoded padding/margin)
+- [ ] Uses typography classes (no inline font styles)
+- [ ] Uses border-radius tokens (no hardcoded radii)
+- [ ] Matches Figma structure and hierarchy
+- [ ] Visual output verified in browser
+
+## Figma MCP Tools
+
+Use these tools to verify designs:
+
+```
+figma_execute - Query Figma design data
+figma_capture_screenshot - Get visual reference
+figma_get_variables - Check token bindings
+figma_get_styles - Get text styles
+```
+
+## Example Workflow
+
+```
+User: "Add a button to the header"
+
+Assistant Actions:
+1. Check Figma for header button design
+2. Verify button variant in Figma components
+3. Check which tokens are used (colors, spacing, typography)
+4. Implement using ONLY design tokens
+5. Capture screenshot to verify match
+```
+
+## Zero Tolerance Policy
+
+**NEVER:**
+- Add styles not present in Figma
+- Hardcode color values (use tokens)
+- Hardcode spacing values (use tokens)
+- Guess typography (use Figma text styles)
+- Add "improvements" not requested
+- Change existing working designs without reason
+
+**ALWAYS:**
+- Verify against Figma before implementing
+- Use design tokens exclusively
+- Match Figma structure exactly
+- Test visual output in browser

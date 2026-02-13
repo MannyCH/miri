@@ -1,0 +1,155 @@
+---
+description: Always verify visual output matches Figma designs
+alwaysApply: true
+---
+
+# Visual Verification Protocol
+
+After implementing or modifying ANY UI component or pattern, ALWAYS verify the visual output matches Figma.
+
+## Verification Workflow
+
+### After EVERY UI Change:
+
+1. **Capture Figma Reference**
+   ```
+   Use: figma_capture_screenshot
+   Purpose: Get exact visual reference from Figma
+   ```
+
+2. **Test in Browser**
+   ```
+   Run: npm run dev
+   Open: http://localhost:5173
+   Check: Visual appearance matches Figma screenshot
+   ```
+
+3. **Verify Specifics:**
+   - ✅ Typography (font family, size, weight, line-height)
+   - ✅ Colors (text, background, borders, icons)
+   - ✅ Spacing (padding, margin, gaps between elements)
+   - ✅ Border radius (corners match Figma)
+   - ✅ Component hierarchy (layout structure)
+   - ✅ Alignment and positioning
+
+## Common Discrepancies to Check
+
+### Typography Mismatch
+```
+❌ Browser shows: Arial, 18px
+✅ Figma shows: Baloo Bhaijaan 2, 40px
+→ Issue: Wrong typography class or missing font import
+```
+
+### Color Mismatch
+```
+❌ Browser shows: Black (#000000)
+✅ Figma shows: Text/Strong (#260B00F2)
+→ Issue: Not using color token
+```
+
+### Spacing Mismatch
+```
+❌ Browser shows: 20px padding
+✅ Figma shows: 16px padding
+→ Issue: Not using spacing token or wrong value
+```
+
+### Layout Mismatch
+```
+❌ Browser shows: Items overlapping, wrong alignment
+✅ Figma shows: Clean spacing, proper hierarchy
+→ Issue: Missing CSS properties or wrong flexbox values
+```
+
+## Mandatory Checks
+
+Before considering ANY UI work complete:
+
+### Typography Check
+```javascript
+// Verify each text element uses correct class
+✅ Title: .text-h1-bold
+✅ Body: .text-body-regular
+✅ Labels: .text-annotation-bold
+```
+
+### Color Check
+```javascript
+// Verify NO hardcoded colors
+✅ color: var(--color-text-strong)
+❌ color: #260B00
+```
+
+### Spacing Check
+```javascript
+// Verify NO hardcoded spacing
+✅ padding: var(--spacing-16)
+❌ padding: 16px
+```
+
+### Border Radius Check
+```javascript
+// Verify NO hardcoded radii
+✅ border-radius: var(--corner-radius-12)
+❌ border-radius: 12px
+```
+
+## Testing Process
+
+### Local Testing Required
+
+ALWAYS test changes in browser before committing:
+
+```bash
+# 1. Start dev server
+npm run dev
+
+# 2. Open browser
+http://localhost:5173
+
+# 3. Navigate to changed component/pattern
+
+# 4. Compare with Figma:
+#    - Open Figma design
+#    - Place screenshots side-by-side
+#    - Check every visual detail
+
+# 5. If mismatch found:
+#    - Fix the issue
+#    - Repeat verification
+```
+
+## When to Re-verify
+
+Re-verify visual output after:
+
+1. ✅ Implementing new components
+2. ✅ Modifying existing components
+3. ✅ Updating design tokens
+4. ✅ Changing typography
+5. ✅ Adjusting layout/spacing
+6. ✅ Fixing bugs that affect appearance
+
+## Documentation
+
+When delivering UI changes, include:
+
+```markdown
+✅ Visual verification completed:
+- Compared with Figma node [ID]
+- All typography tokens match
+- All color tokens match
+- All spacing tokens match
+- Tested in browser at http://localhost:5173
+```
+
+## Zero Tolerance
+
+**Never consider UI work complete without:**
+1. Figma screenshot reference
+2. Browser testing
+3. Side-by-side comparison
+4. Token usage verification
+
+**Visual accuracy is mandatory, not optional.**

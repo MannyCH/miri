@@ -1,0 +1,141 @@
+---
+description: Make only requested changes, avoid random additions or modifications
+alwaysApply: true
+---
+
+# Minimal Changes Policy
+
+Make ONLY the changes explicitly requested by the user. Do not add unrequested features, styles, or modifications.
+
+## Core Principles
+
+### 1. Respect Existing Code
+
+```javascript
+// ❌ BAD: Adding unrequested improvements
+// User asks: "Fix the button color"
+const Button = () => {
+  // Added loading state, icons, tooltips (NOT REQUESTED)
+  return <button className="btn">{isLoading ? <Spinner /> : children}</button>;
+};
+
+// ✅ GOOD: Only fix what was asked
+const Button = () => {
+  return <button className="btn">{children}</button>;
+  // Only changed: className to use correct color token
+};
+```
+
+### 2. Don't Add Unrequested Features
+
+**User asks:** "Add a search bar"
+
+```jsx
+// ❌ BAD: Added sorting, filters, advanced features
+<SearchBar 
+  onChange={handleSearch}
+  onSort={handleSort}        // NOT REQUESTED
+  filters={filters}          // NOT REQUESTED
+  debounce={300}             // NOT REQUESTED
+/>
+
+// ✅ GOOD: Just the search bar
+<SearchBar 
+  onChange={handleSearch}
+/>
+```
+
+### 3. Don't Modify Working Code
+
+If something works and wasn't mentioned, **don't touch it**:
+
+```jsx
+// ❌ BAD: "Improving" code that wasn't broken
+// User asks: "Add a new recipe view"
+// Agent also refactors unrelated components, renames variables, reorganizes structure
+
+// ✅ GOOD: Only add the new recipe view
+// Leave all other files untouched
+```
+
+### 4. Don't Add Styling Not in Figma
+
+```css
+/* ❌ BAD: Adding hover effects, animations, transitions not in design */
+.button {
+  transition: all 0.3s ease;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ✅ GOOD: Only styles from Figma */
+.button {
+  background: var(--color-fill-brand-strong);
+  padding: var(--spacing-12) var(--spacing-24);
+}
+```
+
+### 5. Don't Guess Requirements
+
+**If unclear, ASK instead of guessing:**
+
+```
+User: "Make the app faster"
+
+❌ BAD: Add caching, code splitting, lazy loading, service workers
+✅ GOOD: "What specific performance issue are you experiencing?"
+```
+
+## Implementation Guidelines
+
+### When Making Changes:
+
+1. **Read the request carefully** - understand EXACTLY what's asked
+2. **Make minimal edits** - change only what's necessary
+3. **Preserve everything else** - don't refactor unrelated code
+4. **Test only the change** - don't add extra test cases
+5. **Don't optimize prematurely** - only optimize if requested
+
+### Red Flags (Things to AVOID):
+
+- "I also added..." (unless requested)
+- "I improved..." (unless requested)
+- "I refactored..." (unless requested)
+- "While I was at it..." (never do this)
+- "For better UX..." (only if asked)
+- Adding comments/documentation beyond the change
+- Reorganizing file structure
+- Renaming variables/functions
+- Adding error handling not requested
+- Adding validation not requested
+
+## Examples
+
+### ✅ Good: Surgical Changes
+
+```
+User: "Change button color to brand color"
+
+Changes:
+- Update button CSS: color token only
+- Nothing else touched
+```
+
+### ❌ Bad: Scope Creep
+
+```
+User: "Change button color to brand color"
+
+Changes made:
+- Update button CSS (requested)
+- Add hover state (NOT requested)
+- Add loading spinner (NOT requested)
+- Refactor button component (NOT requested)
+- Update all other buttons (NOT requested)
+```
+
+## Key Principle
+
+**If the user didn't ask for it, don't add it.**
+
+Respect the user's codebase and only make the specific changes they request.
