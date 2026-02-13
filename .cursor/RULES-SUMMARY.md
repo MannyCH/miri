@@ -341,7 +341,29 @@ AFTER:
 ✅ Quality standards (code-quality-standards.mdc)
 ✅ Conventional commits (git-conventional-commits.mdc)
 ✅ Use Context7 for library docs (context7-mcp-usage.mdc)
+✅ Use Storybook HTTP API when running (storybook-workflow.mdc)
 ```
+
+### Storybook MCP Usage (When Running)
+
+**CRITICAL: If Storybook is running on port 6006, ALWAYS:**
+
+```bash
+# 1. Check if running
+curl -s http://localhost:6006/index.json >/dev/null 2>&1
+
+# 2. If running, get exact data
+curl -s http://localhost:6006/index.json | grep "component-name"
+
+# 3. Return exact story IDs and URLs
+# Example: components-searchbar--default
+# URL: http://localhost:6006/?path=/story/components-searchbar--default
+```
+
+**Never:**
+- ❌ Guess story IDs or URLs
+- ❌ Read files when Storybook is running
+- ❌ Manually construct URLs
 
 ---
 
