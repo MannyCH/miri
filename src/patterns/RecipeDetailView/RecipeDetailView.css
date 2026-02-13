@@ -9,28 +9,25 @@
   overflow: hidden;
 }
 
-/* Scrollable content area - Takes remaining space */
-.recipe-detail-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--spacing-16);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-16);
-}
-
-/* Recipe Title - Sticks to top of scroll container (valid use of sticky) */
+/* Recipe Title - Fixed at top */
 .recipe-detail-title {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   margin: 0;
   padding: var(--spacing-16);
   padding-bottom: var(--spacing-8);
   background: var(--color-background-base);
   color: var(--color-text-strong);
-  z-index: 10;
-  margin: calc(var(--spacing-16) * -1); /* Offset parent padding */
-  margin-bottom: var(--spacing-8);
+}
+
+/* Scrollable content area - Takes remaining space between title and nav */
+.recipe-detail-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-16);
+  padding-top: var(--spacing-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
 }
 
 /* Hero Image */
