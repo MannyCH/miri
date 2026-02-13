@@ -7,15 +7,42 @@ alwaysApply: true
 
 All UI implementations must EXACTLY match the Figma design library.
 
-## Before Implementing ANY UI
+## Two-Phase Workflow
 
-1. **Check Figma First** using Figma Console MCP tools
-2. **Verify exact specifications:**
+### Phase 1: Creating Storybook Components
+
+**When:** Documenting components in Storybook from Figma designs
+
+**Before Implementing:**
+1. **Check Figma First** using Figma Console MCP tools:
+   ```
+   - figma_execute: Get component structure
+   - figma_capture_screenshot: Visual reference
+   - figma_get_variables: Check token bindings
+   - figma_get_styles: Get typography styles
+   ```
+
+2. **Verify exact specifications from Figma:**
    - Typography styles (font family, size, weight, line-height)
    - Color tokens (never hardcode colors)
    - Spacing values (padding, margin, gaps)
    - Border radius values
    - Component structure and hierarchy
+
+3. **Implement with Base UI + Tokens:**
+   - Use Base UI components as foundation
+   - Apply design tokens exclusively
+   - Match Figma structure exactly
+
+### Phase 2: Building Web App
+
+**When:** Creating application components from Storybook docs
+
+**Before Implementing:**
+1. **Check Storybook First** using Storybook MCP tools
+2. **Use existing components** - don't recreate
+3. **Compose patterns** from documented components
+4. **Maintain token usage** from Storybook components
 
 ## Design Token Requirements
 

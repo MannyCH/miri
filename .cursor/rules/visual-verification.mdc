@@ -1,15 +1,15 @@
 ---
-description: Always verify visual output matches Figma designs
+description: Always verify visual output matches Figma or Storybook reference
 alwaysApply: true
 ---
 
 # Visual Verification Protocol
 
-After implementing or modifying ANY UI component or pattern, ALWAYS verify the visual output matches Figma.
+## Two-Phase Verification
 
-## Verification Workflow
+### Phase 1: Storybook Component Creation (from Figma)
 
-### After EVERY UI Change:
+**After creating/modifying Storybook components:**
 
 1. **Capture Figma Reference**
    ```
@@ -17,12 +17,42 @@ After implementing or modifying ANY UI component or pattern, ALWAYS verify the v
    Purpose: Get exact visual reference from Figma
    ```
 
-2. **Test in Browser**
+2. **Test in Storybook**
+   ```
+   Run: npm run storybook
+   Open: http://localhost:6006
+   Check: Component matches Figma screenshot exactly
+   ```
+
+3. **Verify Specifics:**
+   - ✅ Typography matches Figma text styles
+   - ✅ Colors match Figma color variables
+   - ✅ Spacing matches Figma auto-layout values
+   - ✅ Border radius matches Figma corner radius
+   - ✅ Component structure matches Figma layers
+
+### Phase 2: Web App Development (from Storybook)
+
+**After implementing web app features:**
+
+1. **Check Storybook Reference**
+   ```
+   Use: Storybook MCP or open http://localhost:6006
+   Purpose: Verify component usage and props
+   ```
+
+2. **Test in Web App**
    ```
    Run: npm run dev
    Open: http://localhost:5173
-   Check: Visual appearance matches Figma screenshot
+   Check: App uses components correctly as documented
    ```
+
+3. **Verify Specifics:**
+   - ✅ Uses Storybook components (not recreated)
+   - ✅ Props match Storybook documentation
+   - ✅ Composition matches patterns
+   - ✅ Visual output consistent with Storybook
 
 3. **Verify Specifics:**
    - ✅ Typography (font family, size, weight, line-height)

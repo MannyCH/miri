@@ -1,31 +1,97 @@
 ---
-description: Storybook MCP workflow instructions for UI development
+description: Two-phase workflow - Figma to Storybook, then Storybook to Web App
 alwaysApply: true
 ---
 
 # Storybook Development Workflow
 
-## MCP Server Integration
+## Complete Two-Phase Workflow
 
-Before doing any UI, frontend or React development, **ALWAYS call the storybook MCP server** to get further instructions.
+### Phase 1: Figma → Storybook (Component Library Creation)
 
-The Storybook MCP server provides:
+**When:** Creating or documenting new components
 
-1. **UI Building Instructions** - Standardized guidelines for component development
-2. **Story URL Retrieval** - Direct links to view component stories
-3. **Component Documentation** - Detailed documentation for all components
-4. **Component Discovery** - List of available UI components
+**Process:**
+1. **Get Figma Design** using Figma Console MCP:
+   ```
+   - Use: figma_execute, figma_capture_screenshot
+   - Extract: Typography, colors, spacing, structure
+   ```
 
-## When to Use Storybook MCP
+2. **Write Code with Base UI + Design Tokens:**
+   ```javascript
+   // Match Figma design using:
+   // - Base UI components (@base-ui/react)
+   // - Design tokens: var(--color-*), var(--spacing-*)
+   // - Typography classes: .text-h1-bold, .text-body-regular
+   ```
 
-Call the Storybook MCP server when:
+3. **Document in Storybook:**
+   ```
+   - Create component stories (CSF3 format)
+   - Show all variants and states
+   - Document props and usage
+   - Verify visual match with Figma
+   ```
 
-- Creating new UI components
-- Modifying existing components
-- Writing component stories
-- Needing to verify component appearance
-- Looking for existing components to reuse
-- Understanding component APIs and props
+4. **Verify:**
+   - Component matches Figma design exactly
+   - All design tokens used (no hardcoded values)
+   - Stories demonstrate all states
+   - Accessible and well-documented
+
+### Phase 2: Storybook → Web App (Application Development)
+
+**When:** Building the actual web application
+
+**Process:**
+1. **Check Storybook First** - Always use Storybook MCP before implementing:
+   ```
+   - Use: list-all-documentation, get-documentation
+   - Find: Existing components to reuse
+   - Understand: Component APIs and props
+   ```
+
+2. **Build from Documented Components:**
+   ```javascript
+   // Import components documented in Storybook
+   import { Button } from './components/Button';
+   import { RecipeListItem } from './components/RecipeListItem';
+   
+   // Use them in your app
+   // DO NOT create new versions or modify
+   ```
+
+3. **Compose Patterns:**
+   ```
+   - Patterns are compositions of Storybook components
+   - Document patterns in Storybook too
+   - Example: MealPlanningView uses CalendarWeek + RecipeListItem + NavigationBar
+   ```
+
+4. **Single Source of Truth:**
+   ```
+   Storybook = Component Library Reference
+   Web App = Uses Storybook Components
+   ```
+
+## When to Use Each MCP Server
+
+### Figma Console MCP (Phase 1 Only)
+
+Use for **creating** Storybook components:
+- `figma_execute` - Get component structure
+- `figma_capture_screenshot` - Visual reference
+- `figma_get_variables` - Design token bindings
+- `figma_get_styles` - Typography styles
+
+### Storybook MCP (Phase 2 Only)
+
+Use for **building** web app:
+- `get_ui_building_instructions` - Component guidelines
+- `list-all-documentation` - Discover components
+- `get-documentation` - Component API details
+- `preview-stories` - View component stories
 
 ## Required: Storybook Must Be Running
 
@@ -47,9 +113,13 @@ When creating or modifying components:
 4. Ensure stories are accessible and well-documented
 5. Use the MCP server to get story URLs for verification
 
-## Available MCP Tools
+## Key Principle
 
-- `get_ui_building_instructions` - Get component development guidelines
-- `preview-stories` - Get URLs to specific story variants
-- `list-all-documentation` - Discover available components
-- `get-documentation` - Get detailed component docs
+```
+Figma (Design) → Base UI Code + Tokens → Storybook (Docs) → Web App (Implementation)
+     ↑                                         ↑                    ↑
+Phase 1: Component Creation          Phase 2: App Development
+Uses: Figma MCP                      Uses: Storybook MCP
+```
+
+**Never skip Storybook documentation. It's the bridge between design and implementation.**

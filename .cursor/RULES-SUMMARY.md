@@ -2,6 +2,50 @@
 
 This document maps your goals to the Cursor rules that enforce them.
 
+## Your Development Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    PHASE 1: Component Library                    │
+│                                                                   │
+│  Figma Design                                                    │
+│      ↓                                                           │
+│  [Use Figma Console MCP]                                        │
+│      ↓                                                           │
+│  Extract: Typography, Colors, Spacing, Structure                │
+│      ↓                                                           │
+│  Implement with Base UI + Design Tokens                         │
+│      ↓                                                           │
+│  Document in Storybook (Stories + Props)                        │
+│      ↓                                                           │
+│  Verify: Storybook matches Figma                                │
+│                                                                   │
+│  Rules: figma-design-consistency, base-ui-best-practices,       │
+│         visual-verification, storybook-workflow                  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+                    Storybook = Single Source of Truth
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                    PHASE 2: Web Application                      │
+│                                                                   │
+│  Storybook Docs                                                  │
+│      ↓                                                           │
+│  [Use Storybook MCP]                                            │
+│      ↓                                                           │
+│  Find: Existing components to reuse                             │
+│      ↓                                                           │
+│  Import & Compose: Build patterns from components               │
+│      ↓                                                           │
+│  Build: Web app pages/features                                  │
+│      ↓                                                           │
+│  Verify: App uses components correctly                          │
+│                                                                   │
+│  Rules: storybook-workflow, minimal-changes,                    │
+│         visual-verification, code-quality-standards             │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ## Your Goals & Coverage
 
 ### ✅ Goal 1: Constant Visual Design Consistency
@@ -113,27 +157,79 @@ This document maps your goals to the Cursor rules that enforce them.
 
 ---
 
-## Verification Workflow
+## Two-Phase Development Workflow
 
-Every UI change must follow this workflow:
+### Phase 1: Figma → Storybook (Component Library)
+
+**Purpose:** Create and document reusable components
 
 ```
 1. CHECK FIGMA
    ├─ Use: figma_execute, figma_capture_screenshot
-   └─ Verify: tokens, typography, spacing, colors
+   ├─ Use: figma_get_variables, figma_get_styles
+   └─ Verify: tokens, typography, spacing, colors, structure
 
-2. IMPLEMENT WITH TOKENS
+2. IMPLEMENT WITH BASE UI + TOKENS
+   ├─ Use: Base UI components (@base-ui/react)
    ├─ Use: var(--color-*), var(--spacing-*), .text-*
    └─ Never: hardcoded colors, spacing, fonts
 
-3. VERIFY IN BROWSER
-   ├─ Run: npm run dev
-   ├─ Compare: Browser vs Figma screenshot
+3. DOCUMENT IN STORYBOOK
+   ├─ Create: Component stories (CSF3 format)
+   ├─ Document: Props, variants, usage examples
+   └─ Verify: All states and variants shown
+
+4. VERIFY IN STORYBOOK
+   ├─ Run: npm run storybook
+   ├─ Compare: Storybook vs Figma screenshot
    └─ Check: Typography, colors, spacing, layout
 
-4. COMMIT
+5. COMMIT
    ├─ Use: Conventional commit format
    └─ Scope: Only requested changes
+```
+
+### Phase 2: Storybook → Web App (Application)
+
+**Purpose:** Build web application using documented components
+
+```
+1. CHECK STORYBOOK FIRST
+   ├─ Use: Storybook MCP (list-all-documentation, get-documentation)
+   └─ Find: Existing components to reuse
+
+2. COMPOSE FROM STORYBOOK COMPONENTS
+   ├─ Import: Documented components from Storybook
+   ├─ Use: Props and APIs as documented
+   └─ Never: Recreate components or modify without updating Storybook
+
+3. BUILD PATTERNS
+   ├─ Compose: Multiple Storybook components
+   ├─ Document: Patterns in Storybook too
+   └─ Example: MealPlanningView = CalendarWeek + RecipeListItem + NavigationBar
+
+4. VERIFY IN WEB APP
+   ├─ Run: npm run dev
+   ├─ Compare: App vs Storybook reference
+   └─ Check: Components used correctly, props match docs
+
+5. COMMIT
+   ├─ Use: Conventional commit format
+   └─ Scope: Only requested changes
+```
+
+### Key Principle
+
+```
+Figma (Design Source) 
+  ↓ Phase 1: Component Creation
+  ↓ Uses: Figma MCP + Base UI
+  ↓
+Storybook (Component Library & Single Source of Truth)
+  ↓ Phase 2: App Development  
+  ↓ Uses: Storybook MCP
+  ↓
+Web App (Final Application)
 ```
 
 ---
@@ -192,21 +288,51 @@ If rules are:
 
 ## Quick Reference Card
 
+### Phase 1: Creating Storybook Components
+
 ```
-BEFORE EVERY UI CHANGE:
-✅ Check Figma (figma-design-consistency.mdc)
+BEFORE:
+✅ Check Figma using Figma MCP (figma-design-consistency.mdc)
+✅ Get exact specs: typography, colors, spacing (figma-design-consistency.mdc)
+✅ Use Base UI + design tokens (base-ui-best-practices.mdc)
+
+DURING:
 ✅ Use design tokens only (figma-design-consistency.mdc)
 ✅ Make only requested changes (minimal-changes.mdc)
+✅ Document in Storybook with stories (storybook-workflow.mdc)
 
-AFTER EVERY UI CHANGE:
-✅ Test in browser (visual-verification.mdc)
+AFTER:
+✅ Test in Storybook (visual-verification.mdc)
 ✅ Compare with Figma screenshot (visual-verification.mdc)
 ✅ Verify token usage (figma-design-consistency.mdc)
+```
 
-ALWAYS:
+### Phase 2: Building Web App
+
+```
+BEFORE:
+✅ Check Storybook using Storybook MCP (storybook-workflow.mdc)
+✅ Find existing components to reuse (storybook-workflow.mdc)
+✅ Understand component APIs (storybook-workflow.mdc)
+
+DURING:
+✅ Import from Storybook components (storybook-workflow.mdc)
+✅ Make only requested changes (minimal-changes.mdc)
+✅ Compose patterns from documented components (storybook-workflow.mdc)
+
+AFTER:
+✅ Test in web app (visual-verification.mdc)
+✅ Verify component usage (visual-verification.mdc)
+✅ Check props match Storybook docs (visual-verification.mdc)
+```
+
+### Always (Both Phases)
+
+```
 ✅ Clean code (clean-code-principles.mdc)
 ✅ Quality standards (code-quality-standards.mdc)
 ✅ Conventional commits (git-conventional-commits.mdc)
+✅ Use Context7 for library docs (context7-mcp-usage.mdc)
 ```
 
 ---
