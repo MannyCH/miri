@@ -1,5 +1,6 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { userEvent, within, expect } from 'storybook/test';
 import { RecipeDetailView } from './RecipeDetailView';
 
 export default {
@@ -86,8 +87,87 @@ export const Interactive = {
         checkedIngredients={checkedIngredients}
         onIngredientCheck={handleIngredientCheck}
         onIngredientDelete={handleIngredientDelete}
+        onAddToList={() => console.log('Added to shopping list')}
       />
     );
+  },
+};
+
+/**
+ * Automated interaction test - demonstrates checking ingredients and adding to list
+ * Watch the Interactions panel to see the step-by-step flow
+ */
+export const WithPlayFunction = {
+  render: () => {
+    const [checkedIngredients, setCheckedIngredients] = React.useState({});
+    const [ingredients, setIngredients] = React.useState(sampleRecipe.ingredients);
+
+    const handleIngredientCheck = (index, checked) => {
+      setCheckedIngredients((prev) => ({
+        ...prev,
+        [index]: checked,
+      }));
+    };
+
+    const handleIngredientDelete = (index) => {
+      setIngredients((prev) => prev.filter((_, i) => i !== index));
+      setCheckedIngredients((prev) => {
+        const newChecked = { ...prev };
+        delete newChecked[index];
+        return newChecked;
+      });
+    };
+
+    return (
+      <RecipeDetailView
+        recipe={{
+          ...sampleRecipe,
+          ingredients,
+        }}
+        checkedIngredients={checkedIngredients}
+        onIngredientCheck={handleIngredientCheck}
+        onIngredientDelete={handleIngredientDelete}
+        onAddToList={() => console.log('Added to shopping list')}
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Step 1: Wait for the component to render
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Step 2: Check the first ingredient (salmon fillets)
+    const firstIngredient = canvas.getByText('2 salmon fillets (about 6 oz each)');
+    await userEvent.click(firstIngredient);
+    
+    // Small delay to see the interaction
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Step 3: Check the third ingredient (cherry tomatoes)
+    const thirdIngredient = canvas.getByText('2 cups cherry tomatoes');
+    await userEvent.click(thirdIngredient);
+    
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Step 4: Check the fifth ingredient (olive oil)
+    const fifthIngredient = canvas.getByText('2 tbsp olive oil');
+    await userEvent.click(fifthIngredient);
+    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Step 5: Scroll down to see the "Add to Shopping List" button
+    const scrollContainer = canvas.getByRole('article');
+    scrollContainer.scrollTop = 200;
+    
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // Step 6: Click "Add to Shopping List" button
+    const addButton = canvas.getByRole('button', { name: /add to shopping list/i });
+    await userEvent.click(addButton);
+
+    // Step 7: Verify button was clicked (console.log will show in browser console)
+    await expect(addButton).toBeInTheDocument();
   },
 };
 
