@@ -33,12 +33,7 @@
 .recipe-list-item-title {
   flex: 1;
   margin: 0;
-  /* Use Heading 4 Bold typography token from Figma */
-  font-family: var(--font-family-heading);
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 28px;
-  letter-spacing: 0;
+  /* Typography is handled by text-h4-bold class */
   color: var(--color-text-strong);
 }
 
