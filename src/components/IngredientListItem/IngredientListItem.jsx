@@ -1,12 +1,11 @@
 import React from 'react';
-import { Checkbox } from '@base-ui/react/checkbox';
 import { Divider } from '../Divider';
 import './IngredientListItem.css';
 
 /**
  * IngredientListItem component - Exactly as designed in Figma
  * Interactive ingredient item - tap to toggle strikethrough, swipe left to delete
- * Built with Base UI Checkbox for accessibility (hidden)
+ * Uses role="button" with aria-pressed for accessible toggle state
  */
 export const IngredientListItem = ({ 
   children = '2l Milch',
@@ -91,6 +90,7 @@ export const IngredientListItem = ({
           role="button"
           tabIndex={0}
           aria-pressed={checked}
+          aria-label={`${checked ? 'Uncheck' : 'Check'} ${children}`}
           onKeyDown={(e) => {
             // Support keyboard: Space/Enter to toggle
             if (e.key === ' ' || e.key === 'Enter') {
@@ -105,16 +105,6 @@ export const IngredientListItem = ({
           }}
           {...props}
         >
-          {/* Hidden checkbox for accessibility - controlled by parent */}
-          <Checkbox.Root 
-            className="ingredient-list-item-checkbox-hidden"
-            checked={checked}
-            onCheckedChange={onCheckedChange}
-            tabIndex={-1}
-          >
-            <Checkbox.Indicator />
-          </Checkbox.Root>
-          
           <span className="ingredient-list-item-text">{children}</span>
         </div>
       </div>
