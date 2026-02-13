@@ -1,0 +1,217 @@
+---
+title: Pull Request Failed Checks Workflow
+tags: [pr, chromatic, ci-cd, testing]
+---
+
+# Pull Request Failed Checks Workflow
+
+When a Pull Request has failed CI/CD checks (especially Chromatic visual testing), follow this systematic workflow to analyze and fix issues.
+
+## 🔍 Step 1: Access Failed Check Details
+
+### How to Access:
+1. Open the Pull Request on GitHub
+2. Scroll to "Checks" section at the bottom
+3. Look for failed checks (red X)
+4. Click "Details" next to the failed check
+5. For Chromatic: Opens build page with all test results
+
+### Direct URL Pattern:
+```
+https://www.chromatic.com/build?appId=[APP_ID]&number=[BUILD_NUMBER]
+```
+
+## 📊 Step 2: Analyze DENIED Changes
+
+### What to Look For:
+
+**In Chromatic Build Page:**
+- **"Denied" status** (red) = Changes that need investigation
+- **"Accepted" status** (green) = Changes approved
+- **"Unreviewed" status** (gray) = Pending review
+
+### CRITICAL: Read User Comments
+**ALWAYS check for comments/feedback left by reviewers on denied changes:**
+- Click on each DENIED change individually
+- Read the comment/reason for denial
+- Note whether issue is:
+  - **Visual** (design mismatch)
+  - **Code quality** (semantic HTML, best practices)
+  - **Accessibility** (a11y violations)
+  - **Functionality** (broken behavior)
+
+## 🧠 Step 3: Think Before Acting
+
+### For Visual Issues:
+
+**Compare with Figma Design:**
+1. Use Figma MCP Console to get component specs
+2. Check design tokens (spacing, colors, typography)
+3. Identify what's missing or incorrect
+4. Ask: "Why wasn't this properly implemented?"
+
+**Common Visual Issues:**
+- Missing design properties (underline, borders, shadows)
+- Wrong spacing/padding values
+- Incorrect typography tokens
+- Color mismatches
+
+### For Code Quality Issues:
+
+**Semantic HTML:**
+```html
+<!-- ❌ BAD: Visual class doesn't match semantic element -->
+<h3 className="text-h4-bold">Title</h3>
+
+<!-- ✅ GOOD: Semantic element matches visual styling -->
+<h4 className="text-h4-bold">Title</h4>
+```
+
+**Principle:** If it looks like H4, it should BE H4.
+
+**CSS Duplication:**
+```css
+/* ❌ BAD: Duplicating what typography class already does */
+.title {
+  font-family: var(--font-family-heading);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+/* ✅ GOOD: Let typography class handle it */
+.title {
+  /* Typography handled by text-h4-bold class */
+  color: var(--color-text-strong);
+}
+```
+
+### For Accessibility Issues:
+
+**Common A11y Problems:**
+- Heading hierarchy violations
+- Missing ARIA labels
+- Color contrast issues
+- Interactive element nesting
+- Duplicate content
+
+## 💬 Step 4: Present Recommendations to User
+
+**NEVER make changes without user approval!**
+
+### Present Analysis Like This:
+
+```markdown
+## 🔍 Analysis of DENIED Changes
+
+### 1. Component Name: Issue Title
+**Status:** Visual/Code/Accessibility
+**User Comment:** [Exact comment from Chromatic]
+**Root Cause:** [Why this happened]
+
+**My Assessment:**
+- [What I found]
+- [What needs to change]
+
+**Recommended Fix:**
+```code
+// Show before/after
+```
+
+**Question for you:**
+- [Any clarification needed]
+```
+
+## ✅ Step 5: Implement Approved Fixes
+
+**Only after user confirms:**
+1. Make code changes
+2. Commit with clear message referencing issue
+3. Push to branch
+4. Chromatic will auto-run new build
+5. Review new results
+
+### Commit Message Format:
+```bash
+fix(component): [brief description]
+
+- Issue 1: [what was wrong] → [what was fixed]
+- Issue 2: [what was wrong] → [what was fixed]
+
+Addresses Chromatic Build #[number] denied changes.
+```
+
+## 🚫 Common Mistakes to Avoid
+
+### ❌ DON'T:
+- Assume you know why something was denied
+- Skip reading user comments
+- Make changes without asking first
+- Only look at visual diff without checking code
+- Ignore semantic HTML correctness
+- Fix only what Chromatic flags (think holistically)
+
+### ✅ DO:
+- Read ALL comments on denied changes
+- Check Figma design with MCP Console
+- Analyze WHY implementation was wrong
+- Present clear before/after recommendations
+- Ask for confirmation before changing
+- Consider related components that might have same issue
+
+## 🎯 Example Workflow
+
+### Good Example:
+
+**User says:** "Check the failed Chromatic check"
+
+**You do:**
+1. ✅ Open Chromatic build page
+2. ✅ Find 5 denied changes
+3. ✅ Read user's comments on each one:
+   - "Tertiary button missing underline"
+   - "RecipeListItem using h3 but styled as h4 - semantic mismatch"
+4. ✅ Analyze root cause:
+   - Underline: Forgot to add text-decoration from Figma
+   - Semantic: Used wrong HTML element
+5. ✅ Present analysis with recommendations
+6. ✅ Wait for approval
+7. ✅ Implement fixes
+8. ✅ Push and verify
+
+### Bad Example:
+
+**User says:** "Check the failed Chromatic check"
+
+**You do:**
+1. ❌ Look at visual diff only
+2. ❌ Don't read comments
+3. ❌ Assume you know the issue
+4. ❌ Make changes immediately
+5. ❌ User has to correct you
+
+## 📋 Checklist
+
+Before proposing fixes, ensure:
+
+- [ ] Opened Chromatic build page
+- [ ] Identified all DENIED changes
+- [ ] Read user comments on each denied change
+- [ ] Checked Figma design (if visual issue)
+- [ ] Analyzed code (if code quality issue)
+- [ ] Understood WHY it was wrong
+- [ ] Prepared clear recommendations
+- [ ] Asked user for approval
+
+## 🔗 Related Rules
+
+- `figma-design-consistency.mdc` - Visual design verification
+- `web-accessibility` skill - Accessibility standards
+- `storybook-workflow.mdc` - Component development flow
+- `chromatic-testing.mdc` - Visual regression testing
+
+## 📚 Resources
+
+- **Chromatic Docs:** https://www.chromatic.com/docs
+- **Semantic HTML:** https://developer.mozilla.org/en-US/docs/Glossary/Semantics
+- **WCAG Guidelines:** https://www.w3.org/WAI/WCAG21/quickref/
