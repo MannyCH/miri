@@ -1,12 +1,14 @@
-/* MealPlanningView Pattern - Pure Flexbox Layout */
+/* MealPlanningView Pattern - Pure Flexbox Layout with Safe Areas */
 .meal-planning-view {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   background: var(--color-background-base);
   max-width: 390px;
   margin: 0 auto;
   overflow: hidden;
+  padding-top: var(--safe-area-inset-top);
 }
 
 /* Header area (title + calendar) - Fixed at top, don't shrink */
@@ -19,7 +21,9 @@
 .meal-planning-content {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0 var(--spacing-16);
+  padding-bottom: calc(88px + var(--safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 0; /* Figma Container has itemSpacing: 0 - spacing comes from section padding */
