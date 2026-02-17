@@ -1,12 +1,14 @@
-/* RecipeDetailView Pattern - Pure Flexbox Layout */
+/* RecipeDetailView Pattern - Pure Flexbox Layout with Safe Areas */
 .recipe-detail-view {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   background: var(--color-background-base);
   max-width: 390px;
   margin: 0 auto;
   overflow: hidden;
+  padding-top: var(--safe-area-inset-top);
 }
 
 /* Recipe Title - Fixed at top */
@@ -23,8 +25,10 @@
 .recipe-detail-content {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: var(--spacing-16);
   padding-top: var(--spacing-8);
+  padding-bottom: calc(88px + var(--safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: var(--spacing-16);

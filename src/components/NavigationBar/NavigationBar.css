@@ -1,10 +1,16 @@
-/* NavigationBar - Exact Figma Design with Flexbox Layout */
+/* NavigationBar - Fixed at Bottom with Safe Area Support */
 .navigation-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-around;
   align-items: center;
   width: 100%;
   padding: var(--spacing-8) 0;
+  padding-bottom: calc(var(--spacing-8) + var(--safe-area-inset-bottom));
   background: var(--color-background-raised);
   border-top: 1px solid var(--color-stroke-weak);
+  z-index: 1000;
 }
