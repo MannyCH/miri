@@ -1,9 +1,6 @@
-/* NavigationBar - Fixed at Bottom with Safe Area Support */
+/* NavigationBar - Flexbox with Safe Area Support */
 .navigation-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -12,5 +9,4 @@
   padding-bottom: calc(var(--spacing-8) + var(--safe-area-inset-bottom));
   background: var(--color-background-raised);
   border-top: 1px solid var(--color-stroke-weak);
-  z-index: 1000;
 }

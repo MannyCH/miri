@@ -9,11 +9,13 @@
   margin: 0 auto;
   overflow: hidden;
   padding-top: var(--safe-area-inset-top);
+  padding-bottom: calc(var(--safe-area-inset-bottom));
 }
 
 /* Header - Fixed at top, don't shrink */
 .shopping-list-header {
   flex-shrink: 0;
+  order: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -63,11 +65,10 @@
 /* Scrollable content - Takes remaining space */
 .shopping-list-content {
   flex: 1;
+  order: 2;
   padding: var(--spacing-16);
-  padding-bottom: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  margin-bottom: calc(88px + var(--safe-area-inset-bottom));
 }
 
 .shopping-list-clear {
@@ -124,17 +125,16 @@
   outline-offset: 2px;
 }
 
-/* Search bar - Fixed above navigation */
+/* Search bar - Above navigation using flexbox order */
 .shopping-list-search {
-  position: fixed;
-  bottom: calc(72px + var(--safe-area-inset-bottom));
-  left: 0;
-  right: 0;
-  max-width: 390px;
-  margin: 0 auto;
+  flex-shrink: 0;
+  order: 3;
   padding: var(--spacing-16);
-  padding-bottom: var(--spacing-24);
   background: var(--color-background-base);
   border-top: 1px solid var(--color-stroke-weak);
-  z-index: 999;
+}
+
+/* Navigation bar */
+.shopping-list-view .navigation-bar {
+  order: 4;
 }
