@@ -64,9 +64,10 @@
 .shopping-list-content {
   flex: 1;
   padding: var(--spacing-16);
-  padding-bottom: calc(136px + var(--safe-area-inset-bottom));
+  padding-bottom: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  margin-bottom: calc(88px + var(--safe-area-inset-bottom));
 }
 
 .shopping-list-clear {
