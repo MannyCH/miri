@@ -39,8 +39,6 @@ export function RecipeDetailPage() {
   
   const handleAddToList = () => {
     addRecipeToShoppingList(recipe.id);
-    // Navigate to shopping list
-    navigate('/shopping-list');
   };
   
   return (

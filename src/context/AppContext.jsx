@@ -23,7 +23,15 @@ export function AppProvider({ children }) {
   
   // Show toast notification
   const showToast = (variant, message) => {
-    const id = Date.now();
+    const id = Date.now() + Math.random(); // More unique ID
+    
+    // Prevent duplicate toasts with same message
+    const hasDuplicate = toasts.some(
+      toast => toast.message === message && toast.variant === variant
+    );
+    
+    if (hasDuplicate) return;
+    
     setToasts(prev => [...prev, { id, variant, message }]);
     
     // Auto-dismiss after 4 seconds

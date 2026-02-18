@@ -38,8 +38,6 @@ export function MealPlanningPage() {
   const handleAddMeals = () => {
     // Add all ingredients from the entire 7-day plan to shopping list
     addAllToShoppingList();
-    // Navigate to shopping list to see the added ingredients
-    navigate('/shopping-list');
   };
   
   return (
