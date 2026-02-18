@@ -113,6 +113,8 @@
   --color-stroke-error-weak: #C6222233;
   --color-stroke-success-strong: #3E7028CC;
   --color-stroke-success-weak: #3E702833;
+  --color-stroke-warning-strong: #91600ACC;
+  --color-stroke-warning-weak: #91600A33;
 
   /* Icon */
   --color-icon-neutral: #4D170080;
