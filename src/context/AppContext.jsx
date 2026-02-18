@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { generateMealPlan, getRecipeById } from '../data/recipes';
 
 const AppContext = createContext();
@@ -14,6 +14,7 @@ export function AppProvider({ children }) {
   
   // Toast State
   const [toasts, setToasts] = useState([]);
+  const pendingToastsRef = useRef(new Set());
   
   // Generate initial meal plan on mount
   useEffect(() => {
@@ -23,26 +24,43 @@ export function AppProvider({ children }) {
   
   // Show toast notification
   const showToast = (variant, message) => {
-    const id = Date.now() + Math.random(); // More unique ID
+    const toastKey = `${variant}-${message}`;
     
-    // Prevent duplicate toasts with same message
+    // Prevent duplicate toasts (handles React StrictMode double renders)
+    if (pendingToastsRef.current.has(toastKey)) {
+      return;
+    }
+    
+    // Check if toast with same message already visible
     const hasDuplicate = toasts.some(
       toast => toast.message === message && toast.variant === variant
     );
     
     if (hasDuplicate) return;
     
+    // Mark as pending
+    pendingToastsRef.current.add(toastKey);
+    
+    const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, variant, message }]);
     
     // Auto-dismiss after 4 seconds
     setTimeout(() => {
       setToasts(prev => prev.filter(toast => toast.id !== id));
+      pendingToastsRef.current.delete(toastKey);
     }, 4000);
   };
   
   // Dismiss toast manually
   const dismissToast = (id) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+    setToasts(prev => {
+      const toast = prev.find(t => t.id === id);
+      if (toast) {
+        const toastKey = `${toast.variant}-${toast.message}`;
+        pendingToastsRef.current.delete(toastKey);
+      }
+      return prev.filter(t => t.id !== id);
+    });
   };
   
   // Auto-generate new meal plan
