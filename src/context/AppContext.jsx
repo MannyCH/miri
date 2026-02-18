@@ -12,11 +12,30 @@ export function AppProvider({ children }) {
   const [shoppingList, setShoppingList] = useState([]);
   const [shoppingListViewMode, setShoppingListViewMode] = useState('list'); // 'list' or 'recipe'
   
+  // Toast State
+  const [toasts, setToasts] = useState([]);
+  
   // Generate initial meal plan on mount
   useEffect(() => {
     const plan = generateMealPlan();
     setMealPlan(plan);
   }, []);
+  
+  // Show toast notification
+  const showToast = (variant, message) => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, variant, message }]);
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+      setToasts(prev => prev.filter(toast => toast.id !== id));
+    }, 4000);
+  };
+  
+  // Dismiss toast manually
+  const dismissToast = (id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
   
   // Auto-generate new meal plan
   const regenerateMealPlan = () => {
@@ -49,6 +68,11 @@ export function AppProvider({ children }) {
     setShoppingList(prev => {
       const existingIds = new Set(prev.map(item => item.id));
       const newItems = allIngredients.filter(item => !existingIds.has(item.id));
+      
+      if (newItems.length > 0) {
+        showToast('Info', `${newItems.length} items added to list`);
+      }
+      
       return [...prev, ...newItems];
     });
   };
@@ -70,6 +94,11 @@ export function AppProvider({ children }) {
     setShoppingList(prev => {
       const existingIds = new Set(prev.map(item => item.id));
       const filteredNew = newItems.filter(item => !existingIds.has(item.id));
+      
+      if (filteredNew.length > 0) {
+        showToast('Info', `${filteredNew.length} items added to list`);
+      }
+      
       return [...prev, ...filteredNew];
     });
   };
@@ -122,6 +151,11 @@ export function AppProvider({ children }) {
     deleteIngredient,
     deleteRecipeFromShoppingList,
     clearShoppingList,
+    
+    // Toast
+    toasts,
+    showToast,
+    dismissToast,
   };
   
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
