@@ -68,8 +68,8 @@
 
 /* Success Variant */
 .toast-success {
-  background-color: var(--color-fill-success-weak);
-  border-color: var(--color-stroke-success-weak);
+  background-color: #F5F8F4; /* Green/Light/50 (5%) composited over white = solid color */
+  border-color: #E5EFE3; /* Green/Light/200 (20%) composited over white = solid color */
 }
 
 .toast-success .toast-icon {
@@ -86,8 +86,8 @@
 
 /* Error Variant */
 .toast-error {
-  background-color: var(--color-fill-error-weak);
-  border-color: var(--color-stroke-error-weak);
+  background-color: #FCF4F4; /* Red/Light/50 (5%) composited over white = solid color */
+  border-color: #F7DBDB; /* Red/Light/200 (20%) composited over white = solid color */
 }
 
 .toast-error .toast-icon {
@@ -104,8 +104,8 @@
 
 /* Warning Variant */
 .toast-warning {
-  background-color: var(--color-fill-warning-weak);
-  border-color: var(--color-stroke-warning-weak);
+  background-color: #F9F7F3; /* Amber/Light/50 (5%) composited over white = solid color */
+  border-color: #F0E9DC; /* Amber/Light/200 (20%) composited over white = solid color */
 }
 
 .toast-warning .toast-icon {
@@ -122,8 +122,8 @@
 
 /* Info Variant */
 .toast-info {
-  background-color: var(--color-fill-warning-weak);
-  border-color: var(--color-stroke-warning-weak);
+  background-color: #F9F7F3; /* Amber/Light/50 (5%) composited over white = solid color */
+  border-color: #F0E9DC; /* Amber/Light/200 (20%) composited over white = solid color */
 }
 
 .toast-info .toast-icon {
