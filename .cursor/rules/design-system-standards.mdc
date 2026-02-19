@@ -1,161 +1,403 @@
 ---
-description: Design system component standards and quality checklist
+description: Design Systems Checklist - Build better design system components using this comprehensive checklist by Tyler Coderre
 globs: "**/*.{jsx,tsx,css,stories.jsx,stories.tsx,mdx}"
 alwaysApply: false
 ---
 
-# Design System Standards
+# Design Systems Checklist
 
-When creating or modifying design system components, ensure they meet these quality standards based on industry best practices.
+Source: https://tylercoderre.com/projects/design-systems-checklist.html by Tyler Coderre
 
-## Foundations Checklist
+## Design Language
+
+This is how your product "talks" to people. It's the look, feel, and flow that makes everything feel connected. When it all works together, users don't have to think too hard.
+
+### Brand
+
+Your brand is more than a logo or a cool name. It's what you stand for and how people remember you. It should guide every decision you make.
+
+- [ ] **Vision** - Why you exist, what you believe in, and what direction you're going.
+- [ ] **Design Principles** - Your go-to rules for making design choices. They help keep your work focused and clear.
+- [ ] **Tone of Voice** - How you sound when you talk to users. This helps make sure people always know it's you speaking, no matter where they are. (WCAG: 3.1, 3.1.1–3.1.6)
+- [ ] **Terminology** - Pick the right words and use them the same way across your product. This keeps things simple and clear. (WCAG: 3.1.3–3.1.6)
+- [ ] **Brand Assets** - Things like your logo, fonts, colors, and icons. Using them the same way everywhere helps your product look and feel like one solid thing.
+
+### Guidelines
+
+You lose if your product feels different every time someone uses it. Clear guidelines help your team stay on the same page and create a consistent experience.
+
+- [ ] **Accessibility** - Make sure everyone can use your product. Use clear color contrast, logical layout, and support for screen readers and other tools. (WCAG: All Criteria)
+- [ ] **Writing Guidelines** - Set the rules for how you write. Things like grammar, tone, and word choice should all match. (WCAG: 3.1, 3.1.1–3.1.6)
+- [ ] **Microcopy Guidelines** - Short UI text like button labels, error messages, and tooltips should follow consistent rules. (WCAG: 3.1.2–3.1.4)
+- [ ] **Terminology** - Pick the right words once, and use them everywhere. This avoids confusion and keeps things running smoothly. (WCAG: 3.1.3, 3.1.4, 3.1.6)
+- [ ] **Internationalization** - Plan for translation. Set up rules for handling different languages, longer words, and right-to-left text when needed. (WCAG: 3.1, 3.1.1–3.1.6)
+
+---
+
+## Foundations
+
+This is the base layer of your design system. Stuff like colors, fonts, and tokens live here. When you change something here, it ripples out through everything else... so it's important to get it right.
 
 ### Color
-- [ ] **Accessibility**: Text meets WCAG AA contrast (4.5:1 for normal, 3:1 for large text)
-- [ ] **Semantic Colors**: Use design tokens for all colors (no hardcoded values)
-- [ ] **Dark Mode**: Component works in both light and dark modes
-- [ ] **Guidelines**: Document when and how to use each color variant
+
+Color isn't just for looks. It helps people understand what to do, what matters, and what to pay attention to.
+
+- [ ] **Accessibility** - Make sure your color choices have enough contrast so text is easy to read. Always check your background and text pairings meet at least AA standards. (WCAG: 1.4.1, 1.4.3, 1.4.6)
+- [ ] **Semantic Colors** - Besides your main brand colors, set up specific colors for things like disabled buttons, background areas, links, and alerts. These should all have a clear role. (WCAG: 1.4.1, 1.4.3, 1.4.6)
+- [ ] **Dark Mode** - Make a version of your color palette that works in dark mode so your product can match the user's system settings without breaking. (WCAG: 1.4.1, 1.4.3, 1.4.6)
+- [ ] **Guidelines** - Write down how to use your colors, when to use them, and what to avoid. (WCAG: 1.4.1, 1.4.3, 1.4.6)
+
+### Layout
+
+A good layout helps people make sense of what they're looking at. Using a consistent grid and spacing makes things easier to scan and more comfortable to use.
+
+- [ ] **Order & Sequence** - Content should be laid out in such a way that it will make logical sense to read as well as be read to in order by assistive technologies. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Units** - Start small. Use a clear set of spacing values like 4, 8, 12, and 16. These give you a solid base to build your grid and layout.
+- [ ] **Grid** - Use a grid to keep things aligned and balanced. Set up versions for mobile, tablet, and desktop with clear rules for columns, gutters, and margins.
+- [ ] **Breakpoints** - Decide ahead of time which screen sizes your design should respond to. (WCAG: 1.3.4)
+- [ ] **Spacing** - Keep spacing between elements consistent, both up-and-down and side-to-side. Use simple spacing rules that aren't tied to the grid so you have flexibility.
 
 ### Typography
-- [ ] **Responsiveness**: Font sizes scale appropriately across screen sizes
-- [ ] **Grid Relation**: Line heights align with spacing system
-- [ ] **Readability**: Line length, letter spacing, and line height are comfortable
-- [ ] **Typography Classes**: Use predefined classes (e.g., `.text-h1-bold`, `.text-body-regular`)
 
-### Spacing & Layout
-- [ ] **Consistent Units**: Use spacing tokens (--spacing-4, --spacing-8, etc.)
-- [ ] **No Hardcoded Values**: All spacing uses design tokens
-- [ ] **Grid Alignment**: Components align to 4px or 8px grid
-- [ ] **Responsive**: Layout adapts to different screen sizes
+Text is how most people get info from your product. A clear type scale with good structure helps users read faster and understand what matters.
+
+- [ ] **Responsiveness** - Font sizes should adjust to the screen size. Bigger text works on desktop, but on smaller screens, scale it down so everything still feels balanced. (WCAG: 1.4.4, 1.4.5, 1.4.8, 1.4.9, 1.4.10, 1.4.12)
+- [ ] **Grid Relation** - Line height and font size should work with your layout grid. This helps text line up nicely with icons, buttons, and other UI pieces. (WCAG: 1.4.4, 1.4.10, 1.4.12)
+- [ ] **Readability** - Make sure your text isn't too tight or too loose. Watch the spacing between letters, the height between lines, and the length of each line. (WCAG: 1.4.8, 1.4.12)
+- [ ] **Performance** - Custom fonts can slow things down, especially on the web. Use fast-loading fonts and have backups ready. System fonts are a solid choice if speed is a top priority.
+- [ ] **Guidelines** - Document how to use typography, which styles to use where, and what to avoid.
+
+### Iconography
+
+Icons are quick visual cues that help people understand actions or content fast. When used right, they make the interface easier to use. When used randomly, they just create noise.
+
+- [ ] **Accessibility** - If an icon does something or means something, give it an accessible name so screen readers can describe it. If it's just for decoration, no name needed. (WCAG: 1.1.1, 1.3.1, 1.3.6)
+- [ ] **Style** - Pick a style—like outline or filled—and stick with it. (WCAG: 1.4.1, 1.4.3, 1.4.6)
+- [ ] **Naming** - Name your icons based on what they do, not what they look like. For example, call it "play" instead of "triangle." (WCAG: 3.1.2–3.1.5)
+- [ ] **Grid Alignment** - Design icons in a size and shape that fits your layout grid. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Keywords** - Add extra keywords to your icon library to make finding the right one faster and easier. (WCAG: 3.1.2–3.1.5)
+- [ ] **Reserved Icons** - Keep some icons locked in for specific uses, like navigation or delete. Don't let them get reused for random stuff.
+- [ ] **Guidelines** - Set rules for how and when to use icons, and what to avoid. Consistency goes a long way.
+
+### Elevation
+
+Elevation is how you show that one thing sits above another in your interface. In light mode, that usually means shadows. In dark mode, it's done with different background colors.
+
+- [ ] **Shadow** - Set up a few shadow styles that match your elevation levels. Most products only need about 3 or 4. (WCAG: 1.3.1, 1.3.3)
+- [ ] **Background Color** - In dark mode, shadows don't always work well. Use slightly different background colors to show depth instead. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Z-Index** - Create a clear system for z-index values so you know what should sit on top of what.
 
 ### Motion
-- [ ] **Accessibility**: Respect reduced motion preferences
-- [ ] **Easing**: Use spring animations with consistent timing (bounce: 0.2, duration: 0.4s)
-- [ ] **Duration**: Keep animations under 400ms for responsiveness
-- [ ] **Purpose**: Motion provides feedback or guides attention
 
-## Component Standards
+Motion helps guide people through your product. It can show what's changing, what just happened, or what to focus on. Used right, it feels smooth and helpful. Used wrong, it just gets in the way.
 
-### Visual States (All Interactive Components)
-- [ ] **Default**: Clear initial appearance
-- [ ] **Hover**: Visual feedback on mouse over
-- [ ] **Focus**: Visible focus indicator for keyboard navigation (WCAG 2.4.7)
-- [ ] **Active**: Visual feedback when clicked/pressed
-- [ ] **Disabled**: Clearly shows when not interactive (WCAG 2.5.2)
-- [ ] **Error**: Clear visual and text error messages (WCAG 3.3.1)
-- [ ] **Loading**: Shows when action is processing
+- [ ] **Accessibility** - Always check for reduced motion settings. If someone prefers less motion, make sure your animations either tone it down or turn off. (WCAG: 2.2.1, 2.2.3, 2.3, 2.3.1, 2.3.2, 2.3.3)
+- [ ] **Easing** - Set a few standard easing types like standard, fast-in, and slow-out. These help your animations feel natural and consistent. (WCAG: 2.2.1, 2.2.3, 2.3, 2.3.1, 2.3.2, 2.3.3)
+- [ ] **Duration** - Pick a few go-to timing values for how long animations should run. This keeps things feeling smooth and avoids weird jumps or delays. (WCAG: 2.2.1, 2.2.3, 2.3, 2.3.1, 2.3.2, 2.3.3)
 
-### Accessibility (WCAG 2.1 AA)
-- [ ] **Keyboard Navigation**: All interactive elements are keyboard accessible (WCAG 2.1.1)
-- [ ] **Focus Management**: Logical tab order and visible focus indicators (WCAG 2.4.3, 2.4.7)
-- [ ] **Screen Reader**: Proper ARIA labels and roles (WCAG 4.1.2)
-- [ ] **Color Independence**: Meaning not conveyed by color alone (WCAG 1.4.1)
-- [ ] **Touch Targets**: Minimum 44x44px for touch targets (WCAG 2.5.5)
-- [ ] **Text Alternatives**: All images/icons have alt text or aria-labels (WCAG 1.1.1)
+---
 
-### Component-Specific: Buttons
-- [ ] **Variants**: Primary, secondary, tertiary styles clearly differentiated
-- [ ] **Sizes**: Multiple sizes for different contexts (small, medium, large)
-- [ ] **Icon Support**: Works with icons, text, or both
-- [ ] **Loading State**: Shows spinner without layout shift
-- [ ] **Full Width Option**: Can stretch to container width
+## Core Components
 
-### Component-Specific: Forms
-- [ ] **Labels**: Every input has a visible label (WCAG 2.4.6, 3.3.2)
-- [ ] **Placeholder**: Used only for hints, not as replacement for labels
-- [ ] **Helper Text**: Guidance text below inputs when needed
-- [ ] **Error Messages**: Specific, actionable error text (WCAG 3.3.3)
-- [ ] **Required Indicators**: Clear marking for required fields
+Core components are the basic building blocks of your interface. They show up everywhere in your product, like buttons, inputs, and toggles. Reusing them helps reduce design and tech debt, keeps things consistent, and speeds up development.
 
-### Component-Specific: Modals/Dialogs
-- [ ] **Focus Trap**: Focus stays within modal until closed
-- [ ] **Initial Focus**: Focus moves to first focusable element
-- [ ] **Escape to Close**: ESC key closes modal
-- [ ] **Return Focus**: Focus returns to trigger element on close
-- [ ] **Backdrop Dismiss**: Click outside closes (or doesn't, but be consistent)
+### Accordion (Collapse)
 
-### Component-Specific: Toasts/Notifications
-- [ ] **Timeout**: Auto-dismisses after 4-6 seconds (or stays if action needed)
-- [ ] **Dismissible**: Clear way to close manually
-- [ ] **Stacking**: Multiple toasts stack neatly
-- [ ] **Position**: Consistent position (bottom/top, left/right)
-- [ ] **Variants**: Success, error, warning, info clearly differentiated
-- [ ] **No Auto-Dismiss on Focus**: Stays open when keyboard focused
+- [ ] **Open vs Closed** - Two main states. If there's an icon (like an arrow), it should clearly show which state it's in. (WCAG: 1.3.1, 1.3.2, 1.4.13)
+- [ ] **Composition** - The content area should be flexible. It should work with text, images, or even other components inside. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Toggle Transition** - Use a smooth, simple animation when opening or closing. (WCAG: 2.2.1, 2.2.3, 2.3, 2.3.1, 2.3.2, 2.3.3)
+- [ ] **Content & Trigger Relation** - Make sure assistive tech can link the content to the trigger. (WCAG: 1.3.5, 1.3.6, 2.1.1–2.1.3, 2.4.3, 2.4.11–2.4.13, 2.5.3, 2.5.5, 2.5.8, 4.1.1)
 
-## Storybook Documentation
+### Alert
 
-### Required Stories
-- [ ] **Default**: Basic component usage
-- [ ] **All Variants**: Show every visual variant
-- [ ] **All States**: Show hover, focus, active, disabled, error, loading
-- [ ] **Sizes**: Demonstrate all size options
-- [ ] **Composition**: Show component with complex content
+- [ ] **Color** - Use different background colors to show the type of alert. Make sure the text inside has enough contrast. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Title Support** - Including a title helps users quickly get the point, especially if the alert has a longer message. (WCAG: 2.4.6, 3.1.2, 3.1.4–3.1.6, 4.1.3)
+- [ ] **Icon Support** - Icons help explain what the alert is about and are useful for people who can't rely on color alone. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Actions** - If there's something the user needs to do, include a clear action button or link. (WCAG: 1.3.6, 2.4.3, 2.4.4, 3.1.2)
+- [ ] **Responsiveness** - Make sure alerts adjust to screen size. On smaller screens, they should go full-width. (WCAG: 1.4.4, 1.4.10)
+- [ ] **Accessibility Role** - Use the correct accessibility role so screen readers know to announce the alert properly. (WCAG: 1.3.6, 2.1.1–2.1.4, 2.4.3, 2.4.11–2.4.13, 2.5.3, 4.1.1)
+
+### Avatar
+
+- [ ] **Image** - Avatars should crop images into the right shape and handle whatever image size gets thrown at them. (WCAG: 1.1.1, 1.4.11)
+- [ ] **Image Fallback** - If the image doesn't load, show an icon or initials instead. (WCAG: 1.1.1, 1.4.11)
+- [ ] **Size** - Include small, medium, and large options at minimum. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Color** - When there's no image, use a background color that meets contrast guidelines. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Avatar Groups** - Stack a few avatars together to show a group of users.
+- [ ] **Accessibility Label** - If there's no visible name, make sure screen readers can describe what or who the avatar represents. (WCAG: 1.3.6, 2.1.1–2.1.3, 2.4.3, 2.4.7, 2.4.11–2.4.13, 2.5.3, 4.1.1)
+
+### Badge (Chip & Tag)
+
+- [ ] **Color** - Use different colors to show different meanings. Make sure text or icon on top has enough contrast. Not the sole meaning of status for colorblind users. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Variants** - Some can be bold and bright, others more subtle with soft backgrounds. (WCAG: 1.4.1)
+- [ ] **Size** - A few size options so badges work in different spots. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Icon Support** - Add icons next to the text to help show meaning fast. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Dismissable** - If showing a selected filter, make it possible to remove it with a close button. (WCAG: 2.1.1, 2.4.3, 2.4.4, 2.4.7, 2.4.11–2.4.13, 2.5.3, 2.5.5, 2.5.8, 3.2.1)
+- [ ] **Empty State** - Some badges don't need text, like a small dot for status. Adjust the style so they still look right.
+- [ ] **Positioning** - For notification indicators, badges should be easy to place in the corner of an icon or avatar. (WCAG: 1.1.1, 1.3.6, 1.4.9)
+
+### Button
+
+- [ ] **Color** - Use different colors for different button roles. Always meet WCAG AA contrast standards. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Variants** - Primary buttons should stand out, secondary or subtle buttons can blend in more. (WCAG: 1.4.1)
+- [ ] **Size** - Have a few sizes ready. Smaller for tight spaces, larger for touch-heavy areas. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Icon Support** - Can include icons alongside text or stand alone as icon-only. Icon-only needs accessibility label. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Hover State** - Show a clear visual change on hover. (WCAG: 1.4.1, 1.4.3)
+- [ ] **Focus State** - Show a visible focus ring or style for keyboard/assistive tech users. (WCAG: 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1)
+- [ ] **Active State** - Show feedback when clicked or toggled. (WCAG: 1.4.1, 1.4.3)
+- [ ] **Loading State** - Show a loading indicator. Button shouldn't change size when loading. (WCAG: 2.5.2)
+- [ ] **Disabled State** - Should look inactive and not respond to clicks or taps. (WCAG: 2.5.2)
+- [ ] **Accessibility Role** - Announced correctly by screen readers. Use the right role based on what it does. (WCAG: 2.4.4, 2.4.6, 2.5.3, 4.2.1)
+
+### Breadcrumb
+
+- [ ] **Icon Support** - Use icons consistently next to breadcrumb items. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Disabled State** - Allow individual items to be disabled when needed. (WCAG: 2.5.2)
+- [ ] **Collapsed State** - If there isn't enough room, collapse the middle items so the first and last few stay visible.
+- [ ] **Separator** - Use a separator that fits your design—but keep it consistent.
+
+### Calendar (Date & Time Pickers)
+
+- [ ] **Display Modes** - Support different layouts (single month, multi-month, vertical stack).
+- [ ] **Selected State** - Users should be able to pick one date or a range. Highlight clearly.
+- [ ] **Month Selection** - Make it easy to switch between months.
+- [ ] **Day Names** - Show short weekday labels above the date numbers.
+- [ ] **Internationalization** - Support different regions, languages, local date formats, and weekday order.
+- [ ] **Keyboard Navigation** - All dates keyboard focusable. Arrow keys to move, screen readers navigate smoothly. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1)
+- [ ] **State Announcement** - Assistive tech should announce selected or focused dates clearly. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1, 4.1.1, 4.1.2)
+
+### Card
+
+- [ ] **Composition** - Flexible inside. Works with text, images, buttons, or other components. Consider reading order for assistive devices. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Media** - Cards often include images or videos at the top or side.
+- [ ] **Actions** - Buttons or links, usually at the bottom. Sometimes the whole card can be clickable. (WCAG: 1.3.6, 2.4.3, 2.4.4, 3.1.2)
+- [ ] **Responsiveness** - On smaller screens, cards should stretch to full width. (WCAG: 1.4.4, 1.4.10)
+- [ ] **Groups** - Stack multiple cards in a list or grid for related items.
+
+### Carousel (Slider)
+
+- [ ] **Navigation** - Users can move through using mouse controls, not just swipe or drag.
+- [ ] **Composition** - Each carousel item should hold different kinds of content. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Size** - On smaller screens, show part of the next item to hint that more content is scrollable. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Touch** - Scrollable with touch gestures on mobile.
+- [ ] **Responsiveness** - Adjust layout based on screen size. (WCAG: 1.4.4, 1.4.10)
+- [ ] **Keyboards** - Users should be able to move through with keyboard and screen readers.
+
+### Checkbox
+
+- [ ] **Label** - Every checkbox should have a label. Clicking the label toggles the checkbox. (WCAG: 2.4.6, 3.3.2)
+- [ ] **Checked State** - Show clearly when selected.
+- [ ] **Error State** - Show error message and change field color. Include both visual and text feedback. (WCAG: 1.4.1, 3.3.1, 3.3.3, 3.3.4)
+- [ ] **Disabled State** - Non-interactive. Doesn't send data when submitted. (WCAG: 2.5.2)
+- [ ] **Intermediate State** - Shows when only some options in a group are selected (dash or shaded box).
+- [ ] **Grouping** - Group multiple checkboxes for related options. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Accessibility** - Works with keyboard. Include hover, focus, and active states. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1)
+
+### Divider
+
+- [ ] **Direction** - Works in both horizontal and vertical layouts.
+- [ ] **Accessibility Role** - If marking a meaningful break in content, assistive tech can announce its role.
+
+### Dropdown
+
+- [ ] **Composition** - Flexible enough to hold icons, text, or other components. Consider reading and focus order. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Hover & Focus State** - Opens on hover and also works for keyboard users on focus. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1)
+- [ ] **Dynamic Positioning** - Opens in a direction that keeps it visible. Never gets cut off.
+- [ ] **Responsiveness** - Adjusts to fit smaller screens. (WCAG: 1.4.4, 1.4.10)
+- [ ] **Focus Trapping** - Focus moves inside when open. Returns to trigger on close.
+- [ ] **Keyboard Navigation** - Arrow keys to move through items, Escape to close, screen readers announce contents.
+
+### Icon
+
+- [ ] **Color** - Use color tokens. Should also inherit color from parent element. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Size** - A few standard sizes that line up with your typography scale. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Interactivity** - If clickable, wrap in a proper interactive element like a button or link.
+
+### Image
+
+- [ ] **Image Fallback** - If image doesn't load, show a background color, icon, or placeholder.
+- [ ] **Alt Text** - Always include alt text if the image has meaning. Skip if purely decorative.
+- [ ] **Size** - Support flexible width, height, and aspect ratio. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Screen Density Support** - Support different image sizes for different screen resolutions.
+
+### Link
+
+- [ ] **Icon Support** - Icons can give extra context. Don't use icons by themselves—always include text label. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Color** - Follow color tokens. Check contrast meets WCAG AA against backgrounds and adjacent text. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Disabled State** - Should look inactive and not respond to clicks. (WCAG: 2.5.2)
+- [ ] **Font Inheritance** - Links in text should match the typography around them.
+- [ ] **Multiline Display** - Links inside paragraphs should wrap across lines without breaking layout.
+- [ ] **Accessibility** - Announced correctly by screen readers. Use the right role (link or button). Underlines encouraged.
+
+### List
+
+- [ ] **Order** - Use bullets, numbers, or custom markers depending on content.
+- [ ] **Composition** - Each list item should support text, icons, or other components. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Accessibility** - Assistive tech can recognize the list, its role, and how many items it includes.
+
+### Loading
+
+- [ ] **Color** - Match the color scheme of the area they're in. Use color tokens. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Size** - Different sizes depending on where the loader appears. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Duration** - Keep visible until it finishes or fails. If timing is known, use a progress bar.
+- [ ] **Motion** - Respect reduced motion settings. Slow down or simplify animation.
+- [ ] **Accessibility Label** - Add a label so screen readers can announce what's being loaded. (WCAG: 1.3.6, 2.5.3)
+
+### Modal (Dialog)
+
+- [ ] **Composition** - Flexible enough to hold text, forms, media, or other components. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Actions** - Put actions in a clear area—usually at the bottom. (WCAG: 1.3.6, 2.4.3, 2.4.4, 3.1.2)
+- [ ] **Close** - There should always be a clear way to close the modal.
+- [ ] **Positioning** - Usually centered on screen, but can slide in from sides.
+- [ ] **Size** - Support different sizes based on the content. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Focus Trapping** - Move focus to first focusable element inside. Keep trapped until closed. Return focus to trigger on close.
+- [ ] **Keyboard Navigation** - Tab and Shift+Tab through elements. Esc should close.
+- [ ] **Title & Subtitle Labeling** - Screen readers can announce title and subtitle. Add accessible label if not visible. (WCAG: 2.4.4, 2.4.6, 2.5.3, 4.2.1)
+
+### Pagination
+
+- [ ] **Selected State** - Clearly show which page is selected. Selected page shouldn't be clickable. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1)
+- [ ] **Display Ranges** - Show a few pages around the current one, not every page number.
+- [ ] **Items per Page** - Give users control over how many items they see per page.
+- [ ] **Intermediate or Truncated Pages** - If total pages unknown, use next/previous controls only.
+- [ ] **Full Page Label Announcements** - Screen readers announce "Page 3 of 10" instead of just "3."
+- [ ] **State Announcements** - Assistive technologies announce focus/selection changes clearly.
+
+### Progress
+
+- [ ] **Label** - Show a clear label that tells users what the progress bar is tracking. (WCAG: 2.4.6, 3.3.2)
+- [ ] **Size** - A few size options for different layouts. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Duration** - If timing is known, show progress filling up. If not, keep showing until task finishes or fails.
+- [ ] **Accessibility Label** - Add an accessibility label if no visible label on screen. (WCAG: 2.5.3)
+
+### Radio
+
+- [ ] **Label** - Every radio button should have a label. Clicking the label selects it. (WCAG: 2.4.6, 3.3.2)
+- [ ] **Checked State** - Clearly show which option is selected. (WCAG: 1.4.1)
+- [ ] **Error State** - Show error message and change field's visual style. (WCAG: 1.4.1, 3.3.1, 3.3.3, 3.3.4)
+- [ ] **Grouping** - Always used in a group. Ensures only one can be picked. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Accessibility** - Keyboard selectable. Include hover, focus, active, and disabled states. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 2.5.2, 3.2.1)
+
+### Select
+
+- [ ] **Label** - Every select field should have a text label. Clicking the label opens the dropdown. (WCAG: 2.4.6, 3.3.2)
+- [ ] **Error State** - Show an error message and a visual cue like an icon or color change. (WCAG: 1.4.1, 3.3.1, 3.3.3, 3.3.4)
+- [ ] **Disabled State** - Non-interactive. Won't send data when submitted. (WCAG: 2.5.2)
+- [ ] **Placeholder** - Show a placeholder if nothing is selected yet.
+- [ ] **Helper Text** - Add extra text under the field to explain what to choose. (WCAG: 3.3.2)
+- [ ] **Icon Support** - Include an icon before selected text for context. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Prefix & Suffix** - Add custom visuals or text like flags, currency symbols.
+- [ ] **Accessibility** - Provide an accessibility label if label isn't visible. Cover hover, focus, and active states. (WCAG: 1.4.1, 1.4.3)
+
+### Skeleton
+
+- [ ] **Size** - Match the size of the real content they're standing in for. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Shape** - Use shapes that match real components (circles for avatars, rectangles for text).
+- [ ] **Composition** - Group simple skeletons to represent complex layouts. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Accessibility** - If reduced motion turned on, slow down or remove animation. (WCAG: 2.3.1, 2.3.2, 2.3.3)
+
+### Switch (Toggle)
+
+- [ ] **Label** - Every switch should have a label. Clicking label toggles. (WCAG: 2.4.6, 3.3.2)
+- [ ] **Checked State** - When on, show it clearly. Communicate state with more than just color.
+- [ ] **Disabled State** - Shouldn't respond to clicks, taps, or key presses. (WCAG: 2.5.2)
+- [ ] **Keyboard** - Users should be able to toggle using keyboard.
+- [ ] **Accessibility** - Provide an accessible name if no visible label.
+
+### Tabs (Segmented)
+
+- [ ] **Composition** - Content under each tab supports text, images, forms, or other components. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Variants** - Tabs can look different depending on context (pill-style, underlined, etc.).
+- [ ] **Selected State** - One tab always selected by default, visually highlighted.
+- [ ] **Disabled State** - Specific tabs can be disabled. Shouldn't respond to clicks or keyboard. (WCAG: 2.5.2)
+- [ ] **Icon Support** - Add icons next to tab labels if it helps explain content. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Equal Width** - When spanning full width, stretch each tab to take equal space.
+- [ ] **Accessibility** - Full keyboard navigation. Arrow keys to move, Home/End to jump to first/last.
+
+### Text Area
+
+- [ ] **Label** - Every text area should have a label. Clicking label moves focus to field. (WCAG: 2.4.6, 3.3.2)
+- [ ] **Error State** - Show error message and visual style change. (WCAG: 1.4.1, 3.3.1, 3.3.3, 3.3.4)
+- [ ] **Disabled State** - Looks inactive and won't send data when submitted. (WCAG: 2.5.2)
+- [ ] **Placeholder** - Used for hints only, not as replacement for labels.
+- [ ] **Helper Text** - Extra info under the field if users need guidance. (WCAG: 3.3.2)
+- [ ] **Size** - Different sizes for different layouts. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Accessibility** - Include accessibility label if no label on screen.
+
+### Text Field
+
+- [ ] **Label** - Every text field should have a label. Clicking label moves focus to field. (WCAG: 2.4.6, 3.3.2)
+- [ ] **Error State** - Show error message and change visual style. (WCAG: 1.4.1, 3.3.1, 3.3.3, 3.3.4)
+- [ ] **Disabled State** - Looks inactive and won't send value when submitted. (WCAG: 2.5.2)
+- [ ] **Placeholder** - For examples or short hints, not label replacement.
+- [ ] **Helper Text** - Show extra info below the field when users need guidance. (WCAG: 3.3.2)
+- [ ] **Icon Support** - Place an icon inside the field for context (e.g., search icon). (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Prefix & Suffix** - For added context like dollar sign for prices.
+- [ ] **Size** - Multiple size options for different contexts. (WCAG: 2.5.5, 2.5.8)
+- [ ] **Accessibility** - Provide accessibility label if no visible label.
+
+### Toast (Message)
+
+- [ ] **Composition** - Flexible enough to include text, icons, buttons, or other components. (WCAG: 1.3.1, 1.3.2)
+- [ ] **Color** - Add an icon at the start to help users quickly understand the purpose—especially helpful for colorblind users. (WCAG: 1.4.1, 1.4.3, 1.4.6, 1.4.11)
+- [ ] **Icon Support** - Include a clear button to dismiss if they don't close automatically. (WCAG: 1.1.1, 1.3.5, 1.4.5)
+- [ ] **Timeout** - Disappear after a short delay. Make sure users have enough time to read them. (WCAG: 2.2.1–2.2.6)
+- [ ] **Stacking** - When multiple toasts are triggered, stack them neatly so they don't overlap.
+- [ ] **Actions** - If the toast has an action (Undo, Retry), make it contextual and clear. (WCAG: 1.3.6, 2.4.3, 2.4.4, 3.1.2)
+- [ ] **Focus** - If toast includes actions, they should be keyboard-focusable. While focused, toast shouldn't auto-dismiss. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1)
+- [ ] **Motion** - If reduced motion enabled, simplify or turn off animations. (WCAG: 2.2.1–2.2.3, 2.3.1, 2.3.2, 2.3.3)
+
+### Tooltip
+
+- [ ] **Position** - Show quick info when user hovers over or focuses on an element. (WCAG: 1.4.1, 1.4.3)
+- [ ] **Timeout** - Add a short delay before showing to avoid them popping up during mouse movement. (WCAG: 2.2.1–2.2.6)
+- [ ] **Keyboard** - Appear on keyboard focus too, not just hover. (WCAG: 1.4.1, 1.4.3, 2.1.1, 2.4.3, 2.4.7, 2.4.11–2.4.13, 3.2.1)
+
+---
+
+## Maintenance
+
+Design systems aren't "set it and forget it" projects. They need regular updates, clear planning, and open feedback loops.
 
 ### Documentation
-- [ ] **Props Table**: Auto-generated from TypeScript/PropTypes
-- [ ] **Usage Guidelines**: When to use this component
-- [ ] **Accessibility Notes**: Keyboard shortcuts, ARIA patterns
-- [ ] **Code Examples**: Copy-pasteable examples
-- [ ] **Design Tokens**: Document which tokens are used
 
-## Code Quality
+- [ ] **Design System Principles** - List core values and decision-making rules.
+- [ ] **Getting Started** - Simple guide for setting up and using the system.
+- [ ] **Design Best Practices** - Smart ways to use the system in your design tool.
+- [ ] **Development Best Practices** - Technical do's and don'ts.
+- [ ] **Component Anatomy** - Break down components so users know which parts can be changed.
+- [ ] **Component Properties** - List all supported properties in design file and code.
+- [ ] **Component Composition Examples** - Show how smaller components combine into complex ones.
+- [ ] **Sandbox Product Example** - Working example showing components in context.
+- [ ] **Browser and/or OS Support** - Document officially supported browsers and operating systems.
+- [ ] **Release Cycle** - Set a clear release schedule for major changes.
 
-### Component Structure
-- [ ] **Single Responsibility**: Component does one thing well
-- [ ] **Composition**: Can be composed with other components
-- [ ] **Controlled/Uncontrolled**: Supports both patterns when stateful
-- [ ] **Prop Types**: All props typed/documented
-- [ ] **Default Props**: Sensible defaults for optional props
+### Libraries
 
-### Styling
-- [ ] **Design Tokens**: Uses CSS variables exclusively
-- [ ] **No Magic Numbers**: All values are tokens or documented constants
-- [ ] **BEM or Consistent Naming**: Clear, consistent class names
-- [ ] **No Inline Styles**: Styles in CSS files, not JavaScript
-- [ ] **Responsive**: Uses media queries or container queries
+- [ ] **When to Build** - When to build locally vs adding to the core system.
+- [ ] **Horizontal and Vertical Libraries** - Shared across products vs built for a single product.
+- [ ] **Library Expectations** - Basic standards for code quality, documentation, naming, maintenance.
+- [ ] **Release Cycle Alignment** - Local libraries stay in sync with main system updates.
 
-### Performance
-- [ ] **No Unnecessary Re-renders**: Proper memoization if needed
-- [ ] **Lazy Loading**: Heavy components loaded when needed
-- [ ] **Bundle Size**: Monitor component size impact
-- [ ] **Animation Performance**: Use transform/opacity for animations
+### Processes
 
-## Testing (When Applicable)
+- [ ] **Decision Log** - Track design and development decisions and their reasoning.
+- [ ] **Roadmap** - Plan big-picture goals, not just day-to-day requests.
+- [ ] **Stakeholder Mapping** - Identify who uses the system and how.
+- [ ] **Analytics** - Track doc site visits, design tool usage, feedback to understand what needs attention.
+- [ ] **Ongoing Support "Shifts"** - Take turns handling questions and requests.
+- [ ] **SLA** - Set clear expectations on response times for bugs, questions, feature requests.
 
-- [ ] **Visual Regression**: Chromatic tests for visual changes
-- [ ] **Accessibility**: Automated a11y tests pass
-- [ ] **Interaction**: User interactions work as expected
-- [ ] **Responsive**: Tests across breakpoints
+### Community
 
-## Quick Reference: Common WCAG Criteria
+- [ ] **Support Channels** - Clear channels for support, split by platform if needed.
+- [ ] **Templates** - Easy bug report and feature request templates.
+- [ ] **Regular Updates** - Share updates to keep community in the loop.
+- [ ] **Office Hours** - Bookable time slots for teams to talk through problems.
 
-- **1.1.1**: Text alternatives for images/icons
-- **1.4.1**: Color is not the only visual means of conveying information
-- **1.4.3**: Text contrast minimum (4.5:1 normal, 3:1 large)
-- **2.1.1**: All functionality available from keyboard
-- **2.4.3**: Logical focus order
-- **2.4.6**: Headings and labels describe purpose
-- **2.4.7**: Visible focus indicator
-- **2.5.5**: Touch target size (44x44px minimum)
-- **3.3.1**: Error identification
-- **3.3.2**: Labels or instructions
-- **4.1.2**: Name, role, value for UI components
+### Contribution
 
-## Before Merging
-
-- [ ] Storybook documentation complete
-- [ ] Visual regression tests passing
-- [ ] Accessibility audit completed
-- [ ] Cross-browser testing done (if applicable)
-- [ ] Component reviewed against this checklist
-- [ ] Design tokens used exclusively
-- [ ] Responsive behavior verified
-- [ ] Keyboard navigation tested
-- [ ] Screen reader tested (if possible)
-
-## Resources
-
-- WCAG Quick Reference: https://www.w3.org/WAI/WCAG21/quickref/
-- Motion Library Docs: https://motion.dev
-- Design Systems Checklist: https://tylercoderre.com/projects/design-systems-checklist.html
-- Base UI Documentation: https://base-ui.com
+- [ ] **House Rules for the System** - How your team works around design and development decisions.
+- [ ] **Contribution Guidelines** - Step-by-step instructions for setting up and testing changes.
+- [ ] **Feature Proposal Template** - Guide for new feature proposals with design mockups and impact assessment.
+- [ ] **Engagement** - Shout out contributors in release notes. Recognize their effort.
