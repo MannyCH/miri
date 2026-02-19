@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
 import { MealPlanningView } from '../patterns/MealPlanningView';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useApp } from '../context/AppContext';
 
 /**
@@ -18,7 +20,10 @@ export function MealPlanningPage() {
     regenerateMealPlan,
     getDailyMeals,
     addAllToShoppingList,
+    shoppingList,
   } = useApp();
+  
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   
   // Get meals for the selected day
   const dailyMeals = getDailyMeals();
@@ -36,17 +41,58 @@ export function MealPlanningPage() {
   };
   
   const handleAddMeals = () => {
-    // Add all ingredients from the entire 7-day plan to shopping list
-    addAllToShoppingList();
+    // Check if shopping list has items
+    if (shoppingList.length > 0) {
+      // Show confirmation dialog
+      setShowConfirmDialog(true);
+    } else {
+      // Just add without confirmation
+      addAllToShoppingList(false);
+    }
   };
   
+  const handleConfirmReplace = () => {
+    addAllToShoppingList(true);
+    setShowConfirmDialog(false);
+  };
+  
+  const handleConfirmAdd = () => {
+    addAllToShoppingList(false);
+    setShowConfirmDialog(false);
+  };
+  
+  const handleCancel = () => {
+    setShowConfirmDialog(false);
+  };
+  
+  // Count unique recipes in shopping list
+  const uniqueRecipes = new Set(shoppingList.map(item => item.recipeId)).size;
+  
   return (
-    <MealPlanningView
-      selectedDay={selectedDay}
-      onDayClick={setSelectedDay}
-      meals={meals}
-      onPlanMeals={handlePlanMeals}
-      onAddMeals={handleAddMeals}
-    />
+    <>
+      <MealPlanningView
+        selectedDay={selectedDay}
+        onDayClick={setSelectedDay}
+        meals={meals}
+        onPlanMeals={handlePlanMeals}
+        onAddMeals={handleAddMeals}
+      />
+      
+      <AnimatePresence>
+        {showConfirmDialog && (
+          <ConfirmDialog
+            isOpen={showConfirmDialog}
+            title="Replace shopping list?"
+            message={`You have ingredients from ${uniqueRecipes} ${uniqueRecipes === 1 ? 'recipe' : 'recipes'} in your shopping list. Do you want to replace them with the new meal plan or add to the existing list?`}
+            confirmLabel="Replace"
+            tertiaryLabel="Cancel"
+            onConfirm={handleConfirmReplace}
+            onTertiary={handleCancel}
+            onCancel={handleConfirmAdd}
+            variant="warning"
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }

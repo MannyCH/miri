@@ -1,10 +1,12 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import './Toast.css';
 
 /**
  * Toast component - Mobile notification from Figma design
  * Variants: Success, Error, Warning, Info
  * Built with design tokens for consistent styling
+ * Animated with Motion library
  */
 export const Toast = ({ 
   variant = 'Success',
@@ -34,10 +36,18 @@ export const Toast = ({
   };
   
   return (
-    <div 
+    <motion.div 
       className={`toast ${variantClass}`}
       role="status"
       aria-live="polite"
+      initial={{ opacity: 0, y: 16, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.95 }}
+      transition={{ 
+        type: "spring",
+        bounce: 0.2,
+        duration: 0.4
+      }}
       {...props}
     >
       <span className="toast-icon" aria-hidden="true">
@@ -55,7 +65,7 @@ export const Toast = ({
           <CloseIcon />
         </button>
       )}
-    </div>
+    </motion.div>
   );
 };
 
