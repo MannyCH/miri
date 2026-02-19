@@ -126,21 +126,10 @@ export function AppProvider({ children }) {
       checked: false,
     }));
     
-    // Merge with existing shopping list (avoid duplicates)
-    setShoppingList(prev => {
-      const existingIds = new Set(prev.map(item => item.id));
-      const filteredNew = newItems.filter(item => !existingIds.has(item.id));
-      const alreadyAdded = newItems.length - filteredNew.length;
-      
-      // Always show feedback
-      if (filteredNew.length > 0) {
-        showToast('Info', `${filteredNew.length} items added to list`);
-      } else if (alreadyAdded > 0) {
-        showToast('Info', 'All items already in list');
-      }
-      
-      return [...prev, ...filteredNew];
-    });
+    // Always add items from recipe page (no duplicate check)
+    // User explicitly wants to add these ingredients
+    setShoppingList(prev => [...prev, ...newItems]);
+    showToast('Info', `${newItems.length} items added to list`);
   };
   
   // Toggle ingredient checked state
