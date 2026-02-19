@@ -61,6 +61,13 @@ export function MealPlanningPage() {
     setShowConfirmDialog(false);
   };
   
+  const handleCancel = () => {
+    setShowConfirmDialog(false);
+  };
+  
+  // Count unique recipes in shopping list
+  const uniqueRecipes = new Set(shoppingList.map(item => item.recipeId)).size;
+  
   return (
     <>
       <MealPlanningView
@@ -76,10 +83,11 @@ export function MealPlanningPage() {
           <ConfirmDialog
             isOpen={showConfirmDialog}
             title="Replace shopping list?"
-            message={`You have ${shoppingList.length} items in your shopping list. Do you want to replace them with the new meal plan ingredients, or add to the existing list?`}
+            message={`You have ingredients from ${uniqueRecipes} ${uniqueRecipes === 1 ? 'recipe' : 'recipes'} in your shopping list. Do you want to replace them with the new meal plan or add to the existing list?`}
             confirmLabel="Replace"
-            cancelLabel="Add to list"
+            tertiaryLabel="Cancel"
             onConfirm={handleConfirmReplace}
+            onTertiary={handleCancel}
             onCancel={handleConfirmAdd}
             variant="warning"
           />

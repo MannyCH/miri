@@ -11,9 +11,10 @@ export function ConfirmDialog({
   title,
   message,
   confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  tertiaryLabel,
   onConfirm,
   onCancel,
+  onTertiary,
   variant = 'default' // 'default' or 'warning'
 }) {
   if (!isOpen) return null;
@@ -38,21 +39,32 @@ export function ConfirmDialog({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="confirm-dialog-title text-h3-bold">
-          {title}
-        </h3>
+        <div className="confirm-dialog-header">
+          <h3 className="confirm-dialog-title text-h3-bold">
+            {title}
+          </h3>
+          <button 
+            className="confirm-dialog-close"
+            onClick={onCancel}
+            aria-label="Close dialog"
+          >
+            <CloseIcon />
+          </button>
+        </div>
         
         <p className="confirm-dialog-message text-body-regular">
           {message}
         </p>
         
         <div className="confirm-dialog-actions">
-          <button 
-            className="confirm-dialog-button confirm-dialog-button-cancel"
-            onClick={onCancel}
-          >
-            <span className="text-body-small-bold">{cancelLabel}</span>
-          </button>
+          {tertiaryLabel && onTertiary && (
+            <button 
+              className="confirm-dialog-button confirm-dialog-button-tertiary"
+              onClick={onTertiary}
+            >
+              <span className="text-body-small-bold">{tertiaryLabel}</span>
+            </button>
+          )}
           
           <button 
             className={`confirm-dialog-button confirm-dialog-button-confirm ${variant === 'warning' ? 'warning' : ''}`}
@@ -65,5 +77,13 @@ export function ConfirmDialog({
     </motion.div>
   );
 }
+
+// Close icon
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/>
+    <line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
 
 ConfirmDialog.displayName = 'ConfirmDialog';
