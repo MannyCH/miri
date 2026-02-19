@@ -94,9 +94,13 @@ export function AppProvider({ children }) {
     setShoppingList(prev => {
       const existingIds = new Set(prev.map(item => item.id));
       const newItems = allIngredients.filter(item => !existingIds.has(item.id));
+      const alreadyAdded = allIngredients.length - newItems.length;
       
+      // Always show feedback
       if (newItems.length > 0) {
         showToast('Info', `${newItems.length} items added to list`);
+      } else if (alreadyAdded > 0) {
+        showToast('Info', 'All items already in list');
       }
       
       return [...prev, ...newItems];
@@ -120,9 +124,13 @@ export function AppProvider({ children }) {
     setShoppingList(prev => {
       const existingIds = new Set(prev.map(item => item.id));
       const filteredNew = newItems.filter(item => !existingIds.has(item.id));
+      const alreadyAdded = newItems.length - filteredNew.length;
       
+      // Always show feedback
       if (filteredNew.length > 0) {
         showToast('Info', `${filteredNew.length} items added to list`);
+      } else if (alreadyAdded > 0) {
+        showToast('Info', 'All items already in list');
       }
       
       return [...prev, ...filteredNew];
