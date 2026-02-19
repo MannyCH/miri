@@ -8,6 +8,18 @@ alwaysApply: false
 
 Source: https://tylercoderre.com/projects/design-systems-checklist.html by Tyler Coderre
 
+## MANDATORY: Pre-Creation Check
+
+**Before creating any new component, ALWAYS consult this checklist first:**
+
+1. Find the matching component section below (e.g., Button, Toast, Modal, Select)
+2. Review every checklist item for that component type
+3. Plan the implementation to address all relevant items (states, accessibility, composition, keyboard navigation, etc.)
+4. If the component type is not listed, use the closest match and apply the general Foundations rules (Color, Typography, Layout, Motion)
+5. After implementation, verify each checklist item has been addressed
+
+**This check is not optional. Skipping it leads to incomplete, inaccessible, or inconsistent components.**
+
 ## Design Language
 
 This is how your product "talks" to people. It's the look, feel, and flow that makes everything feel connected. When it all works together, users don't have to think too hard.
