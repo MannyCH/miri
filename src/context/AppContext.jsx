@@ -70,7 +70,7 @@ export function AppProvider({ children }) {
   };
   
   // Add all ingredients from meal plan to shopping list
-  const addAllToShoppingList = () => {
+  const addAllToShoppingList = (replaceExisting = false) => {
     const allIngredients = [];
     
     mealPlan.forEach(day => {
@@ -90,21 +90,27 @@ export function AppProvider({ children }) {
       });
     });
     
-    // Merge with existing shopping list (avoid duplicates)
-    setShoppingList(prev => {
-      const existingIds = new Set(prev.map(item => item.id));
-      const newItems = allIngredients.filter(item => !existingIds.has(item.id));
-      const alreadyAdded = allIngredients.length - newItems.length;
-      
-      // Always show feedback
-      if (newItems.length > 0) {
-        showToast('Info', `${newItems.length} items added to list`);
-      } else if (alreadyAdded > 0) {
-        showToast('Info', 'All items already in list');
-      }
-      
-      return [...prev, ...newItems];
-    });
+    if (replaceExisting) {
+      // Replace all existing items
+      setShoppingList(allIngredients);
+      showToast('Info', `${allIngredients.length} items added to list`);
+    } else {
+      // Merge with existing shopping list (avoid duplicates)
+      setShoppingList(prev => {
+        const existingIds = new Set(prev.map(item => item.id));
+        const newItems = allIngredients.filter(item => !existingIds.has(item.id));
+        const alreadyAdded = allIngredients.length - newItems.length;
+        
+        // Always show feedback
+        if (newItems.length > 0) {
+          showToast('Info', `${newItems.length} items added to list`);
+        } else if (alreadyAdded > 0) {
+          showToast('Info', 'All items already in list');
+        }
+        
+        return [...prev, ...newItems];
+      });
+    }
   };
   
   // Add ingredients from a specific recipe to shopping list
