@@ -1,0 +1,161 @@
+---
+description: Design system component standards and quality checklist
+globs: "**/*.{jsx,tsx,css,stories.jsx,stories.tsx,mdx}"
+alwaysApply: false
+---
+
+# Design System Standards
+
+When creating or modifying design system components, ensure they meet these quality standards based on industry best practices.
+
+## Foundations Checklist
+
+### Color
+- [ ] **Accessibility**: Text meets WCAG AA contrast (4.5:1 for normal, 3:1 for large text)
+- [ ] **Semantic Colors**: Use design tokens for all colors (no hardcoded values)
+- [ ] **Dark Mode**: Component works in both light and dark modes
+- [ ] **Guidelines**: Document when and how to use each color variant
+
+### Typography
+- [ ] **Responsiveness**: Font sizes scale appropriately across screen sizes
+- [ ] **Grid Relation**: Line heights align with spacing system
+- [ ] **Readability**: Line length, letter spacing, and line height are comfortable
+- [ ] **Typography Classes**: Use predefined classes (e.g., `.text-h1-bold`, `.text-body-regular`)
+
+### Spacing & Layout
+- [ ] **Consistent Units**: Use spacing tokens (--spacing-4, --spacing-8, etc.)
+- [ ] **No Hardcoded Values**: All spacing uses design tokens
+- [ ] **Grid Alignment**: Components align to 4px or 8px grid
+- [ ] **Responsive**: Layout adapts to different screen sizes
+
+### Motion
+- [ ] **Accessibility**: Respect reduced motion preferences
+- [ ] **Easing**: Use spring animations with consistent timing (bounce: 0.2, duration: 0.4s)
+- [ ] **Duration**: Keep animations under 400ms for responsiveness
+- [ ] **Purpose**: Motion provides feedback or guides attention
+
+## Component Standards
+
+### Visual States (All Interactive Components)
+- [ ] **Default**: Clear initial appearance
+- [ ] **Hover**: Visual feedback on mouse over
+- [ ] **Focus**: Visible focus indicator for keyboard navigation (WCAG 2.4.7)
+- [ ] **Active**: Visual feedback when clicked/pressed
+- [ ] **Disabled**: Clearly shows when not interactive (WCAG 2.5.2)
+- [ ] **Error**: Clear visual and text error messages (WCAG 3.3.1)
+- [ ] **Loading**: Shows when action is processing
+
+### Accessibility (WCAG 2.1 AA)
+- [ ] **Keyboard Navigation**: All interactive elements are keyboard accessible (WCAG 2.1.1)
+- [ ] **Focus Management**: Logical tab order and visible focus indicators (WCAG 2.4.3, 2.4.7)
+- [ ] **Screen Reader**: Proper ARIA labels and roles (WCAG 4.1.2)
+- [ ] **Color Independence**: Meaning not conveyed by color alone (WCAG 1.4.1)
+- [ ] **Touch Targets**: Minimum 44x44px for touch targets (WCAG 2.5.5)
+- [ ] **Text Alternatives**: All images/icons have alt text or aria-labels (WCAG 1.1.1)
+
+### Component-Specific: Buttons
+- [ ] **Variants**: Primary, secondary, tertiary styles clearly differentiated
+- [ ] **Sizes**: Multiple sizes for different contexts (small, medium, large)
+- [ ] **Icon Support**: Works with icons, text, or both
+- [ ] **Loading State**: Shows spinner without layout shift
+- [ ] **Full Width Option**: Can stretch to container width
+
+### Component-Specific: Forms
+- [ ] **Labels**: Every input has a visible label (WCAG 2.4.6, 3.3.2)
+- [ ] **Placeholder**: Used only for hints, not as replacement for labels
+- [ ] **Helper Text**: Guidance text below inputs when needed
+- [ ] **Error Messages**: Specific, actionable error text (WCAG 3.3.3)
+- [ ] **Required Indicators**: Clear marking for required fields
+
+### Component-Specific: Modals/Dialogs
+- [ ] **Focus Trap**: Focus stays within modal until closed
+- [ ] **Initial Focus**: Focus moves to first focusable element
+- [ ] **Escape to Close**: ESC key closes modal
+- [ ] **Return Focus**: Focus returns to trigger element on close
+- [ ] **Backdrop Dismiss**: Click outside closes (or doesn't, but be consistent)
+
+### Component-Specific: Toasts/Notifications
+- [ ] **Timeout**: Auto-dismisses after 4-6 seconds (or stays if action needed)
+- [ ] **Dismissible**: Clear way to close manually
+- [ ] **Stacking**: Multiple toasts stack neatly
+- [ ] **Position**: Consistent position (bottom/top, left/right)
+- [ ] **Variants**: Success, error, warning, info clearly differentiated
+- [ ] **No Auto-Dismiss on Focus**: Stays open when keyboard focused
+
+## Storybook Documentation
+
+### Required Stories
+- [ ] **Default**: Basic component usage
+- [ ] **All Variants**: Show every visual variant
+- [ ] **All States**: Show hover, focus, active, disabled, error, loading
+- [ ] **Sizes**: Demonstrate all size options
+- [ ] **Composition**: Show component with complex content
+
+### Documentation
+- [ ] **Props Table**: Auto-generated from TypeScript/PropTypes
+- [ ] **Usage Guidelines**: When to use this component
+- [ ] **Accessibility Notes**: Keyboard shortcuts, ARIA patterns
+- [ ] **Code Examples**: Copy-pasteable examples
+- [ ] **Design Tokens**: Document which tokens are used
+
+## Code Quality
+
+### Component Structure
+- [ ] **Single Responsibility**: Component does one thing well
+- [ ] **Composition**: Can be composed with other components
+- [ ] **Controlled/Uncontrolled**: Supports both patterns when stateful
+- [ ] **Prop Types**: All props typed/documented
+- [ ] **Default Props**: Sensible defaults for optional props
+
+### Styling
+- [ ] **Design Tokens**: Uses CSS variables exclusively
+- [ ] **No Magic Numbers**: All values are tokens or documented constants
+- [ ] **BEM or Consistent Naming**: Clear, consistent class names
+- [ ] **No Inline Styles**: Styles in CSS files, not JavaScript
+- [ ] **Responsive**: Uses media queries or container queries
+
+### Performance
+- [ ] **No Unnecessary Re-renders**: Proper memoization if needed
+- [ ] **Lazy Loading**: Heavy components loaded when needed
+- [ ] **Bundle Size**: Monitor component size impact
+- [ ] **Animation Performance**: Use transform/opacity for animations
+
+## Testing (When Applicable)
+
+- [ ] **Visual Regression**: Chromatic tests for visual changes
+- [ ] **Accessibility**: Automated a11y tests pass
+- [ ] **Interaction**: User interactions work as expected
+- [ ] **Responsive**: Tests across breakpoints
+
+## Quick Reference: Common WCAG Criteria
+
+- **1.1.1**: Text alternatives for images/icons
+- **1.4.1**: Color is not the only visual means of conveying information
+- **1.4.3**: Text contrast minimum (4.5:1 normal, 3:1 large)
+- **2.1.1**: All functionality available from keyboard
+- **2.4.3**: Logical focus order
+- **2.4.6**: Headings and labels describe purpose
+- **2.4.7**: Visible focus indicator
+- **2.5.5**: Touch target size (44x44px minimum)
+- **3.3.1**: Error identification
+- **3.3.2**: Labels or instructions
+- **4.1.2**: Name, role, value for UI components
+
+## Before Merging
+
+- [ ] Storybook documentation complete
+- [ ] Visual regression tests passing
+- [ ] Accessibility audit completed
+- [ ] Cross-browser testing done (if applicable)
+- [ ] Component reviewed against this checklist
+- [ ] Design tokens used exclusively
+- [ ] Responsive behavior verified
+- [ ] Keyboard navigation tested
+- [ ] Screen reader tested (if possible)
+
+## Resources
+
+- WCAG Quick Reference: https://www.w3.org/WAI/WCAG21/quickref/
+- Motion Library Docs: https://motion.dev
+- Design Systems Checklist: https://tylercoderre.com/projects/design-systems-checklist.html
+- Base UI Documentation: https://base-ui.com
