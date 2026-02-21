@@ -20,7 +20,7 @@ export function RecipeDetailPage() {
   
   if (!recipe) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <div style={{ padding: 'var(--spacing-32)', textAlign: 'center' }}>
         <h2>Recipe not found</h2>
         <button onClick={() => navigate('/recipes')}>Back to Recipes</button>
       </div>

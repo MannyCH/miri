@@ -16,7 +16,7 @@ export const SearchBar = ({
     <Field.Root className="search-bar">
       <div className="search-bar-container">
         <Field.Control
-          className="search-bar-input"
+          className="search-bar-input text-body-small-regular"
           placeholder={placeholder}
           type="search"
           {...props}

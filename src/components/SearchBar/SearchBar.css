@@ -23,10 +23,6 @@
   padding: 0;
   border: none;
   background: transparent;
-  font-family: var(--font-family-body);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
   color: var(--color-text-strong);
   outline: none;
 }

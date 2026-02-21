@@ -11,7 +11,7 @@ export const Badge = ({
 }) => {
   return (
     <span 
-      className="badge"
+      className="badge text-tiny-bold"
       {...props}
     >
       {children}

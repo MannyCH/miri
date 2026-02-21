@@ -19,10 +19,6 @@
 }
 
 .nav-item-text {
-  font-family: var(--font-family-body);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
   color: var(--color-text-weak);
 }
 
@@ -32,7 +28,6 @@
 }
 
 .nav-item-pressed .nav-item-text {
-  font-weight: 600;
   color: var(--color-text-strong);
 }
 

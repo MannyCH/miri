@@ -25,7 +25,7 @@ export const Button = ({
           {icon}
         </span>
       )}
-      <span className="button-text">{children}</span>
+      <span className="button-text text-body-small-bold">{children}</span>
     </BaseButton>
   );
 };

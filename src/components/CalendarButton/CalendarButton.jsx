@@ -22,8 +22,8 @@ export const CalendarButton = ({
       aria-pressed={state === 'pressed'}
       {...props}
     >
-      <span className="calendar-button-weekday">{weekday}</span>
-      <span className="calendar-button-day">{day}</span>
+      <span className="calendar-button-weekday text-tiny-regular">{weekday}</span>
+      <span className="calendar-button-day text-body-small-regular">{day}</span>
     </Button>
   );
 };
