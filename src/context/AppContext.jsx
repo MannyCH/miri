@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { generateMealPlan, getRecipeById } from '../data/recipes';
+import { generateMealPlan, generateCalendarDays, getRecipeById, formatDayTitle } from '../data/recipes';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  // Meal Plan State (7 days)
+  // Meal Plan State (7 days from today)
   const [mealPlan, setMealPlan] = useState([]);
-  const [selectedDay, setSelectedDay] = useState(23); // Default to day 23
+  const [calendarDays] = useState(() => generateCalendarDays(28));
+  const todayStr = calendarDays[0]?.fullDate;
+  const [selectedFullDate, setSelectedFullDate] = useState(todayStr);
   
   // Shopping List State
   const [shoppingList, setShoppingList] = useState([]);
@@ -16,11 +18,7 @@ export function AppProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const pendingToastsRef = useRef(new Set());
   
-  // Generate initial meal plan on mount
-  useEffect(() => {
-    const plan = generateMealPlan();
-    setMealPlan(plan);
-  }, []);
+  // Start with no plan — user taps "Plan my week" to generate
   
   // Show toast notification
   const showToast = (variant, message) => {
@@ -91,23 +89,11 @@ export function AppProvider({ children }) {
     });
     
     if (replaceExisting) {
-      // Replace all existing items
       setShoppingList(allIngredients);
-      showToast('Info', `${allIngredients.length} items added to list`);
     } else {
-      // Merge with existing shopping list (avoid duplicates)
       setShoppingList(prev => {
         const existingIds = new Set(prev.map(item => item.id));
         const newItems = allIngredients.filter(item => !existingIds.has(item.id));
-        const alreadyAdded = allIngredients.length - newItems.length;
-        
-        // Always show feedback
-        if (newItems.length > 0) {
-          showToast('Info', `${newItems.length} items added to list`);
-        } else if (alreadyAdded > 0) {
-          showToast('Info', 'All items already in list');
-        }
-        
         return [...prev, ...newItems];
       });
     }
@@ -126,10 +112,8 @@ export function AppProvider({ children }) {
       checked: false,
     }));
     
-    // Always add items from recipe page (no duplicate check)
-    // User explicitly wants to add these ingredients
     setShoppingList(prev => [...prev, ...newItems]);
-    showToast('Info', `${newItems.length} items added to list`);
+    showToast('Info', `${recipe.title} added to list`);
   };
   
   // Toggle ingredient checked state
@@ -156,20 +140,28 @@ export function AppProvider({ children }) {
     setShoppingList([]);
   };
   
-  // Get daily meals for selected date
+  // Clear entire meal plan
+  const clearMealPlan = () => {
+    setMealPlan([]);
+  };
+
+  // Get daily meals for selected date (by fullDate string)
   const getDailyMeals = () => {
-    const day = mealPlan.find(d => d.date === selectedDay);
+    const day = mealPlan.find(d => d.fullDate === selectedFullDate);
     return day || null;
   };
   
   const value = {
     // Meal Plan
     mealPlan,
-    selectedDay,
-    setSelectedDay,
+    calendarDays,
+    selectedFullDate,
+    setSelectedFullDate,
     regenerateMealPlan,
+    clearMealPlan,
     getDailyMeals,
     addAllToShoppingList,
+    formatDayTitle,
     
     // Shopping List
     shoppingList,

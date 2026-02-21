@@ -43,7 +43,7 @@
 /* Secondary - Brown 5% fill with stroke */
 .button-secondary {
   background: var(--color-fill-brand-weak);
-  color: var(--color-text-strong);
+  color: var(--color-text-weak);
   border: 1px solid var(--color-stroke-weak);
 }
 

@@ -7,6 +7,7 @@ export { NavItem } from './NavItem';
 export { NavigationBar } from './NavigationBar';
 export { CalendarButton } from './CalendarButton';
 export { CalendarWeek } from './CalendarWeek';
+export { CalendarModule } from './CalendarModule';
 export { IngredientListItem } from './IngredientListItem';
 export { IngredientList } from './IngredientList';
 export { RecipeListItem } from './RecipeListItem';

@@ -1,0 +1,41 @@
+/* CalendarModule - Matches Figma Calendar Module pattern */
+.calendar-module {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  background: var(--color-fill-hover);
+  padding: var(--spacing-16);
+  border-radius: var(--spacing-16);
+}
+
+.calendar-module-title {
+  margin: 0;
+  color: var(--color-text-weak);
+}
+
+/* Horizontally swipeable calendar */
+.calendar-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+}
+
+.calendar-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.calendar-scroll-track {
+  display: inline-flex;
+  gap: var(--spacing-4);
+}
+
+.calendar-scroll-track .calendar-button {
+  flex-shrink: 0;
+}
+
+/* Snap every 7th button to create week-based paging */
+.calendar-scroll-track .calendar-button:nth-child(7n + 1) {
+  scroll-snap-align: start;
+}

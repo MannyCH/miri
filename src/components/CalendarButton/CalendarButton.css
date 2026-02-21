@@ -1,38 +1,66 @@
-/* CalendarButton - Exact Figma Design */
+/* CalendarButton - Matches Figma Calendar Button component set */
 .calendar-button {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   border: none;
   cursor: pointer;
+  padding: var(--spacing-0);
+  gap: var(--spacing-4);
+  border-radius: var(--corner-radius-8);
+  flex-shrink: 0;
+}
+
+.calendar-button-weekday {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.calendar-button-day {
   font-family: var(--font-family-body);
   font-size: 14px;
   font-weight: 400;
-  line-height: 20px;
+  line-height: 1;
 }
 
-/* No Background - Transparent with grey text */
+/* No Background - Past/inactive days */
 .calendar-button-no-background {
   background: transparent;
-  color: var(--color-text-weak);
-  border-radius: 0;
+  border-radius: var(--corner-radius-8);
 }
 
-/* Default - Light background with rounded corners and stroke */
+.calendar-button-no-background .calendar-button-weekday,
+.calendar-button-no-background .calendar-button-day {
+  color: var(--color-text-disabled);
+}
+
+/* Default - Available days, no fill */
 .calendar-button-default {
-  background: var(--color-fill-brand-weak);
-  color: var(--color-text-strong);
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-8);
+  background: transparent;
 }
 
-/* Pressed - Brown solid background with white text */
+.calendar-button-default .calendar-button-weekday {
+  color: var(--color-grey-slate-light-500);
+}
+
+.calendar-button-default .calendar-button-day {
+  color: var(--color-text-weak);
+}
+
+/* Pressed - Selected/today with brand fill */
 .calendar-button-pressed {
-  background: var(--color-fill-brand-strong);
+  background: var(--color-fill-selected);
+  padding: var(--spacing-4);
+}
+
+.calendar-button-pressed .calendar-button-weekday,
+.calendar-button-pressed .calendar-button-day {
   color: var(--color-text-inverted);
-  border-radius: var(--corner-radius-8);
 }
 
 .calendar-button:focus-visible {

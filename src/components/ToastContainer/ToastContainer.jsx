@@ -11,7 +11,7 @@ import './ToastContainer.css';
 export function ToastContainer({ toasts, onDismiss }) {
   return (
     <div className="toast-container">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence>
         {toasts.map(toast => (
           <Toast
             key={toast.id}

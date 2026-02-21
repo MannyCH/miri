@@ -2,31 +2,37 @@ import React from 'react';
 import { CalendarButton } from '../CalendarButton';
 import './CalendarWeek.css';
 
+const WEEKDAY_LABELS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
 /**
- * CalendarWeek component - Exactly as designed in Figma
- * Week view with 7 calendar buttons
+ * CalendarWeek component - Matches Figma Calendar week component
+ * Horizontal row of 7 CalendarButtons with weekday labels and day numbers
  */
 export const CalendarWeek = ({ 
-  days = [22, 23, 24, 25, 26, 27, 28],
+  days = [],
   selectedDay,
   onDayClick,
   ...props 
 }) => {
   return (
     <div className="calendar-week" {...props}>
-      {days.map((day, index) => {
+      {days.map((dayData, index) => {
+        const { date, weekday, isPast } = typeof dayData === 'object' 
+          ? dayData 
+          : { date: dayData, weekday: WEEKDAY_LABELS[index], isPast: false };
+        
         let state = 'default';
-        if (index === 0) state = 'no-background';
-        if (day === selectedDay) state = 'pressed';
+        if (isPast) state = 'no-background';
+        if (date === selectedDay) state = 'pressed';
         
         return (
           <CalendarButton
-            key={day}
+            key={date}
+            day={date}
+            weekday={weekday}
             state={state}
-            onClick={() => onDayClick?.(day)}
-          >
-            {day}
-          </CalendarButton>
+            onClick={() => onDayClick?.(date)}
+          />
         );
       })}
     </div>
