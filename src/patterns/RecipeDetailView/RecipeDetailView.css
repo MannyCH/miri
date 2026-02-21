@@ -82,11 +82,14 @@
   flex-shrink: 0;
   width: 24px;
   color: var(--color-text-strong);
-  font-weight: 600;
 }
 
 .recipe-direction-text {
   flex: 1;
   margin: 0;
   color: var(--color-text-strong);
+}
+
+.recipe-detail-add-button {
+  margin-top: var(--spacing-16);
 }

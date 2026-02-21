@@ -70,10 +70,6 @@
 /* Item text */
 .ingredient-list-item-text {
   flex: 1;
-  font-family: var(--font-family-body);
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
   color: var(--color-text-strong);
   transition: all 0.2s ease;
 }

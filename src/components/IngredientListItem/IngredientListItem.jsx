@@ -105,7 +105,7 @@ export const IngredientListItem = ({
           }}
           {...props}
         >
-          <span className="ingredient-list-item-text">{children}</span>
+          <span className="ingredient-list-item-text text-body-small-regular">{children}</span>
         </div>
       </div>
       

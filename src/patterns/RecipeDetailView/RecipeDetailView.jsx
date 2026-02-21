@@ -49,7 +49,7 @@ export const RecipeDetailView = ({
           
           {/* Add to Shopping List Button */}
           {onAddToList && (
-            <div style={{ marginTop: 'var(--spacing-16)' }}>
+            <div className="recipe-detail-add-button">
               <Button variant="primary" onClick={onAddToList}>
                 Add to Shopping List
               </Button>
@@ -67,7 +67,7 @@ export const RecipeDetailView = ({
           <ol className="recipe-directions-list">
             {recipe.directions.map((direction, index) => (
               <li key={index} className="recipe-direction-item">
-                <span className="recipe-direction-number text-body-small-regular">
+                <span className="recipe-direction-number text-body-small-bold">
                   {index + 1}
                 </span>
                 <p className="recipe-direction-text text-body-small-regular">

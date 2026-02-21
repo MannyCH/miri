@@ -24,7 +24,7 @@ export const NavItem = ({
           {icon}
         </span>
       )}
-      <span className="nav-item-text">{children}</span>
+      <span className={`nav-item-text ${state === 'pressed' ? 'text-body-small-bold' : 'text-body-small-regular'}`}>{children}</span>
     </Button>
   );
 };

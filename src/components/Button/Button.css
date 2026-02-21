@@ -6,10 +6,6 @@
   gap: var(--spacing-8);
   padding: var(--spacing-12) var(--spacing-12);
   border-radius: var(--corner-radius-8);
-  font-family: var(--font-family-body);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1;
   cursor: pointer;
   border: none;
 }
@@ -23,10 +19,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.button-text {
-  line-height: 1;
 }
 
 /* Primary - Brown solid fill, no stroke */
