@@ -219,20 +219,81 @@ export function getRecipeById(id) {
   return recipes.find(r => r.id === id);
 }
 
+const WEEKDAY_LABELS_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const WEEKDAY_LABELS_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function toLocalDateStr(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 /**
- * Generate a 7-day meal plan
+ * Generate a 7-day meal plan starting from today
  */
 export function generateMealPlan() {
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const dates = Array.from({ length: 7 }, (_, i) => 22 + i); // 22-28
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
-  return days.map((day, index) => ({
-    day,
-    date: dates[index],
-    meals: {
-      breakfast: getRandomRecipes(1, 'breakfast')[0],
-      lunch: getRandomRecipes(1, 'lunch')[0],
-      dinner: getRandomRecipes(1, 'dinner')[0],
-    },
-  }));
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    
+    return {
+      day: WEEKDAY_LABELS_LONG[date.getDay()],
+      date: date.getDate(),
+      weekday: WEEKDAY_LABELS_SHORT[date.getDay()],
+      fullDate: toLocalDateStr(date),
+      month: MONTH_NAMES[date.getMonth()],
+      isToday: i === 0,
+      meals: {
+        breakfast: getRandomRecipes(1, 'breakfast')[0],
+        lunch: getRandomRecipes(1, 'lunch')[0],
+        dinner: getRandomRecipes(1, 'dinner')[0],
+      },
+    };
+  });
+}
+
+/**
+ * Generate extended calendar days for swipeable calendar (4 weeks)
+ */
+export function generateCalendarDays(numDays = 28) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  return Array.from({ length: numDays }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    
+    return {
+      date: date.getDate(),
+      weekday: WEEKDAY_LABELS_SHORT[date.getDay()],
+      fullDate: toLocalDateStr(date),
+      dayOffset: i,
+    };
+  });
+}
+
+/**
+ * Format a date label based on its relation to today
+ * Today → "Today, 21. February"
+ * Tomorrow → "Tomorrow, 22. February"
+ * 2+ days → "Wednesday, 23. February"
+ */
+export function formatDayTitle(fullDateStr) {
+  const target = new Date(fullDateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const diffMs = target.getTime() - today.getTime();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  
+  const datePart = `${target.getDate()}. ${MONTH_NAMES[target.getMonth()]}`;
+  
+  if (diffDays === 0) return `Today, ${datePart}`;
+  if (diffDays === 1) return `Tomorrow, ${datePart}`;
+  return `${WEEKDAY_LABELS_LONG[target.getDay()]}, ${datePart}`;
 }

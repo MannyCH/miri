@@ -1,144 +1,183 @@
-import React from 'react';
-import { CalendarWeek } from '../../components/CalendarWeek';
+import React, { useState, useRef, useEffect } from 'react';
+import { CalendarModule } from '../../components/CalendarModule';
 import { Button } from '../../components/Button';
 import { RecipeListItem } from '../../components/RecipeListItem';
 import { Divider } from '../../components/Divider';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './MealPlanningView.css';
 
-/**
- * MealPlanningView Pattern - Meal planning screen with calendar and meals
- * Composition of: CalendarWeek, Button, RecipeListItem, NavigationBar
- * EXACT Figma implementation with correct text styles and color tokens
- */
 export const MealPlanningView = ({
-  selectedDay = 23,
+  title = 'Meal Planning',
+  calendarTitle,
+  days = [],
+  selectedFullDate,
   onDayClick,
   meals = {},
+  hasPlan = false,
+  hasMealsForDay = false,
+  hasAddedToList = false,
   onPlanMeals,
   onAddMeals,
+  onReplan,
+  onClearPlan,
+  onAddRecipeToList,
   ...props
 }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e) => {
+      if (!menuRef.current?.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
+  }, [menuOpen]);
+
+  const handleMenuAction = (action) => {
+    setMenuOpen(false);
+    action?.();
+  };
+
   return (
     <div className="meal-planning-view" {...props}>
-      {/* Fixed Header: Title + Calendar */}
+      {/* Header: Title + three-dot menu + Calendar Module */}
       <div className="meal-planning-fixed-header">
-        {/* Section Header */}
         <div className="meal-planning-section-header">
           <h1 className="text-h1-bold" style={{ color: 'var(--color-text-strong)' }}>
-            Meal Planning
+            {title}
           </h1>
+          {hasPlan && (
+            <div className="meal-planning-menu-wrapper" ref={menuRef}>
+              <button
+                className="icon-button"
+                aria-label="More options"
+                aria-expanded={menuOpen}
+                aria-haspopup="menu"
+                onClick={() => setMenuOpen(prev => !prev)}
+              >
+                <MoreIcon />
+              </button>
+              {menuOpen && (
+                <div className="context-menu" role="menu">
+                  <button
+                    className="context-menu-item text-body-base-regular"
+                    role="menuitem"
+                    onClick={() => handleMenuAction(onReplan)}
+                  >
+                    Replan week
+                  </button>
+                  <button
+                    className="context-menu-item context-menu-item-danger text-body-base-regular"
+                    role="menuitem"
+                    onClick={() => handleMenuAction(onClearPlan)}
+                  >
+                    Clear week
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Date Section */}
-        <div className="meal-planning-date-section">
-          <div className="meal-planning-date-row">
-            <span className="text-annotation-bold" style={{ color: 'var(--color-text-weak)' }}>
-              22.11 - 28.11
-            </span>
-            <Button variant="secondary" onClick={onPlanMeals}>
-              Plan meals this week
-            </Button>
-          </div>
-          
-          <CalendarWeek
-            days={[22, 23, 24, 25, 26, 27, 28]}
-            selectedDay={selectedDay}
+        <div className="meal-planning-calendar-section">
+          <CalendarModule
+            title={calendarTitle}
+            days={days}
+            selectedDay={selectedFullDate}
             onDayClick={onDayClick}
           />
         </div>
       </div>
 
-      {/* Scrollable Content: Meals List */}
+      {/* Scrollable Content */}
       <div className="meal-planning-content">
-        {/* Day Section */}
-        <div className="meal-planning-day-section">
-          <h2 className="text-h4-regular" style={{ color: 'var(--color-text-weak)' }}>
-            Monday, 23. November
-          </h2>
-          <Button variant="secondary" onClick={onAddMeals}>
-            Add meals to list
-          </Button>
-        </div>
-
-        {/* Breakfast - Meal Section (all sections are direct children, no wrapper) */}
-        <div className="meal-section-header">
-          <h3 className="text-body-base-bold" style={{ color: 'var(--color-text-strong)' }}>
-            Breakfast
-          </h3>
-          <div className="meal-actions">
-            <button className="icon-button" aria-label="Refresh">
-              <RefreshIcon />
-            </button>
-            <button className="icon-button" aria-label="Add to cart">
-              <ShoppingCartIcon />
-            </button>
-          </div>
-        </div>
-        <Divider />
-        {meals.breakfast && (
-          <RecipeListItem
-            title={meals.breakfast.title}
-            thumbnail={meals.breakfast.thumbnail}
-            showUpperDivider={false}
-            showBelowDivider={false}
-          />
+        {hasPlan && hasMealsForDay && (
+          <>
+            {['breakfast', 'lunch', 'dinner'].map(mealType => (
+              <MealSection
+                key={mealType}
+                label={mealType.charAt(0).toUpperCase() + mealType.slice(1)}
+                meal={meals[mealType]}
+                onAddToList={() => onAddRecipeToList?.(meals[mealType]?.id)}
+              />
+            ))}
+          </>
         )}
 
-        {/* Lunch - Meal Section */}
-        <div className="meal-section-header">
-          <h3 className="text-body-base-bold" style={{ color: 'var(--color-text-strong)' }}>
-            Lunch
-          </h3>
-          <div className="meal-actions">
-            <button className="icon-button" aria-label="Refresh">
-              <RefreshIcon />
-            </button>
-            <button className="icon-button" aria-label="Add to cart">
-              <ShoppingCartIcon />
-            </button>
+        {hasPlan && !hasMealsForDay && (
+          <div className="meal-planning-empty">
+            <p className="text-body-base-regular" style={{ color: 'var(--color-text-weak)' }}>
+              No meals planned for this day.
+            </p>
           </div>
-        </div>
-        <Divider />
-        {meals.lunch && (
-          <RecipeListItem
-            title={meals.lunch.title}
-            thumbnail={meals.lunch.thumbnail}
-            showUpperDivider={false}
-            showBelowDivider={false}
-          />
         )}
 
-        {/* Dinner - Meal Section */}
-        <div className="meal-section-header">
-          <h3 className="text-body-base-bold" style={{ color: 'var(--color-text-strong)' }}>
-            Dinner
-          </h3>
-          <div className="meal-actions">
-            <button className="icon-button" aria-label="Refresh">
-              <RefreshIcon />
-            </button>
-            <button className="icon-button" aria-label="Add to cart">
-              <ShoppingCartIcon />
-            </button>
+        {!hasPlan && (
+          <div className="meal-planning-empty">
+            <p className="text-body-base-regular" style={{ color: 'var(--color-text-weak)' }}>
+              No meals planned yet.
+            </p>
+            <Button variant="primary" onClick={onPlanMeals}>
+              Plan my week
+            </Button>
           </div>
-        </div>
-        <Divider />
-        {meals.dinner && (
-          <RecipeListItem
-            title={meals.dinner.title}
-            thumbnail={meals.dinner.thumbnail}
-            showUpperDivider={false}
-            showBelowDivider={false}
-          />
         )}
       </div>
 
-      {/* Bottom Navigation */}
+      {/* Bottom action bar — only when a plan exists */}
+      {hasPlan && (
+        <div className="meal-planning-action">
+          <Button
+            variant={hasAddedToList ? 'secondary' : 'primary'}
+            onClick={hasAddedToList ? undefined : onAddMeals}
+            disabled={hasAddedToList}
+          >
+            {hasAddedToList ? 'Added to list \u2713' : 'Add week to list'}
+          </Button>
+        </div>
+      )}
+
       <NavigationBarConnected activeItem="planning" />
     </div>
   );
 };
+
+const MealSection = ({ label, meal, onAddToList }) => (
+  <>
+    <div className="meal-section-header">
+      <h3 className="text-body-base-bold" style={{ color: 'var(--color-text-strong)' }}>
+        {label}
+      </h3>
+      <div className="meal-actions">
+        <button className="icon-button" aria-label={`Refresh ${label.toLowerCase()}`}>
+          <RefreshIcon />
+        </button>
+        <button className="icon-button" aria-label={`Add ${label.toLowerCase()} to list`} onClick={onAddToList}>
+          <ShoppingCartIcon />
+        </button>
+      </div>
+    </div>
+    <Divider />
+    {meal && (
+      <RecipeListItem
+        title={meal.title}
+        thumbnail={meal.thumbnail}
+        showUpperDivider={false}
+        showBelowDivider={false}
+      />
+    )}
+  </>
+);
+
+const MoreIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="12" cy="5" r="2" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="12" cy="19" r="2" />
+  </svg>
+);
 
 const RefreshIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

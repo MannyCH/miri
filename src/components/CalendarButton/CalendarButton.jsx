@@ -3,20 +3,27 @@ import { Button } from '@base-ui/react/button';
 import './CalendarButton.css';
 
 /**
- * CalendarButton component - Exactly as designed in Figma
- * Calendar date button with 3 states: No background, Default, Pressed
+ * CalendarButton component - Matches Figma Calendar Button component set
+ * Three variants: No background (past/inactive), Default (future days), Pressed (selected/today)
+ * Each button shows weekday abbreviation + day number in a vertical stack
  */
 export const CalendarButton = ({ 
-  children = '22',
+  day = 22,
+  weekday = 'Mo',
   state = 'default',
+  onClick,
   ...props 
 }) => {
   return (
     <Button 
       className={`calendar-button calendar-button-${state}`}
+      onClick={onClick}
+      aria-label={`${weekday} ${day}`}
+      aria-pressed={state === 'pressed'}
       {...props}
     >
-      {children}
+      <span className="calendar-button-weekday">{weekday}</span>
+      <span className="calendar-button-day">{day}</span>
     </Button>
   );
 };

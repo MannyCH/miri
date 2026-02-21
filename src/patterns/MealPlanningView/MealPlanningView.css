@@ -11,7 +11,7 @@
   padding-top: var(--safe-area-inset-top);
 }
 
-/* Header area (title + calendar) - Fixed at top, don't shrink */
+/* Header area (title + calendar module) - Fixed at top, don't shrink */
 .meal-planning-fixed-header {
   flex-shrink: 0;
   background: var(--color-background-base);
@@ -23,14 +23,15 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0 var(--spacing-16);
-  padding-bottom: calc(88px + var(--safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 0; /* Figma Container has itemSpacing: 0 - spacing comes from section padding */
 }
 
-/* Section Header: "Meal Planning" */
+/* Section Header: "Meal Planning" + three-dot icon */
 .meal-planning-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: var(--spacing-24) var(--spacing-16) var(--spacing-16);
 }
 
@@ -38,38 +39,66 @@
   margin: 0;
 }
 
-/* Date Section: Date range + buttons + calendar */
-.meal-planning-date-section {
-  display: flex;
-  flex-direction: column;
-  margin: 0 var(--spacing-16);
-  padding: var(--spacing-16);
+/* Three-dot menu wrapper (relative anchor for the dropdown) */
+.meal-planning-menu-wrapper {
+  position: relative;
+}
+
+/* Context menu dropdown */
+.context-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--spacing-4);
+  min-width: 160px;
   background: var(--color-background-raised);
-  border-radius: var(--corner-radius-12);
-  gap: var(--spacing-16);
+  border-radius: var(--corner-radius-8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: var(--spacing-4) 0;
+  z-index: 10;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-12) var(--spacing-16);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: var(--color-text-strong);
+}
+
+.context-menu-item:hover {
+  background: var(--color-fill-hover);
+}
+
+.context-menu-item:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: -2px;
+}
+
+.context-menu-item-danger {
+  color: var(--color-text-error);
+}
+
+/* Calendar section wrapping the CalendarModule */
+.meal-planning-calendar-section {
+  padding: 0 var(--spacing-16);
   margin-bottom: var(--spacing-16);
 }
 
-.meal-planning-date-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Day Section: "Monday, 23. November" + button */
-.meal-planning-day-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-16) 0;
-}
-
-/* Meal section header - direct child of content container */
+/* Meal section header */
 .meal-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-8) 0;
+}
+
+.meal-section-header h3 {
+  margin: 0;
 }
 
 .meal-actions {
@@ -98,4 +127,30 @@
 .icon-button:focus-visible {
   outline: 2px solid var(--color-stroke-focus);
   outline-offset: 2px;
+}
+
+/* Primary action button area - only shown when plan exists */
+.meal-planning-action {
+  flex-shrink: 0;
+  padding: var(--spacing-16);
+}
+
+.meal-planning-action .button {
+  width: 100%;
+}
+
+/* Empty state - centered text + button */
+.meal-planning-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-16);
+  padding: var(--spacing-48) var(--spacing-16);
+  text-align: center;
+}
+
+.meal-planning-empty p {
+  margin: 0;
 }

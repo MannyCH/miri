@@ -67,44 +67,20 @@
 
 .confirm-dialog-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-12);
-  flex-wrap: wrap;
 }
 
-.confirm-dialog-button {
+.confirm-dialog-actions-row {
+  display: flex;
+  gap: var(--spacing-12);
+}
+
+/* Make buttons fill available width inside the dialog */
+.confirm-dialog-actions-row .button {
   flex: 1;
-  min-width: 120px;
-  padding: var(--spacing-12) var(--spacing-16);
-  border-radius: var(--corner-radius-8);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
-.confirm-dialog-button-tertiary {
-  flex: 1 1 100%;
-  background: transparent;
-  color: var(--color-text-weak);
-  border: 1px solid var(--color-stroke-weak);
-}
-
-.confirm-dialog-button-tertiary:hover {
-  background: var(--color-fill-hover);
-}
-
-.confirm-dialog-button-confirm {
-  background: var(--color-fill-brand-strong);
-  color: var(--color-text-inverted);
-}
-
-.confirm-dialog-button-confirm:hover {
-  opacity: 0.9;
-}
-
-.confirm-dialog-button-confirm.warning {
-  background: var(--color-fill-error-strong);
-}
-
-.confirm-dialog-button:active {
-  transform: scale(0.98);
+.confirm-dialog-actions > .button {
+  width: 100%;
 }

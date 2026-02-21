@@ -72,30 +72,40 @@ export const ShoppingListView = ({
 
         {/* Recipe View Mode */}
         {viewMode === 'recipe' && (
-          <div className="shopping-list-recipe-groups">
-            {recipeGroups.map((group, groupIndex) => (
-              <div key={groupIndex} className="recipe-group">
-                <div className="recipe-group-header">
-                  <h3 className="text-body-base-bold">{group.recipeName}</h3>
-                  <button 
-                    className="icon-button-delete"
-                    onClick={() => group.onDelete?.()}
-                    aria-label={`Delete ${group.recipeName}`}
-                  >
-                    <TrashIcon />
-                  </button>
+          <>
+            <div className="shopping-list-recipe-groups">
+              {recipeGroups.map((group, groupIndex) => (
+                <div key={groupIndex} className="recipe-group">
+                  <div className="recipe-group-header">
+                    <h3 className="text-body-base-bold">{group.recipeName}</h3>
+                    <button 
+                      className="icon-button-delete"
+                      onClick={() => group.onDelete?.()}
+                      aria-label={`Delete ${group.recipeName}`}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
+                  <IngredientList
+                    ingredients={group.ingredients}
+                    checkedItems={group.checkedItems || {}}
+                    onCheckedChange={(index, checked) => 
+                      group.onIngredientCheck?.(index, checked)
+                    }
+                    onDelete={(index) => group.onIngredientDelete?.(index)}
+                  />
                 </div>
-                <IngredientList
-                  ingredients={group.ingredients}
-                  checkedItems={group.checkedItems || {}}
-                  onCheckedChange={(index, checked) => 
-                    group.onIngredientCheck?.(index, checked)
-                  }
-                  onDelete={(index) => group.onIngredientDelete?.(index)}
-                />
+              ))}
+            </div>
+
+            {recipeGroups.length > 0 && (
+              <div className="shopping-list-clear">
+                <Button variant="tertiary-delete" onClick={onClearList}>
+                  Clear whole list
+                </Button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 

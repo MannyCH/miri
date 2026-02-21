@@ -8,26 +8,36 @@ export default {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Calendar week view with 7 day buttons. Exactly as designed in Figma.',
+        component: 'Calendar week view with 7 day buttons showing weekday labels and day numbers. Matches Figma Calendar week component.',
       },
     },
   },
 };
 
+const sampleDays = [
+  { date: 17, weekday: 'Mo', isPast: false },
+  { date: 18, weekday: 'Tu', isPast: false },
+  { date: 19, weekday: 'We', isPast: false },
+  { date: 20, weekday: 'Th', isPast: false },
+  { date: 21, weekday: 'Fr', isPast: false },
+  { date: 22, weekday: 'Sa', isPast: false },
+  { date: 23, weekday: 'Su', isPast: false },
+];
+
 export const Default = {
   args: {
-    days: [22, 23, 24, 25, 26, 27, 28],
-    selectedDay: 23,
+    days: sampleDays,
+    selectedDay: 20,
   },
 };
 
 export const Interactive = () => {
-  const [selected, setSelected] = React.useState(23);
+  const [selected, setSelected] = React.useState(20);
   
   return (
     <div style={{ width: '358px' }}>
       <CalendarWeek
-        days={[22, 23, 24, 25, 26, 27, 28]}
+        days={sampleDays}
         selectedDay={selected}
         onDayClick={setSelected}
       />

@@ -8,7 +8,7 @@ export default {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Calendar date button with 3 states: No background, Default, and Pressed.',
+        component: 'Calendar date button with weekday label and day number. Three states: No background (past/inactive), Default (available), and Pressed (selected/today). Matches Figma Calendar Button component set.',
       },
     },
   },
@@ -16,11 +16,15 @@ export default {
     state: {
       control: 'select',
       options: ['no-background', 'default', 'pressed'],
-      description: 'Button state',
+      description: 'Visual state of the button',
     },
-    children: {
+    day: {
+      control: 'number',
+      description: 'Day number to display',
+    },
+    weekday: {
       control: 'text',
-      description: 'Date number',
+      description: 'Weekday abbreviation (Mo, Tu, We, etc.)',
     },
   },
 };
@@ -28,28 +32,31 @@ export default {
 export const NoBackground = {
   args: {
     state: 'no-background',
-    children: '22',
+    day: 22,
+    weekday: 'Mo',
   },
 };
 
 export const Default = {
   args: {
     state: 'default',
-    children: '22',
+    day: 23,
+    weekday: 'Tu',
   },
 };
 
 export const Pressed = {
   args: {
     state: 'pressed',
-    children: '22',
+    day: 25,
+    weekday: 'Th',
   },
 };
 
 export const AllStates = () => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-16)' }}>
-    <CalendarButton state="no-background">22</CalendarButton>
-    <CalendarButton state="default">22</CalendarButton>
-    <CalendarButton state="pressed">22</CalendarButton>
+  <div style={{ display: 'flex', gap: 'var(--spacing-16)' }}>
+    <CalendarButton state="no-background" day={22} weekday="Mo" />
+    <CalendarButton state="default" day={23} weekday="Tu" />
+    <CalendarButton state="pressed" day={25} weekday="Th" />
   </div>
 );

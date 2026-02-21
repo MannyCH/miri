@@ -1,23 +1,27 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { Button } from '../Button';
 import './ConfirmDialog.css';
 
 /**
  * ConfirmDialog - Modal confirmation dialog
- * Used for destructive or important actions
+ * Uses Button component variants: secondary for actions, tertiary-delete for cancel
  */
 export function ConfirmDialog({ 
   isOpen,
   title,
   message,
   confirmLabel = 'Confirm',
+  secondaryLabel,
   tertiaryLabel,
   onConfirm,
-  onCancel,
+  onSecondary,
   onTertiary,
-  variant = 'default' // 'default' or 'warning'
+  onCancel,
 }) {
   if (!isOpen) return null;
+  
+  const handleOverlayClick = onCancel || onTertiary;
   
   return (
     <motion.div 
@@ -25,7 +29,7 @@ export function ConfirmDialog({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onCancel}
+      onClick={handleOverlayClick}
     >
       <motion.div 
         className="confirm-dialog"
@@ -45,7 +49,7 @@ export function ConfirmDialog({
           </h3>
           <button 
             className="confirm-dialog-close"
-            onClick={onCancel}
+            onClick={handleOverlayClick}
             aria-label="Close dialog"
           >
             <CloseIcon />
@@ -57,28 +61,29 @@ export function ConfirmDialog({
         </p>
         
         <div className="confirm-dialog-actions">
-          {tertiaryLabel && onTertiary && (
-            <button 
-              className="confirm-dialog-button confirm-dialog-button-tertiary"
-              onClick={onTertiary}
-            >
-              <span className="text-body-small-bold">{tertiaryLabel}</span>
-            </button>
+          <div className="confirm-dialog-actions-row">
+            <Button variant="secondary" onClick={onConfirm}>
+              {confirmLabel}
+            </Button>
+
+            {secondaryLabel && onSecondary && (
+              <Button variant="secondary" onClick={onSecondary}>
+                {secondaryLabel}
+              </Button>
+            )}
+          </div>
+
+          {tertiaryLabel && (onTertiary || onCancel) && (
+            <Button variant="tertiary-delete" onClick={onTertiary || onCancel}>
+              {tertiaryLabel}
+            </Button>
           )}
-          
-          <button 
-            className={`confirm-dialog-button confirm-dialog-button-confirm ${variant === 'warning' ? 'warning' : ''}`}
-            onClick={onConfirm}
-          >
-            <span className="text-body-small-bold">{confirmLabel}</span>
-          </button>
         </div>
       </motion.div>
     </motion.div>
   );
 }
 
-// Close icon
 const CloseIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="18" y1="6" x2="6" y2="18"/>
