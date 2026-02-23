@@ -24,11 +24,23 @@
   background: transparent;
   color: var(--color-text-strong);
   outline: none;
-  font-size: 16px; /* Prevents iOS zoom on focus (minimum 16px required) */
+  -webkit-appearance: none;
+  appearance: none;
+  box-shadow: none;
+  font-family: var(--font-family-body);
+  font-size: 16px; /* iOS requires >=16px to avoid auto-zoom */
+  font-weight: 400;
+  line-height: 20px;
 }
 
 .search-bar-input::placeholder {
   color: var(--color-text-weak);
+}
+
+.search-bar-input:focus,
+.search-bar-input:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .search-bar-input::-webkit-search-cancel-button {

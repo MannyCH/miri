@@ -17,9 +17,11 @@ export const SearchBar = ({
     <div className="search-bar">
       <div className="search-bar-container">
         <input
-          className="search-bar-input text-body-small-regular"
+          className="search-bar-input"
           placeholder={placeholder}
-          type="search"
+          type="text"
+          inputMode="search"
+          enterKeyHint="search"
           value={value}
           onChange={onChange}
           {...props}
