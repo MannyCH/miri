@@ -43,6 +43,18 @@
   border-top: 1px solid var(--color-stroke-weak);
 }
 
+/* While search is focused, pin only the search bar above the keyboard */
+.recipes-view-search-active .recipes-search {
+  position: fixed;
+  left: 50%;
+  bottom: var(--recipes-keyboard-offset, 0);
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
+  z-index: 20;
+  border-top: none;
+}
+
 /* Navigation bar */
 .recipes-view .navigation-bar {
   order: 4;

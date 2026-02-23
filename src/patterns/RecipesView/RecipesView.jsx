@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
@@ -13,10 +13,48 @@ export const RecipesView = ({
   searchQuery = '',
   onSearchChange,
   onRecipeClick,
+  className,
+  style,
   ...props
 }) => {
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+  useEffect(() => {
+    if (!isSearchFocused) {
+      setKeyboardOffset(0);
+      return;
+    }
+
+    const viewport = window.visualViewport;
+    if (!viewport) {
+      return;
+    }
+
+    const updateKeyboardOffset = () => {
+      const nextOffset = Math.max(
+        0,
+        window.innerHeight - (viewport.height + viewport.offsetTop)
+      );
+      setKeyboardOffset(nextOffset);
+    };
+
+    updateKeyboardOffset();
+    viewport.addEventListener('resize', updateKeyboardOffset);
+    viewport.addEventListener('scroll', updateKeyboardOffset);
+
+    return () => {
+      viewport.removeEventListener('resize', updateKeyboardOffset);
+      viewport.removeEventListener('scroll', updateKeyboardOffset);
+    };
+  }, [isSearchFocused]);
+
   return (
-    <div className="recipes-view" {...props}>
+    <div
+      className={`recipes-view ${isSearchFocused ? 'recipes-view-search-active' : ''}${className ? ` ${className}` : ''}`}
+      style={{ ...style, '--recipes-keyboard-offset': `${keyboardOffset}px` }}
+      {...props}
+    >
       {/* Header */}
       <header className="recipes-header">
         <h1 className="text-h1-bold">Recipes</h1>
@@ -33,6 +71,8 @@ export const RecipesView = ({
           placeholder="Rezepte suchen..."
           value={searchQuery}
           onChange={(e) => onSearchChange?.(e.target.value)}
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
           trailingIcon={<SearchIcon />}
         />
       </div>
