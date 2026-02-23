@@ -57,6 +57,12 @@
 
 /* Freeze page height while keyboard is open to prevent title/list jump */
 .recipes-view-search-active {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
   height: var(--recipes-frozen-height, 100vh);
 }
 

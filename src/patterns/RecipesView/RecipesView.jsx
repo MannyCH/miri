@@ -20,6 +20,7 @@ export const RecipesView = ({
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [frozenHeight, setFrozenHeight] = useState(null);
+  const [layoutHeight, setLayoutHeight] = useState(window.innerHeight);
 
   useEffect(() => {
     if (!isSearchFocused) {
@@ -50,6 +51,36 @@ export const RecipesView = ({
     };
   }, [isSearchFocused]);
 
+  useEffect(() => {
+    if (isSearchFocused) {
+      return undefined;
+    }
+
+    const handleResize = () => {
+      setLayoutHeight(window.innerHeight);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isSearchFocused]);
+
+  useEffect(() => {
+    if (!isSearchFocused) {
+      document.body.style.overflow = '';
+      return undefined;
+    }
+
+    document.body.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isSearchFocused]);
+
   return (
     <div
       className={`recipes-view ${isSearchFocused ? 'recipes-view-search-active' : ''}${className ? ` ${className}` : ''}`}
@@ -77,7 +108,7 @@ export const RecipesView = ({
           value={searchQuery}
           onChange={(e) => onSearchChange?.(e.target.value)}
           onFocus={() => {
-            setFrozenHeight(window.innerHeight);
+            setFrozenHeight(layoutHeight);
             setIsSearchFocused(true);
           }}
           onBlur={() => {
