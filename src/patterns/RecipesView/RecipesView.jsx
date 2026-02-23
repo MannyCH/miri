@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
@@ -19,8 +19,7 @@ export const RecipesView = ({
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
-  const [frozenHeight, setFrozenHeight] = useState(null);
-  const [layoutHeight, setLayoutHeight] = useState(window.innerHeight);
+  const overlayInputRef = useRef(null);
 
   useEffect(() => {
     if (!isSearchFocused) {
@@ -52,33 +51,15 @@ export const RecipesView = ({
   }, [isSearchFocused]);
 
   useEffect(() => {
-    if (isSearchFocused) {
-      return undefined;
-    }
-
-    const handleResize = () => {
-      setLayoutHeight(window.innerHeight);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [isSearchFocused]);
-
-  useEffect(() => {
     if (!isSearchFocused) {
-      document.body.style.overflow = '';
-      return undefined;
+      return;
     }
 
-    document.body.style.overflow = 'hidden';
-    window.scrollTo(0, 0);
+    const focusTimer = window.setTimeout(() => {
+      overlayInputRef.current?.focus();
+    }, 0);
 
-    return () => {
-      document.body.style.overflow = '';
-    };
+    return () => window.clearTimeout(focusTimer);
   }, [isSearchFocused]);
 
   return (
@@ -87,7 +68,6 @@ export const RecipesView = ({
       style={{
         ...style,
         '--recipes-keyboard-offset': `${keyboardOffset}px`,
-        '--recipes-frozen-height': frozenHeight ? `${frozenHeight}px` : '100vh',
       }}
       {...props}
     >
@@ -107,17 +87,23 @@ export const RecipesView = ({
           placeholder="Rezepte suchen..."
           value={searchQuery}
           onChange={(e) => onSearchChange?.(e.target.value)}
-          onFocus={() => {
-            setFrozenHeight(layoutHeight);
-            setIsSearchFocused(true);
-          }}
-          onBlur={() => {
-            setIsSearchFocused(false);
-            setFrozenHeight(null);
-          }}
+          onFocus={() => setIsSearchFocused(true)}
           trailingIcon={<SearchIcon />}
         />
       </div>
+
+      {isSearchFocused && (
+        <div className="recipes-search-overlay">
+          <SearchBar
+            inputRef={overlayInputRef}
+            placeholder="Rezepte suchen..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            onBlur={() => setIsSearchFocused(false)}
+            trailingIcon={<SearchIcon />}
+          />
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <NavigationBarConnected activeItem="recipes" />

@@ -9,6 +9,7 @@ export const SearchBar = ({
   placeholder = 'Ich brauche...',
   value,
   onChange,
+  inputRef,
   trailingIcon,
   showTrailingIcon = true,
   ...props 
@@ -18,6 +19,7 @@ export const SearchBar = ({
       <div className="search-bar-container">
         <input
           className="search-bar-input"
+          ref={inputRef}
           placeholder={placeholder}
           type="text"
           inputMode="search"
@@ -28,13 +30,9 @@ export const SearchBar = ({
         />
         
         {showTrailingIcon && trailingIcon && (
-          <button
-            type="button"
-            className="search-bar-icon-button"
-            aria-label="Search"
-          >
+          <span className="search-bar-icon-button" aria-hidden="true">
             {trailingIcon}
-          </button>
+          </span>
         )}
       </div>
     </div>
