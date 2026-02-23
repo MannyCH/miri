@@ -1,4 +1,4 @@
-/* RecipeDetailView Pattern - Pure Flexbox Layout with Safe Areas */
+/* RecipeDetailView Pattern - Matches Figma "Recipes - Detailed" */
 .recipe-detail-view {
   display: flex;
   flex-direction: column;
@@ -11,65 +11,90 @@
   padding-top: var(--safe-area-inset-top);
 }
 
-/* Recipe Title - Fixed at top */
-.recipe-detail-title {
-  flex-shrink: 0;
-  margin: 0;
-  padding: var(--spacing-16);
-  padding-bottom: var(--spacing-8);
-  background: var(--color-background-base);
-  color: var(--color-text-strong);
-}
-
-/* Scrollable content area - Takes remaining space between title and nav */
+/* Scrollable content — takes remaining space between top and nav */
 .recipe-detail-content {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: var(--spacing-16);
-  padding-top: var(--spacing-8);
-  padding-bottom: calc(88px + var(--safe-area-inset-bottom));
+  padding-bottom: var(--spacing-16);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-16);
 }
 
-/* Hero Image */
+/* Recipe Title */
+.recipe-detail-title {
+  margin: 0;
+  color: var(--color-text-strong);
+}
+
+/* Hero Image — Figma: cornerRadius 4 */
 .recipe-detail-image {
   width: 100%;
-  border-radius: var(--corner-radius-12);
+  flex-shrink: 0;
+  border-radius: var(--corner-radius-4);
   overflow: hidden;
   background: var(--color-background-sunken);
 }
 
 .recipe-detail-image img {
   width: 100%;
-  height: auto;
+  height: 240px;
   display: block;
+  object-fit: cover;
+  object-position: center;
 }
 
-/* Section spacing */
+/* Section container */
 .recipe-detail-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-16);
 }
 
-/* Section titles (INGREDIENTS, DIRECTIONS) */
+/* Section titles (INGREDIENTS, DIRECTIONS) — Figma: Tiny/Bold with letter-spacing */
 .recipe-detail-section-title {
   margin: 0;
   color: var(--color-text-weak);
   letter-spacing: 2px;
 }
 
-/* Directions list - numbered steps */
+/* ============================================
+   INGREDIENTS — Figma: non-interactive rows
+   ============================================ */
+
+.recipe-ingredients-section {
+  gap: 0;
+  padding-bottom: var(--spacing-16);
+}
+
+/* Figma: itemSpacing 8 between ingredient rows */
+.recipe-ingredient-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  margin-top: var(--spacing-8);
+}
+
+.recipe-ingredient-item {
+  color: var(--color-text-strong);
+}
+
+/* ============================================
+   DIRECTIONS — Figma: Badge + instruction text
+   ============================================ */
+
 .recipe-directions-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-24); /* Figma: itemSpacing: 24 */
+  gap: var(--spacing-24);
+  margin-top: var(--spacing-16);
 }
 
 .recipe-direction-item {
@@ -78,10 +103,10 @@
   align-items: flex-start;
 }
 
-.recipe-direction-number {
+/* Keep badge aligned to top of text */
+.recipe-direction-item .badge {
   flex-shrink: 0;
-  width: 24px;
-  color: var(--color-text-strong);
+  margin-top: -2px;
 }
 
 .recipe-direction-text {
@@ -90,6 +115,14 @@
   color: var(--color-text-strong);
 }
 
+/* ============================================
+   ADD TO LIST BUTTON — full width at bottom
+   ============================================ */
+
 .recipe-detail-add-button {
-  margin-top: var(--spacing-16);
+  padding-top: 0;
+}
+
+.recipe-detail-add-button .button {
+  width: 100%;
 }

@@ -1,13 +1,12 @@
 import React from 'react';
-import { IngredientList } from '../../components/IngredientList';
+import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './RecipeDetailView.css';
 
 /**
- * RecipeDetailView Pattern - Complete recipe view with ingredients and directions
- * Composition of: IngredientList, NavigationBar, scrollable directions
- * Combines ingredients and cooking instructions in one scrollable view
+ * RecipeDetailView Pattern - Matches Figma "Recipes - Detailed" pattern
+ * Structure: Title → Image → Ingredients (non-interactive) → Directions (with Badge) → Button
  */
 export const RecipeDetailView = ({
   recipe = {
@@ -16,60 +15,48 @@ export const RecipeDetailView = ({
     ingredients: [],
     directions: [],
   },
-  checkedIngredients = {},
-  onIngredientCheck,
-  onIngredientDelete,
   onAddToList,
   ...props
 }) => {
   return (
     <div className="recipe-detail-view" {...props}>
-      {/* Recipe Title - Fixed at top */}
-      <h1 className="text-h1-bold recipe-detail-title">{recipe.title}</h1>
-
       {/* Scrollable Content Area */}
       <div className="recipe-detail-content">
-        {/* Hero Image */}
-        <div className="recipe-detail-image">
-          <img src={recipe.image} alt={recipe.title} />
-        </div>
+        {/* Recipe Title */}
+        <h1 className="text-h1-bold recipe-detail-title">{recipe.title}</h1>
 
-        {/* Ingredients Section */}
-        <div className="recipe-detail-section">
-          <h2 className="text-annotation-bold recipe-detail-section-title">
+        {/* Hero Image */}
+        {recipe.image && (
+          <div className="recipe-detail-image">
+            <img src={recipe.image} alt={recipe.title} />
+          </div>
+        )}
+
+        {/* Ingredients Section — non-interactive list */}
+        <div className="recipe-detail-section recipe-ingredients-section">
+          <h2 className="text-tiny-bold recipe-detail-section-title">
             INGREDIENTS
           </h2>
-          
-          <IngredientList
-            ingredients={recipe.ingredients}
-            checkedItems={checkedIngredients}
-            onCheckedChange={onIngredientCheck}
-            onDelete={onIngredientDelete}
-          />
-          
-          {/* Add to Shopping List Button */}
-          {onAddToList && (
-            <div className="recipe-detail-add-button">
-              <Button variant="primary" onClick={onAddToList}>
-                Add to Shopping List
-              </Button>
-            </div>
-          )}
+
+          <ul className="recipe-ingredient-list">
+            {recipe.ingredients.map((ingredient, index) => (
+              <li key={index} className="recipe-ingredient-item text-body-small-regular">
+                {typeof ingredient === 'string' ? ingredient : `${ingredient.quantity} ${ingredient.name}`}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Directions Section */}
+        {/* Directions Section — Badge numbers + instruction text */}
         <div className="recipe-detail-section">
-          <h2 className="text-annotation-bold recipe-detail-section-title">
+          <h2 className="text-tiny-bold recipe-detail-section-title">
             DIRECTIONS
           </h2>
-          
-          {/* Numbered instruction steps */}
+
           <ol className="recipe-directions-list">
             {recipe.directions.map((direction, index) => (
               <li key={index} className="recipe-direction-item">
-                <span className="recipe-direction-number text-body-small-bold">
-                  {index + 1}
-                </span>
+                <Badge>{index + 1}</Badge>
                 <p className="recipe-direction-text text-body-small-regular">
                   {direction}
                 </p>
@@ -77,6 +64,19 @@ export const RecipeDetailView = ({
             ))}
           </ol>
         </div>
+
+        {/* Add to list button — at bottom after all content */}
+        {onAddToList && (
+          <div className="recipe-detail-add-button">
+            <Button
+              variant="primary"
+              icon={<CartIcon />}
+              onClick={onAddToList}
+            >
+              Add to list
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Bottom Navigation */}
@@ -84,5 +84,13 @@ export const RecipeDetailView = ({
     </div>
   );
 };
+
+const CartIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="9" cy="21" r="1"/>
+    <circle cx="20" cy="21" r="1"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  </svg>
+);
 
 RecipeDetailView.displayName = 'RecipeDetailView';

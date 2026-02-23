@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-16);
-  padding: var(--spacing-8) 0;
+  padding: var(--spacing-12) 0;
   background: transparent;
   border: none;
   text-align: left;
@@ -16,8 +16,8 @@
 }
 
 .recipe-list-item-thumbnail {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   flex-shrink: 0;
   border-radius: var(--corner-radius-8);
   overflow: hidden;
@@ -33,7 +33,7 @@
 .recipe-list-item-title {
   flex: 1;
   margin: 0;
-  /* Typography is handled by text-h4-bold class */
+  /* Typography handled by text-h4-regular class */
   color: var(--color-text-strong);
 }
 
