@@ -1,6 +1,5 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { userEvent, within, expect } from 'storybook/test';
 import { RecipeDetailView } from './RecipeDetailView';
 
 export default {
@@ -17,21 +16,7 @@ export default {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Complete recipe view with scrollable ingredients and cooking directions.',
-      },
-    },
-    a11y: {
-      config: {
-        rules: [
-          {
-            // Disable contrast check for sticky title (false positive)
-            // Reason: Checker can't determine background due to position:sticky + z-index
-            // Verified: Text #260B00F2 (dark brown) on #FFFFFF (white) = 13:1 contrast
-            id: 'color-contrast',
-            selector: '.recipe-detail-title',
-            enabled: false,
-          },
-        ],
+        component: 'Recipe detail view matching Figma "Recipes - Detailed" pattern. Non-interactive ingredient list, Badge-numbered directions, and full-width "Add to list" button at bottom.',
       },
     },
   },
@@ -59,148 +44,47 @@ const sampleRecipe = {
 };
 
 /**
- * Default RecipeDetailView with ingredients and directions
+ * Default view with image, ingredients, directions, and add-to-list button
  */
 export const Default = {
   args: {
     recipe: sampleRecipe,
-    checkedIngredients: {},
+    onAddToList: () => console.log('Added to list'),
   },
 };
 
 /**
- * Interactive demo with ingredient checking and deletion
+ * Without image — fallback when no recipe image is available
  */
-export const Interactive = {
-  render: () => {
-    const [checkedIngredients, setCheckedIngredients] = React.useState({});
-    const [ingredients, setIngredients] = React.useState(sampleRecipe.ingredients);
-
-    const handleIngredientCheck = (index, checked) => {
-      setCheckedIngredients((prev) => ({
-        ...prev,
-        [index]: checked,
-      }));
-    };
-
-    const handleIngredientDelete = (index) => {
-      setIngredients((prev) => prev.filter((_, i) => i !== index));
-      setCheckedIngredients((prev) => {
-        const newChecked = { ...prev };
-        delete newChecked[index];
-        return newChecked;
-      });
-    };
-
-    return (
-      <RecipeDetailView
-        recipe={{
-          ...sampleRecipe,
-          ingredients,
-        }}
-        checkedIngredients={checkedIngredients}
-        onIngredientCheck={handleIngredientCheck}
-        onIngredientDelete={handleIngredientDelete}
-        onAddToList={() => console.log('Added to shopping list')}
-      />
-    );
-  },
-};
-
-/**
- * Automated interaction test - demonstrates checking ingredients and adding to list
- * Watch the Interactions panel to see the step-by-step flow
- */
-export const WithPlayFunction = {
-  render: () => {
-    const [checkedIngredients, setCheckedIngredients] = React.useState({});
-    const [ingredients, setIngredients] = React.useState(sampleRecipe.ingredients);
-
-    const handleIngredientCheck = (index, checked) => {
-      setCheckedIngredients((prev) => ({
-        ...prev,
-        [index]: checked,
-      }));
-    };
-
-    const handleIngredientDelete = (index) => {
-      setIngredients((prev) => prev.filter((_, i) => i !== index));
-      setCheckedIngredients((prev) => {
-        const newChecked = { ...prev };
-        delete newChecked[index];
-        return newChecked;
-      });
-    };
-
-    return (
-      <RecipeDetailView
-        recipe={{
-          ...sampleRecipe,
-          ingredients,
-        }}
-        checkedIngredients={checkedIngredients}
-        onIngredientCheck={handleIngredientCheck}
-        onIngredientDelete={handleIngredientDelete}
-        onAddToList={() => console.log('Added to shopping list')}
-      />
-    );
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // Step 1: Wait for the component to render
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    // Step 2: Check the first ingredient (salmon fillets)
-    const firstIngredient = canvas.getByText(/2 salmon fillets/i);
-    await userEvent.click(firstIngredient);
-    
-    // Small delay to see the interaction
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    // Step 3: Check the third ingredient (cherry tomatoes)
-    const thirdIngredient = canvas.getByText(/2 cups cherry tomatoes/i);
-    await userEvent.click(thirdIngredient);
-    
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    // Step 4: Check the fifth ingredient (olive oil)
-    const fifthIngredient = canvas.getByText(/2 tbsp olive oil/i);
-    await userEvent.click(fifthIngredient);
-    
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Step 5: Scroll down to see the "Add to Shopping List" button
-    // Use the scrollable content container
-    const recipeDetailContent = canvasElement.querySelector('.recipe-detail-content');
-    if (recipeDetailContent) {
-      recipeDetailContent.scrollTop = 300;
-    }
-    
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    // Step 6: Click "Add to Shopping List" button
-    const addButton = canvas.getByRole('button', { name: /add to shopping list/i });
-    await userEvent.click(addButton);
-
-    // Step 7: Verify button was clicked
-    await expect(addButton).toBeInTheDocument();
-    
-    // Optional: Verify ingredients are checked (have strikethrough style)
-    await expect(firstIngredient).toBeInTheDocument();
-  },
-};
-
-/**
- * With some ingredients checked
- */
-export const WithCheckedIngredients = {
+export const WithoutImage = {
   args: {
-    recipe: sampleRecipe,
-    checkedIngredients: {
-      0: true,
-      2: true,
-      4: true,
+    recipe: {
+      ...sampleRecipe,
+      image: null,
     },
+    onAddToList: () => console.log('Added to list'),
+  },
+};
+
+/**
+ * Short recipe with fewer ingredients and steps
+ */
+export const ShortRecipe = {
+  args: {
+    recipe: {
+      title: 'Quick Avocado Toast',
+      image: 'https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?w=400&h=300&fit=crop',
+      ingredients: [
+        '2 slices sourdough bread',
+        '1 ripe avocado',
+        'Salt and pepper',
+        'Red pepper flakes',
+      ],
+      directions: [
+        'Toast the bread until golden and crispy.',
+        'Mash the avocado with a fork, season with salt and pepper. Spread on toast and top with red pepper flakes.',
+      ],
+    },
+    onAddToList: () => console.log('Added to list'),
   },
 };

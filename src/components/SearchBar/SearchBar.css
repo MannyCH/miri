@@ -14,8 +14,7 @@
 }
 
 .search-bar-container:focus-within {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .search-bar-input {
@@ -25,6 +24,7 @@
   background: transparent;
   color: var(--color-text-strong);
   outline: none;
+  font-size: 16px; /* Prevents iOS zoom on focus (minimum 16px required) */
 }
 
 .search-bar-input::placeholder {
