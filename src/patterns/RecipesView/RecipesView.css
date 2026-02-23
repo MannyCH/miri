@@ -55,6 +55,11 @@
   border-top: none;
 }
 
+/* Freeze page height while keyboard is open to prevent title/list jump */
+.recipes-view-search-active {
+  height: var(--recipes-frozen-height, 100vh);
+}
+
 /* Navigation bar */
 .recipes-view .navigation-bar {
   order: 4;

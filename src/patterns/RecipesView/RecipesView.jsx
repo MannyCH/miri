@@ -19,6 +19,7 @@ export const RecipesView = ({
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [frozenHeight, setFrozenHeight] = useState(null);
 
   useEffect(() => {
     if (!isSearchFocused) {
@@ -52,7 +53,11 @@ export const RecipesView = ({
   return (
     <div
       className={`recipes-view ${isSearchFocused ? 'recipes-view-search-active' : ''}${className ? ` ${className}` : ''}`}
-      style={{ ...style, '--recipes-keyboard-offset': `${keyboardOffset}px` }}
+      style={{
+        ...style,
+        '--recipes-keyboard-offset': `${keyboardOffset}px`,
+        '--recipes-frozen-height': frozenHeight ? `${frozenHeight}px` : '100vh',
+      }}
       {...props}
     >
       {/* Header */}
@@ -71,8 +76,14 @@ export const RecipesView = ({
           placeholder="Rezepte suchen..."
           value={searchQuery}
           onChange={(e) => onSearchChange?.(e.target.value)}
-          onFocus={() => setIsSearchFocused(true)}
-          onBlur={() => setIsSearchFocused(false)}
+          onFocus={() => {
+            setFrozenHeight(window.innerHeight);
+            setIsSearchFocused(true);
+          }}
+          onBlur={() => {
+            setIsSearchFocused(false);
+            setFrozenHeight(null);
+          }}
           trailingIcon={<SearchIcon />}
         />
       </div>
