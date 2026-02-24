@@ -63,12 +63,17 @@
   color: var(--color-icon-brand);
 }
 
-/* Overlay search bar above keyboard without moving title/list */
+/* Overlay search bar above keyboard without moving title/list.
+   Uses top-based positioning with the visual viewport bottom coordinate
+   to work around WebKit (Safari/Chrome on iOS) ignoring
+   interactive-widget=resizes-visual and producing unreliable
+   visualViewport.offsetTop values with bottom-based calculations. */
 .recipes-search-overlay {
   position: fixed;
   left: 50%;
-  bottom: var(--recipes-keyboard-offset, 0);
-  transform: translateX(-50%);
+  top: var(--recipes-visual-bottom, 100%);
+  bottom: auto;
+  transform: translate(-50%, -100%);
   width: 100%;
   max-width: 390px;
   z-index: 20;

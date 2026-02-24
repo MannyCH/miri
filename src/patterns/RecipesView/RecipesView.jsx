@@ -18,35 +18,35 @@ export const RecipesView = ({
   ...props
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [visualViewportBottom, setVisualViewportBottom] = useState(
+    () => window.visualViewport
+      ? window.visualViewport.offsetTop + window.visualViewport.height
+      : window.innerHeight
+  );
   const overlayInputRef = useRef(null);
 
   useEffect(() => {
-    if (!isSearchOpen) {
-      setKeyboardOffset(0);
-      return;
-    }
+    if (!isSearchOpen) return;
 
     const viewport = window.visualViewport;
-    if (!viewport) {
-      return;
-    }
+    if (!viewport) return;
 
-    const updateKeyboardOffset = () => {
-      const nextOffset = Math.max(
-        0,
-        window.innerHeight - (viewport.height + viewport.offsetTop)
-      );
-      setKeyboardOffset(nextOffset);
+    const updateVisualViewportBottom = () => {
+      setVisualViewportBottom(viewport.offsetTop + viewport.height);
+
+      // iOS WebKit ignores overflow:hidden on html/body when the keyboard
+      // opens and forcibly scrolls the document to reveal the focused input.
+      // Reset that scroll so the header / recipe list stay in place.
+      window.scrollTo(0, 0);
     };
 
-    updateKeyboardOffset();
-    viewport.addEventListener('resize', updateKeyboardOffset);
-    viewport.addEventListener('scroll', updateKeyboardOffset);
+    updateVisualViewportBottom();
+    viewport.addEventListener('resize', updateVisualViewportBottom);
+    viewport.addEventListener('scroll', updateVisualViewportBottom);
 
     return () => {
-      viewport.removeEventListener('resize', updateKeyboardOffset);
-      viewport.removeEventListener('scroll', updateKeyboardOffset);
+      viewport.removeEventListener('resize', updateVisualViewportBottom);
+      viewport.removeEventListener('scroll', updateVisualViewportBottom);
     };
   }, [isSearchOpen]);
 
@@ -56,7 +56,7 @@ export const RecipesView = ({
     }
 
     const focusTimer = window.setTimeout(() => {
-      overlayInputRef.current?.focus();
+      overlayInputRef.current?.focus({ preventScroll: true });
     }, 0);
 
     return () => window.clearTimeout(focusTimer);
@@ -67,7 +67,7 @@ export const RecipesView = ({
       className={`recipes-view ${className ? ` ${className}` : ''}`}
       style={{
         ...style,
-        '--recipes-keyboard-offset': `${keyboardOffset}px`,
+        '--recipes-visual-bottom': `${visualViewportBottom}px`,
       }}
       {...props}
     >
