@@ -21,6 +21,13 @@ export const RecipesView = ({
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const overlayInputRef = useRef(null);
 
+  const activateOverlaySearch = (event) => {
+    event.preventDefault();
+    if (!isSearchFocused) {
+      setIsSearchFocused(true);
+    }
+  };
+
   useEffect(() => {
     if (!isSearchFocused) {
       setKeyboardOffset(0);
@@ -87,7 +94,14 @@ export const RecipesView = ({
           placeholder="Rezepte suchen..."
           value={searchQuery}
           onChange={(e) => onSearchChange?.(e.target.value)}
-          onFocus={() => setIsSearchFocused(true)}
+          onMouseDown={activateOverlaySearch}
+          onTouchStart={activateOverlaySearch}
+          onFocus={(event) => {
+            event.target.blur();
+            if (!isSearchFocused) {
+              setIsSearchFocused(true);
+            }
+          }}
           trailingIcon={<SearchIcon />}
         />
       </div>
