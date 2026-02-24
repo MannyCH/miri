@@ -18,8 +18,10 @@ export const RecipesView = ({
   ...props
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [viewportHeight, setViewportHeight] = useState(
-    () => window.visualViewport?.height ?? window.innerHeight
+  const [visualViewportBottom, setVisualViewportBottom] = useState(
+    () => window.visualViewport
+      ? window.visualViewport.offsetTop + window.visualViewport.height
+      : window.innerHeight
   );
   const overlayInputRef = useRef(null);
 
@@ -29,17 +31,22 @@ export const RecipesView = ({
     const viewport = window.visualViewport;
     if (!viewport) return;
 
-    const updateViewportHeight = () => {
-      setViewportHeight(viewport.height);
+    const updateVisualViewportBottom = () => {
+      setVisualViewportBottom(viewport.offsetTop + viewport.height);
+
+      // iOS WebKit ignores overflow:hidden on html/body when the keyboard
+      // opens and forcibly scrolls the document to reveal the focused input.
+      // Reset that scroll so the header / recipe list stay in place.
+      window.scrollTo(0, 0);
     };
 
-    updateViewportHeight();
-    viewport.addEventListener('resize', updateViewportHeight);
-    viewport.addEventListener('scroll', updateViewportHeight);
+    updateVisualViewportBottom();
+    viewport.addEventListener('resize', updateVisualViewportBottom);
+    viewport.addEventListener('scroll', updateVisualViewportBottom);
 
     return () => {
-      viewport.removeEventListener('resize', updateViewportHeight);
-      viewport.removeEventListener('scroll', updateViewportHeight);
+      viewport.removeEventListener('resize', updateVisualViewportBottom);
+      viewport.removeEventListener('scroll', updateVisualViewportBottom);
     };
   }, [isSearchOpen]);
 
@@ -57,10 +64,10 @@ export const RecipesView = ({
 
   return (
     <div
-      className={`recipes-view${isSearchOpen ? ' recipes-view--search-open' : ''}${className ? ` ${className}` : ''}`}
+      className={`recipes-view ${className ? ` ${className}` : ''}`}
       style={{
         ...style,
-        '--recipes-viewport-height': `${viewportHeight}px`,
+        '--recipes-visual-bottom': `${visualViewportBottom}px`,
       }}
       {...props}
     >
@@ -101,7 +108,10 @@ export const RecipesView = ({
       )}
 
       {/* Bottom Navigation — always rendered to preserve flex layout */}
-      <NavigationBarConnected activeItem="recipes" />
+      <NavigationBarConnected
+        activeItem="recipes"
+        style={isSearchOpen ? { visibility: 'hidden' } : undefined}
+      />
     </div>
   );
 };
