@@ -107,10 +107,11 @@ export const RecipesView = ({
         </div>
       )}
 
-      {/* Bottom Navigation */}
-      {!isSearchOpen && (
-        <NavigationBarConnected activeItem="recipes" />
-      )}
+      {/* Bottom Navigation — always rendered to preserve flex layout */}
+      <NavigationBarConnected
+        activeItem="recipes"
+        style={isSearchOpen ? { visibility: 'hidden' } : undefined}
+      />
     </div>
   );
 };
