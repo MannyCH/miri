@@ -63,16 +63,13 @@
   color: var(--color-icon-brand);
 }
 
-/* Overlay search bar above keyboard without moving title/list.
-   Uses top-based positioning with the visual viewport bottom coordinate
-   to work around WebKit (Safari/Chrome on iOS) ignoring
-   interactive-widget=resizes-visual and producing unreliable
-   visualViewport.offsetTop values with bottom-based calculations. */
+/* Search overlay — floats above the keyboard via position:fixed.
+   Title and recipe list stay completely still; only the search bar and
+   keyboard appear. */
 .recipes-search-overlay {
   position: fixed;
   left: 50%;
-  top: var(--recipes-visual-bottom, 100%);
-  bottom: auto;
+  top: var(--recipes-viewport-height, 100%);
   transform: translate(-50%, -100%);
   width: 100%;
   max-width: 390px;
@@ -81,7 +78,28 @@
   background: var(--color-background-base);
 }
 
+/* Solid curtain below the search bar so no list items or the nav bar
+   are visible between the search bar and the keyboard. */
+.recipes-search-overlay::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background: inherit;
+}
+
 /* Navigation bar */
 .recipes-view .navigation-bar {
   order: 4;
+}
+
+/* Lock the container when search is active so iOS WebKit cannot
+   auto-scroll the page when the keyboard appears. */
+.recipes-view--search-open {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
 }
