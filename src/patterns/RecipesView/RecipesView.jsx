@@ -87,12 +87,7 @@ export const RecipesView = ({
           placeholder="Rezepte suchen..."
           value={searchQuery}
           onChange={(e) => onSearchChange?.(e.target.value)}
-          readOnly
-          tabIndex={-1}
-          onPointerDown={(event) => {
-            event.preventDefault();
-            setIsSearchFocused(true);
-          }}
+          onFocus={() => setIsSearchFocused(true)}
           trailingIcon={<SearchIcon />}
         />
       </div>
