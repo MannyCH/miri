@@ -17,12 +17,12 @@ export const RecipesView = ({
   style,
   ...props
 }) => {
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const overlayInputRef = useRef(null);
 
   useEffect(() => {
-    if (!isSearchFocused) {
+    if (!isSearchOpen) {
       setKeyboardOffset(0);
       return;
     }
@@ -48,10 +48,10 @@ export const RecipesView = ({
       viewport.removeEventListener('resize', updateKeyboardOffset);
       viewport.removeEventListener('scroll', updateKeyboardOffset);
     };
-  }, [isSearchFocused]);
+  }, [isSearchOpen]);
 
   useEffect(() => {
-    if (!isSearchFocused) {
+    if (!isSearchOpen) {
       return;
     }
 
@@ -60,11 +60,11 @@ export const RecipesView = ({
     }, 0);
 
     return () => window.clearTimeout(focusTimer);
-  }, [isSearchFocused]);
+  }, [isSearchOpen]);
 
   return (
     <div
-      className={`recipes-view ${isSearchFocused ? 'recipes-view-search-active' : ''}${className ? ` ${className}` : ''}`}
+      className={`recipes-view ${className ? ` ${className}` : ''}`}
       style={{
         ...style,
         '--recipes-keyboard-offset': `${keyboardOffset}px`,
@@ -81,37 +81,36 @@ export const RecipesView = ({
         <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
       </div>
 
-      {/* Search Bar */}
-      <div className="recipes-search">
-        <SearchBar
-          placeholder="Rezepte suchen..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange?.(e.target.value)}
-          readOnly
-          tabIndex={-1}
-          onPointerDown={(event) => {
-            event.preventDefault();
-            setIsSearchFocused(true);
-          }}
-          trailingIcon={<SearchIcon />}
-        />
-      </div>
+      {!isSearchOpen && (
+        <div className="recipes-search-trigger-layer">
+          <button
+            type="button"
+            className="recipes-search-trigger"
+            onClick={() => setIsSearchOpen(true)}
+            aria-label="Open search"
+          >
+            <SearchIcon />
+          </button>
+        </div>
+      )}
 
-      {isSearchFocused && (
+      {isSearchOpen && (
         <div className="recipes-search-overlay">
           <SearchBar
             inputRef={overlayInputRef}
             placeholder="Rezepte suchen..."
             value={searchQuery}
             onChange={(e) => onSearchChange?.(e.target.value)}
-            onBlur={() => setIsSearchFocused(false)}
+            onBlur={() => setIsSearchOpen(false)}
             trailingIcon={<SearchIcon />}
           />
         </div>
       )}
 
       {/* Bottom Navigation */}
-      <NavigationBarConnected activeItem="recipes" />
+      {!isSearchOpen && (
+        <NavigationBarConnected activeItem="recipes" />
+      )}
     </div>
   );
 };

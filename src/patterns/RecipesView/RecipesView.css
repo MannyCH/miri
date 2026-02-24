@@ -35,18 +35,32 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Search bar - Above navigation using flexbox order */
-.recipes-search {
-  flex-shrink: 0;
-  order: 3;
-  padding: var(--spacing-16);
-  background: var(--color-background-base);
-  border-top: 1px solid var(--color-stroke-weak);
+/* Floating search trigger over bottom navigation */
+.recipes-search-trigger-layer {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--safe-area-inset-bottom) + var(--spacing-12));
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 var(--spacing-16);
+  pointer-events: none;
 }
 
-/* Keep layout slot while overlay search is active */
-.recipes-view-search-active .recipes-search {
-  visibility: hidden;
+.recipes-search-trigger {
+  pointer-events: auto;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--color-stroke-weak);
+  background: var(--color-background-raised);
+  color: var(--color-icon-brand);
 }
 
 /* Overlay search bar above keyboard without moving title/list */
