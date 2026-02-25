@@ -18,100 +18,66 @@ export const RecipesView = ({
   ...props
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [visualViewportBottom, setVisualViewportBottom] = useState(
-    () => window.visualViewport
-      ? window.visualViewport.offsetTop + window.visualViewport.height
-      : window.innerHeight
-  );
-  const overlayInputRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     if (!isSearchOpen) return;
-
-    const viewport = window.visualViewport;
-    if (!viewport) return;
-
-    const updateVisualViewportBottom = () => {
-      setVisualViewportBottom(viewport.offsetTop + viewport.height);
-
-      // iOS WebKit ignores overflow:hidden on html/body when the keyboard
-      // opens and forcibly scrolls the document to reveal the focused input.
-      // Reset that scroll so the header / recipe list stay in place.
-      window.scrollTo(0, 0);
-    };
-
-    updateVisualViewportBottom();
-    viewport.addEventListener('resize', updateVisualViewportBottom);
-    viewport.addEventListener('scroll', updateVisualViewportBottom);
-
-    return () => {
-      viewport.removeEventListener('resize', updateVisualViewportBottom);
-      viewport.removeEventListener('scroll', updateVisualViewportBottom);
-    };
+    const timer = setTimeout(() => {
+      searchInputRef.current?.focus({ preventScroll: true });
+    }, 50);
+    return () => clearTimeout(timer);
   }, [isSearchOpen]);
 
-  useEffect(() => {
-    if (!isSearchOpen) {
-      return;
-    }
-
-    const focusTimer = window.setTimeout(() => {
-      overlayInputRef.current?.focus({ preventScroll: true });
-    }, 0);
-
-    return () => window.clearTimeout(focusTimer);
-  }, [isSearchOpen]);
+  const handleCloseSearch = () => {
+    setIsSearchOpen(false);
+    onSearchChange?.('');
+  };
 
   return (
     <div
-      className={`recipes-view ${className ? ` ${className}` : ''}`}
-      style={{
-        ...style,
-        '--recipes-visual-bottom': `${visualViewportBottom}px`,
-      }}
+      className={`recipes-view${className ? ` ${className}` : ''}`}
+      style={style}
       {...props}
     >
-      {/* Header */}
       <header className="recipes-header">
         <h1 className="text-h1-bold">Recipes</h1>
-      </header>
-
-      {/* Recipe List */}
-      <div className="recipes-content">
-        <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
-      </div>
-
-      {!isSearchOpen && (
-        <div className="recipes-search-trigger-layer">
+        {!isSearchOpen && (
           <button
             type="button"
-            className="recipes-search-trigger"
+            className="recipes-search-icon-btn"
             onClick={() => setIsSearchOpen(true)}
-            aria-label="Open search"
+            aria-label="Search recipes"
           >
             <SearchIcon />
+          </button>
+        )}
+      </header>
+
+      {isSearchOpen && (
+        <div className="recipes-search-bar">
+          <SearchBar
+            inputRef={searchInputRef}
+            placeholder="Rezepte suchen..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            showTrailingIcon={false}
+          />
+          <button
+            type="button"
+            className="recipes-search-close"
+            onClick={handleCloseSearch}
+            aria-label="Close search"
+          >
+            <CloseIcon />
           </button>
         </div>
       )}
 
-      {isSearchOpen && (
-        <div className="recipes-search-overlay">
-          <SearchBar
-            inputRef={overlayInputRef}
-            placeholder="Rezepte suchen..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange?.(e.target.value)}
-            onBlur={() => setIsSearchOpen(false)}
-            trailingIcon={<SearchIcon />}
-          />
-        </div>
-      )}
+      <div className="recipes-content">
+        <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
+      </div>
 
-      {/* Bottom Navigation — always rendered to preserve flex layout */}
-      <NavigationBarConnected
-        activeItem="recipes"
-        style={isSearchOpen ? { visibility: 'hidden' } : undefined}
-      />
+      <NavigationBarConnected activeItem="recipes" />
     </div>
   );
 };
@@ -120,6 +86,12 @@ const SearchIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="11" cy="11" r="8"/>
     <path d="m21 21-4.35-4.35"/>
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M18 6 6 18M6 6l12 12"/>
   </svg>
 );
 
