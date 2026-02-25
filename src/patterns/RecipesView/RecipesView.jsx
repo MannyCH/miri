@@ -24,14 +24,9 @@ export const RecipesView = ({
     if (!isSearchOpen) return;
     const timer = setTimeout(() => {
       searchInputRef.current?.focus({ preventScroll: true });
-    }, 50);
+    }, 0);
     return () => clearTimeout(timer);
   }, [isSearchOpen]);
-
-  const handleCloseSearch = () => {
-    setIsSearchOpen(false);
-    onSearchChange?.('');
-  };
 
   return (
     <div
@@ -59,28 +54,21 @@ export const RecipesView = ({
             onChange={(e) => onSearchChange?.(e.target.value)}
             showTrailingIcon={false}
           />
-          <button
-            type="button"
-            className="recipes-search-close"
-            onClick={handleCloseSearch}
-            aria-label="Close search"
-          >
-            <CloseIcon />
-          </button>
         </div>
       )}
 
-      {/* Floating search trigger — bottom right, above nav bar */}
-      {!isSearchOpen && (
-        <button
-          type="button"
-          className="recipes-search-fab"
-          onClick={() => setIsSearchOpen(true)}
-          aria-label="Search recipes"
-        >
-          <SearchIcon />
-        </button>
-      )}
+      {/* Floating search trigger — bottom right, above nav bar, always visible */}
+      <button
+        type="button"
+        className="recipes-search-fab"
+        onClick={() => {
+          if (isSearchOpen) onSearchChange?.('');
+          setIsSearchOpen((open) => !open);
+        }}
+        aria-label={isSearchOpen ? 'Close search' : 'Search recipes'}
+      >
+        {isSearchOpen ? <CloseIcon /> : <SearchIcon />}
+      </button>
     </div>
   );
 };

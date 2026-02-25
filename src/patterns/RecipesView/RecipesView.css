@@ -89,21 +89,3 @@
   flex: 1;
 }
 
-.recipes-search-close {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: transparent;
-  color: var(--color-icon-brand);
-  border-radius: var(--corner-radius-8);
-  cursor: pointer;
-}
-
-.recipes-search-close:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-}
