@@ -41,20 +41,17 @@ export const RecipesView = ({
     >
       <header className="recipes-header">
         <h1 className="text-h1-bold">Recipes</h1>
-        {!isSearchOpen && (
-          <button
-            type="button"
-            className="recipes-search-icon-btn"
-            onClick={() => setIsSearchOpen(true)}
-            aria-label="Search recipes"
-          >
-            <SearchIcon />
-          </button>
-        )}
       </header>
 
+      <div className="recipes-content">
+        <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
+      </div>
+
+      <NavigationBarConnected activeItem="recipes" />
+
+      {/* Search overlay — slides in from top, sits above header */}
       {isSearchOpen && (
-        <div className="recipes-search-bar">
+        <div className="recipes-search-overlay">
           <SearchBar
             inputRef={searchInputRef}
             placeholder="Rezepte suchen..."
@@ -73,11 +70,17 @@ export const RecipesView = ({
         </div>
       )}
 
-      <div className="recipes-content">
-        <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
-      </div>
-
-      <NavigationBarConnected activeItem="recipes" />
+      {/* Floating search trigger — bottom right, above nav bar */}
+      {!isSearchOpen && (
+        <button
+          type="button"
+          className="recipes-search-fab"
+          onClick={() => setIsSearchOpen(true)}
+          aria-label="Search recipes"
+        >
+          <SearchIcon />
+        </button>
+      )}
     </div>
   );
 };
