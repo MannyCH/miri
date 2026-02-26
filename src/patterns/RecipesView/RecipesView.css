@@ -89,3 +89,22 @@
   flex: 1;
 }
 
+.recipes-search-cancel {
+  flex-shrink: 0;
+  padding: 0 var(--spacing-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text-brand);
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.recipes-search-cancel:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}
+

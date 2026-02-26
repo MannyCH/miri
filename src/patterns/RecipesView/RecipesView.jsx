@@ -19,6 +19,11 @@ export const RecipesView = ({
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const handleCancel = () => {
+    setIsSearchOpen(false);
+    onSearchChange?.('');
+  };
+
   return (
     <div
       className={`recipes-view${className ? ` ${className}` : ''}`}
@@ -35,7 +40,7 @@ export const RecipesView = ({
 
       <NavigationBarConnected activeItem="recipes" />
 
-      {/* Search overlay — slides in from top, sits above header */}
+      {/* Search overlay — slides in from top, Cancel always visible above keyboard */}
       {isSearchOpen && (
         <div className="recipes-search-overlay">
           <SearchBar
@@ -46,20 +51,24 @@ export const RecipesView = ({
             onChange={(e) => onSearchChange?.(e.target.value)}
             showTrailingIcon={false}
           />
+          <button
+            type="button"
+            className="recipes-search-cancel"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
         </div>
       )}
 
-      {/* Floating search trigger — bottom right, above nav bar, always visible */}
+      {/* Floating search trigger — bottom right, above nav bar, always a search icon */}
       <button
         type="button"
         className="recipes-search-fab"
-        onClick={() => {
-          if (isSearchOpen) onSearchChange?.('');
-          setIsSearchOpen((open) => !open);
-        }}
-        aria-label={isSearchOpen ? 'Close search' : 'Search recipes'}
+        onClick={() => setIsSearchOpen(true)}
+        aria-label="Search recipes"
       >
-        {isSearchOpen ? <CloseIcon /> : <SearchIcon />}
+        <SearchIcon />
       </button>
     </div>
   );
@@ -69,12 +78,6 @@ const SearchIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="11" cy="11" r="8"/>
     <path d="m21 21-4.35-4.35"/>
-  </svg>
-);
-
-const CloseIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M18 6 6 18M6 6l12 12"/>
   </svg>
 );
 
