@@ -37,7 +37,7 @@
 /* Floating search button — fixed + keyboard-height keeps it above the keyboard */
 .recipes-search-fab {
   position: fixed;
-  bottom: calc(64px + var(--safe-area-inset-bottom) + var(--spacing-16) + var(--keyboard-height, 0px));
+  bottom: calc(76px + var(--safe-area-inset-bottom) + var(--spacing-16) + var(--keyboard-height, 0px));
   right: var(--spacing-16);
   width: 48px;
   height: 48px;
