@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
@@ -18,6 +18,17 @@ export const RecipesView = ({
   ...props
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchInputRef = useRef(null);
+
+  const handleFabClick = () => {
+    if (isSearchOpen) {
+      // Search bar already visible — re-focus directly within the user gesture
+      // so mobile browsers allow the keyboard to reappear
+      searchInputRef.current?.focus();
+    } else {
+      setIsSearchOpen(true);
+    }
+  };
 
   const handleCancel = () => {
     setIsSearchOpen(false);
@@ -46,6 +57,7 @@ export const RecipesView = ({
           <SearchBar
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
+            inputRef={searchInputRef}
             placeholder="Rezepte suchen..."
             value={searchQuery}
             onChange={(e) => onSearchChange?.(e.target.value)}
@@ -65,7 +77,7 @@ export const RecipesView = ({
       <button
         type="button"
         className="recipes-search-fab"
-        onClick={() => setIsSearchOpen(true)}
+        onClick={handleFabClick}
         aria-label="Search recipes"
       >
         <SearchIcon />
