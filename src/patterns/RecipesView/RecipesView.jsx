@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
@@ -18,15 +18,6 @@ export const RecipesView = ({
   ...props
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const searchInputRef = useRef(null);
-
-  useEffect(() => {
-    if (!isSearchOpen) return;
-    const timer = setTimeout(() => {
-      searchInputRef.current?.focus({ preventScroll: true });
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [isSearchOpen]);
 
   return (
     <div
@@ -48,7 +39,8 @@ export const RecipesView = ({
       {isSearchOpen && (
         <div className="recipes-search-overlay">
           <SearchBar
-            inputRef={searchInputRef}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
             placeholder="Rezepte suchen..."
             value={searchQuery}
             onChange={(e) => onSearchChange?.(e.target.value)}
