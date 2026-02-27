@@ -1,15 +1,32 @@
-/* Button - Exact Figma Designs (No hover states) */
+/* Button - Figma Design System with all interaction states
+ *
+ * Token mapping from Figma:
+ *   Fill/Brand strong       → --color-fill-brand-strong   (#9C4722)
+ *   Brand/Light/800 (hover) → --color-fill-brand-hover    (#9C4722CC, 80% opacity)
+ *   Fill/Brand weak         → --color-fill-brand-weak     (#9C47220D, 5% opacity)
+ *   Fill/Hover              → --color-fill-hover          (#8026000D)
+ *   Fill/Press              → --color-fill-press          (#661F0026)
+ *   Stroke/Brand weak       → --color-stroke-brand-weak   (#9C472233)
+ *   Stroke/Brand strong     → --color-stroke-brand-strong (#9C4722CC)
+ *   Stroke/Focus            → --color-stroke-focus        (#9C4722)
+ *   Text/Inverted           → --color-text-inverted       (#FFFFFF)
+ *   Text/Brand              → --color-text-brand          (#9C4722)
+ *   Text/Error              → --color-text-error          (#C62222)
+ */
+
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-8);
-  padding: var(--spacing-12) var(--spacing-12);
+  padding: var(--spacing-12);
   border-radius: var(--corner-radius-8);
-  cursor: pointer;
   border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
+.button[disabled],
 .button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
@@ -21,55 +38,123 @@
   justify-content: center;
 }
 
-/* Primary - Brown solid fill, no stroke */
+/* ─── Primary ────────────────────────────────────────────────────────────────
+   Default  : Fill/Brand strong (solid brand)
+   Hover    : Brand/Light/800   (brand at 80% opacity)
+   Pressed  : Fill/Brand strong + inner shadow
+   Focus    : Fill/Brand strong + Stroke/Focus ring
+*/
 .button-primary {
   background: var(--color-fill-brand-strong);
   color: var(--color-text-inverted);
+  border: none;
 }
 
-.button-primary:focus-visible {
+.button-primary:hover:not([disabled]):not(:disabled) {
+  background: var(--color-fill-brand-hover);
+}
+
+.button-primary[data-active],
+.button-primary:active:not([disabled]):not(:disabled) {
+  background: var(--color-fill-brand-strong);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.button-primary:focus-visible,
+.button-primary[data-focus-visible] {
   outline: 2px solid var(--color-stroke-focus);
   outline-offset: 2px;
 }
 
-/* Secondary - Brown 5% fill with stroke */
+/* ─── Secondary ──────────────────────────────────────────────────────────────
+   Default  : Fill/Brand weak 5%  + Stroke/Brand weak
+   Hover    : Fill/Brand weak 15% + Stroke/Brand weak
+   Pressed  : Fill/Brand weak 25% + Stroke/Brand strong
+   Focus    : Fill/Brand weak 5%  + Stroke/Focus ring
+*/
 .button-secondary {
   background: var(--color-fill-brand-weak);
-  color: var(--color-text-weak);
-  border: 1px solid var(--color-stroke-weak);
+  color: var(--color-text-brand);
+  border: 1px solid var(--color-stroke-brand-weak);
 }
 
-.button-secondary:focus-visible {
+.button-secondary:hover:not([disabled]):not(:disabled) {
+  background: color-mix(in srgb, var(--color-fill-brand-strong) 15%, transparent);
+  border-color: var(--color-stroke-brand-weak);
+}
+
+.button-secondary[data-active],
+.button-secondary:active:not([disabled]):not(:disabled) {
+  background: color-mix(in srgb, var(--color-fill-brand-strong) 25%, transparent);
+  border-color: var(--color-stroke-brand-strong);
+}
+
+.button-secondary:focus-visible,
+.button-secondary[data-focus-visible] {
   outline: 2px solid var(--color-stroke-focus);
   outline-offset: 2px;
 }
 
-/* Tertiary - Transparent, text only with underline */
+/* ─── Tertiary ───────────────────────────────────────────────────────────────
+   Default  : Transparent
+   Hover    : Fill/Hover
+   Pressed  : Fill/Press
+   Focus    : Fill/Hover + Stroke/Focus ring
+*/
 .button-tertiary {
   background: transparent;
   color: var(--color-text-brand);
+  border: none;
 }
 
 .button-tertiary .button-text {
   text-decoration: underline;
 }
 
-.button-tertiary:focus-visible {
+.button-tertiary:hover:not([disabled]):not(:disabled) {
+  background: var(--color-fill-hover);
+}
+
+.button-tertiary[data-active],
+.button-tertiary:active:not([disabled]):not(:disabled) {
+  background: var(--color-fill-press);
+}
+
+.button-tertiary:focus-visible,
+.button-tertiary[data-focus-visible] {
+  background: var(--color-fill-hover);
   outline: 2px solid var(--color-stroke-focus);
   outline-offset: 2px;
 }
 
-/* Tertiary Delete - Transparent with error color text and underline */
+/* ─── Tertiary Delete ────────────────────────────────────────────────────────
+   Default  : Transparent, error text
+   Hover    : Fill/Hover
+   Pressed  : Fill/Press
+   Focus    : Fill/Hover + Stroke/Error strong ring
+*/
 .button-tertiary-delete {
   background: transparent;
   color: var(--color-text-error);
+  border: none;
 }
 
 .button-tertiary-delete .button-text {
   text-decoration: underline;
 }
 
-.button-tertiary-delete:focus-visible {
+.button-tertiary-delete:hover:not([disabled]):not(:disabled) {
+  background: var(--color-fill-hover);
+}
+
+.button-tertiary-delete[data-active],
+.button-tertiary-delete:active:not([disabled]):not(:disabled) {
+  background: var(--color-fill-press);
+}
+
+.button-tertiary-delete:focus-visible,
+.button-tertiary-delete[data-focus-visible] {
+  background: var(--color-fill-hover);
   outline: 2px solid var(--color-stroke-error-strong);
   outline-offset: 2px;
 }
