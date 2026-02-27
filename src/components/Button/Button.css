@@ -50,12 +50,14 @@
 }
 
 .button-primary:hover:not([disabled]):not(:disabled) {
-  background: var(--color-fill-hover), var(--color-fill-brand-strong);
+  background: linear-gradient(var(--color-fill-hover), var(--color-fill-hover)),
+              var(--color-fill-brand-strong);
 }
 
 .button-primary[data-active],
 .button-primary:active:not([disabled]):not(:disabled) {
-  background: var(--color-fill-press), var(--color-fill-brand-strong);
+  background: linear-gradient(var(--color-fill-press), var(--color-fill-press)),
+              var(--color-fill-brand-strong);
 }
 
 .button-primary:focus-visible,
@@ -77,13 +79,15 @@
 }
 
 .button-secondary:hover:not([disabled]):not(:disabled) {
-  background: var(--color-fill-hover), var(--color-fill-brand-weak);
+  background: linear-gradient(var(--color-fill-hover), var(--color-fill-hover)),
+              var(--color-fill-brand-weak);
   border-color: var(--color-stroke-brand-weak);
 }
 
 .button-secondary[data-active],
 .button-secondary:active:not([disabled]):not(:disabled) {
-  background: var(--color-fill-press), var(--color-fill-brand-weak);
+  background: linear-gradient(var(--color-fill-press), var(--color-fill-press)),
+              var(--color-fill-brand-weak);
   border-color: var(--color-stroke-brand-strong);
 }
 
