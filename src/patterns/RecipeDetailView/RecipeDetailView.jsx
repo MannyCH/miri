@@ -73,7 +73,6 @@ export const RecipeDetailView = ({
               variant="primary"
               icon={isAdded ? <CheckIcon /> : <CartIcon />}
               onClick={onAddToList}
-              className={isAdded ? 'button-added' : ''}
               disabled={isAdded}
             >
               {isAdded ? 'Added' : 'Add to list'}

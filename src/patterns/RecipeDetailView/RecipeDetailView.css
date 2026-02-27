@@ -128,10 +128,9 @@
   transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-/* Added confirmation state — green fill, no hover/press since disabled */
-.recipe-detail-add-button .button-added {
-  background: var(--color-fill-success-strong);
-  opacity: 1 !important;
+/* Added confirmation — same button design, content swaps with a pop */
+.recipe-detail-add-button .button[disabled] {
+  opacity: 1;
   animation: button-added-pop 0.25s ease;
 }
 
