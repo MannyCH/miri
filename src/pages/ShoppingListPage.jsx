@@ -20,6 +20,7 @@ export function ShoppingListPage() {
     deleteRecipeFromShoppingList,
     clearShoppingList,
   } = useApp();
+  const [searchQuery, setSearchQuery] = React.useState('');
   
   // Group ingredients by recipe for recipe view mode
   const groupedByRecipe = shoppingList.reduce((acc, item) => {
@@ -36,20 +37,27 @@ export function ShoppingListPage() {
     return acc;
   }, []);
   
-  // Convert shopping list items to format expected by ShoppingListView
-  const items = shoppingList.map(item => item.name);
-  
-  // Create checkedItems object
+  const lowerQuery = searchQuery.toLowerCase();
+
+  // Filter first, preserving original indices for callbacks
+  const filteredList = shoppingList
+    .map((item, originalIdx) => ({ ...item, originalIdx }))
+    .filter(item => !lowerQuery || item.name.toLowerCase().includes(lowerQuery));
+
+  const items = filteredList.map(item => item.name);
+
   const checkedItems = {};
-  shoppingList.forEach((item, idx) => {
+  filteredList.forEach((item, idx) => {
     checkedItems[idx] = item.checked;
   });
   
-  // Convert grouped data to match ShoppingListView format
+  // Convert grouped data to match ShoppingListView format (filter by search)
   const recipeGroups = groupedByRecipe.map(group => ({
     recipeName: group.recipeName,
     recipeId: group.recipeId,
-    ingredients: group.ingredients.map(item => item.name),
+    ingredients: group.ingredients
+      .filter(item => !lowerQuery || item.name.toLowerCase().includes(lowerQuery))
+      .map(item => item.name),
     checkedItems: group.ingredients.reduce((acc, item, idx) => {
       acc[idx] = item.checked;
       return acc;
@@ -78,24 +86,20 @@ export function ShoppingListPage() {
       items={items}
       recipeGroups={recipeGroups}
       checkedItems={checkedItems}
-      onItemCheck={(idx, checked) => {
-        // Find the actual item by index
-        const item = shoppingList[idx];
-        if (item) {
-          toggleIngredientCheck(item.id);
-        }
+      onItemCheck={(idx) => {
+        const item = filteredList[idx];
+        if (item) toggleIngredientCheck(item.id);
       }}
       onItemDelete={(idx) => {
-        // Find the actual item by index
-        const item = shoppingList[idx];
-        if (item) {
-          deleteIngredient(item.id);
-        }
+        const item = filteredList[idx];
+        if (item) deleteIngredient(item.id);
       }}
       onRecipeDelete={(recipeId) => {
         deleteRecipeFromShoppingList(recipeId);
       }}
       onClearList={clearShoppingList}
+      searchQuery={searchQuery}
+      onSearch={setSearchQuery}
     />
   );
 }
