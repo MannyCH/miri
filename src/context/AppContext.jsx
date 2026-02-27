@@ -113,7 +113,6 @@ export function AppProvider({ children }) {
     }));
     
     setShoppingList(prev => [...prev, ...newItems]);
-    showToast('Info', `${recipe.title} added to list`);
   };
   
   // Toggle ingredient checked state

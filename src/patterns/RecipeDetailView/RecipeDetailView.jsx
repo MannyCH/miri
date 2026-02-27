@@ -16,6 +16,7 @@ export const RecipeDetailView = ({
     directions: [],
   },
   onAddToList,
+  isAdded = false,
   ...props
 }) => {
   return (
@@ -70,10 +71,12 @@ export const RecipeDetailView = ({
           <div className="recipe-detail-add-button">
             <Button
               variant="primary"
-              icon={<CartIcon />}
+              icon={isAdded ? <CheckIcon /> : <CartIcon />}
               onClick={onAddToList}
+              className={isAdded ? 'button-added' : ''}
+              disabled={isAdded}
             >
-              Add to list
+              {isAdded ? 'Added' : 'Add to list'}
             </Button>
           </div>
         )}
@@ -90,6 +93,12 @@ const CartIcon = () => (
     <circle cx="9" cy="21" r="1"/>
     <circle cx="20" cy="21" r="1"/>
     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
   </svg>
 );
 

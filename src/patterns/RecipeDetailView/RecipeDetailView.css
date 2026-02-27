@@ -125,4 +125,18 @@
 
 .recipe-detail-add-button .button {
   width: 100%;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+/* Added confirmation state — green fill, no hover/press since disabled */
+.recipe-detail-add-button .button-added {
+  background: var(--color-fill-success-strong);
+  opacity: 1 !important;
+  animation: button-added-pop 0.25s ease;
+}
+
+@keyframes button-added-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
 }
