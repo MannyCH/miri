@@ -2,7 +2,7 @@
  *
  * Token mapping from Figma:
  *   Fill/Brand strong       → --color-fill-brand-strong   (#9C4722)
- *   Brand/Light/800 (hover) → --color-fill-brand-hover    (#9C4722CC, 80% opacity)
+ *   Brand/Light/800 (hover) → color-mix(brand 80%, transparent) — no semantic token, computed inline
  *   Fill/Brand weak         → --color-fill-brand-weak     (#9C47220D, 5% opacity)
  *   Fill/Hover              → --color-fill-hover          (#8026000D)
  *   Fill/Press              → --color-fill-press          (#661F0026)
@@ -51,7 +51,7 @@
 }
 
 .button-primary:hover:not([disabled]):not(:disabled) {
-  background: var(--color-fill-brand-hover);
+  background: color-mix(in srgb, var(--color-fill-brand-strong) 80%, transparent);
 }
 
 .button-primary[data-active],

@@ -148,7 +148,7 @@ const StateRow = ({ variant, icon, showIcon }) => {
   const fills = {
     primary: {
       default: { background: 'var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none' },
-      hover:   { background: 'var(--color-fill-brand-hover)', color: 'var(--color-text-inverted)', border: 'none' },
+      hover:   { background: 'color-mix(in srgb, var(--color-fill-brand-strong) 80%, transparent)', color: 'var(--color-text-inverted)', border: 'none' },
       pressed: { background: 'var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)' },
       focus:   { background: 'var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none', outline: '2px solid var(--color-stroke-focus)', outlineOffset: '2px' },
     },
