@@ -117,6 +117,14 @@
   background: var(--color-fill-hover);
 }
 
+.button-tertiary:hover:not([disabled]):not(:disabled) .button-text,
+.button-tertiary[data-active] .button-text,
+.button-tertiary:active:not([disabled]):not(:disabled) .button-text,
+.button-tertiary:focus-visible .button-text,
+.button-tertiary[data-focus-visible] .button-text {
+  text-decoration: none;
+}
+
 .button-tertiary[data-active],
 .button-tertiary:active:not([disabled]):not(:disabled) {
   background: var(--color-fill-press);
@@ -147,6 +155,14 @@
 
 .button-tertiary-delete:hover:not([disabled]):not(:disabled) {
   background: var(--color-fill-hover);
+}
+
+.button-tertiary-delete:hover:not([disabled]):not(:disabled) .button-text,
+.button-tertiary-delete[data-active] .button-text,
+.button-tertiary-delete:active:not([disabled]):not(:disabled) .button-text,
+.button-tertiary-delete:focus-visible .button-text,
+.button-tertiary-delete[data-focus-visible] .button-text {
+  text-decoration: none;
 }
 
 .button-tertiary-delete[data-active],
