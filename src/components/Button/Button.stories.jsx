@@ -148,14 +148,14 @@ const StateRow = ({ variant, icon, showIcon }) => {
   const fills = {
     primary: {
       default: { background: 'var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none' },
-      hover:   { background: 'color-mix(in srgb, var(--color-fill-brand-strong) 80%, transparent)', color: 'var(--color-text-inverted)', border: 'none' },
-      pressed: { background: 'var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)' },
+      hover:   { background: 'var(--color-fill-hover), var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none' },
+      pressed: { background: 'var(--color-fill-press), var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none' },
       focus:   { background: 'var(--color-fill-brand-strong)', color: 'var(--color-text-inverted)', border: 'none', outline: '2px solid var(--color-stroke-focus)', outlineOffset: '2px' },
     },
     secondary: {
       default: { background: 'var(--color-fill-brand-weak)', color: 'var(--color-text-brand)', border: '1px solid var(--color-stroke-brand-weak)' },
-      hover:   { background: 'color-mix(in srgb, var(--color-fill-brand-strong) 15%, transparent)', color: 'var(--color-text-brand)', border: '1px solid var(--color-stroke-brand-weak)' },
-      pressed: { background: 'color-mix(in srgb, var(--color-fill-brand-strong) 25%, transparent)', color: 'var(--color-text-brand)', border: '1px solid var(--color-stroke-brand-strong)' },
+      hover:   { background: 'var(--color-fill-hover), var(--color-fill-brand-weak)', color: 'var(--color-text-brand)', border: '1px solid var(--color-stroke-brand-weak)' },
+      pressed: { background: 'var(--color-fill-press), var(--color-fill-brand-weak)', color: 'var(--color-text-brand)', border: '1px solid var(--color-stroke-brand-strong)' },
       focus:   { background: 'var(--color-fill-brand-weak)', color: 'var(--color-text-brand)', border: '1px solid var(--color-stroke-brand-weak)', outline: '2px solid var(--color-stroke-focus)', outlineOffset: '2px' },
     },
     tertiary: {
