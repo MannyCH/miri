@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
@@ -11,7 +11,7 @@ import './ShoppingListView.css';
  * Supports two view modes: list view and recipe-grouped view
  */
 export const ShoppingListView = ({
-  viewMode = 'list', // 'list' or 'recipe'
+  viewMode = 'list',
   items = [],
   recipeGroups = [],
   checkedItems = {},
@@ -23,22 +23,57 @@ export const ShoppingListView = ({
   onSearch,
   ...props
 }) => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      setKeyboardHeight(Math.max(0, window.innerHeight - vv.offsetTop - vv.height));
+    };
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, []);
+
+  const handleFabClick = () => {
+    if (isSearchOpen) {
+      searchInputRef.current?.focus();
+    } else {
+      setIsSearchOpen(true);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsSearchOpen(false);
+    onSearch?.('');
+  };
+
   return (
-    <div className="shopping-list-view" {...props}>
+    <div
+      className="shopping-list-view"
+      style={{ '--keyboard-height': `${keyboardHeight}px` }}
+      {...props}
+    >
       {/* Header */}
       <header className="shopping-list-header">
         <h1 className="text-h1-bold">Shopping list</h1>
-        
+
         {/* View Mode Toggle */}
         <div className="shopping-list-view-toggle">
-          <button 
+          <button
             className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
             onClick={() => onViewModeChange?.('recipe')}
             aria-label="Group by recipe"
           >
             <GridIcon />
           </button>
-          <button 
+          <button
             className={`view-toggle-button ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => onViewModeChange?.('list')}
             aria-label="Simple list"
@@ -50,7 +85,6 @@ export const ShoppingListView = ({
 
       {/* Content */}
       <div className="shopping-list-content">
-        {/* List View Mode */}
         {viewMode === 'list' && (
           <>
             <IngredientList
@@ -59,7 +93,6 @@ export const ShoppingListView = ({
               onCheckedChange={onItemCheck}
               onDelete={onItemDelete}
             />
-            
             {items.length > 0 && (
               <div className="shopping-list-clear">
                 <Button variant="tertiary-delete" onClick={onClearList}>
@@ -70,7 +103,6 @@ export const ShoppingListView = ({
           </>
         )}
 
-        {/* Recipe View Mode */}
         {viewMode === 'recipe' && (
           <>
             <div className="shopping-list-recipe-groups">
@@ -78,7 +110,7 @@ export const ShoppingListView = ({
                 <div key={groupIndex} className="recipe-group">
                   <div className="recipe-group-header">
                     <h3 className="text-body-base-bold">{group.recipeName}</h3>
-                    <button 
+                    <button
                       className="icon-button-delete"
                       onClick={() => group.onDelete?.()}
                       aria-label={`Delete ${group.recipeName}`}
@@ -89,7 +121,7 @@ export const ShoppingListView = ({
                   <IngredientList
                     ingredients={group.ingredients}
                     checkedItems={group.checkedItems || {}}
-                    onCheckedChange={(index, checked) => 
+                    onCheckedChange={(index, checked) =>
                       group.onIngredientCheck?.(index, checked)
                     }
                     onDelete={(index) => group.onIngredientDelete?.(index)}
@@ -97,7 +129,6 @@ export const ShoppingListView = ({
                 </div>
               ))}
             </div>
-
             {recipeGroups.length > 0 && (
               <div className="shopping-list-clear">
                 <Button variant="tertiary-delete" onClick={onClearList}>
@@ -109,18 +140,40 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Search Bar */}
-      <div className="shopping-list-search">
-        <SearchBar
-          placeholder="Ich brauche..."
-          value={searchQuery}
-          onChange={(e) => onSearch?.(e.target.value)}
-          trailingIcon={<SearchIcon />}
-        />
-      </div>
-
       {/* Bottom Navigation */}
       <NavigationBarConnected activeItem="shopping-list" />
+
+      {/* Search overlay — slides in from top, Cancel always visible above keyboard */}
+      {isSearchOpen && (
+        <div className="shopping-list-search-overlay">
+          <SearchBar
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            inputRef={searchInputRef}
+            placeholder="Ich brauche..."
+            value={searchQuery}
+            onChange={(e) => onSearch?.(e.target.value)}
+            showTrailingIcon={false}
+          />
+          <button
+            type="button"
+            className="shopping-list-search-cancel"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {/* Floating search FAB — fixed, floats above keyboard */}
+      <button
+        type="button"
+        className="shopping-list-search-fab"
+        onClick={handleFabClick}
+        aria-label="Search shopping list"
+      >
+        <SearchIcon />
+      </button>
     </div>
   );
 };

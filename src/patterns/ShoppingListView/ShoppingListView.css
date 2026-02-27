@@ -1,5 +1,6 @@
 /* ShoppingListView Pattern - Pure Flexbox Layout with Safe Areas */
 .shopping-list-view {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -9,13 +10,12 @@
   margin: 0 auto;
   overflow: hidden;
   padding-top: var(--safe-area-inset-top);
-  padding-bottom: calc(var(--safe-area-inset-bottom));
+  padding-bottom: var(--safe-area-inset-bottom);
 }
 
-/* Header - Fixed at top, don't shrink */
+/* Header */
 .shopping-list-header {
   flex-shrink: 0;
-  order: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -62,10 +62,9 @@
   outline-offset: 2px;
 }
 
-/* Scrollable content - Takes remaining space */
+/* Scrollable content */
 .shopping-list-content {
   flex: 1;
-  order: 2;
   padding: var(--spacing-16);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -125,16 +124,70 @@
   outline-offset: 2px;
 }
 
-/* Search bar - Above navigation using flexbox order */
-.shopping-list-search {
-  flex-shrink: 0;
-  order: 3;
-  padding: var(--spacing-16);
-  background: var(--color-background-base);
-  border-top: 1px solid var(--color-stroke-weak);
+/* Floating search FAB — fixed, tracks keyboard height */
+.shopping-list-search-fab {
+  position: fixed;
+  bottom: calc(76px + var(--safe-area-inset-bottom) + var(--spacing-16) + var(--keyboard-height, 0px));
+  right: var(--spacing-16);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--color-stroke-weak);
+  background: var(--color-background-raised);
+  color: var(--color-icon-brand);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 10;
 }
 
-/* Navigation bar */
-.shopping-list-view .navigation-bar {
-  order: 4;
+.shopping-list-search-fab:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+/* Search overlay — slides in from top, above header */
+.shopping-list-search-overlay {
+  position: absolute;
+  top: var(--safe-area-inset-top);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12) var(--spacing-16);
+  background: var(--color-background-base);
+  border-bottom: 1px solid var(--color-stroke-weak);
+  animation: search-slide-down 0.2s ease;
+}
+
+@keyframes search-slide-down {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.shopping-list-search-overlay .search-bar {
+  flex: 1;
+}
+
+.shopping-list-search-cancel {
+  flex-shrink: 0;
+  padding: 0 var(--spacing-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text-brand);
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.shopping-list-search-cancel:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
 }
