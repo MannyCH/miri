@@ -28,7 +28,7 @@
 .button[disabled],
 .button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 1;
 }
 
 .button-icon {
@@ -67,34 +67,33 @@
 }
 
 /* ─── Secondary ──────────────────────────────────────────────────────────────
-   Default  : Fill/Brand weak 5%  + Stroke/Brand weak
-   Hover    : Fill/Brand weak 15% + Stroke/Brand weak
-   Pressed  : Fill/Brand weak 25% + Stroke/Brand strong
-   Focus    : Fill/Brand weak 5%  + Stroke/Focus ring
+   Default  : Transparent + Stroke/Brand strong
+   Hover    : Fill/Hover + no stroke
+   Pressed  : Transparent + Stroke/Brand strong
+   Focus    : Transparent + Stroke/Focus
 */
 .button-secondary {
-  background: var(--color-fill-brand-weak);
+  background: transparent;
   color: var(--color-text-brand);
-  border: 1px solid var(--color-stroke-brand-weak);
+  border: 1px solid var(--color-stroke-brand-strong);
 }
 
 .button-secondary:hover:not([disabled]):not(:disabled) {
-  background: linear-gradient(var(--color-fill-hover), var(--color-fill-hover)),
-              var(--color-fill-brand-weak);
-  border-color: var(--color-stroke-brand-weak);
+  background: var(--color-fill-hover);
+  border-color: var(--color-stroke-brand-strong);
 }
 
 .button-secondary[data-active],
 .button-secondary:active:not([disabled]):not(:disabled) {
-  background: linear-gradient(var(--color-fill-press), var(--color-fill-press)),
-              var(--color-fill-brand-weak);
+  background: transparent;
   border-color: var(--color-stroke-brand-strong);
 }
 
 .button-secondary:focus-visible,
 .button-secondary[data-focus-visible] {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
+  background: transparent;
+  border-color: var(--color-stroke-focus);
+  outline: none;
 }
 
 /* ─── Tertiary ───────────────────────────────────────────────────────────────
@@ -175,4 +174,43 @@
   background: var(--color-fill-hover);
   outline: 2px solid var(--color-stroke-error-strong);
   outline-offset: 2px;
+}
+
+/* ─── Disabled (Figma) ────────────────────────────────────────────────────────
+   Primary / Secondary / Tertiary       : Stroke/Weak for fill, stroke, text, icon
+   Tertiary Delete                       : Stroke/Error weak for fill, stroke, text, icon
+*/
+.button-primary[disabled],
+.button-primary:disabled {
+  background: var(--color-stroke-weak);
+  border: 1px solid var(--color-stroke-weak);
+  color: var(--color-stroke-weak);
+}
+
+.button-secondary[disabled],
+.button-secondary:disabled {
+  background: transparent;
+  border-color: var(--color-stroke-weak);
+  color: var(--color-stroke-weak);
+}
+
+.button-tertiary[disabled],
+.button-tertiary:disabled {
+  background: var(--color-stroke-weak);
+  border: 1px solid var(--color-stroke-weak);
+  color: var(--color-stroke-weak);
+}
+
+.button-tertiary-delete[disabled],
+.button-tertiary-delete:disabled {
+  background: var(--color-stroke-error-weak);
+  border: 1px solid var(--color-stroke-error-weak);
+  color: var(--color-stroke-error-weak);
+}
+
+.button-tertiary[disabled] .button-text,
+.button-tertiary:disabled .button-text,
+.button-tertiary-delete[disabled] .button-text,
+.button-tertiary-delete:disabled .button-text {
+  text-decoration: none;
 }

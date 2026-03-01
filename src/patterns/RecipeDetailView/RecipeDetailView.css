@@ -80,7 +80,19 @@
 }
 
 .recipe-ingredient-item {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  column-gap: var(--spacing-8);
+  align-items: start;
   color: var(--color-text-strong);
+}
+
+.recipe-ingredient-amount {
+  white-space: nowrap;
+}
+
+.recipe-ingredient-name {
+  min-width: 0;
 }
 
 /* ============================================

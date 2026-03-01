@@ -19,6 +19,71 @@ export const RecipeDetailView = ({
   isAdded = false,
   ...props
 }) => {
+  const fractionMap = {
+    '1/2': '½',
+    '1/3': '⅓',
+    '2/3': '⅔',
+    '1/4': '¼',
+    '3/4': '¾',
+    '1/8': '⅛',
+    '3/8': '⅜',
+    '5/8': '⅝',
+    '7/8': '⅞',
+  };
+
+  const formatFractions = (value = '') =>
+    Object.entries(fractionMap).reduce(
+      (acc, [raw, glyph]) => acc.replaceAll(raw, glyph),
+      value
+    );
+
+  const splitIngredient = (ingredient) => {
+    if (typeof ingredient !== 'string') {
+      const quantity = ingredient?.quantity ? formatFractions(String(ingredient.quantity)) : '';
+      const name = ingredient?.name ? formatFractions(String(ingredient.name)) : '';
+      return { amount: quantity, name };
+    }
+
+    const text = ingredient.trim();
+    const knownUnits = new Set([
+      'g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'lbs',
+      'cup', 'cups', 'tbsp', 'tsp',
+      'pc', 'pcs', 'piece', 'pieces',
+      'clove', 'cloves', 'bunch', 'bunches',
+      'can', 'cans', 'slice', 'slices', 'roll', 'rolls',
+    ]);
+
+    const compactMatch = text.match(/^(\d+(?:[./]\d+)?)\s*([a-zA-Z]+)\b\s*(.*)$/);
+    if (compactMatch && knownUnits.has(compactMatch[2].toLowerCase())) {
+      const amountRaw = `${compactMatch[1]} ${compactMatch[2]}`.trim();
+      const nameRaw = compactMatch[3].trim();
+      return {
+        amount: formatFractions(amountRaw),
+        name: formatFractions(nameRaw),
+      };
+    }
+
+    const numberMatch = text.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?)(?:\s+(.+))?$/);
+    if (!numberMatch) {
+      return { amount: '', name: formatFractions(text) };
+    }
+
+    const quantity = numberMatch[1];
+    const rest = (numberMatch[2] || '').trim();
+    if (!rest) {
+      return { amount: formatFractions(quantity), name: '' };
+    }
+
+    const [firstWord, ...remainingWords] = rest.split(/\s+/);
+    const hasUnit = knownUnits.has(firstWord.toLowerCase().replace('.', ''));
+    const amountRaw = hasUnit ? `${quantity} ${firstWord}` : quantity;
+    const nameRaw = hasUnit ? remainingWords.join(' ') : rest;
+
+    const amount = formatFractions(amountRaw.trim());
+    const name = formatFractions(nameRaw.trim());
+    return { amount, name };
+  };
+
   return (
     <div className="recipe-detail-view" {...props}>
       {/* Scrollable Content Area */}
@@ -40,11 +105,15 @@ export const RecipeDetailView = ({
           </h2>
 
           <ul className="recipe-ingredient-list">
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={index} className="recipe-ingredient-item text-body-small-regular">
-                {typeof ingredient === 'string' ? ingredient : `${ingredient.quantity} ${ingredient.name}`}
-              </li>
-            ))}
+            {recipe.ingredients.map((ingredient, index) => {
+              const { amount, name } = splitIngredient(ingredient);
+              return (
+                <li key={index} className="recipe-ingredient-item text-body-regular">
+                  <span className="recipe-ingredient-amount">{amount}</span>
+                  <span className="recipe-ingredient-name">{name}</span>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -58,7 +127,7 @@ export const RecipeDetailView = ({
             {recipe.directions.map((direction, index) => (
               <li key={index} className="recipe-direction-item">
                 <Badge>{index + 1}</Badge>
-                <p className="recipe-direction-text text-body-small-regular">
+                <p className="recipe-direction-text text-body-regular">
                   {direction}
                 </p>
               </li>
