@@ -24,7 +24,7 @@ export const IngredientListItem = ({
 
   const MAX_SWIPE = 120;
   const SWIPE_THRESHOLD = 84;
-  const SWIPE_TRANSITION = '250ms linear(0, 0.4238, 0.8821, 1.0441, 1.0447, 1.0153, 0.9998, 1)';
+  const SWIPE_TRANSITION = '360ms cubic-bezier(0.22, 0.61, 0.36, 1)';
 
   const triggerDelete = React.useCallback(() => {
     if (isRemoving) return;
@@ -32,8 +32,8 @@ export const IngredientListItem = ({
     // Keep the item fully swiped for a brief beat so users can perceive deletion intent.
     setSwipeOffset(MAX_SWIPE);
     setIsSwiping(false);
-    window.setTimeout(() => setIsRemoving(true), 120);
-    window.setTimeout(() => onDelete?.(), 360);
+    window.setTimeout(() => setIsRemoving(true), 180);
+    window.setTimeout(() => onDelete?.(), 520);
   }, [isRemoving, onDelete]);
 
   const handleTouchStart = (e) => {
@@ -86,7 +86,7 @@ export const IngredientListItem = ({
           ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }
           : { opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0 }
       }
-      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.34, ease: [0.22, 0.61, 0.36, 1] }}
     >
       {showUpperDivider && <Divider />}
       

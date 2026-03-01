@@ -24,8 +24,7 @@
   color: var(--color-text-inverted);
   border: none;
   opacity: calc(var(--swipe-progress, 0));
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  transform: scale(calc(0.94 + (var(--swipe-progress, 0) * 0.06)));
+  transition: opacity 0.24s ease;
   pointer-events: none;
 }
 
