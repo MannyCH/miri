@@ -1,6 +1,7 @@
 /* IngredientListItem - Tap to toggle, Swipe to delete */
 .ingredient-list-item {
   width: 100%;
+  overflow: hidden;
 }
 
 /* Swipe wrapper - contains delete zone and content */
@@ -21,12 +22,15 @@
   justify-content: center;
   background: var(--color-fill-error-strong);
   color: var(--color-text-inverted);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  border: none;
+  opacity: calc(var(--swipe-progress, 0));
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: scale(calc(0.94 + (var(--swipe-progress, 0) * 0.06)));
+  pointer-events: none;
 }
 
 .ingredient-list-item-wrapper.is-swiping .ingredient-list-item-delete-zone {
-  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Interactive container - supports tap and swipe */
@@ -42,6 +46,7 @@
   -webkit-user-select: none;
   position: relative;
   z-index: 1;
+  will-change: transform;
 }
 
 /* Accessibility: Focus state for keyboard navigation */
@@ -65,6 +70,10 @@
 /* Active/pressed state (touch feedback) */
 .ingredient-list-item-container:active {
   background-color: var(--color-background-sunken);
+}
+
+.ingredient-list-item.is-removing .ingredient-list-item-container {
+  pointer-events: none;
 }
 
 /* Item text */

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { Divider } from '../Divider';
 import './IngredientListItem.css';
 
@@ -18,12 +19,25 @@ export const IngredientListItem = ({
 }) => {
   const [swipeOffset, setSwipeOffset] = React.useState(0);
   const [isSwiping, setIsSwiping] = React.useState(false);
+  const [isRemoving, setIsRemoving] = React.useState(false);
   const startXRef = React.useRef(0);
-  const containerRef = React.useRef(null);
 
-  const SWIPE_THRESHOLD = 100; // Minimum swipe distance to trigger delete
+  const MAX_SWIPE = 120;
+  const SWIPE_THRESHOLD = 84;
+  const SWIPE_TRANSITION = '250ms linear(0, 0.4238, 0.8821, 1.0441, 1.0447, 1.0153, 0.9998, 1)';
+
+  const triggerDelete = React.useCallback(() => {
+    if (isRemoving) return;
+
+    // Keep the item fully swiped for a brief beat so users can perceive deletion intent.
+    setSwipeOffset(MAX_SWIPE);
+    setIsSwiping(false);
+    window.setTimeout(() => setIsRemoving(true), 120);
+    window.setTimeout(() => onDelete?.(), 360);
+  }, [isRemoving, onDelete]);
 
   const handleTouchStart = (e) => {
+    if (isRemoving) return;
     startXRef.current = e.touches[0].clientX;
     setIsSwiping(true);
   };
@@ -36,17 +50,18 @@ export const IngredientListItem = ({
     
     // Only allow left swipe (positive diff)
     if (diff > 0) {
-      setSwipeOffset(Math.min(diff, 120)); // Max 120px swipe
+      setSwipeOffset(Math.min(diff, MAX_SWIPE));
     }
   };
 
   const handleTouchEnd = () => {
+    if (isRemoving) return;
+
     if (swipeOffset > SWIPE_THRESHOLD) {
-      // Trigger delete
-      onDelete?.();
+      triggerDelete();
+      return;
     }
-    
-    // Reset swipe state
+
     setSwipeOffset(0);
     setIsSwiping(false);
   };
@@ -54,7 +69,7 @@ export const IngredientListItem = ({
   // Handle click on entire list item to toggle checkbox
   const handleItemClick = (event) => {
     // Don't toggle if swiping
-    if (isSwiping || swipeOffset > 0) {
+    if (isSwiping || swipeOffset > 0 || isRemoving) {
       return;
     }
     
@@ -63,25 +78,40 @@ export const IngredientListItem = ({
   };
 
   return (
-    <div className="ingredient-list-item">
+    <motion.div
+      className={`ingredient-list-item ${isRemoving ? 'is-removing' : ''}`}
+      initial={false}
+      animate={
+        isRemoving
+          ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }
+          : { opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0 }
+      }
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+    >
       {showUpperDivider && <Divider />}
       
       {/* Swipe container wrapper */}
       <div 
         className={`ingredient-list-item-wrapper ${swipeOffset > 0 ? 'is-swiping' : ''}`}
-        ref={containerRef}
+        style={{ '--swipe-progress': Math.min(1, swipeOffset / MAX_SWIPE) }}
       >
         {/* Delete button revealed on swipe */}
-        <div className="ingredient-list-item-delete-zone">
+        <button
+          type="button"
+          className="ingredient-list-item-delete-zone"
+          aria-label={`Delete ${children}`}
+          onClick={triggerDelete}
+          tabIndex={swipeOffset > 0 ? 0 : -1}
+        >
           <TrashIcon />
-        </div>
+        </button>
 
         {/* Interactive container - supports tap and swipe */}
         <div 
           className={`ingredient-list-item-container ${checked ? 'is-checked' : ''}`}
           style={{
             transform: `translateX(-${swipeOffset}px)`,
-            transition: isSwiping ? 'none' : 'transform 0.3s ease'
+            transition: isSwiping ? 'none' : `transform ${SWIPE_TRANSITION}`
           }}
           onClick={handleItemClick}
           onTouchStart={handleTouchStart}
@@ -110,7 +140,7 @@ export const IngredientListItem = ({
       </div>
       
       {showBelowDivider && <Divider />}
-    </div>
+    </motion.div>
   );
 };
 

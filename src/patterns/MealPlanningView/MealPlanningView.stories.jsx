@@ -30,7 +30,7 @@ Empty state shows centered "Plan my week" button. After planning, a three-dot co
 | Danger item text | \`Text/Error\` |
 | Hover state | \`Fill/Hover\` |
 | Focus ring | \`Stroke/Focus\` (2px) |
-| Spacing | \`Spacing/4\`, \`Spacing/12\`, \`Spacing/16\` |
+| Spacing | \`Spacing/4\`, \`Spacing/16\` |
 
 Implementation note:
 - Elevation currently follows implementation shadow values in CSS for parity with the running app.
@@ -174,15 +174,28 @@ export const ContextMenuSpec = {
     };
 
     const menuWrapperStyle = { minHeight: '100px' };
+    const menuStaticStyle = {
+      position: 'static',
+      width: '160px',
+      height: '72px',
+      padding: 'var(--spacing-4) 0',
+      boxSizing: 'border-box',
+      overflow: 'hidden',
+    };
+    const itemFigmaStyle = {
+      height: '32px',
+      padding: 'var(--spacing-4) var(--spacing-16)',
+      boxSizing: 'border-box',
+    };
 
     return (
       <div style={boardStyle}>
         <div>
           <p className="text-body-base-bold" style={labelStyle}>Default</p>
           <div style={menuWrapperStyle}>
-            <div className="context-menu" style={{ position: 'static' }}>
-              <div className="context-menu-item text-body-base-regular">Replan week</div>
-              <div className="context-menu-item context-menu-item-danger text-body-base-regular">Clear week</div>
+            <div className="context-menu" style={menuStaticStyle}>
+              <div className="context-menu-item text-body-base-regular" style={itemFigmaStyle}>Replan week</div>
+              <div className="context-menu-item context-menu-item-danger text-body-base-regular" style={itemFigmaStyle}>Clear week</div>
             </div>
           </div>
         </div>
@@ -190,14 +203,14 @@ export const ContextMenuSpec = {
         <div>
           <p className="text-body-base-bold" style={labelStyle}>Hover</p>
           <div style={menuWrapperStyle}>
-            <div className="context-menu" style={{ position: 'static' }}>
+            <div className="context-menu" style={menuStaticStyle}>
               <div
                 className="context-menu-item text-body-base-regular"
-                style={{ background: 'var(--color-fill-hover)' }}
+                style={{ ...itemFigmaStyle, background: 'var(--color-fill-hover)' }}
               >
                 Replan week
               </div>
-              <div className="context-menu-item context-menu-item-danger text-body-base-regular">Clear week</div>
+              <div className="context-menu-item context-menu-item-danger text-body-base-regular" style={itemFigmaStyle}>Clear week</div>
             </div>
           </div>
         </div>
@@ -205,17 +218,17 @@ export const ContextMenuSpec = {
         <div>
           <p className="text-body-base-bold" style={labelStyle}>Focus</p>
           <div style={menuWrapperStyle}>
-            <div className="context-menu" style={{ position: 'static' }}>
+            <div className="context-menu" style={menuStaticStyle}>
               <div
                 className="context-menu-item text-body-base-regular"
                 style={{
-                  outline: '2px solid var(--color-stroke-focus)',
-                  outlineOffset: '-2px',
+                  ...itemFigmaStyle,
+                  border: '1px solid var(--color-stroke-focus)',
                 }}
               >
                 Replan week
               </div>
-              <div className="context-menu-item context-menu-item-danger text-body-base-regular">Clear week</div>
+              <div className="context-menu-item context-menu-item-danger text-body-base-regular" style={itemFigmaStyle}>Clear week</div>
             </div>
           </div>
         </div>
