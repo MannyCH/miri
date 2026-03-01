@@ -17,7 +17,25 @@ export default {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Meal Planning pattern with swipeable Calendar Module and stateful layout. Empty state shows centered "Plan my week" button. After planning, a three-dot context menu provides "Replan week" and "Clear week" actions, while the bottom bar shows "Add week to list".',
+        component: `
+Meal Planning pattern with swipeable Calendar Module and stateful layout.
+
+Empty state shows centered "Plan my week" button. After planning, a three-dot context menu provides "Replan week" and "Clear week" actions, while the bottom bar shows "Add week to list".
+
+## Context menu token mapping (pattern-scoped)
+| Element | Token(s) |
+|---|---|
+| Menu surface | \`Background/Raised\`, \`Corner radius/8\` |
+| Menu item text | \`Text/Strong\` |
+| Danger item text | \`Text/Error\` |
+| Hover state | \`Fill/Hover\` |
+| Focus ring | \`Stroke/Focus\` (2px) |
+| Spacing | \`Spacing/4\`, \`Spacing/12\`, \`Spacing/16\` |
+
+Implementation note:
+- Elevation currently follows implementation shadow values in CSS for parity with the running app.
+- Design source in Figma: page \`Context Menu\`, component set \`Context menu\`.
+        `,
       },
     },
   },
@@ -121,6 +139,87 @@ export const Interactive = {
         onClearPlan={() => { setHasPlan(false); setHasAdded(false); }}
         onAddMeals={() => setHasAdded(true)}
       />
+    );
+  },
+};
+
+/**
+ * Visual spec story for context menu states and tokens.
+ * Pattern-scoped (not a standalone reusable component).
+ */
+export const ContextMenuSpec = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Reference state matrix for the Meal Planning context menu: default, hover and focus treatment, plus danger action color semantics.',
+      },
+    },
+  },
+  render: () => {
+    const boardStyle = {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 180px)',
+      gap: 'var(--spacing-16)',
+      padding: 'var(--spacing-16)',
+      background: 'var(--color-background-base)',
+      border: '1px solid var(--color-stroke-weak)',
+      borderRadius: 'var(--corner-radius-8)',
+      width: 'fit-content',
+      margin: 'var(--spacing-16)',
+    };
+
+    const labelStyle = {
+      margin: 0,
+      color: 'var(--color-text-weak)',
+    };
+
+    const menuWrapperStyle = { minHeight: '100px' };
+
+    return (
+      <div style={boardStyle}>
+        <div>
+          <p className="text-body-base-bold" style={labelStyle}>Default</p>
+          <div style={menuWrapperStyle}>
+            <div className="context-menu" style={{ position: 'static' }}>
+              <div className="context-menu-item text-body-base-regular">Replan week</div>
+              <div className="context-menu-item context-menu-item-danger text-body-base-regular">Clear week</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-body-base-bold" style={labelStyle}>Hover</p>
+          <div style={menuWrapperStyle}>
+            <div className="context-menu" style={{ position: 'static' }}>
+              <div
+                className="context-menu-item text-body-base-regular"
+                style={{ background: 'var(--color-fill-hover)' }}
+              >
+                Replan week
+              </div>
+              <div className="context-menu-item context-menu-item-danger text-body-base-regular">Clear week</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-body-base-bold" style={labelStyle}>Focus</p>
+          <div style={menuWrapperStyle}>
+            <div className="context-menu" style={{ position: 'static' }}>
+              <div
+                className="context-menu-item text-body-base-regular"
+                style={{
+                  outline: '2px solid var(--color-stroke-focus)',
+                  outlineOffset: '-2px',
+                }}
+              >
+                Replan week
+              </div>
+              <div className="context-menu-item context-menu-item-danger text-body-base-regular">Clear week</div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   },
 };
