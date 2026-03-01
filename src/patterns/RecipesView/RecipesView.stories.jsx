@@ -16,7 +16,12 @@ export default {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Recipe browsing screen with search functionality. Composition of SearchBar, RecipeList, and NavigationBar components.',
+        component: `
+Recipe browsing screen with search functionality. Composition of SearchBar, RecipeList, and NavigationBar components.
+
+## Elevation token usage
+- Floating search FAB uses \`--elevation-overlay\`.
+        `,
       },
     },
   },

@@ -16,7 +16,12 @@ export default {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Shopping list screen with two view modes: simple list or grouped by recipe. Composition of IngredientList, SearchBar, Button, and NavigationBar components.',
+        component: `
+Shopping list screen with two view modes: simple list or grouped by recipe. Composition of IngredientList, SearchBar, Button, and NavigationBar components.
+
+## Elevation token usage
+- Floating search FAB uses \`--elevation-overlay\`.
+        `,
       },
     },
     a11y: {

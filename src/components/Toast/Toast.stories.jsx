@@ -10,6 +10,7 @@ import './Toast.css';
  * - Colors: Fill/Warning weak, Fill/Success weak, Fill/Error weak, Stroke variants
  * - Spacing: 8px, 12px, 16px
  * - Corner Radius: 12px
+ * - Elevation: --elevation-raised
  * - Typography: text-body-small-bold
  */
 export default {
@@ -19,7 +20,7 @@ export default {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Mobile notification component for feedback messages. Matches Figma design with 4 variants: Success, Error, Warning, and Info.',
+        component: 'Mobile notification component for feedback messages. Matches Figma design with 4 variants: Success, Error, Warning, and Info. Uses `--elevation-raised` for shadow.',
       },
     },
   },

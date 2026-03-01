@@ -30,10 +30,11 @@ Empty state shows centered "Plan my week" button. After planning, a three-dot co
 | Danger item text | \`Text/Error\` |
 | Hover state | \`Fill/Hover\` |
 | Focus ring | \`Stroke/Focus\` (2px) |
+| Elevation | \`--elevation-overlay\` |
 | Spacing | \`Spacing/4\`, \`Spacing/16\` |
 
 Implementation note:
-- Elevation currently follows implementation shadow values in CSS for parity with the running app.
+- Menu shadow uses \`--elevation-overlay\` from elevation tokens.
 - Design source in Figma: page \`Context Menu\`, component set \`Context menu\`.
         `,
       },

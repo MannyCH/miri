@@ -25,12 +25,13 @@ Modal confirmation dialog used in Meal Planning when adding meals to a non-empty
 | Message text | \`Text/Weak\` |
 | Close icon | \`Icon/Neutral\` |
 | Close hover | \`Fill/Hover\` |
+| Elevation | \`--elevation-overlay\` |
 | Outer spacing | \`Spacing/16\` |
 | Inner spacing | \`Spacing/16\`, \`Spacing/12\`, \`Spacing/4\` |
 | Actions | Reuses \`Button\` variants (\`secondary\`, \`tertiary-delete\`) |
 
 Notes:
-- Overlay and shadow opacity/blur currently follow implementation values from code.
+- Overlay fill uses \`Fill/Overlay\`; dialog shadow uses \`--elevation-overlay\`.
 - Design source in Figma: page \`Dialog\`, component \`Dialog\`.
 - This story documents current behavior and token intent without introducing new design-system tokens.
         `,
