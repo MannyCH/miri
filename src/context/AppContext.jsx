@@ -13,6 +13,7 @@ export function AppProvider({ children }) {
   // Shopping List State
   const [shoppingList, setShoppingList] = useState([]);
   const [shoppingListViewMode, setShoppingListViewMode] = useState('list'); // 'list' or 'recipe'
+  const nextEntryIdRef = useRef(0);
   
   // Toast State
   const [toasts, setToasts] = useState([]);
@@ -70,6 +71,7 @@ export function AppProvider({ children }) {
   // Add all ingredients from meal plan to shopping list
   const addAllToShoppingList = (replaceExisting = false) => {
     const allIngredients = [];
+    const createEntryId = () => `sl-${Date.now()}-${nextEntryIdRef.current++}`;
     
     mealPlan.forEach(day => {
       ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
@@ -78,6 +80,7 @@ export function AppProvider({ children }) {
           meal.ingredients.forEach((ingredient, idx) => {
             allIngredients.push({
               id: `${meal.id}-${idx}`,
+              entryId: createEntryId(),
               name: ingredient,
               recipeId: meal.id,
               recipeName: meal.title,
@@ -104,8 +107,10 @@ export function AppProvider({ children }) {
     const recipe = getRecipeById(recipeId);
     if (!recipe) return;
     
+    const createEntryId = () => `sl-${Date.now()}-${nextEntryIdRef.current++}`;
     const newItems = recipe.ingredients.map((ingredient, idx) => ({
       id: `${recipe.id}-${idx}`,
+      entryId: createEntryId(),
       name: ingredient,
       recipeId: recipe.id,
       recipeName: recipe.title,
@@ -119,14 +124,18 @@ export function AppProvider({ children }) {
   const toggleIngredientCheck = (ingredientId) => {
     setShoppingList(prev =>
       prev.map(item =>
-        item.id === ingredientId ? { ...item, checked: !item.checked } : item
+        (item.entryId ?? item.id) === ingredientId
+          ? { ...item, checked: !item.checked }
+          : item
       )
     );
   };
   
   // Delete single ingredient from shopping list
   const deleteIngredient = (ingredientId) => {
-    setShoppingList(prev => prev.filter(item => item.id !== ingredientId));
+    setShoppingList(prev =>
+      prev.filter(item => (item.entryId ?? item.id) !== ingredientId)
+    );
   };
   
   // Delete all ingredients from a specific recipe

@@ -14,6 +14,7 @@ export const ShoppingListView = ({
   viewMode = 'list',
   items = [],
   itemKeys = [],
+  itemIds = [],
   recipeGroups = [],
   checkedItems = {},
   onItemCheck,
@@ -91,6 +92,7 @@ export const ShoppingListView = ({
             <IngredientList
               ingredients={items}
               itemKeys={itemKeys}
+              itemIds={itemIds}
               checkedItems={checkedItems}
               onCheckedChange={onItemCheck}
               onDelete={onItemDelete}
@@ -123,6 +125,7 @@ export const ShoppingListView = ({
                   <IngredientList
                     ingredients={group.ingredients}
                     itemKeys={group.ingredientKeys || []}
+                    itemIds={group.ingredientIds || []}
                     checkedItems={group.checkedItems || {}}
                     onCheckedChange={(index, checked, itemId) =>
                       group.onIngredientCheck?.(index, checked, itemId)

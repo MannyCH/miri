@@ -45,7 +45,8 @@ export function ShoppingListPage() {
     .filter(item => !lowerQuery || item.name.toLowerCase().includes(lowerQuery));
 
   const items = filteredList.map(item => item.name);
-  const itemKeys = filteredList.map(item => item.id);
+  const itemKeys = filteredList.map((item, index) => item.entryId ?? `${item.id}-${index}`);
+  const itemIds = filteredList.map(item => item.entryId ?? item.id);
 
   const checkedItems = {};
   filteredList.forEach((item, idx) => {
@@ -61,7 +62,8 @@ export function ShoppingListPage() {
       recipeName: group.recipeName,
       recipeId: group.recipeId,
       ingredients: filteredIngredients.map(item => item.name),
-      ingredientKeys: filteredIngredients.map(item => item.id),
+      ingredientKeys: filteredIngredients.map((item, index) => item.entryId ?? `${item.id}-${index}`),
+      ingredientIds: filteredIngredients.map(item => item.entryId ?? item.id),
       checkedItems: filteredIngredients.reduce((acc, item, idx) => {
         acc[idx] = item.checked;
         return acc;
@@ -94,6 +96,7 @@ export function ShoppingListPage() {
       onViewModeChange={setShoppingListViewMode}
       items={items}
       itemKeys={itemKeys}
+      itemIds={itemIds}
       recipeGroups={recipeGroups}
       checkedItems={checkedItems}
       onItemCheck={(idx, checked, itemId) => {
