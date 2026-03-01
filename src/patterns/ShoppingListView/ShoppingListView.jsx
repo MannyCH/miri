@@ -13,6 +13,7 @@ import './ShoppingListView.css';
 export const ShoppingListView = ({
   viewMode = 'list',
   items = [],
+  itemKeys = [],
   recipeGroups = [],
   checkedItems = {},
   onItemCheck,
@@ -89,6 +90,7 @@ export const ShoppingListView = ({
           <>
             <IngredientList
               ingredients={items}
+              itemKeys={itemKeys}
               checkedItems={checkedItems}
               onCheckedChange={onItemCheck}
               onDelete={onItemDelete}
@@ -120,11 +122,12 @@ export const ShoppingListView = ({
                   </div>
                   <IngredientList
                     ingredients={group.ingredients}
+                    itemKeys={group.ingredientKeys || []}
                     checkedItems={group.checkedItems || {}}
-                    onCheckedChange={(index, checked) =>
-                      group.onIngredientCheck?.(index, checked)
+                    onCheckedChange={(index, checked, itemId) =>
+                      group.onIngredientCheck?.(index, checked, itemId)
                     }
-                    onDelete={(index) => group.onIngredientDelete?.(index)}
+                    onDelete={(index, itemId) => group.onIngredientDelete?.(index, itemId)}
                   />
                 </div>
               ))}

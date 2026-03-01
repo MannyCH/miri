@@ -9,6 +9,7 @@ import './IngredientList.css';
  */
 export const IngredientList = ({ 
   ingredients = [],
+  itemKeys = [],
   checkedItems = {},
   onCheckedChange,
   onDelete, // Callback when item is deleted (swipe or keyboard)
@@ -18,10 +19,10 @@ export const IngredientList = ({
     <div className="ingredient-list" {...props}>
       {ingredients.map((ingredient, index) => (
         <IngredientListItem
-          key={index}
+          key={itemKeys[index] ?? `${ingredient}-${index}`}
           checked={checkedItems[index]}
-          onCheckedChange={(checked) => onCheckedChange?.(index, checked)}
-          onDelete={() => onDelete?.(index)}
+          onCheckedChange={(checked) => onCheckedChange?.(index, checked, itemKeys[index])}
+          onDelete={() => onDelete?.(index, itemKeys[index])}
           showUpperDivider={index === 0}
           showBelowDivider={true}
         >
