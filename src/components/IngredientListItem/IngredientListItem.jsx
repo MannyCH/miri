@@ -81,6 +81,7 @@ export const IngredientListItem = ({
     <motion.div
       className={`ingredient-list-item ${isRemoving ? 'is-removing' : ''}`}
       initial={false}
+      style={isRemoving ? { pointerEvents: 'none' } : undefined}
       animate={
         isRemoving
           ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }

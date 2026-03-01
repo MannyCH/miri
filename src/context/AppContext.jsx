@@ -14,10 +14,25 @@ export function AppProvider({ children }) {
   const [shoppingList, setShoppingList] = useState([]);
   const [shoppingListViewMode, setShoppingListViewMode] = useState('list'); // 'list' or 'recipe'
   const nextEntryIdRef = useRef(0);
+  const createEntryId = React.useCallback(() => `sl-${nextEntryIdRef.current++}`, []);
   
   // Toast State
   const [toasts, setToasts] = useState([]);
   const pendingToastsRef = useRef(new Set());
+
+  // Backfill unique row IDs for any existing shopping-list entries.
+  // This keeps swipe/delete identity stable even when items move.
+  useEffect(() => {
+    setShoppingList(prev => {
+      let changed = false;
+      const next = prev.map(item => {
+        if (item.entryId) return item;
+        changed = true;
+        return { ...item, entryId: createEntryId() };
+      });
+      return changed ? next : prev;
+    });
+  }, [createEntryId]);
   
   // Start with no plan — user taps "Plan my week" to generate
   
@@ -71,7 +86,6 @@ export function AppProvider({ children }) {
   // Add all ingredients from meal plan to shopping list
   const addAllToShoppingList = (replaceExisting = false) => {
     const allIngredients = [];
-    const createEntryId = () => `sl-${Date.now()}-${nextEntryIdRef.current++}`;
     
     mealPlan.forEach(day => {
       ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
@@ -107,7 +121,6 @@ export function AppProvider({ children }) {
     const recipe = getRecipeById(recipeId);
     if (!recipe) return;
     
-    const createEntryId = () => `sl-${Date.now()}-${nextEntryIdRef.current++}`;
     const newItems = recipe.ingredients.map((ingredient, idx) => ({
       id: `${recipe.id}-${idx}`,
       entryId: createEntryId(),
