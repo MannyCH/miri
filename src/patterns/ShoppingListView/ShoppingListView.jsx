@@ -25,6 +25,7 @@ export const ShoppingListView = ({
   onSearch,
   ...props
 }) => {
+  const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const searchInputRef = useRef(null);
@@ -55,6 +56,27 @@ export const ShoppingListView = ({
     setIsSearchOpen(false);
     onSearch?.('');
   };
+
+  const uncheckedItems = {
+    ingredients: [],
+    itemKeys: [],
+    itemIds: [],
+    originalIndices: [],
+  };
+  const checkedListItems = {
+    ingredients: [],
+    itemKeys: [],
+    itemIds: [],
+    originalIndices: [],
+  };
+
+  items.forEach((ingredient, index) => {
+    const target = checkedItems[index] ? checkedListItems : uncheckedItems;
+    target.ingredients.push(ingredient);
+    target.itemKeys.push(itemKeys[index]);
+    target.itemIds.push(itemIds[index]);
+    target.originalIndices.push(index);
+  });
 
   return (
     <div
@@ -90,13 +112,39 @@ export const ShoppingListView = ({
         {viewMode === 'list' && (
           <>
             <IngredientList
-              ingredients={items}
-              itemKeys={itemKeys}
-              itemIds={itemIds}
-              checkedItems={checkedItems}
-              onCheckedChange={onItemCheck}
-              onDelete={onItemDelete}
+              ingredients={uncheckedItems.ingredients}
+              itemKeys={uncheckedItems.itemKeys}
+              itemIds={uncheckedItems.itemIds}
+              checkedItems={{}}
+              onCheckedChange={(sectionIndex, checked, itemId) =>
+                onItemCheck?.(uncheckedItems.originalIndices[sectionIndex], checked, itemId)
+              }
+              onDelete={(sectionIndex, itemId) =>
+                onItemDelete?.(uncheckedItems.originalIndices[sectionIndex], itemId)
+              }
             />
+            {checkedListItems.ingredients.length > 0 && (
+              <>
+                <h2 className="shopping-list-purchased-title text-body-small-bold">
+                  {PURCHASED_SECTION_TITLE}
+                </h2>
+                <IngredientList
+                  ingredients={checkedListItems.ingredients}
+                  itemKeys={checkedListItems.itemKeys}
+                  itemIds={checkedListItems.itemIds}
+                  checkedItems={checkedListItems.ingredients.reduce((acc, _, index) => {
+                    acc[index] = true;
+                    return acc;
+                  }, {})}
+                  onCheckedChange={(sectionIndex, checked, itemId) =>
+                    onItemCheck?.(checkedListItems.originalIndices[sectionIndex], checked, itemId)
+                  }
+                  onDelete={(sectionIndex, itemId) =>
+                    onItemDelete?.(checkedListItems.originalIndices[sectionIndex], itemId)
+                  }
+                />
+              </>
+            )}
             {items.length > 0 && (
               <div className="shopping-list-clear">
                 <Button variant="tertiary-delete" onClick={onClearList}>

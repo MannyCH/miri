@@ -1,8 +1,12 @@
 import React, { useRef, useEffect } from 'react';
+import { animate } from 'motion';
+import { motion } from 'motion/react';
 import { CalendarButton } from '../CalendarButton';
 import './CalendarModule.css';
 
 const DAYS_PER_VIEW = 7;
+const LAST_DAY_WEEK_SHIFT_PX = 15;
+const SCROLL_ANIMATION_DURATION_S = 0.28;
 
 /**
  * CalendarModule component - Matches Figma Calendar Module pattern
@@ -17,21 +21,38 @@ export const CalendarModule = ({
   ...props
 }) => {
   const scrollRef = useRef(null);
+  const scrollAnimationRef = useRef(null);
+  const selectedIndex = days.findIndex(d => d.fullDate === selectedDay);
+  const isLastDayInWeekSelected = selectedIndex >= 0 && selectedIndex % DAYS_PER_VIEW === DAYS_PER_VIEW - 1;
 
   useEffect(() => {
     if (!scrollRef.current) return;
-    const selectedIndex = days.findIndex(d => d.fullDate === selectedDay);
-    if (selectedIndex < 0) return;
 
     const container = scrollRef.current;
-    const buttonWidth = 45;
-    const containerWidth = container.clientWidth;
-    const gap = (containerWidth - buttonWidth * DAYS_PER_VIEW) / (DAYS_PER_VIEW - 1);
-    const pageIndex = Math.floor(selectedIndex / DAYS_PER_VIEW);
-    const targetScroll = pageIndex * containerWidth;
+    if (selectedIndex < 0) return;
 
-    container.scrollTo({ left: targetScroll, behavior: 'smooth' });
-  }, [selectedDay, days]);
+    scrollAnimationRef.current?.stop?.();
+
+    const currentScroll = container.scrollLeft;
+    const containerWidth = container.clientWidth;
+    const maxScroll = Math.max(0, container.scrollWidth - containerWidth);
+    const pageIndex = Math.floor(selectedIndex / DAYS_PER_VIEW);
+    const nextScroll = pageIndex * containerWidth;
+    const clampedNextScroll = Math.min(Math.max(nextScroll, 0), maxScroll);
+    if (Math.abs(clampedNextScroll - currentScroll) < 1) return;
+
+    scrollAnimationRef.current = animate(currentScroll, clampedNextScroll, {
+      duration: SCROLL_ANIMATION_DURATION_S,
+      ease: [0.22, 0.61, 0.36, 1],
+      onUpdate: (value) => {
+        container.scrollLeft = value;
+      },
+    });
+
+    return () => {
+      scrollAnimationRef.current?.stop?.();
+    };
+  }, [selectedIndex, days]);
 
   return (
     <div className="calendar-module" {...props}>
@@ -39,7 +60,11 @@ export const CalendarModule = ({
         {title}
       </h2>
       <div className="calendar-scroll" ref={scrollRef}>
-        <div className="calendar-scroll-track">
+        <motion.div
+          className="calendar-scroll-track"
+          animate={{ x: isLastDayInWeekSelected ? -LAST_DAY_WEEK_SHIFT_PX : 0 }}
+          transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
+        >
           {days.map((dayData) => {
             let state = 'default';
             if (dayData.fullDate === selectedDay) state = 'pressed';
@@ -54,7 +79,7 @@ export const CalendarModule = ({
               />
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

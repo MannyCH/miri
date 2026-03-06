@@ -2,6 +2,7 @@
 .calendar-button {
   width: 45px;
   height: 45px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;

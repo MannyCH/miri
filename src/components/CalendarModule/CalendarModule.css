@@ -29,6 +29,7 @@
 .calendar-scroll-track {
   display: inline-flex;
   gap: var(--spacing-4);
+  padding-right: var(--spacing-12);
 }
 
 .calendar-scroll-track .calendar-button {

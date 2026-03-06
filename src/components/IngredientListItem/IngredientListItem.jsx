@@ -25,16 +25,17 @@ export const IngredientListItem = ({
   const MAX_SWIPE = 120;
   const SWIPE_THRESHOLD = 84;
   const SWIPE_TRANSITION = '360ms cubic-bezier(0.22, 0.61, 0.36, 1)';
+  const REMOVE_ANIMATION_MS = 320;
 
   const triggerDelete = React.useCallback(() => {
     if (isRemoving) return;
 
-    // Keep the item fully swiped for a brief beat so users can perceive deletion intent.
-    setSwipeOffset(MAX_SWIPE);
+    // Animate out immediately and remove from state after Motion finishes.
+    setSwipeOffset(Math.max(swipeOffset, MAX_SWIPE));
     setIsSwiping(false);
-    window.setTimeout(() => setIsRemoving(true), 180);
-    window.setTimeout(() => onDelete?.(), 520);
-  }, [isRemoving, onDelete]);
+    setIsRemoving(true);
+    window.setTimeout(() => onDelete?.(), REMOVE_ANIMATION_MS);
+  }, [isRemoving, onDelete, swipeOffset]);
 
   const handleTouchStart = (e) => {
     if (isRemoving) return;
@@ -81,13 +82,18 @@ export const IngredientListItem = ({
     <motion.div
       className={`ingredient-list-item ${isRemoving ? 'is-removing' : ''}`}
       initial={false}
-      style={isRemoving ? { pointerEvents: 'none' } : undefined}
+      layout="position"
+      style={isRemoving ? { pointerEvents: 'none', overflow: 'hidden' } : { overflow: 'hidden' }}
       animate={
         isRemoving
-          ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }
-          : { opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0 }
+          ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, x: -16, scale: 0.98 }
+          : { opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0, x: 0, scale: 1 }
       }
-      transition={{ duration: 0.34, ease: [0.22, 0.61, 0.36, 1] }}
+      transition={{
+        duration: REMOVE_ANIMATION_MS / 1000,
+        ease: [0.22, 0.61, 0.36, 1],
+        layout: { type: 'spring', stiffness: 420, damping: 34, mass: 0.65 },
+      }}
     >
       {showUpperDivider && <Divider />}
       
