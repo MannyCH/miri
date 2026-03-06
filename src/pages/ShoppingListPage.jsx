@@ -18,6 +18,8 @@ export function ShoppingListPage() {
     toggleIngredientCheck,
     deleteIngredient,
     deleteRecipeFromShoppingList,
+    markRecipeAsPurchased,
+    markRecipeAsUnpurchased,
     clearShoppingList,
   } = useApp();
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -85,7 +87,10 @@ export function ShoppingListPage() {
         if (item) deleteIngredient(item.id);
       },
       onDelete: () => {
-        deleteRecipeFromShoppingList(group.recipeId);
+        markRecipeAsPurchased(group.recipeId);
+      },
+      onRestore: () => {
+        markRecipeAsUnpurchased(group.recipeId);
       },
     };
   });

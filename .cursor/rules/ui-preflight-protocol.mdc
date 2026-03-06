@@ -1,0 +1,43 @@
+---
+description: Mandatory UI preflight before any visual implementation
+alwaysApply: true
+---
+
+# UI Preflight Protocol
+
+Before making any UI change, complete this checklist in order. Do not skip steps.
+
+## Mandatory Order
+
+1. **Read project UI rules first**
+   - Review design-system, Storybook, and visual-verification rules before editing.
+
+2. **Check Storybook availability**
+   - If Storybook is running, use `http://localhost:6006/index.json` as source of truth.
+   - Do not guess component APIs, story IDs, or variants.
+
+3. **Reuse documented UI building blocks**
+   - Prefer documented components/icons/tokens over custom implementations.
+   - Do not add ad-hoc inline SVGs if a documented icon exists.
+
+4. **Token-only styling**
+   - Use existing design tokens and typography classes.
+   - No hardcoded colors, spacing, radius, or custom visual values unless already established by design.
+
+5. **Pre-edit self-check**
+   - Confirm in one sentence internally: which documented source is being used (Storybook/Figma/Foundation).
+   - If the source is missing or unclear, stop and ask instead of guessing.
+
+## Prohibited Shortcuts
+
+- Implementing UI quickly first and aligning with design system later.
+- Inventing new visual patterns when documented ones already exist.
+- Mixing icon styles outside the documented icon system.
+
+## Completion Gate for UI Tasks
+
+A UI task is only complete when:
+
+- documented components/icons/tokens were used,
+- behavior matches requested scope,
+- lints pass for edited files.

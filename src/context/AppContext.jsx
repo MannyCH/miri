@@ -155,6 +155,28 @@ export function AppProvider({ children }) {
   const deleteRecipeFromShoppingList = (recipeId) => {
     setShoppingList(prev => prev.filter(item => item.recipeId !== recipeId));
   };
+
+  // Mark all ingredients from a specific recipe as purchased
+  const markRecipeAsPurchased = (recipeId) => {
+    setShoppingList(prev =>
+      prev.map(item =>
+        item.recipeId === recipeId
+          ? { ...item, checked: true }
+          : item
+      )
+    );
+  };
+
+  // Mark all ingredients from a specific recipe as not purchased
+  const markRecipeAsUnpurchased = (recipeId) => {
+    setShoppingList(prev =>
+      prev.map(item =>
+        item.recipeId === recipeId
+          ? { ...item, checked: false }
+          : item
+      )
+    );
+  };
   
   // Clear entire shopping list
   const clearShoppingList = () => {
@@ -192,6 +214,8 @@ export function AppProvider({ children }) {
     toggleIngredientCheck,
     deleteIngredient,
     deleteRecipeFromShoppingList,
+    markRecipeAsPurchased,
+    markRecipeAsUnpurchased,
     clearShoppingList,
     
     // Toast

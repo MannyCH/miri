@@ -62,6 +62,7 @@ export const CalendarModule = ({
       <div className="calendar-scroll" ref={scrollRef}>
         <motion.div
           className="calendar-scroll-track"
+          initial={false}
           animate={{ x: isLastDayInWeekSelected ? -LAST_DAY_WEEK_SHIFT_PX : 0 }}
           transition={{ duration: 0.22, ease: [0.22, 0.61, 0.36, 1] }}
         >

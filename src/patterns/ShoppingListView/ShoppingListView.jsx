@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import { RotateCcw } from 'react-feather';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
@@ -26,8 +28,10 @@ export const ShoppingListView = ({
   ...props
 }) => {
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
+  const RECIPE_REMOVE_ANIMATION_MS = 320;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
 
   useEffect(() => {
@@ -57,6 +61,24 @@ export const ShoppingListView = ({
     onSearch?.('');
   };
 
+  const getRecipeGroupKey = (group, index) =>
+    group.recipeId ?? group.id ?? group.recipeName ?? `group-${index}`;
+
+  const handleRecipeGroupDelete = (group, groupIndex) => {
+    const groupKey = getRecipeGroupKey(group, groupIndex);
+    if (removingRecipeKeys[groupKey]) return;
+
+    setRemovingRecipeKeys(prev => ({ ...prev, [groupKey]: true }));
+    window.setTimeout(() => {
+      group.onDelete?.();
+      setRemovingRecipeKeys(prev => {
+        const next = { ...prev };
+        delete next[groupKey];
+        return next;
+      });
+    }, RECIPE_REMOVE_ANIMATION_MS);
+  };
+
   const uncheckedItems = {
     ingredients: [],
     itemKeys: [],
@@ -77,6 +99,48 @@ export const ShoppingListView = ({
     target.itemIds.push(itemIds[index]);
     target.originalIndices.push(index);
   });
+
+  const splitRecipeGroupByChecked = (group) => {
+    const uncheckedIndices = [];
+    const checkedIndices = [];
+
+    (group.ingredients || []).forEach((_, index) => {
+      const checkedValue = group.checkedItems?.[index];
+      if (checkedValue === true) {
+        checkedIndices.push(index);
+      } else {
+        uncheckedIndices.push(index);
+      }
+    });
+
+    const createGroupFromIndices = (indices, isCheckedGroup) => {
+      if (indices.length === 0) return null;
+      return {
+        ...group,
+        ingredients: indices.map((index) => group.ingredients?.[index]),
+        ingredientKeys: indices.map((index) => group.ingredientKeys?.[index]),
+        ingredientIds: indices.map((index) => group.ingredientIds?.[index]),
+        originalIndices: indices,
+        checkedItems: indices.reduce((acc, _, nextIndex) => {
+          acc[nextIndex] = isCheckedGroup;
+          return acc;
+        }, {}),
+      };
+    };
+
+    return {
+      uncheckedGroup: createGroupFromIndices(uncheckedIndices, false),
+      checkedGroup: createGroupFromIndices(checkedIndices, true),
+    };
+  };
+
+  const groupedSections = recipeGroups.map(splitRecipeGroupByChecked);
+  const uncheckedRecipeGroups = groupedSections
+    .map((group) => group.uncheckedGroup)
+    .filter(Boolean);
+  const checkedRecipeGroups = groupedSections
+    .map((group) => group.checkedGroup)
+    .filter(Boolean);
 
   return (
     <div
@@ -158,13 +222,33 @@ export const ShoppingListView = ({
         {viewMode === 'recipe' && (
           <>
             <div className="shopping-list-recipe-groups">
-              {recipeGroups.map((group, groupIndex) => (
-                <div key={groupIndex} className="recipe-group">
+              {uncheckedRecipeGroups.map((group, groupIndex) => (
+                <motion.div
+                  key={getRecipeGroupKey(group, groupIndex)}
+                  className="recipe-group"
+                  initial={false}
+                  layout="position"
+                  style={
+                    removingRecipeKeys[getRecipeGroupKey(group, groupIndex)]
+                      ? { pointerEvents: 'none', overflow: 'hidden' }
+                      : { overflow: 'hidden' }
+                  }
+                  animate={
+                    removingRecipeKeys[getRecipeGroupKey(group, groupIndex)]
+                      ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, scale: 0.98 }
+                      : { opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0, scale: 1 }
+                  }
+                  transition={{
+                    duration: RECIPE_REMOVE_ANIMATION_MS / 1000,
+                    ease: [0.22, 0.61, 0.36, 1],
+                    layout: { type: 'spring', stiffness: 420, damping: 34, mass: 0.65 },
+                  }}
+                >
                   <div className="recipe-group-header">
                     <h3 className="text-body-base-bold">{group.recipeName}</h3>
                     <button
                       className="icon-button-delete"
-                      onClick={() => group.onDelete?.()}
+                      onClick={() => handleRecipeGroupDelete(group, groupIndex)}
                       aria-label={`Delete ${group.recipeName}`}
                     >
                       <TrashIcon />
@@ -176,13 +260,62 @@ export const ShoppingListView = ({
                     itemIds={group.ingredientIds || []}
                     checkedItems={group.checkedItems || {}}
                     onCheckedChange={(index, checked, itemId) =>
-                      group.onIngredientCheck?.(index, checked, itemId)
+                      group.onIngredientCheck?.(group.originalIndices[index], checked, itemId)
                     }
-                    onDelete={(index, itemId) => group.onIngredientDelete?.(index, itemId)}
+                    onDelete={(index, itemId) =>
+                      group.onIngredientDelete?.(group.originalIndices[index], itemId)
+                    }
                   />
-                </div>
+                </motion.div>
               ))}
             </div>
+            {checkedRecipeGroups.length > 0 && (
+              <>
+                <h2 className="shopping-list-purchased-title text-body-small-bold">
+                  {PURCHASED_SECTION_TITLE}
+                </h2>
+                <div className="shopping-list-recipe-groups">
+                  {checkedRecipeGroups.map((group, groupIndex) => (
+                    <motion.div
+                      key={`purchased-${getRecipeGroupKey(group, groupIndex)}`}
+                      className="recipe-group"
+                      initial={false}
+                      layout="position"
+                      style={{ overflow: 'hidden' }}
+                      animate={{ opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0, x: 0, scale: 1 }}
+                      transition={{
+                        duration: RECIPE_REMOVE_ANIMATION_MS / 1000,
+                        ease: [0.22, 0.61, 0.36, 1],
+                        layout: { type: 'spring', stiffness: 420, damping: 34, mass: 0.65 },
+                      }}
+                    >
+                      <div className="recipe-group-header">
+                        <h3 className="text-body-base-bold">{group.recipeName}</h3>
+                        <button
+                          className="icon-button-restore"
+                          onClick={() => group.onRestore?.()}
+                          aria-label={`Restore ${group.recipeName}`}
+                        >
+                          <RotateCcw size={20} />
+                        </button>
+                      </div>
+                      <IngredientList
+                        ingredients={group.ingredients}
+                        itemKeys={group.ingredientKeys || []}
+                        itemIds={group.ingredientIds || []}
+                        checkedItems={group.checkedItems || {}}
+                        onCheckedChange={(index, checked, itemId) =>
+                          group.onIngredientCheck?.(group.originalIndices[index], checked, itemId)
+                        }
+                        onDelete={(index, itemId) =>
+                          group.onIngredientDelete?.(group.originalIndices[index], itemId)
+                        }
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </>
+            )}
             {recipeGroups.length > 0 && (
               <div className="shopping-list-clear">
                 <Button variant="tertiary-delete" onClick={onClearList}>

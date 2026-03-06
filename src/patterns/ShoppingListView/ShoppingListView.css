@@ -129,6 +129,29 @@
   outline-offset: 2px;
 }
 
+.icon-button-restore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--corner-radius-4);
+  color: var(--color-icon-brand);
+  cursor: pointer;
+}
+
+.icon-button-restore:hover {
+  background: var(--color-fill-brand-weak);
+}
+
+.icon-button-restore:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
 /* Floating search FAB — fixed, tracks keyboard height */
 .shopping-list-search-fab {
   position: fixed;
