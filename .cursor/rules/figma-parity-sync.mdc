@@ -1,0 +1,33 @@
+---
+description: Enforce exact Figma source-to-target parity sync
+alwaysApply: true
+---
+
+# Figma Parity Sync Rule
+
+When the user asks to "match", "sync", "reuse", or "apply same styles/tokens" from one module/component to others, use strict parity behavior.
+
+## Source of Truth
+
+- Treat the named source module as the single source of truth.
+- Do not reinterpret styling semantically.
+- Do not map to "closest" styles if exact source-bound values are available.
+
+## Required Sync Scope
+
+Mirror from source to targets for matching node roles:
+
+1. Text styles and text color variable bindings
+2. Container/input/button fills and stroke variable bindings
+3. Spacing and radius variable bindings
+4. Component usage parity (reuse documented component instances when source uses them)
+
+## Completion Gate
+
+Before finishing, provide a parity audit:
+
+- `Matched`: list of node-role categories copied exactly
+- `Mismatches`: any remaining differences from source (must be explicit)
+- `Reason`: why mismatch exists (missing token/style/component, structural difference, API limit)
+
+If any mismatch remains and no valid reason exists, continue iterating until parity is achieved.

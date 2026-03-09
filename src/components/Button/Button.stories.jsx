@@ -143,9 +143,6 @@ const StateRow = ({ variant, icon, showIcon }) => {
     padding: 'var(--spacing-12)',
     borderRadius: 'var(--corner-radius-8)',
     cursor: 'pointer',
-    fontFamily: 'var(--font-family-body)',
-    fontSize: '14px',
-    fontWeight: 700,
     transition: 'none',
     ...extra,
   });
@@ -186,7 +183,7 @@ const StateRow = ({ variant, icon, showIcon }) => {
   return ['default', 'hover', 'pressed', 'focus', 'disabled'].map((state) => (
     <div key={state} style={pseudoStyle(v[state])}>
       {showIcon && <span style={{ display: 'flex' }}><HeartIcon /></span>}
-      <span>Label</span>
+      <span className="text-body-small-bold">Label</span>
     </div>
   ));
 };
@@ -208,15 +205,11 @@ Includes Disabled state with weak token mapping and full opacity.
   render: () => {
     const headerStyle = {
       color: 'var(--color-text-weak)',
-      fontSize: '12px',
-      fontFamily: 'var(--font-family-body)',
       textAlign: 'center',
       padding: '0 var(--spacing-8)',
     };
     const rowLabelStyle = {
       color: 'var(--color-text-weak)',
-      fontSize: '12px',
-      fontFamily: 'var(--font-family-body)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'flex-end',
@@ -245,13 +238,13 @@ Includes Disabled state with weak token mapping and full opacity.
         {/* Header row */}
         <div />
         {['Default', 'Hover', 'Pressed', 'Focus', 'Disabled'].map(s => (
-          <div key={s} style={headerStyle}>{s}</div>
+          <div key={s} style={headerStyle} className="text-tiny-regular">{s}</div>
         ))}
 
         {/* Variant rows */}
         {variants.map(({ key, label, showIcon }) => (
           <React.Fragment key={key}>
-            <div style={rowLabelStyle}>{label}</div>
+            <div style={rowLabelStyle} className="text-tiny-regular">{label}</div>
             <StateRow variant={key} showIcon={showIcon} />
           </React.Fragment>
         ))}

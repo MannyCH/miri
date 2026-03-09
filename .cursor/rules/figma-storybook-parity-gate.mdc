@@ -1,0 +1,43 @@
+---
+description: Enforce strict Figma-to-Storybook parity workflow for all UI work
+alwaysApply: true
+---
+
+# Figma -> Storybook Parity Gate (Global)
+
+Use this process for every component/pattern mapping or visual implementation task.
+
+## Mandatory Workflow
+
+1. Build mapping first
+   - Storybook source: `http://localhost:6006/index.json`
+   - Figma source: `user-figma-console` tools only
+   - Keep `FIGMA_STORYBOOK_MAPPING.md` and `design-mapping.json` updated
+
+2. Extract exact Figma specs before coding
+   - Pull node-level structure (layout, spacing, size, radius, stroke/fill vars)
+   - Pull text specs (text style, size, line-height, color token)
+   - Pull component-in-component usage (e.g., Button instance) and map to existing Storybook components
+
+3. Reuse Storybook components, do not reinvent
+   - If a component exists in Storybook, use it directly (props/variants only)
+   - Do not recreate visuals with local CSS if a documented component already provides it
+
+4. Token/style rules
+   - No hardcoded visual values for color/spacing/radius/typography when token/style exists
+   - Prefer existing typography utility classes over custom font declarations
+   - Any exception must be explicitly justified and minimized
+
+5. Parity audit required before completion
+   - Produce a concise checklist per changed module:
+     - Structure/hierarchy parity
+     - Typography class parity
+     - Color/stroke/fill token parity
+     - Spacing/radius parity
+     - Embedded component parity (Button, etc.)
+
+## Stop Conditions (Do Not Proceed)
+
+- Mapping between Figma node and Storybook story is ambiguous
+- Required Storybook component exists but implementation uses custom substitute
+- Typography is implemented with ad-hoc sizes despite existing text styles

@@ -1,0 +1,153 @@
+{
+  "figmaFile": {
+    "name": "Design Library - Smartly",
+    "fileKey": "FJcw5Rdkp6B5NlYiBC0G7b"
+  },
+  "storybook": {
+    "indexUrl": "http://localhost:6006/index.json"
+  },
+  "mappings": [
+    {
+      "storybookTitle": "Components/Badge",
+      "figmaNodeId": "149:1085",
+      "figmaNodeName": "Badge",
+      "figmaNodeType": "INSTANCE",
+      "figmaUrl": "https://www.figma.com/design/FJcw5Rdkp6B5NlYiBC0G7b/Design-Library---Smartly?node-id=149-1085&t=joJ3CDFN4bpQliyC-4",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/Button",
+      "figmaNodeId": "225:1762",
+      "figmaNodeName": "Button",
+      "figmaNodeType": "COMPONENT_SET",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/CalendarButton",
+      "figmaNodeId": "164:290",
+      "figmaNodeName": "Calendar Button",
+      "figmaNodeType": "COMPONENT_SET",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/CalendarModule",
+      "figmaNodeId": "214:2415",
+      "figmaNodeName": "Calendar Module",
+      "figmaNodeType": "FRAME",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/CalendarWeek",
+      "figmaNodeId": "164:707",
+      "figmaNodeName": "Calendar week",
+      "figmaNodeType": "COMPONENT",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/ConfirmDialog",
+      "figmaNodeId": "232:2337",
+      "figmaNodeName": "Dialog",
+      "figmaNodeType": "COMPONENT",
+      "figmaUrl": "https://www.figma.com/design/FJcw5Rdkp6B5NlYiBC0G7b/Design-Library---Smartly?node-id=232-2337&t=joJ3CDFN4bpQliyC-4",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/Divider",
+      "figmaNodeId": "I6:4331;51964:62996;51964:63468",
+      "figmaNodeName": "Divider",
+      "figmaNodeType": "INSTANCE",
+      "confidence": "medium"
+    },
+    {
+      "storybookTitle": "Components/IngredientList",
+      "figmaNodeId": "157:1577",
+      "figmaNodeName": "Ingredient List",
+      "figmaNodeType": "COMPONENT",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/IngredientListItem",
+      "figmaNodeId": "157:1502",
+      "figmaNodeName": "Ingredient List item",
+      "figmaNodeType": "COMPONENT",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/NavItem",
+      "figmaNodeId": "157:2098",
+      "figmaNodeName": "Nav item",
+      "figmaNodeType": "COMPONENT_SET",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/NavigationBar",
+      "figmaNodeId": "157:2171",
+      "figmaNodeName": "Navigation Bar",
+      "figmaNodeType": "COMPONENT",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/RecipeList",
+      "figmaNodeId": "157:2548",
+      "figmaNodeName": "Recipe List",
+      "figmaNodeType": "COMPONENT",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/RecipeListItem",
+      "figmaNodeId": "157:2502",
+      "figmaNodeName": "Recipe List Item",
+      "figmaNodeType": "COMPONENT",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/SearchBar",
+      "figmaNodeId": "156:970",
+      "figmaNodeName": "Search bar",
+      "figmaNodeType": "COMPONENT",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Components/Toast",
+      "figmaNodeId": "209:2087",
+      "figmaNodeName": "Toast",
+      "figmaNodeType": "COMPONENT_SET",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Patterns/Auth Modules",
+      "figmaNodeId": "273:1638",
+      "figmaNodeName": "Auth Components",
+      "figmaNodeType": "SECTION",
+      "confidence": "high"
+    },
+    {
+      "storybookTitle": "Patterns/MealPlanningView",
+      "figmaNodeId": "162:513",
+      "figmaNodeName": "Meal Section",
+      "figmaNodeType": "FRAME",
+      "confidence": "medium"
+    },
+    {
+      "storybookTitle": "Patterns/RecipeDetailView",
+      "figmaNodeId": "146:720",
+      "figmaNodeName": "Recipes - Detailed",
+      "figmaNodeType": "FRAME",
+      "confidence": "medium"
+    },
+    {
+      "storybookTitle": "Patterns/RecipesView",
+      "figmaNodeId": "157:2549",
+      "figmaNodeName": "Recipes",
+      "figmaNodeType": "FRAME",
+      "confidence": "medium"
+    },
+    {
+      "storybookTitle": "Patterns/ShoppingListView",
+      "figmaNodeId": "146:692",
+      "figmaNodeName": "Shopping List - Ordered by list",
+      "figmaNodeType": "FRAME",
+      "confidence": "medium"
+    }
+  ]
+}

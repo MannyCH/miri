@@ -1,0 +1,32 @@
+---
+description: Enforce variable-bound Figma components
+alwaysApply: true
+---
+
+# Figma Component Binding Rule
+
+When creating or editing Figma components, do not use resolved/hardcoded visual values.
+
+## Binding Requirements (Mandatory)
+
+1. Create components with variable bindings, not resolved values.
+2. Use existing text styles from the file; no manual typography values.
+3. Reject output if any fill/stroke/spacing/radius is unbound.
+4. Return a validation list showing which variable/style is bound on each element.
+
+## What Is Forbidden
+
+- Hardcoded color values (hex/rgb) when an existing color variable exists.
+- Manual font family/size/weight/line-height when an existing text style exists.
+- Manual spacing or corner radius when spacing/radius variables exist.
+- Delivering components without a binding audit.
+
+## Required Validation Output
+
+After every Figma component task, return a compact audit like:
+
+- Element: `SignIn/Card` -> Fill: `Background/Raised`, Stroke: `Stroke/Weak`, Radius: `Corner radius/16`
+- Element: `SignIn/Title` -> Text Style: `<style-name>`, Color: `Text/Strong`
+- Element: `SignIn/PrimaryButton` -> Fill: `Fill/Brand strong`, Text Style: `<style-name>`, Radius: `Corner radius/8`
+
+If any binding cannot be applied, stop and report exactly which token/style is missing.

@@ -110,10 +110,9 @@ export const TapToToggle = () => {
         marginBottom: 'var(--spacing-16)',
         background: 'var(--color-background-sunken)',
         borderRadius: 'var(--corner-radius-8)',
-        fontSize: '14px',
         color: 'var(--color-text-weak)'
       }}>
-        👆 Tap anywhere on the item to toggle strikethrough
+        <span className="text-body-small-regular">👆 Tap anywhere on the item to toggle strikethrough</span>
       </div>
       
       <IngredientListItem 
@@ -169,16 +168,16 @@ export const SwipeToDelete = () => {
         marginBottom: 'var(--spacing-16)',
         background: 'var(--color-background-sunken)',
         borderRadius: 'var(--corner-radius-8)',
-        fontSize: '14px',
-        color: 'var(--color-text-weak)',
-        lineHeight: '1.5'
+        color: 'var(--color-text-weak)'
       }}>
+        <span className="text-body-small-regular">
         <strong>Try it:</strong><br />
         👆 <strong>Tap</strong> to toggle strikethrough<br />
         👈 <strong>Swipe left</strong> to reveal delete button<br />
         ⌨️ <strong>Delete/Backspace</strong> key to remove<br />
         <br />
         <em>(Use touch or trackpad for best swipe experience)</em>
+        </span>
       </div>
       
       <div style={{ background: 'var(--color-background-raised)' }}>
@@ -199,10 +198,9 @@ export const SwipeToDelete = () => {
           <div style={{
             padding: 'var(--spacing-24)',
             textAlign: 'center',
-            color: 'var(--color-text-weak)',
-            fontSize: '14px'
+            color: 'var(--color-text-weak)'
           }}>
-            All items deleted! 🎉
+            <span className="text-body-small-regular">All items deleted! 🎉</span>
           </div>
         )}
       </div>
@@ -234,10 +232,9 @@ export const KeyboardNavigation = () => {
         marginBottom: 'var(--spacing-16)',
         background: 'var(--color-background-sunken)',
         borderRadius: 'var(--corner-radius-8)',
-        fontSize: '14px',
         color: 'var(--color-text-weak)'
       }}>
-        ⌨️ <strong>Tab</strong> to navigate, <strong>Space/Enter</strong> to toggle, <strong>Delete</strong> to remove
+        <span className="text-body-small-regular">⌨️ <strong>Tab</strong> to navigate, <strong>Space/Enter</strong> to toggle, <strong>Delete</strong> to remove</span>
       </div>
       
       {items.map((item, index) => (
