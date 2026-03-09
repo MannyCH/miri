@@ -1,0 +1,26 @@
+---
+description: Use Figma Console MCP only for Storybook-Figma component mapping
+alwaysApply: true
+---
+
+# Figma Mapping via Console MCP Only
+
+When the task is to list, map, or pair Storybook components/patterns with Figma nodes:
+
+- Use `user-figma-console` only.
+- Do not use `user-Figma Desktop` for mapping/inventory extraction.
+
+## Required Workflow
+
+1. Get Storybook inventory from `http://localhost:6006/index.json`.
+2. Verify Figma Console connection via `figma_get_status`.
+3. Extract Figma inventory with:
+   - `figma_search_components` (catalog-level),
+   - `figma_execute` (node-level scan), if needed.
+4. Build and document pairings with confidence levels.
+5. If user provides canonical Figma node links, treat those nodes as source of truth.
+
+## Output Requirements
+
+- Update `FIGMA_STORYBOOK_MAPPING.md` with pairing decisions and rationale.
+- Keep `design-mapping.json` aligned with the same canonical node IDs.

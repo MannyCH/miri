@@ -1,10 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { MealPlanningPage } from './pages/MealPlanningPage';
 import { RecipesPage } from './pages/RecipesPage';
 import { RecipeDetailPage } from './pages/RecipeDetailPage';
 import { ShoppingListPage } from './pages/ShoppingListPage';
+import { AuthPage } from './pages/AuthPage';
+import { AccountPage } from './pages/AccountPage';
 import { ToastContainer } from './components/ToastContainer';
 import './index.css';
 
@@ -22,15 +25,40 @@ import './index.css';
  */
 function AppContent() {
   const { toasts, dismissToast } = useApp();
+  const { isAuthenticated, isAuthReady } = useAuth();
+
+  if (!isAuthReady) {
+    return <div>Loading authentication...</div>;
+  }
   
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/planning" replace />} />
-        <Route path="/planning" element={<MealPlanningPage />} />
-        <Route path="/recipes" element={<RecipesPage />} />
-        <Route path="/recipes/:id" element={<RecipeDetailPage />} />
-        <Route path="/shopping-list" element={<ShoppingListPage />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? '/planning' : '/auth'} replace />} />
+        <Route
+          path="/auth"
+          element={isAuthenticated ? <Navigate to="/planning" replace /> : <AuthPage />}
+        />
+        <Route
+          path="/planning"
+          element={isAuthenticated ? <MealPlanningPage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/recipes"
+          element={isAuthenticated ? <RecipesPage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/recipes/:id"
+          element={isAuthenticated ? <RecipeDetailPage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/shopping-list"
+          element={isAuthenticated ? <ShoppingListPage /> : <Navigate to="/auth" replace />}
+        />
+        <Route
+          path="/account"
+          element={isAuthenticated ? <AccountPage /> : <Navigate to="/auth" replace />}
+        />
       </Routes>
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </>
@@ -39,11 +67,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AppProvider>
+    </AuthProvider>
   );
 }
 

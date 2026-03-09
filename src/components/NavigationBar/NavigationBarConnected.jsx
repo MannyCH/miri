@@ -17,6 +17,7 @@ export function NavigationBarConnected({ activeItem: activeItemProp, ...props })
     if (location.pathname.startsWith('/recipes')) return 'recipes';
     if (location.pathname.startsWith('/planning')) return 'planning';
     if (location.pathname.startsWith('/shopping-list')) return 'shopping-list';
+    if (location.pathname.startsWith('/account')) return 'account';
     return 'planning';
   };
   
@@ -32,8 +33,7 @@ export function NavigationBarConnected({ activeItem: activeItemProp, ...props })
         navigate('/shopping-list');
         break;
       case 'account':
-        // TODO: Add account page
-        alert('Account page coming soon!');
+        navigate('/account');
         break;
       default:
         break;

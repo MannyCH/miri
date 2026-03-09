@@ -10,7 +10,7 @@ Before making any UI change, complete this checklist in order. Do not skip steps
 ## Mandatory Order
 
 1. **Read project UI rules first**
-   - Review design-system, Storybook, and visual-verification rules before editing.
+   - Review design-system, Storybook, visual-verification, `figma-component-binding`, `figma-parity-sync`, `figma-storybook-parity-gate`, and `storybook-source-of-truth` rules before editing.
 
 2. **Check Storybook availability**
    - If Storybook is running, use `http://localhost:6006/index.json` as source of truth.

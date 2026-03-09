@@ -1,0 +1,37 @@
+---
+description: Storybook is the implementation source of truth for all UI coding
+alwaysApply: true
+---
+
+# Storybook Source Of Truth
+
+For UI implementation work, Storybook is the canonical source of truth.
+
+## Workflow Contract
+
+1. Figma -> Storybook
+   - Use Figma to explore and translate design decisions into Storybook stories/components.
+   - Do not treat Figma as the final implementation API.
+
+2. Storybook -> App Code
+   - Build app UI from existing Storybook components and documented variants/props.
+   - If a Storybook component exists, it must be reused instead of recreated.
+
+## Strict Rules
+
+- No custom replacement for existing Storybook components (e.g., Button, fields, list items).
+- No hardcoded visual values when tokens/classes/components already exist.
+- Prefer existing typography utility classes over manual font-size/line-height.
+- If mapping is unclear, stop and ask before coding.
+
+## Required Pre-Code Output
+
+- List Storybook story IDs/URLs used for implementation.
+- List mapped app components that will reuse those Storybook components.
+
+## Required Completion Audit
+
+- Component reuse: confirmed
+- Typography classes: confirmed
+- Token usage (color/spacing/radius): confirmed
+- Hardcoded visual overrides: none

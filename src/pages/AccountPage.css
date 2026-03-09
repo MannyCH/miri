@@ -1,0 +1,50 @@
+.account-page {
+  min-height: 100%;
+  padding: var(--spacing-20) var(--spacing-16) calc(var(--spacing-96) + var(--safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.account-card {
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-12);
+  background: var(--color-background-raised);
+  padding: var(--spacing-16);
+}
+
+.account-title {
+  margin: 0;
+}
+
+.account-email,
+.account-name {
+  margin: var(--spacing-8) 0 0;
+}
+
+.account-email {
+  color: var(--color-text-strong);
+}
+
+.account-name {
+  color: var(--color-text-weak);
+}
+
+.account-signout {
+  margin-top: var(--spacing-16);
+  height: 44px;
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-8);
+  background: var(--color-background-base);
+  color: var(--color-text-strong);
+  width: 100%;
+  cursor: pointer;
+}
+
+.account-signout:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.account-error {
+  color: var(--color-text-danger, #b42318);
+  margin-top: var(--spacing-12);
+}

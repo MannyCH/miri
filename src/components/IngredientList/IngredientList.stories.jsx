@@ -65,15 +65,15 @@ export const Interactive = () => {
         marginBottom: 'var(--spacing-16)',
         background: 'var(--color-background-sunken)',
         borderRadius: 'var(--corner-radius-8)',
-        fontSize: '14px',
-        color: 'var(--color-text-weak)',
-        lineHeight: '1.5'
+        color: 'var(--color-text-weak)'
       }}>
+        <span className="text-body-small-regular">
         <strong>Try it:</strong><br />
         👆 <strong>Tap</strong> to toggle strikethrough<br />
         👈 <strong>Swipe left</strong> to delete<br />
         <br />
         <em>(Use touch or trackpad for swipe)</em>
+        </span>
       </div>
       
       {items.length > 0 ? (
@@ -88,10 +88,9 @@ export const Interactive = () => {
           background: 'var(--color-background-raised)',
           padding: 'var(--spacing-24)',
           textAlign: 'center',
-          color: 'var(--color-text-weak)',
-          fontSize: '14px'
+          color: 'var(--color-text-weak)'
         }}>
-          All items deleted! 🎉
+          <span className="text-body-small-regular">All items deleted! 🎉</span>
         </div>
       )}
     </div>
