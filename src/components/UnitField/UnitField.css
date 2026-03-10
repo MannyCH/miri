@@ -1,0 +1,67 @@
+/*
+ * UnitField — Token mapping from Figma:
+ *   Stroke/Weak      → --color-stroke-weak        (input border)
+ *   Text/Strong      → --color-text-strong        (input value)
+ *   Text/Weak        → --color-text-weak          (label, unit)
+ *   corner-radius-8  → 8px
+ *   input frame: 94px wide, 56px tall, padding 16px horizontal
+ *   row gap: 16px
+ */
+
+.unit-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.unit-field-label {
+  color: var(--color-text-weak);
+}
+
+.unit-field-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-16);
+}
+
+.unit-field-input-frame {
+  width: 94px;
+  height: var(--spacing-56);
+  border-radius: var(--corner-radius-8);
+  border: 1px solid var(--color-stroke-weak);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-16);
+  box-sizing: border-box;
+}
+
+.unit-field-input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  color: var(--color-text-strong);
+}
+
+.unit-field-input:focus {
+  outline: none;
+}
+
+.unit-field-input::placeholder {
+  color: var(--color-text-weak);
+}
+
+/* Remove number input arrows */
+.unit-field-input[type='number']::-webkit-inner-spin-button,
+.unit-field-input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.unit-field-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.unit-field-unit {
+  color: var(--color-text-weak);
+}

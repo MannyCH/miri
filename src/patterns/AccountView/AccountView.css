@@ -1,0 +1,54 @@
+/*
+ * AccountView — Token mapping from Figma:
+ *   Background/Base  → --color-background-base (page background)
+ *   Text/Strong      → --color-text-strong     (page title, settings header)
+ *   spacing-16 page padding
+ *   spacing-16 gap between sections
+ */
+
+.account-view {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--color-background-base);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.account-view-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--spacing-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.account-view-header {
+  padding-bottom: 0;
+}
+
+.account-view-settings-title {
+  padding: var(--spacing-32) 0 var(--spacing-8);
+  color: var(--color-text-strong);
+}
+
+.account-view-calculate-link {
+  display: inline;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-strong);
+}
+
+.account-view-health-row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-32);
+}
+
+.account-view-navigation {
+  flex-shrink: 0;
+}

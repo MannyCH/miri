@@ -1,0 +1,26 @@
+/*
+ * SettingsSection — Token mapping from Figma:
+ *   Stroke/Weak      → --color-stroke-weak   (bottom border on header)
+ *   Text/Strong      → --color-text-strong   (title)
+ *   spacing-32 top, spacing-8 bottom before divider
+ */
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-8) 0;
+  border-bottom: 1px solid var(--color-stroke-weak);
+  color: var(--color-text-strong);
+}
+
+.settings-section-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}

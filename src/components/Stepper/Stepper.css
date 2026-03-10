@@ -1,0 +1,63 @@
+/*
+ * Stepper — Token mapping from Figma:
+ *   Fill/Brand weak  → --color-fill-brand-weak   (stepper background)
+ *   Stroke/Weak      → --color-stroke-weak        (border)
+ *   Text/Weak        → --color-text-weak          (label)
+ *   Text/Strong      → --color-text-strong        (count value)
+ *   corner-radius-8  → 8px
+ */
+
+.stepper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.stepper-label {
+  color: var(--color-text-weak);
+}
+
+.stepper-control {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: var(--spacing-56);
+  border-radius: var(--corner-radius-8);
+  border: 1px solid var(--color-stroke-weak);
+  background: var(--color-fill-brand-weak);
+  overflow: hidden;
+  width: fit-content;
+}
+
+.stepper-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-56);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-strong);
+  padding: 0 var(--spacing-16);
+  flex-shrink: 0;
+}
+
+.stepper-button:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.stepper-button:not(:disabled):hover {
+  background: var(--color-fill-hover);
+}
+
+.stepper-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--spacing-56);
+  color: var(--color-text-strong);
+  border-left: 1px solid var(--color-stroke-weak);
+  border-right: 1px solid var(--color-stroke-weak);
+  padding: 0 var(--spacing-8);
+}
