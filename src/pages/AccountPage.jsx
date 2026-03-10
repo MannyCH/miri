@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useUserPreferences } from '../hooks/useUserPreferences';
 import { AccountCard } from '../components/AccountCard/AccountCard';
 import { SettingsSection } from '../components/SettingsSection/SettingsSection';
 import { Stepper } from '../components/Stepper/Stepper';
@@ -25,11 +26,8 @@ const GOAL_OPTIONS = [
 ];
 
 export function AccountPage() {
-  const { user, signOut } = useAuth();
-  const [servings, setServings] = useState(2);
-  const [eatingStyle, setEatingStyle] = useState('');
-  const [goal, setGoal] = useState('');
-  const [bmr, setBmr] = useState('');
+  const { user, signOut, isAuthenticated } = useAuth();
+  const { preferences, updatePreferences, isLoading } = useUserPreferences(isAuthenticated);
 
   return (
     <main className="account-page">
@@ -50,22 +48,25 @@ export function AccountPage() {
         <SettingsSection title="Eating preferences">
           <Stepper
             label="How many people are you usually cooking for?"
-            value={servings}
+            value={preferences.servings}
             min={1}
             max={20}
-            onChange={setServings}
+            onChange={(servings) => updatePreferences({ servings })}
+            disabled={isLoading}
           />
           <SelectField
             label="How do you like to eat?"
             options={EATING_OPTIONS}
-            value={eatingStyle}
-            onChange={setEatingStyle}
+            value={preferences.eatingStyle}
+            onChange={(eatingStyle) => updatePreferences({ eatingStyle })}
+            disabled={isLoading}
           />
           <SelectField
             label="What's your goal?"
             options={GOAL_OPTIONS}
-            value={goal}
-            onChange={setGoal}
+            value={preferences.goal}
+            onChange={(goal) => updatePreferences({ goal })}
+            disabled={isLoading}
           />
         </SettingsSection>
 
@@ -73,13 +74,16 @@ export function AccountPage() {
           <UnitField
             label="Metabolic basal rate"
             unit="kcal"
-            value={bmr}
-            onChange={setBmr}
+            value={preferences.bmr}
+            onChange={(bmr) => updatePreferences({ bmr })}
             min={0}
             step={10}
+            disabled={isLoading}
           />
           <BmrCalculatorCard
-            onSave={({ bmr: calculated }) => setBmr(String(calculated ?? ''))}
+            onSave={({ bmr: calculated }) =>
+              updatePreferences({ bmr: String(calculated ?? '') })
+            }
           />
         </SettingsSection>
       </div>
