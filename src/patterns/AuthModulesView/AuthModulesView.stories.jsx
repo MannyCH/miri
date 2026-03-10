@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { AlertTriangle, Check } from 'react-feather';
+import { AlertTriangle, Check, Circle, EyeOff } from 'react-feather';
 import { Button } from '../../components/Button/Button';
 import { FormField } from '../../components/FormField/FormField';
 import './AuthModulesView.css';
@@ -43,10 +43,13 @@ export const SignInModule = {
         </FormField>
         <FormField label="Password" variant="filled">
           <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
+          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
+            <EyeOff size={18} />
+          </button>
           <span className="auth-modules-inline-link text-tiny-regular">Forgot password?</span>
         </FormField>
         <div className="auth-modules-button-row">
-          <Button variant="primary" showIcon={false}>Continue</Button>
+          <Button variant="primary" showIcon={false}>Log in</Button>
         </div>
         <p className="auth-modules-footer-copy text-body-small-regular">
           Don&apos;t have an account? <span className="auth-modules-footer-link text-body-small-bold-underlined">Sign up</span>
@@ -71,7 +74,28 @@ export const SignUpModule = {
         </FormField>
         <FormField label="Password" variant="filled">
           <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
+          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
+            <EyeOff size={18} />
+          </button>
         </FormField>
+        <ul className="auth-modules-password-requirements" aria-live="polite">
+          <li className="auth-modules-password-requirement">
+            <Circle size={14} aria-hidden="true" />
+            <span className="text-body-small-regular">at least 8 characters</span>
+          </li>
+          <li className="auth-modules-password-requirement">
+            <Circle size={14} aria-hidden="true" />
+            <span className="text-body-small-regular">at least 1 number</span>
+          </li>
+          <li className="auth-modules-password-requirement">
+            <Circle size={14} aria-hidden="true" />
+            <span className="text-body-small-regular">at least 1 uppercase letter</span>
+          </li>
+          <li className="auth-modules-password-requirement">
+            <Circle size={14} aria-hidden="true" />
+            <span className="text-body-small-regular">at least 1 special sign</span>
+          </li>
+        </ul>
         <div className="auth-modules-button-row">
           <Button variant="primary" showIcon={false}>Create Account</Button>
         </div>
@@ -98,8 +122,11 @@ export const VerifyEmailModule = {
               <input key={index} className="auth-modules-code-input text-body-regular" value="" readOnly />
             ))}
           </div>
-          <div className="auth-modules-button-row">
-            <Button variant="primary" showIcon={false}>Continue</Button>
+        <div className="auth-modules-verify-actions">
+          <Button variant="primary" showIcon={false}>Continue</Button>
+          <p className="auth-modules-footer-copy text-body-small-regular">
+            Code not received? <span className="auth-modules-footer-link text-body-small-bold-underlined">Resend code</span>
+          </p>
           </div>
         <span className="auth-modules-back-link text-body-small-bold-underlined">Back to login</span>
       </form>
@@ -115,13 +142,16 @@ export const VerifyEmailSuccess = {
         Enter the login code sent to:<br />
         laura@nicelydone.club
       </p>
+      <p className="auth-modules-verify-subtitle text-body-small-regular">
+        Account already exists. Please verify your email.
+      </p>
       <form className="auth-modules-form auth-modules-verify-form">
         <div className="auth-modules-code-group" role="group" aria-label="Verification code">
           {Array.from({ length: 6 }).map((_, index) => (
             <input key={index} className="auth-modules-code-input text-body-regular" value="4" readOnly />
           ))}
         </div>
-        <div className="auth-modules-button-row">
+        <div className="auth-modules-verify-actions">
           <Button
             variant="primary"
             showIcon
@@ -129,6 +159,10 @@ export const VerifyEmailSuccess = {
           >
             Verified
           </Button>
+          <p className="auth-modules-success-message text-body-small-bold">
+            <Check size={16} />
+            <span>Code resent</span>
+          </p>
         </div>
         <span className="auth-modules-back-link text-body-small-bold-underlined">Back to login</span>
       </form>
@@ -150,7 +184,7 @@ export const VerifyEmailError = {
             <input key={index} className="auth-modules-code-input text-body-regular" value="4" readOnly />
           ))}
         </div>
-        <div className="auth-modules-button-row">
+        <div className="auth-modules-verify-actions">
           <Button
             variant="primary"
             showIcon
@@ -158,6 +192,9 @@ export const VerifyEmailError = {
           >
             Wrong code
           </Button>
+          <p className="auth-modules-footer-copy text-body-small-regular">
+            Code not received? <span className="auth-modules-footer-link text-body-small-bold-underlined">Resend code</span>
+          </p>
         </div>
         <span className="auth-modules-back-link text-body-small-bold-underlined">Back to login</span>
       </form>
@@ -214,9 +251,15 @@ export const ResetPasswordModule = {
       <form className="auth-modules-form">
         <FormField label="New password" variant="filled">
           <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
+          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
+            <EyeOff size={18} />
+          </button>
         </FormField>
         <FormField label="Retype password" variant="filled">
           <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
+          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
+            <EyeOff size={18} />
+          </button>
         </FormField>
         <div className="auth-modules-button-row">
           <Button variant="primary" showIcon={false}>Update Password</Button>
