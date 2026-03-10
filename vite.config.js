@@ -10,6 +10,33 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return;
+          }
+
+          if (id.includes('/react/') || id.includes('/react-dom/')) {
+            return 'vendor-react';
+          }
+
+          if (id.includes('/react-router/') || id.includes('/react-router-dom/')) {
+            return 'vendor-router';
+          }
+
+          if (id.includes('/motion/') || id.includes('/framer-motion/')) {
+            return 'vendor-motion';
+          }
+
+          if (id.includes('/react-feather/')) {
+            return 'vendor-icons';
+          }
+        },
+      },
+    },
+  },
   test: {
     projects: [{
       extends: true,

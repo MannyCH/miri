@@ -1,7 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Navigate, useSearchParams } from 'react-router-dom';
+import { motion } from 'motion/react';
+import { AlertTriangle, Check, CheckCircle, Circle, Eye, EyeOff, Loader, X } from 'react-feather';
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useApp } from '../context/AppContext';
 import { Button } from '../components/Button/Button';
+import { FormField } from '../components/FormField/FormField';
 import './AuthPage.css';
 
 const AUTH_MODES = {
@@ -12,9 +16,20 @@ const AUTH_MODES = {
   VERIFY_EMAIL: 'verify-email',
 };
 const OTP_LENGTH = 6;
+const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_HAS_NUMBER_REGEX = /\d/;
+const PASSWORD_HAS_UPPERCASE_REGEX = /[A-Z]/;
+const PASSWORD_HAS_SPECIAL_REGEX = /[^A-Za-z0-9]/;
+const PENDING_SIGNUP_NAMES_STORAGE_KEY = 'miri-pending-signup-names';
+
+function normalizeEmailAddress(email) {
+  return String(email || '').trim().toLowerCase();
+}
 
 export function AuthPage() {
   const [params] = useSearchParams();
+  const location = useLocation();
+  const { showToast } = useApp();
   const { isAuthenticated, isAuthReady, signIn, signUp, requestPasswordReset, resetPassword, verifyEmail, sendVerificationCode } = useAuth();
   const hasTokenParam = Boolean(params.get('token'));
 
@@ -28,11 +43,14 @@ export function AuthPage() {
     if (tokenFromUrl && typeFromUrl === 'reset-password') {
       return AUTH_MODES.RESET_PASSWORD;
     }
+    if (location.pathname === '/auth/reset-password') {
+      return AUTH_MODES.RESET_PASSWORD;
+    }
     if (tokenFromUrl) {
       return AUTH_MODES.RESET_PASSWORD;
     }
     return AUTH_MODES.SIGN_IN;
-  }, [params]);
+  }, [location.pathname, params]);
 
   const [mode, setMode] = useState(initialMode);
   const [name, setName] = useState('');
@@ -47,6 +65,33 @@ export function AuthPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResendingCode, setIsResendingCode] = useState(false);
+  const [resendCodeActionState, setResendCodeActionState] = useState('default');
+  const [forgotActionState, setForgotActionState] = useState('default');
+  const [verifyActionState, setVerifyActionState] = useState('default');
+  const [resetActionState, setResetActionState] = useState('default');
+  const [signInToastMessage, setSignInToastMessage] = useState('');
+  const [signInEmailError, setSignInEmailError] = useState('');
+  const [signUpEmailError, setSignUpEmailError] = useState('');
+  const [signUpPasswordRulesTouched, setSignUpPasswordRulesTouched] = useState(false);
+  const [resetNewPasswordError, setResetNewPasswordError] = useState('');
+  const [resetConfirmPasswordError, setResetConfirmPasswordError] = useState('');
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [showResetNewPassword, setShowResetNewPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
+  const [showForgotLoadingIcon, setShowForgotLoadingIcon] = useState(false);
+  const [verifyInfoMessage, setVerifyInfoMessage] = useState('');
+  const [pendingSignUpNamesByEmail, setPendingSignUpNamesByEmail] = useState(() => {
+    try {
+      const stored = window.localStorage.getItem(PENDING_SIGNUP_NAMES_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch (_error) {
+      return {};
+    }
+  });
+  const suppressSignInBlurValidationRef = useRef(false);
+  const resendInFlightRef = useRef(false);
+  const resendSuccessTimeoutRef = useRef(null);
   const codeInputRefs = useRef([]);
 
   if (!isAuthReady) {
@@ -62,44 +107,136 @@ export function AuthPage() {
     setErrorMessage('');
   };
 
+  const rememberPendingSignUpName = (emailAddress, firstName) => {
+    const normalizedEmail = normalizeEmailAddress(emailAddress);
+    const normalizedName = String(firstName || '').trim();
+    if (!normalizedEmail || !normalizedName) {
+      return;
+    }
+    setPendingSignUpNamesByEmail((prev) => {
+      if (prev[normalizedEmail] === normalizedName) {
+        return prev;
+      }
+      const next = { ...prev, [normalizedEmail]: normalizedName };
+      window.localStorage.setItem(PENDING_SIGNUP_NAMES_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const clearPendingSignUpName = (emailAddress) => {
+    const normalizedEmail = normalizeEmailAddress(emailAddress);
+    if (!normalizedEmail) {
+      return;
+    }
+    setPendingSignUpNamesByEmail((prev) => {
+      if (!prev[normalizedEmail]) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[normalizedEmail];
+      window.localStorage.setItem(PENDING_SIGNUP_NAMES_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const clearAuthFormValues = () => {
+    setName('');
+    setEmail('');
+    setPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setVerificationCode('');
+    setVerifyToken(params.get('token') || '');
+    setVerifyEmailAddress('');
+    setVerifyInfoMessage('');
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    let forgotLoadingDelayTimer = null;
     setIsSubmitting(true);
     clearFeedback();
 
     try {
       if (mode === AUTH_MODES.SIGN_IN) {
+        const trimmedEmail = email.trim();
+        if (!EMAIL_FORMAT_REGEX.test(trimmedEmail)) {
+          setSignInEmailError('Please enter a valid email address.');
+          return;
+        }
+        setSignInEmailError('');
         await signIn({ email, password });
         return;
       }
 
       if (mode === AUTH_MODES.SIGN_UP) {
-        await signUp({ name, email, password });
-        setMessage('Account created. Enter your email code to verify.');
+        const trimmedEmail = normalizeEmailAddress(email);
+        if (!EMAIL_FORMAT_REGEX.test(trimmedEmail)) {
+          setSignUpEmailError('Please enter a valid email address.');
+          return;
+        }
+        setSignUpEmailError('');
+        const rememberedName = pendingSignUpNamesByEmail[trimmedEmail];
+        const signUpName = rememberedName || String(name || '').trim();
+        const allPasswordRulesMet = (
+          signUpPasswordChecks.minLength
+          && signUpPasswordChecks.hasNumber
+          && signUpPasswordChecks.hasUppercase
+          && signUpPasswordChecks.hasSpecial
+        );
+        if (!allPasswordRulesMet) {
+          setSignUpPasswordRulesTouched(true);
+          return;
+        }
+        await signUp({ name: signUpName, email: trimmedEmail, password });
+        rememberPendingSignUpName(trimmedEmail, signUpName);
+        setName(signUpName);
         setVerifyEmailAddress(email);
         setMode(AUTH_MODES.VERIFY_EMAIL);
         setPassword('');
+        setSignUpPasswordRulesTouched(false);
         return;
       }
 
       if (mode === AUTH_MODES.FORGOT_PASSWORD) {
+        setShowForgotLoadingIcon(false);
+        forgotLoadingDelayTimer = setTimeout(() => {
+          setShowForgotLoadingIcon(true);
+        }, 2000);
         await requestPasswordReset({
           email,
-          redirectTo: `${window.location.origin}/auth?mode=reset-password`,
+          redirectTo: `${window.location.origin}/auth/reset-password`,
         });
-        setMessage('Password reset email sent.');
+        clearTimeout(forgotLoadingDelayTimer);
+        setShowForgotLoadingIcon(false);
+        setForgotActionState('success');
+        setTimeout(() => {
+          setForgotActionState('default');
+        }, 3000);
         return;
       }
 
       if (mode === AUTH_MODES.RESET_PASSWORD) {
+        setResetNewPasswordError('');
+        setResetConfirmPasswordError('');
         if (!verifyToken) {
-          throw new Error('Missing reset token. Open the reset link from your email again.');
+          setResetNewPasswordError('Missing reset token. Open the reset link from your email again.');
+          return;
         }
         if (newPassword !== confirmPassword) {
-          throw new Error('Passwords do not match.');
+          setResetConfirmPasswordError('Passwords do not match.');
+          return;
+        }
+        if (password && newPassword === password) {
+          setResetNewPasswordError('New password must be different from your current password.');
+          return;
         }
         await resetPassword({ token: verifyToken, newPassword });
-        setMessage('Password updated. You can now sign in.');
+        setResetActionState('success');
+        setSignInToastMessage('Password has been updated successfully.');
+        setTimeout(() => {
+          setSignInToastMessage('');
+        }, 4000);
         setMode(AUTH_MODES.SIGN_IN);
         setPassword('');
         setNewPassword('');
@@ -114,31 +251,80 @@ export function AuthPage() {
           throw new Error('Enter email + verification code, or paste a verification token.');
         }
 
-        await verifyEmail({
+        const verifyResult = await verifyEmail({
           token: verifyToken,
           email: verifyEmailAddress,
           code: verificationCode,
         });
-        setMessage('Email verified. You can now sign in.');
+        setVerifyActionState('success');
+        const normalizedVerifyEmail = normalizeEmailAddress(verifyEmailAddress || email);
+        const welcomeName = verifyResult?.session?.user?.name
+          || verifyResult?.user?.name
+          || pendingSignUpNamesByEmail[normalizedVerifyEmail]
+          || name.trim()
+          || verifyEmailAddress.split('@')[0]
+          || 'there';
+        showToast('Success', `Welcome to Miri, ${welcomeName}. Account successfully created.`);
+        clearPendingSignUpName(normalizedVerifyEmail);
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+        setVerifyInfoMessage('');
         setMode(AUTH_MODES.SIGN_IN);
         return;
       }
     } catch (error) {
+      if (forgotLoadingDelayTimer) {
+        clearTimeout(forgotLoadingDelayTimer);
+      }
+      setShowForgotLoadingIcon(false);
       const authErrorMessage = error.message || 'Authentication failed.';
+      if (mode === AUTH_MODES.VERIFY_EMAIL) {
+        setVerifyActionState('error');
+      }
+      if (mode === AUTH_MODES.RESET_PASSWORD) {
+        setResetActionState('error');
+        if (/same old|same as old|different from your current|must be different/i.test(authErrorMessage)) {
+          setResetNewPasswordError(authErrorMessage);
+          setErrorMessage('');
+          return;
+        }
+      }
       if (mode === AUTH_MODES.SIGN_IN && /email not verified/i.test(authErrorMessage)) {
         setMode(AUTH_MODES.VERIFY_EMAIL);
         setVerifyEmailAddress(email);
-        setMessage('Enter the verification code from your email.');
+        setVerifyInfoMessage('');
+        setErrorMessage('');
+      } else if (mode === AUTH_MODES.SIGN_UP && /user already exists/i.test(authErrorMessage)) {
+        const normalizedEmail = normalizeEmailAddress(email);
+        const rememberedName = pendingSignUpNamesByEmail[normalizedEmail];
+        if (rememberedName) {
+          setName(rememberedName);
+        }
+        try {
+          await sendVerificationCode({ email: normalizedEmail });
+        } catch (_resendError) {
+          // Keep UX focused on verify step even if resend fails transiently.
+        }
+        setVerifyEmailAddress(normalizedEmail);
+        setVerifyInfoMessage('Account already exists. Please verify your email.');
+        setMode(AUTH_MODES.VERIFY_EMAIL);
         setErrorMessage('');
       } else {
         setErrorMessage(authErrorMessage);
       }
     } finally {
+      if (forgotLoadingDelayTimer) {
+        clearTimeout(forgotLoadingDelayTimer);
+      }
+      setShowForgotLoadingIcon(false);
       setIsSubmitting(false);
     }
   };
 
   const handleResendCode = async () => {
+    if (resendInFlightRef.current || resendCodeActionState === 'success') {
+      return;
+    }
+    resendInFlightRef.current = true;
     clearFeedback();
     setIsResendingCode(true);
     try {
@@ -146,27 +332,209 @@ export function AuthPage() {
         throw new Error('Enter your email first.');
       }
       await sendVerificationCode({ email: verifyEmailAddress });
-      setMessage('Verification code sent.');
+      setVerificationCode('');
+      codeInputRefs.current[0]?.focus();
+      setResendCodeActionState('success');
+      if (resendSuccessTimeoutRef.current) {
+        clearTimeout(resendSuccessTimeoutRef.current);
+      }
+      resendSuccessTimeoutRef.current = setTimeout(() => {
+        setResendCodeActionState('default');
+        resendSuccessTimeoutRef.current = null;
+      }, 3000);
     } catch (error) {
       setErrorMessage(error.message || 'Could not send verification code.');
     } finally {
       setIsResendingCode(false);
+      resendInFlightRef.current = false;
     }
   };
 
-  const handleCodeDigitChange = (index, value) => {
-    const lastTypedChar = value.slice(-1);
-    if (lastTypedChar && !/^\d$/.test(lastTypedChar)) {
+  const resetModeUiState = (nextMode) => {
+    clearAuthFormValues();
+    clearFeedback();
+    setSignInEmailError('');
+    setSignUpEmailError('');
+    setSignUpPasswordRulesTouched(false);
+    setResetNewPasswordError('');
+    setResetConfirmPasswordError('');
+    setShowForgotLoadingIcon(false);
+    setForgotActionState('default');
+    setVerifyActionState('default');
+    setResetActionState('default');
+    setResendCodeActionState('default');
+    setSignInToastMessage('');
+    setVerifyInfoMessage('');
+    resendInFlightRef.current = false;
+    if (resendSuccessTimeoutRef.current) {
+      clearTimeout(resendSuccessTimeoutRef.current);
+      resendSuccessTimeoutRef.current = null;
+    }
+    setMode(nextMode);
+    setTimeout(() => {
+      suppressSignInBlurValidationRef.current = false;
+    }, 0);
+  };
+
+  const resolveSignInFieldError = (rawMessage) => {
+    const normalized = String(rawMessage || '').toLowerCase();
+    if (!normalized) return { email: '', password: '', generic: '' };
+    if (normalized.includes('invalid email or password')) {
+      return { email: '', password: rawMessage, generic: '' };
+    }
+    if (normalized.includes('email') && !normalized.includes('password') && !normalized.includes('credential')) {
+      return { email: rawMessage, password: '', generic: '' };
+    }
+    if (
+      normalized.includes('password')
+      || normalized.includes('credential')
+      || normalized.includes('invalid')
+      || normalized.includes('wrong')
+    ) {
+      return { email: '', password: rawMessage, generic: '' };
+    }
+    return { email: '', password: '', generic: rawMessage };
+  };
+
+  const resolveSignUpFieldError = (rawMessage) => {
+    const normalized = String(rawMessage || '').toLowerCase();
+    if (!normalized) return { email: '', generic: '' };
+    if (normalized.includes('user already exists')) {
+      return { email: rawMessage, generic: '' };
+    }
+    return { email: '', generic: rawMessage };
+  };
+
+  const handleSignInEmailChange = (event) => {
+    const nextEmailValue = event.target.value;
+    setEmail(nextEmailValue);
+    if (signInEmailError) {
+      setSignInEmailError('');
+    }
+  };
+
+  const handleSignInEmailBlur = () => {
+    if (suppressSignInBlurValidationRef.current) {
+      setSignInEmailError('');
       return;
     }
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setSignInEmailError('');
+      return;
+    }
+    if (!EMAIL_FORMAT_REGEX.test(trimmedEmail)) {
+      setSignInEmailError('Please enter a valid email address.');
+      return;
+    }
+    setSignInEmailError('');
+  };
 
+  const handleSignUpEmailChange = (event) => {
+    const nextEmailValue = event.target.value;
+    setEmail(nextEmailValue);
+    if (signUpEmailError) {
+      setSignUpEmailError('');
+    }
+  };
+
+  const handleSignUpEmailBlur = () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setSignUpEmailError('');
+      return;
+    }
+    if (!EMAIL_FORMAT_REGEX.test(trimmedEmail)) {
+      setSignUpEmailError('Please enter a valid email address.');
+      return;
+    }
+    setSignUpEmailError('');
+  };
+
+  const handleResetNewPasswordChange = (event) => {
+    setNewPassword(event.target.value);
+    if (resetNewPasswordError) {
+      setResetNewPasswordError('');
+    }
+    if (resetConfirmPasswordError) {
+      setResetConfirmPasswordError('');
+    }
+  };
+
+  const handleResetConfirmPasswordChange = (event) => {
+    setConfirmPassword(event.target.value);
+    if (resetConfirmPasswordError) {
+      setResetConfirmPasswordError('');
+    }
+  };
+
+  const handleResetConfirmPasswordBlur = () => {
+    if (!confirmPassword) {
+      setResetConfirmPasswordError('');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setResetConfirmPasswordError('Passwords do not match.');
+      return;
+    }
+    if (password && newPassword === password) {
+      setResetNewPasswordError('New password must be different from your current password.');
+      return;
+    }
+    setResetConfirmPasswordError('');
+  };
+
+  const signUpPasswordChecks = {
+    minLength: password.length >= 8,
+    hasNumber: PASSWORD_HAS_NUMBER_REGEX.test(password),
+    hasUppercase: PASSWORD_HAS_UPPERCASE_REGEX.test(password),
+    hasSpecial: PASSWORD_HAS_SPECIAL_REGEX.test(password),
+  };
+
+  const animatedIcon = (type) => {
+    if (type === 'success') {
+      return (
+        <motion.span initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.2 }}>
+          <Check size={18} />
+        </motion.span>
+      );
+    }
+    if (type === 'error') {
+      return (
+        <motion.span initial={{ rotate: -12, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} transition={{ duration: 0.2 }}>
+          <AlertTriangle size={18} />
+        </motion.span>
+      );
+    }
+    if (type === 'loading') {
+      return (
+        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+          <Loader size={18} className="auth-spinning-icon" />
+        </motion.span>
+      );
+    }
+    return null;
+  };
+
+  const handleCodeDigitChange = (index, value) => {
+    const digits = value.replace(/\D/g, '');
+    if (!digits) {
+      const nextChars = verificationCode.padEnd(OTP_LENGTH, ' ').split('');
+      nextChars[index] = ' ';
+      setVerificationCode(nextChars.join('').trimEnd());
+      return;
+    }
     const nextChars = verificationCode.padEnd(OTP_LENGTH, ' ').split('');
-    nextChars[index] = lastTypedChar || ' ';
+    const codeSlice = digits.slice(0, OTP_LENGTH - index).split('');
+    codeSlice.forEach((digit, offset) => {
+      nextChars[index + offset] = digit;
+    });
     const nextCode = nextChars.join('').trimEnd();
     setVerificationCode(nextCode);
 
-    if (lastTypedChar && index < OTP_LENGTH - 1) {
-      codeInputRefs.current[index + 1]?.focus();
+    const nextFocusIndex = Math.min(index + codeSlice.length, OTP_LENGTH - 1);
+    if (codeSlice.length > 0) {
+      codeInputRefs.current[nextFocusIndex]?.focus();
     }
   };
 
@@ -176,51 +544,84 @@ export function AuthPage() {
     }
   };
 
+  const handleCodePaste = (index, event) => {
+    event.preventDefault();
+    const pastedText = event.clipboardData.getData('text');
+    handleCodeDigitChange(index, pastedText);
+  };
+
   const renderSignInContent = () => (
     <>
       <h1 className="auth-title text-h2-bold">Log in to Miri</h1>
+      {signInToastMessage ? (
+        <div className="auth-success-message text-body-small-bold">
+          <Check size={16} aria-hidden="true" />
+          <span>{signInToastMessage}</span>
+        </div>
+      ) : null}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-field">
-          <span className="text-body-small-regular">Email</span>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate>
+        <FormField
+          label="Email"
+          variant={(signInEmailError || resolveSignInFieldError(errorMessage).email) ? 'error' : 'filled'}
+          message={signInEmailError || resolveSignInFieldError(errorMessage).email}
+        >
           <input
             type="email"
             className="text-body-regular"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={handleSignInEmailChange}
+            onBlur={handleSignInEmailBlur}
             required
             autoComplete="email"
           />
-        </label>
+        </FormField>
 
-        <label className="auth-field">
-          <span className="text-body-small-regular">Password</span>
+        <FormField
+          label="Password"
+          variant={resolveSignInFieldError(errorMessage).password ? 'error' : 'filled'}
+          message={resolveSignInFieldError(errorMessage).password}
+        >
           <input
-            type="password"
+            type={showSignInPassword ? 'text' : 'password'}
             className="text-body-regular"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
             autoComplete="current-password"
           />
-        </label>
+          <button
+            type="button"
+            className="auth-password-toggle"
+            onClick={() => setShowSignInPassword((prev) => !prev)}
+            aria-label={showSignInPassword ? 'Hide password' : 'Show password'}
+          >
+            {showSignInPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
+          </button>
+        </FormField>
 
         <div className="auth-field-meta">
           <button
             type="button"
             className="auth-field-link text-tiny-regular"
-            onClick={() => { clearFeedback(); setMode(AUTH_MODES.FORGOT_PASSWORD); }}
+            onClick={() => resetModeUiState(AUTH_MODES.FORGOT_PASSWORD)}
+            onMouseDown={() => {
+              suppressSignInBlurValidationRef.current = true;
+            }}
           >
             Forgot password?
           </button>
         </div>
 
-        {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
-        {message ? <p className="auth-message">{message}</p> : null}
+        {resolveSignInFieldError(errorMessage).generic ? (
+          <p className="auth-error">{resolveSignInFieldError(errorMessage).generic}</p>
+        ) : null}
 
-        <Button variant="primary" showIcon={false} type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Please wait...' : 'Continue'}
-        </Button>
+        <div className="auth-button-row">
+          <Button variant="primary" showIcon={false} type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Please wait...' : 'Log in'}
+          </Button>
+        </div>
       </form>
 
       <p className="auth-footer-copy text-body-small-regular">
@@ -228,7 +629,10 @@ export function AuthPage() {
         <button
           type="button"
           className="auth-footer-link text-body-small-bold-underlined"
-          onClick={() => { clearFeedback(); setMode(AUTH_MODES.SIGN_UP); }}
+          onClick={() => resetModeUiState(AUTH_MODES.SIGN_UP)}
+          onMouseDown={() => {
+            suppressSignInBlurValidationRef.current = true;
+          }}
         >
           Sign up
         </button>
@@ -244,10 +648,12 @@ export function AuthPage() {
         <br />
         {verifyEmailAddress || email || 'your email'}
       </p>
+      {verifyInfoMessage ? (
+        <p className="auth-verify-info text-body-small-regular">{verifyInfoMessage}</p>
+      ) : null}
 
       {!verifyEmailAddress ? (
-        <label className="auth-field">
-          <span>Email</span>
+        <FormField label="Email" variant="filled">
           <input
             type="email"
             className="text-body-regular"
@@ -256,7 +662,7 @@ export function AuthPage() {
             autoComplete="email"
             required
           />
-        </label>
+        </FormField>
       ) : null}
 
       <form className="auth-form auth-verify-form" onSubmit={handleSubmit}>
@@ -275,42 +681,58 @@ export function AuthPage() {
               value={verificationCode[index] || ''}
               onChange={(event) => handleCodeDigitChange(index, event.target.value)}
               onKeyDown={(event) => handleCodeKeyDown(index, event)}
+              onPaste={(event) => handleCodePaste(index, event)}
             />
           ))}
         </div>
 
         {hasTokenParam ? (
-          <label className="auth-field">
-            <span>Verification token</span>
+          <FormField label="Verification token" variant="filled">
             <input
               type="text"
               className="text-body-regular"
               value={verifyToken}
               onChange={(event) => setVerifyToken(event.target.value)}
             />
-          </label>
+          </FormField>
         ) : null}
 
         {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
-        {message ? <p className="auth-message">{message}</p> : null}
 
-        <Button variant="primary" showIcon={false} type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Verifying...' : 'Continue'}
-        </Button>
+        <div className="auth-button-row auth-verify-actions">
+          <Button
+            variant="primary"
+            showIcon={verifyActionState !== 'default'}
+            icon={verifyActionState === 'success' ? animatedIcon('success') : verifyActionState === 'error' ? animatedIcon('error') : null}
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Verifying...' : verifyActionState === 'success' ? 'Verified' : verifyActionState === 'error' ? 'Wrong code' : 'Continue'}
+          </Button>
+          {resendCodeActionState === 'success' ? (
+            <p className="auth-success-message text-body-small-bold">
+              <Check size={16} aria-hidden="true" />
+              <span>Code resent</span>
+            </p>
+          ) : (
+            <p className="auth-footer-copy text-body-small-regular">
+              Code not received?{' '}
+              <button
+                type="button"
+                className="auth-footer-link text-body-small-bold-underlined"
+                onClick={handleResendCode}
+                disabled={isResendingCode}
+              >
+                Resend code
+              </button>
+            </p>
+          )}
+        </div>
       </form>
-
-      <button
-        type="button"
-        className="auth-inline-link text-tiny-regular"
-        onClick={handleResendCode}
-        disabled={isResendingCode}
-      >
-        {isResendingCode ? 'Sending code...' : 'Resend code'}
-      </button>
       <button
         type="button"
         className="auth-inline-link text-body-small-bold-underlined"
-        onClick={() => { clearFeedback(); setMode(AUTH_MODES.SIGN_IN); }}
+        onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
       >
         Back to login
       </button>
@@ -323,8 +745,7 @@ export function AuthPage() {
       <p className="auth-subtitle text-body-regular">Start planning meals with Miri.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-field">
-          <span className="text-body-small-regular">Name</span>
+        <FormField label="First name" variant="filled">
           <input
             type="text"
             className="text-body-regular"
@@ -333,39 +754,99 @@ export function AuthPage() {
             required
             autoComplete="name"
           />
-        </label>
+        </FormField>
 
-        <label className="auth-field">
-          <span className="text-body-small-regular">Email</span>
+        <FormField
+          label="Email"
+          variant={(signUpEmailError || resolveSignUpFieldError(errorMessage).email) ? 'error' : 'filled'}
+          message={signUpEmailError || resolveSignUpFieldError(errorMessage).email}
+        >
           <input
             type="email"
             className="text-body-regular"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={handleSignUpEmailChange}
+            onBlur={handleSignUpEmailBlur}
             required
             autoComplete="email"
           />
-        </label>
+        </FormField>
 
-        <label className="auth-field">
-          <span className="text-body-small-regular">Password</span>
+        <FormField label="Password" variant="filled">
           <input
-            type="password"
+            type={showSignUpPassword ? 'text' : 'password'}
             className="text-body-regular"
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => {
+              setPassword(event.target.value);
+            }}
             required
             autoComplete="new-password"
           />
-        </label>
+          <button
+            type="button"
+            className="auth-password-toggle"
+            onClick={() => setShowSignUpPassword((prev) => !prev)}
+            aria-label={showSignUpPassword ? 'Hide password' : 'Show password'}
+          >
+            {showSignUpPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
+          </button>
+        </FormField>
 
-        {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
-        {message ? <p className="auth-message">{message}</p> : null}
+        <ul className="auth-password-requirements" aria-live="polite">
+          <li className={`auth-password-requirement ${signUpPasswordChecks.minLength ? 'is-met' : ''} ${!signUpPasswordChecks.minLength && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
+            {signUpPasswordChecks.minLength
+              ? <CheckCircle size={14} aria-hidden="true" />
+              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
+            <span className={signUpPasswordChecks.minLength ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
+              at least 8 characters
+            </span>
+          </li>
+          <li className={`auth-password-requirement ${signUpPasswordChecks.hasNumber ? 'is-met' : ''} ${!signUpPasswordChecks.hasNumber && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
+            {signUpPasswordChecks.hasNumber
+              ? <CheckCircle size={14} aria-hidden="true" />
+              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
+            <span className={signUpPasswordChecks.hasNumber ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
+              at least 1 number
+            </span>
+          </li>
+          <li className={`auth-password-requirement ${signUpPasswordChecks.hasUppercase ? 'is-met' : ''} ${!signUpPasswordChecks.hasUppercase && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
+            {signUpPasswordChecks.hasUppercase
+              ? <CheckCircle size={14} aria-hidden="true" />
+              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
+            <span className={signUpPasswordChecks.hasUppercase ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
+              at least 1 uppercase letter
+            </span>
+          </li>
+          <li className={`auth-password-requirement ${signUpPasswordChecks.hasSpecial ? 'is-met' : ''} ${!signUpPasswordChecks.hasSpecial && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
+            {signUpPasswordChecks.hasSpecial
+              ? <CheckCircle size={14} aria-hidden="true" />
+              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
+            <span className={signUpPasswordChecks.hasSpecial ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
+              at least 1 special sign
+            </span>
+          </li>
+        </ul>
 
-        <Button variant="primary" showIcon={false} type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Please wait...' : 'Create account'}
-        </Button>
+        {resolveSignUpFieldError(errorMessage).generic ? <p className="auth-error">{resolveSignUpFieldError(errorMessage).generic}</p> : null}
+
+        <div className="auth-button-row">
+          <Button variant="primary" showIcon={false} type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Please wait...' : 'Create Account'}
+          </Button>
+        </div>
       </form>
+
+      <p className="auth-footer-copy text-body-small-regular">
+        Already have an account?{' '}
+        <button
+          type="button"
+          className="auth-footer-link text-body-small-bold-underlined"
+          onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
+        >
+          Log in
+        </button>
+      </p>
 
     </>
   );
@@ -376,8 +857,7 @@ export function AuthPage() {
       <p className="auth-subtitle text-body-regular">We&apos;ll send a reset link to your email.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-field">
-          <span className="text-body-small-regular">Email</span>
+        <FormField label="Email" variant="filled">
           <input
             type="email"
             className="text-body-regular"
@@ -386,20 +866,27 @@ export function AuthPage() {
             required
             autoComplete="email"
           />
-        </label>
+        </FormField>
 
         {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
-        {message ? <p className="auth-message">{message}</p> : null}
 
-        <Button variant="primary" showIcon={false} type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Please wait...' : 'Send reset email'}
-        </Button>
+        <div className="auth-button-row">
+          <Button
+            variant="primary"
+            showIcon={forgotActionState === 'success' || (isSubmitting && showForgotLoadingIcon)}
+            icon={forgotActionState === 'success' ? animatedIcon('success') : (isSubmitting && showForgotLoadingIcon ? animatedIcon('loading') : null)}
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {forgotActionState === 'success' ? 'Sent' : 'Send reset mail'}
+          </Button>
+        </div>
       </form>
 
       <button
         type="button"
-        className="auth-inline-link"
-        onClick={() => { clearFeedback(); setMode(AUTH_MODES.SIGN_IN); }}
+        className="auth-inline-link text-body-small-bold-underlined"
+        onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
       >
         Back to login
       </button>
@@ -412,41 +899,71 @@ export function AuthPage() {
       <p className="auth-subtitle text-body-regular">Create a new password to continue.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-field">
-          <span className="text-body-small-regular">New password</span>
+        <FormField
+          label="New password"
+          variant={resetNewPasswordError ? 'error' : 'filled'}
+          message={resetNewPasswordError}
+        >
           <input
-            type="password"
+            type={showResetNewPassword ? 'text' : 'password'}
             className="text-body-regular"
             value={newPassword}
-            onChange={(event) => setNewPassword(event.target.value)}
+            onChange={handleResetNewPasswordChange}
             required
             autoComplete="new-password"
           />
-        </label>
-        <label className="auth-field">
-          <span className="text-body-small-regular">Retype password</span>
+          <button
+            type="button"
+            className="auth-password-toggle"
+            onClick={() => setShowResetNewPassword((prev) => !prev)}
+            aria-label={showResetNewPassword ? 'Hide password' : 'Show password'}
+          >
+            {showResetNewPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
+          </button>
+        </FormField>
+        <FormField
+          label="Retype password"
+          variant={resetConfirmPasswordError ? 'error' : 'filled'}
+          message={resetConfirmPasswordError}
+        >
           <input
-            type="password"
+            type={showResetConfirmPassword ? 'text' : 'password'}
             className="text-body-regular"
             value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
+            onChange={handleResetConfirmPasswordChange}
+            onBlur={handleResetConfirmPasswordBlur}
             required
             autoComplete="new-password"
           />
-        </label>
+          <button
+            type="button"
+            className="auth-password-toggle"
+            onClick={() => setShowResetConfirmPassword((prev) => !prev)}
+            aria-label={showResetConfirmPassword ? 'Hide password' : 'Show password'}
+          >
+            {showResetConfirmPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
+          </button>
+        </FormField>
 
-        {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
-        {message ? <p className="auth-message">{message}</p> : null}
+        {errorMessage && !resetNewPasswordError && !resetConfirmPasswordError ? <p className="auth-error">{errorMessage}</p> : null}
 
-        <Button variant="primary" showIcon={false} type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Please wait...' : 'Update password'}
-        </Button>
+        <div className="auth-button-row">
+          <Button
+            variant="primary"
+            showIcon={resetActionState !== 'default'}
+            icon={resetActionState === 'success' ? animatedIcon('success') : resetActionState === 'error' ? animatedIcon('error') : null}
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Please wait...' : resetActionState === 'success' ? 'Updated' : resetActionState === 'error' ? 'Try again' : 'Update Password'}
+          </Button>
+        </div>
       </form>
 
       <button
         type="button"
-        className="auth-inline-link"
-        onClick={() => { clearFeedback(); setMode(AUTH_MODES.SIGN_IN); }}
+        className="auth-inline-link text-body-small-bold-underlined"
+        onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
       >
         Back to login
       </button>

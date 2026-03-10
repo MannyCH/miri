@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { MealPlanningPage } from './pages/MealPlanningPage';
-import { RecipesPage } from './pages/RecipesPage';
-import { RecipeDetailPage } from './pages/RecipeDetailPage';
-import { ShoppingListPage } from './pages/ShoppingListPage';
-import { AuthPage } from './pages/AuthPage';
-import { AccountPage } from './pages/AccountPage';
 import { ToastContainer } from './components/ToastContainer';
 import './index.css';
+
+const MealPlanningPage = lazy(() => import('./pages/MealPlanningPage').then((module) => ({ default: module.MealPlanningPage })));
+const RecipesPage = lazy(() => import('./pages/RecipesPage').then((module) => ({ default: module.RecipesPage })));
+const RecipeDetailPage = lazy(() => import('./pages/RecipeDetailPage').then((module) => ({ default: module.RecipeDetailPage })));
+const ShoppingListPage = lazy(() => import('./pages/ShoppingListPage').then((module) => ({ default: module.ShoppingListPage })));
+const AuthPage = lazy(() => import('./pages/AuthPage').then((module) => ({ default: module.AuthPage })));
+const AccountPage = lazy(() => import('./pages/AccountPage').then((module) => ({ default: module.AccountPage })));
 
 /**
  * Miri - Meal Planning App
@@ -33,33 +34,43 @@ function AppContent() {
   
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Navigate to={isAuthenticated ? '/planning' : '/auth'} replace />} />
-        <Route
-          path="/auth"
-          element={isAuthenticated ? <Navigate to="/planning" replace /> : <AuthPage />}
-        />
-        <Route
-          path="/planning"
-          element={isAuthenticated ? <MealPlanningPage /> : <Navigate to="/auth" replace />}
-        />
-        <Route
-          path="/recipes"
-          element={isAuthenticated ? <RecipesPage /> : <Navigate to="/auth" replace />}
-        />
-        <Route
-          path="/recipes/:id"
-          element={isAuthenticated ? <RecipeDetailPage /> : <Navigate to="/auth" replace />}
-        />
-        <Route
-          path="/shopping-list"
-          element={isAuthenticated ? <ShoppingListPage /> : <Navigate to="/auth" replace />}
-        />
-        <Route
-          path="/account"
-          element={isAuthenticated ? <AccountPage /> : <Navigate to="/auth" replace />}
-        />
-      </Routes>
+      <Suspense fallback={<div>Loading page...</div>}>
+        <Routes>
+          <Route path="/" element={<Navigate to={isAuthenticated ? '/planning' : '/auth'} replace />} />
+          <Route
+            path="/auth"
+            element={isAuthenticated ? <Navigate to="/planning" replace /> : <AuthPage />}
+          />
+          <Route
+            path="/auth/reset-password"
+            element={isAuthenticated ? <Navigate to="/planning" replace /> : <AuthPage />}
+          />
+          <Route
+            path="/auth/verify-email"
+            element={isAuthenticated ? <Navigate to="/planning" replace /> : <AuthPage />}
+          />
+          <Route
+            path="/planning"
+            element={isAuthenticated ? <MealPlanningPage /> : <Navigate to="/auth" replace />}
+          />
+          <Route
+            path="/recipes"
+            element={isAuthenticated ? <RecipesPage /> : <Navigate to="/auth" replace />}
+          />
+          <Route
+            path="/recipes/:id"
+            element={isAuthenticated ? <RecipeDetailPage /> : <Navigate to="/auth" replace />}
+          />
+          <Route
+            path="/shopping-list"
+            element={isAuthenticated ? <ShoppingListPage /> : <Navigate to="/auth" replace />}
+          />
+          <Route
+            path="/account"
+            element={isAuthenticated ? <AccountPage /> : <Navigate to="/auth" replace />}
+          />
+        </Routes>
+      </Suspense>
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </>
   );
