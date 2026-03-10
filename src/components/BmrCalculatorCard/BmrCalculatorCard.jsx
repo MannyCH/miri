@@ -27,7 +27,12 @@ export function BmrCalculatorCard({ onSave }) {
   const expandedRef = useRef(null);
   const cardRef = useRef(null);
 
+  const scrollToCardStart = () => {
+    cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
   const handleToggle = () => {
+    if (isExpanded) scrollToCardStart();
     setIsExpanded((prev) => !prev);
   };
 
@@ -40,6 +45,7 @@ export function BmrCalculatorCard({ onSave }) {
   const handleSave = () => {
     const bmr = calculateBmr({ weightKg: weight, heightCm: height, gender });
     if (onSave) onSave({ bmr, weight, height, gender });
+    scrollToCardStart();
     setIsExpanded(false);
   };
 
