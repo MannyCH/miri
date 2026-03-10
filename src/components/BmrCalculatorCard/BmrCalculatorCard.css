@@ -61,17 +61,3 @@
   color: var(--color-text-weak);
 }
 
-.bmr-card-radio-label {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-8);
-  color: var(--color-text-strong);
-  cursor: pointer;
-}
-
-.bmr-card-radio {
-  accent-color: var(--color-fill-brand-strong);
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}

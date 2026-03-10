@@ -1,0 +1,61 @@
+/*
+ * RadioButton — Token mapping from Figma (node 318:4689 / 319:4739):
+ *   Icon/Brand          → --color-icon-brand       (#9C4722CC) outer ring stroke + inner dot fill
+ *   Text/Weak           → --color-text-weak         label text
+ *   Outer ring: 16×16px, stroke 1.6px, no fill
+ *   Inner dot: 8×8px, fill Icon/Brand at 80% opacity, visible when checked
+ *   Gap between radio and label: 8px (itemSpacing in Figma)
+ *   Label: IBM Plex Sans Regular 14px / 20px line-height (text-body-small-regular)
+ */
+
+.radio-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  cursor: pointer;
+}
+
+/* Hide the native input visually but keep it accessible */
+.radio-button-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.radio-button-circle {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.6px solid var(--color-icon-brand);
+  background: transparent;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radio-button-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-icon-brand);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.radio-button-input:checked + .radio-button-circle .radio-button-dot {
+  opacity: 0.8;
+}
+
+.radio-button-label {
+  color: var(--color-text-weak);
+}
+
+/* Focus ring for keyboard navigation */
+.radio-button-input:focus-visible + .radio-button-circle {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { UnitField } from '../UnitField/UnitField';
+import { RadioButton } from '../RadioButton/RadioButton';
 import { Button } from '../Button/Button';
 import './BmrCalculatorCard.css';
 
@@ -64,9 +65,16 @@ export function BmrCalculatorCard({ onSave }) {
             ref={expandedRef}
             className="bmr-card-expanded"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            animate={{
+              height: 'auto',
+              opacity: 1,
+              transition: { type: 'tween', duration: 0.32, ease: [0.4, 0, 0.2, 1] },
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+              transition: { type: 'tween', duration: 0.25, ease: [0.4, 0, 1, 1] },
+            }}
             onAnimationComplete={handleAnimationComplete}
           >
             <div className="bmr-card-fields">
@@ -89,17 +97,14 @@ export function BmrCalculatorCard({ onSave }) {
                   Gender
                 </span>
                 {GENDER_OPTIONS.map((opt) => (
-                  <label key={opt.value} className="bmr-card-radio-label text-body-small-regular">
-                    <input
-                      type="radio"
-                      name="bmr-gender"
-                      value={opt.value}
-                      checked={gender === opt.value}
-                      onChange={() => setGender(opt.value)}
-                      className="bmr-card-radio"
-                    />
-                    {opt.label}
-                  </label>
+                  <RadioButton
+                    key={opt.value}
+                    label={opt.label}
+                    value={opt.value}
+                    name="bmr-gender"
+                    checked={gender === opt.value}
+                    onChange={setGender}
+                  />
                 ))}
               </div>
             </div>
