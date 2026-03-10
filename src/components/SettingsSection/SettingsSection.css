@@ -1,8 +1,11 @@
 /*
  * SettingsSection — Token mapping from Figma:
- *   Stroke/Weak      → --color-stroke-weak   (bottom border on header)
- *   Text/Strong      → --color-text-strong   (title)
- *   spacing-32 top, spacing-8 bottom before divider
+ *   Stroke/Weak      → --color-stroke-weak        (bottom border on header)
+ *   Text/Strong      → --color-text-strong         (title)
+ *
+ *   spacing="normal"  → Figma node 314:4194 (Eating preferences header):  padding t:8  b:8
+ *   spacing="section" → Figma node 314:4197 (Advanced - Health header):   padding t:32 b:8
+ *   Internal content gap: 16px (Figma 314:4242, 314:4241)
  */
 
 .settings-section {
@@ -14,9 +17,17 @@
 .settings-section-header {
   display: flex;
   align-items: center;
-  padding: var(--spacing-8) 0;
+  padding-bottom: var(--spacing-8);
   border-bottom: 1px solid var(--color-stroke-weak);
   color: var(--color-text-strong);
+}
+
+.settings-section-header--normal {
+  padding-top: var(--spacing-8);
+}
+
+.settings-section-header--section {
+  padding-top: var(--spacing-32);
 }
 
 .settings-section-content {

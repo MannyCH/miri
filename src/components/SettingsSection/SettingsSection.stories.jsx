@@ -45,3 +45,19 @@ export const WithFields = {
     </SettingsSection>
   ),
 };
+
+export const SectionSpacing = {
+  name: 'spacing="section" (Advanced sections)',
+  render: () => (
+    <div>
+      <SettingsSection title="Eating preferences">
+        <p style={{ margin: 0, color: 'var(--color-text-weak)' }}>First section</p>
+      </SettingsSection>
+      <SettingsSection title="Advanced - Health" spacing="section">
+        <p style={{ margin: 0, color: 'var(--color-text-weak)' }}>
+          Second section — 32px top padding separates it from the first
+        </p>
+      </SettingsSection>
+    </div>
+  ),
+};
