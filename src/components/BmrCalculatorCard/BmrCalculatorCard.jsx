@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { UnitField } from '../UnitField/UnitField';
 import { Button } from '../Button/Button';
@@ -23,6 +23,18 @@ export function BmrCalculatorCard({ onSave }) {
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [gender, setGender] = useState('');
+  const expandedRef = useRef(null);
+  const cardRef = useRef(null);
+
+  const handleToggle = () => {
+    setIsExpanded((prev) => !prev);
+  };
+
+  const handleAnimationComplete = () => {
+    if (isExpanded) {
+      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  };
 
   const handleSave = () => {
     const bmr = calculateBmr({ weightKg: weight, heightCm: height, gender });
@@ -33,14 +45,14 @@ export function BmrCalculatorCard({ onSave }) {
   const canCalculate = weight && height && gender;
 
   return (
-    <div className="bmr-card">
+    <div className="bmr-card" ref={cardRef}>
       <p className="bmr-card-question text-body-small-regular">
         Not sure how much kcal you need?
       </p>
       <button
         type="button"
         className="bmr-card-link text-body-small-bold-underlined"
-        onClick={() => setIsExpanded((prev) => !prev)}
+        onClick={handleToggle}
         aria-expanded={isExpanded}
       >
         Calculate from height &amp; weight
@@ -49,11 +61,13 @@ export function BmrCalculatorCard({ onSave }) {
       <AnimatePresence initial={false}>
         {isExpanded ? (
           <motion.div
+            ref={expandedRef}
             className="bmr-card-expanded"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            onAnimationComplete={handleAnimationComplete}
           >
             <div className="bmr-card-fields">
               <UnitField
