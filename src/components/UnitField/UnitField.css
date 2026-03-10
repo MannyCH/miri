@@ -26,10 +26,11 @@
 }
 
 .unit-field-input-frame {
-  width: 94px;
-  height: var(--spacing-56);
+  width: var(--spacing-96);
+  height: 45px; /* Figma: updated field height, no spacing token at 45px */
   border-radius: var(--corner-radius-8);
   border: 1px solid var(--color-stroke-weak);
+  background: var(--color-fill-brand-weak);
   display: flex;
   align-items: center;
   padding: 0 var(--spacing-16);
@@ -41,6 +42,8 @@
   background: transparent;
   width: 100%;
   color: var(--color-text-strong);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .unit-field-input:focus {

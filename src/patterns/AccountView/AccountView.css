@@ -1,9 +1,10 @@
 /*
- * AccountView — Token mapping from Figma:
+ * AccountView — Token mapping from Figma (node 312:2844 Container):
  *   Background/Base  → --color-background-base (page background)
  *   Text/Strong      → --color-text-strong     (page title, settings header)
- *   spacing-16 page padding
- *   spacing-16 gap between sections
+ *   Container: padding 16px, gap 0 — each section manages its own spacing
+ *   Section header (312:2845): padding-bottom 16px after h1
+ *   Settings title (312:2857): padding-top 32px, padding-bottom 8px
  */
 
 .account-view {
@@ -22,32 +23,20 @@
   padding: var(--spacing-16);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-16);
+  gap: 0;
 }
 
 .account-view-header {
-  padding-bottom: 0;
+  margin: 0;
+  padding-bottom: var(--spacing-16);
 }
 
 .account-view-settings-title {
+  margin: 0;
   padding: var(--spacing-32) 0 var(--spacing-8);
   color: var(--color-text-strong);
 }
 
-.account-view-calculate-link {
-  display: inline;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: var(--color-text-strong);
-}
-
-.account-view-health-row {
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-32);
-}
 
 .account-view-navigation {
   flex-shrink: 0;

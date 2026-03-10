@@ -23,7 +23,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: var(--spacing-56);
+  height: 45px; /* Figma: updated field height, no spacing token at 45px */
   border-radius: var(--corner-radius-8);
   border: 1px solid var(--color-stroke-weak);
   background: var(--color-fill-brand-weak);

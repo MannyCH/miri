@@ -1,0 +1,77 @@
+/*
+ * BmrCalculatorCard — Token mapping from Figma (node 319:4936):
+ *   Background/Sunken  → --color-background-sunken  (card bg, #FAF3F0)
+ *   Stroke/Weak        → --color-stroke-weak         (card border)
+ *   Text/Weak          → --color-text-weak           (question text, gender label)
+ *   Text/Strong        → --color-text-strong         (calculate link)
+ *   corner-radius-16   → 16px (card)
+ *   padding: 16px all (card), gap: 16px (card)
+ *   fields row gap: 16px (Frame 2, node 319:4941)
+ *   gender gap: 8px (Frame 3, node 319:4944)
+ */
+
+.bmr-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  padding: var(--spacing-16);
+  border-radius: var(--corner-radius-16);
+  border: 1px solid var(--color-stroke-weak);
+  background: var(--color-background-sunken);
+  box-sizing: border-box;
+}
+
+.bmr-card-question {
+  margin: 0;
+  color: var(--color-text-weak);
+}
+
+.bmr-card-link {
+  display: inline;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-strong);
+  text-align: left;
+}
+
+.bmr-card-expanded {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.bmr-card-fields {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: var(--spacing-16);
+  flex-wrap: wrap;
+}
+
+.bmr-card-gender {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.bmr-card-gender-label {
+  color: var(--color-text-weak);
+}
+
+.bmr-card-radio-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  color: var(--color-text-strong);
+  cursor: pointer;
+}
+
+.bmr-card-radio {
+  accent-color: var(--color-fill-brand-strong);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}

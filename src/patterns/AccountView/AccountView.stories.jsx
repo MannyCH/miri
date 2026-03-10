@@ -4,6 +4,7 @@ import { SettingsSection } from '../../components/SettingsSection/SettingsSectio
 import { Stepper } from '../../components/Stepper/Stepper';
 import { SelectField } from '../../components/SelectField/SelectField';
 import { UnitField } from '../../components/UnitField/UnitField';
+import { BmrCalculatorCard } from '../../components/BmrCalculatorCard/BmrCalculatorCard';
 import { NavigationBar } from '../../components/NavigationBar/NavigationBar';
 import './AccountView.css';
 
@@ -40,8 +41,6 @@ function AccountViewTemplate() {
   const [eatingStyle, setEatingStyle] = useState('');
   const [goal, setGoal] = useState('');
   const [bmr, setBmr] = useState('');
-  const [weight, setWeight] = useState('');
-  const [height, setHeight] = useState('');
 
   return (
     <main className="account-view">
@@ -81,7 +80,7 @@ function AccountViewTemplate() {
           />
         </SettingsSection>
 
-        <SettingsSection title="Advanced - Health">
+        <SettingsSection title="Advanced - Health" spacing="section">
           <UnitField
             label="Metabolic basal rate"
             unit="kcal"
@@ -90,41 +89,14 @@ function AccountViewTemplate() {
             min={0}
             step={10}
           />
-          <button
-            type="button"
-            className="account-view-calculate-link text-body-small-bold-underlined"
-          >
-            Calculate from height &amp; weight
-          </button>
-          <div className="account-view-health-row">
-            <UnitField
-              label="Weight"
-              unit="kg"
-              value={weight}
-              onChange={setWeight}
-              min={0}
-            />
-            <UnitField
-              label="Height"
-              unit="cm"
-              value={height}
-              onChange={setHeight}
-              min={0}
-            />
-          </div>
+          <BmrCalculatorCard
+            onSave={({ bmr: calculated }) => setBmr(String(calculated ?? ''))}
+          />
         </SettingsSection>
       </div>
 
       <div className="account-view-navigation">
-        <NavigationBar
-          items={[
-            { id: 'recipes', label: 'Recipes', icon: 'folder' },
-            { id: 'planning', label: 'Planning', icon: 'list' },
-            { id: 'shopping', label: 'Shopping list', icon: 'shopping-cart' },
-            { id: 'account', label: 'Account', icon: 'user' },
-          ]}
-          activeItem="account"
-        />
+        <NavigationBar activeItem="account" />
       </div>
     </main>
   );
@@ -140,8 +112,6 @@ export const WithValues = {
     const [eatingStyle, setEatingStyle] = useState('plant-forward');
     const [goal, setGoal] = useState('lose-weight');
     const [bmr, setBmr] = useState('1600');
-    const [weight, setWeight] = useState('68');
-    const [height, setHeight] = useState('165');
 
     return (
       <main className="account-view">
@@ -181,7 +151,7 @@ export const WithValues = {
             />
           </SettingsSection>
 
-          <SettingsSection title="Advanced - Health">
+          <SettingsSection title="Advanced - Health" spacing="section">
             <UnitField
               label="Metabolic basal rate"
               unit="kcal"
@@ -190,29 +160,14 @@ export const WithValues = {
               min={0}
               step={10}
             />
-            <button
-              type="button"
-              className="account-view-calculate-link text-body-small-bold-underlined"
-            >
-              Calculate from height &amp; weight
-            </button>
-            <div className="account-view-health-row">
-              <UnitField label="Weight" unit="kg" value={weight} onChange={setWeight} min={0} />
-              <UnitField label="Height" unit="cm" value={height} onChange={setHeight} min={0} />
-            </div>
+            <BmrCalculatorCard
+              onSave={({ bmr: calculated }) => setBmr(String(calculated ?? ''))}
+            />
           </SettingsSection>
         </div>
 
         <div className="account-view-navigation">
-          <NavigationBar
-            items={[
-              { id: 'recipes', label: 'Recipes', icon: 'folder' },
-              { id: 'planning', label: 'Planning', icon: 'list' },
-              { id: 'shopping', label: 'Shopping list', icon: 'shopping-cart' },
-              { id: 'account', label: 'Account', icon: 'user' },
-            ]}
-            activeItem="account"
-          />
+          <NavigationBar activeItem="account" />
         </div>
       </main>
     );
