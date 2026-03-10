@@ -11,19 +11,23 @@
 }
 
 .auth-modules-sign-in {
-  min-height: 450px;
+  min-height: 466px;
 }
 
 .auth-modules-sign-up {
-  min-height: 516px;
+  min-height: 584px;
 }
 
 .auth-modules-verify {
-  min-height: 384px;
+  min-height: 416px;
 }
 
 .auth-modules-reset {
-  min-height: 416px;
+  min-height: 448px;
+}
+
+.auth-modules-forgot {
+  min-height: 348px;
 }
 
 .auth-modules-card-centered {
@@ -52,27 +56,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-16);
-}
-
-.auth-modules-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-8);
-}
-
-.auth-modules-field > span {
-  color: var(--color-text-weak);
-}
-
-.auth-modules-field input {
-  width: 100%;
-  height: 56px;
-  box-sizing: border-box;
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-8);
-  background: var(--color-fill-brand-weak);
-  color: var(--color-text-strong);
-  padding: 0 var(--spacing-16);
 }
 
 .auth-modules-inline-link {

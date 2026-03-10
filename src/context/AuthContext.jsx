@@ -3,6 +3,10 @@ import { authClient } from '../lib/authClient';
 
 const AuthContext = createContext(null);
 
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
+}
+
 function getErrorMessage(result, fallbackMessage) {
   if (!result?.error) return null;
   return result.error.message || fallbackMessage;
@@ -44,7 +48,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
-    const result = await authClient.signIn.email({ email, password });
+    const result = await authClient.signIn.email({
+      email: normalizeEmail(email),
+      password,
+    });
     const message = getErrorMessage(result, 'Sign-in failed.');
     if (message) {
       throw new Error(message);
@@ -54,7 +61,11 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const signUp = useCallback(async ({ email, password, name }) => {
-    const result = await authClient.signUp.email({ email, password, name });
+    const result = await authClient.signUp.email({
+      email: normalizeEmail(email),
+      password,
+      name,
+    });
     const message = getErrorMessage(result, 'Sign-up failed.');
     if (message) {
       throw new Error(message);
@@ -69,7 +80,7 @@ export function AuthProvider({ children }) {
 
     if (hasOtpMethod && email && code) {
       result = await authClient.emailOtp.verifyEmail({
-        email,
+        email: normalizeEmail(email),
         otp: code,
       });
     } else if (token) {
@@ -96,12 +107,12 @@ export function AuthProvider({ children }) {
 
     if (hasOtpMethod) {
       result = await authClient.emailOtp.sendVerificationOtp({
-        email,
+        email: normalizeEmail(email),
         type: 'email-verification',
       });
     } else {
       result = await authClient.sendVerificationEmail({
-        email,
+        email: normalizeEmail(email),
       });
     }
 
@@ -114,7 +125,7 @@ export function AuthProvider({ children }) {
 
   const requestPasswordReset = useCallback(async ({ email, redirectTo }) => {
     const result = await authClient.requestPasswordReset({
-      email,
+      email: normalizeEmail(email),
       ...(redirectTo ? { redirectTo } : {}),
     });
     const message = getErrorMessage(result, 'Password reset request failed.');

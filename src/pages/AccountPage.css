@@ -1,7 +1,24 @@
 .account-page {
-  min-height: 100%;
-  padding: var(--spacing-20) var(--spacing-16) calc(var(--spacing-96) + var(--safe-area-inset-bottom));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 390px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--color-background-base);
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.account-content {
   box-sizing: border-box;
+  padding: var(--spacing-20) var(--spacing-16) var(--spacing-16);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  width: 100%;
 }
 
 .account-card {
@@ -47,4 +64,8 @@
 .account-error {
   color: var(--color-text-danger, #b42318);
   margin-top: var(--spacing-12);
+}
+
+.account-navigation {
+  width: 100%;
 }

@@ -16,6 +16,7 @@ This file documents a license-free mapping strategy between Figma and Storybook.
 | `Components/CalendarWeek` | `Calendar week` (`COMPONENT`, `164:707`) | High | Direct name match |
 | `Components/ConfirmDialog` | `Dialog` (`COMPONENT`, `232:2337`) | High | Canonical source confirmed by provided Figma node |
 | `Components/Divider` | `Divider` (`INSTANCE` inside list structures) | Medium | Reused instance, no top-level component set found |
+| `Components/FormField` | `Form fields` (`COMPONENT_SET`, `295:637`) | High | Variant axis `Field=Empty/Filled/Error` |
 | `Components/IngredientList` | `Ingredient List` (`COMPONENT`, `157:1577`) | High | Direct name match |
 | `Components/IngredientListItem` | `Ingredient List item` (`COMPONENT`, `157:1502`) | High | Direct name match |
 | `Components/NavItem` | `Nav item` (component set) | High | Name matches directly |
@@ -67,6 +68,7 @@ This file documents a license-free mapping strategy between Figma and Storybook.
 
 - Badge: node `149:1085`
 - Dialog: node `232:2337`
+- Form fields: node `295:637`
 
 ## Repeatable Workflow
 

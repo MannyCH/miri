@@ -152,9 +152,9 @@
   outline-offset: 2px;
 }
 
-/* Floating search FAB — fixed, tracks keyboard height */
+/* Floating search FAB — anchored to container */
 .shopping-list-search-fab {
-  position: fixed;
+  position: absolute;
   bottom: calc(76px + var(--safe-area-inset-bottom) + var(--spacing-16) + var(--keyboard-height, 0px));
   right: var(--spacing-16);
   width: 48px;
