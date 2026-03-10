@@ -9,7 +9,7 @@
 }
 
 .form-field-control {
-  height: 56px;
+  height: 45px;
   display: flex;
   align-items: center;
   border: 1px solid var(--color-stroke-weak);

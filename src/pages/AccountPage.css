@@ -1,8 +1,6 @@
 .account-page {
-  position: relative;
   display: flex;
   flex-direction: column;
-  height: 100vh;
   height: 100dvh;
   max-width: 390px;
   margin: 0 auto;
@@ -12,60 +10,22 @@
   padding-bottom: var(--safe-area-inset-bottom);
 }
 
-.account-content {
-  box-sizing: border-box;
-  padding: var(--spacing-20) var(--spacing-16) var(--spacing-16);
+.account-page-content {
+  flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  flex: 1;
-  width: 100%;
+  box-sizing: border-box;
+  padding: var(--spacing-20) var(--spacing-16) var(--spacing-16);
 }
 
-.account-card {
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-12);
-  background: var(--color-background-raised);
-  padding: var(--spacing-16);
+.account-page-header {
+  margin: 0 0 var(--spacing-16) 0;
 }
 
-.account-title {
-  margin: 0;
+.account-page-settings-title {
+  margin: var(--spacing-24) 0 0 0;
 }
 
-.account-email,
-.account-name {
-  margin: var(--spacing-8) 0 0;
-}
-
-.account-email {
-  color: var(--color-text-strong);
-}
-
-.account-name {
-  color: var(--color-text-weak);
-}
-
-.account-signout {
-  margin-top: var(--spacing-16);
-  height: 44px;
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-8);
-  background: var(--color-background-base);
-  color: var(--color-text-strong);
-  width: 100%;
-  cursor: pointer;
-}
-
-.account-signout:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.account-error {
-  color: var(--color-text-danger, #b42318);
-  margin-top: var(--spacing-12);
-}
-
-.account-navigation {
+.account-page-navigation {
   width: 100%;
 }

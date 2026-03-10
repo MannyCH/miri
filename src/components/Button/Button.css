@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-8);
-  padding: var(--spacing-12);
+  padding: var(--spacing-8) var(--spacing-12);
   border-radius: var(--corner-radius-8);
   border: none;
   cursor: pointer;
