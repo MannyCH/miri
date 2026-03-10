@@ -5,7 +5,8 @@ export default async function handler(req, res) {
   let userId;
   try {
     userId = await getUserId(req.headers.authorization || req.headers.Authorization);
-  } catch {
+  } catch (err) {
+    console.error('[profile] auth failed:', err?.message);
     return res.status(401).json({ ok: false, error: 'Unauthorized' });
   }
 

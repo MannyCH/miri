@@ -43,7 +43,7 @@ export function useUserPreferences(isAuthenticated) {
         const state = rowToState(row);
         if (state) setPreferences(state);
       })
-      .catch(() => {})
+      .catch((err) => console.error('[preferences] load failed:', err))
       .finally(() => setIsLoading(false));
   }, [isAuthenticated]);
 
@@ -53,7 +53,9 @@ export function useUserPreferences(isAuthenticated) {
 
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(() => {
-        savePreferences(stateToPayload(next)).catch(() => {});
+        savePreferences(stateToPayload(next)).catch((err) =>
+          console.error('[preferences] save failed:', err)
+        );
       }, SAVE_DEBOUNCE_MS);
 
       return next;
