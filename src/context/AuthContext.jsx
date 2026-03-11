@@ -156,6 +156,28 @@ export function AuthProvider({ children }) {
     setSessionData(null);
   }, []);
 
+  const updateUser = useCallback(async ({ name, email }) => {
+    const result = await authClient.updateUser({ name, email });
+    const message = getErrorMessage(result, 'Could not update user details.');
+    if (message) throw new Error(message);
+    await refreshSession();
+    return result?.data ?? null;
+  }, [refreshSession]);
+
+  const changePassword = useCallback(async ({ newPassword }) => {
+    const result = await authClient.changePassword({ newPassword, revokeOtherSessions: false });
+    const message = getErrorMessage(result, 'Could not change password.');
+    if (message) throw new Error(message);
+    return result?.data ?? null;
+  }, []);
+
+  const deleteUser = useCallback(async () => {
+    const result = await authClient.deleteUser();
+    const message = getErrorMessage(result, 'Could not delete account.');
+    if (message) throw new Error(message);
+    setSessionData(null);
+  }, []);
+
   const value = useMemo(() => {
     const user = sessionData?.user ?? null;
     const session = sessionData?.session ?? null;
@@ -173,8 +195,11 @@ export function AuthProvider({ children }) {
       requestPasswordReset,
       resetPassword,
       signOut,
+      updateUser,
+      changePassword,
+      deleteUser,
     };
-  }, [isAuthReady, refreshSession, sessionData, signIn, signOut, signUp, verifyEmail, sendVerificationCode, requestPasswordReset, resetPassword]);
+  }, [isAuthReady, refreshSession, sessionData, signIn, signOut, signUp, verifyEmail, sendVerificationCode, requestPasswordReset, resetPassword, updateUser, changePassword, deleteUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -10,10 +10,24 @@
   padding-bottom: var(--safe-area-inset-bottom);
 }
 
-.account-page-content {
+/* ─── View container (clipping region for slide animation) ─── */
+
+.account-page-views {
   flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.account-page-view {
+  position: absolute;
+  inset: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Main view ─── */
+
+.account-page-content {
   box-sizing: border-box;
   padding: var(--spacing-16);
 }
@@ -29,6 +43,69 @@
   color: var(--color-text-strong);
 }
 
+/* ─── Navigation bar ─── */
+
 .account-page-navigation {
   width: 100%;
+}
+
+/* ─── Sub-view shared layout ─── */
+
+.account-subview {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 100%;
+}
+
+.account-subview-header {
+  padding: var(--spacing-16) var(--spacing-16) var(--spacing-8);
+  display: flex;
+  align-items: center;
+}
+
+.account-subview-back-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-subview-back-circle {
+  width: var(--spacing-32);
+  height: var(--spacing-32);
+  border-radius: 50%;
+  background: var(--color-fill-brand-weak);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-icon-brand);
+}
+
+.account-subview-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  padding: 0 var(--spacing-16) var(--spacing-24);
+  flex: 1;
+}
+
+.account-subview-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  margin-top: var(--spacing-8);
+}
+
+.account-subview-warning {
+  margin: 0;
+  color: var(--color-text-weak);
+}
+
+.account-subview-error {
+  margin: 0;
+  color: var(--color-text-error);
 }

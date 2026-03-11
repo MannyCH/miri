@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ChevronLeft } from 'react-feather';
 import { useAuth } from '../context/AuthContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { AccountCard } from '../components/AccountCard/AccountCard';
@@ -7,6 +9,8 @@ import { Stepper } from '../components/Stepper/Stepper';
 import { SelectField } from '../components/SelectField/SelectField';
 import { UnitField } from '../components/UnitField/UnitField';
 import { BmrCalculatorCard } from '../components/BmrCalculatorCard/BmrCalculatorCard';
+import { FormField } from '../components/FormField/FormField';
+import { Button } from '../components/Button/Button';
 import { NavigationBarConnected } from '../components/NavigationBar/NavigationBarConnected';
 import './AccountPage.css';
 
@@ -25,67 +29,290 @@ const GOAL_OPTIONS = [
   { value: 'eat-healthier', label: 'Eat healthier' },
 ];
 
+const VIEWS = { MAIN: 'main', DETAILS: 'details', PASSWORD: 'password', DELETE: 'delete' };
+
+const slideVariants = {
+  enter: (dir) => ({ x: dir > 0 ? '100%' : '-100%' }),
+  center: { x: 0 },
+  exit: (dir) => ({ x: dir > 0 ? '-100%' : '100%' }),
+};
+
+const slideTransition = { type: 'tween', duration: 0.3, ease: [0.4, 0, 0.2, 1] };
+
+function SubViewBack({ onBack }) {
+  return (
+    <div className="account-subview-header">
+      <button
+        type="button"
+        className="account-subview-back-btn"
+        onClick={onBack}
+        aria-label="Go back"
+      >
+        <span className="account-subview-back-circle">
+          <ChevronLeft size={20} aria-hidden="true" />
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function UserDetailsView({ user, onBack, onSave }) {
+  const [name, setName] = useState(user?.name ?? '');
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setError('');
+    try {
+      await onSave({ name, email });
+      onBack();
+    } catch (err) {
+      setError(err.message || 'Could not save changes.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="account-subview">
+      <SubViewBack onBack={onBack} />
+      <div className="account-subview-body">
+        <FormField label="Name" variant={name ? 'filled' : 'empty'}>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+          />
+        </FormField>
+        <FormField label="Email address" variant={email ? 'filled' : 'empty'}>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
+          />
+        </FormField>
+        {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
+        <div className="account-subview-actions">
+          <Button variant="primary" onClick={handleSave} disabled={isSaving}>
+            {isSaving ? 'Saving…' : 'Save'}
+          </Button>
+          <Button variant="secondary" onClick={onBack} disabled={isSaving}>
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChangePasswordView({ onBack, onSave }) {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setIsSaving(true);
+    setError('');
+    try {
+      await onSave({ newPassword });
+      onBack();
+    } catch (err) {
+      setError(err.message || 'Could not change password.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="account-subview">
+      <SubViewBack onBack={onBack} />
+      <div className="account-subview-body">
+        <FormField label="New password" variant={newPassword ? 'filled' : 'empty'}>
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="New password"
+          />
+        </FormField>
+        <FormField label="Confirm new password" variant={confirmPassword ? 'filled' : 'empty'}>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Retype new password"
+          />
+        </FormField>
+        {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
+        <div className="account-subview-actions">
+          <Button
+            variant="primary"
+            onClick={handleSave}
+            disabled={isSaving || !newPassword || !confirmPassword}
+          >
+            {isSaving ? 'Saving…' : 'Save'}
+          </Button>
+          <Button variant="secondary" onClick={onBack} disabled={isSaving}>
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeleteAccountView({ onBack, onDelete }) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    setError('');
+    try {
+      await onDelete();
+    } catch (err) {
+      setError(err.message || 'Could not delete account.');
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div className="account-subview">
+      <SubViewBack onBack={onBack} />
+      <div className="account-subview-body">
+        <p className="text-body-small-regular account-subview-warning">
+          This will permanently erase your account and all associated data, including meal plans
+          and saved recipes. This action cannot be undone.
+        </p>
+        {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
+        <div className="account-subview-actions">
+          <Button variant="tertiary-delete" onClick={handleDelete} disabled={isDeleting}>
+            {isDeleting ? 'Deleting…' : 'Delete account'}
+          </Button>
+          <Button variant="secondary" onClick={onBack} disabled={isDeleting}>
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AccountPage() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateUser, changePassword, deleteUser } = useAuth();
   const { preferences, updatePreferences, isLoading } = usePreferences();
+  const [activeView, setActiveView] = useState(VIEWS.MAIN);
+  const [direction, setDirection] = useState(1);
+
+  const navigateTo = (view) => {
+    setDirection(1);
+    setActiveView(view);
+  };
+
+  const navigateBack = () => {
+    setDirection(-1);
+    setActiveView(VIEWS.MAIN);
+  };
 
   return (
     <main className="account-page">
-      <div className="account-page-content">
-        <h1 className="text-h1-bold account-page-header">Account</h1>
+      <div className="account-page-views">
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
+          <motion.div
+            key={activeView}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={slideTransition}
+            className="account-page-view"
+          >
+            {activeView === VIEWS.MAIN && (
+              <div className="account-page-content">
+                <h1 className="text-h1-bold account-page-header">Account</h1>
 
-        <AccountCard
-          name={user?.name || user?.email}
-          email={user?.email}
-          onLogOut={signOut}
-          onChangeUserDetails={() => {}}
-          onChangePassword={() => {}}
-          onDeleteAccount={() => {}}
-        />
+                <AccountCard
+                  name={user?.name || user?.email}
+                  email={user?.email}
+                  onLogOut={signOut}
+                  onChangeUserDetails={() => navigateTo(VIEWS.DETAILS)}
+                  onChangePassword={() => navigateTo(VIEWS.PASSWORD)}
+                  onDeleteAccount={() => navigateTo(VIEWS.DELETE)}
+                />
 
-        <h2 className="text-h4-regular account-page-settings-title">Settings</h2>
+                <h2 className="text-h4-regular account-page-settings-title">Settings</h2>
 
-        <SettingsSection title="Eating preferences">
-          <Stepper
-            label="How many people are you usually cooking for?"
-            value={preferences.servings}
-            min={1}
-            max={20}
-            onChange={(servings) => updatePreferences({ servings })}
-            disabled={isLoading}
-          />
-          <SelectField
-            label="How do you like to eat?"
-            options={EATING_OPTIONS}
-            value={preferences.eatingStyle}
-            onChange={(eatingStyle) => updatePreferences({ eatingStyle })}
-            disabled={isLoading}
-          />
-          <SelectField
-            label="What's your goal?"
-            options={GOAL_OPTIONS}
-            value={preferences.goal}
-            onChange={(goal) => updatePreferences({ goal })}
-            disabled={isLoading}
-          />
-        </SettingsSection>
+                <SettingsSection title="Eating preferences">
+                  <Stepper
+                    label="How many people are you usually cooking for?"
+                    value={preferences.servings}
+                    min={1}
+                    max={20}
+                    onChange={(servings) => updatePreferences({ servings })}
+                    disabled={isLoading}
+                  />
+                  <SelectField
+                    label="How do you like to eat?"
+                    options={EATING_OPTIONS}
+                    value={preferences.eatingStyle}
+                    onChange={(eatingStyle) => updatePreferences({ eatingStyle })}
+                    disabled={isLoading}
+                  />
+                  <SelectField
+                    label="What's your goal?"
+                    options={GOAL_OPTIONS}
+                    value={preferences.goal}
+                    onChange={(goal) => updatePreferences({ goal })}
+                    disabled={isLoading}
+                  />
+                </SettingsSection>
 
-        <SettingsSection title="Advanced - Health" spacing="section">
-          <UnitField
-            label="Metabolic basal rate"
-            unit="kcal"
-            value={preferences.bmr}
-            onChange={(bmr) => updatePreferences({ bmr })}
-            min={0}
-            step={10}
-            disabled={isLoading}
-          />
-          <BmrCalculatorCard
-            onSave={({ bmr: calculated }) =>
-              updatePreferences({ bmr: String(calculated ?? '') })
-            }
-          />
-        </SettingsSection>
+                <SettingsSection title="Advanced - Health" spacing="section">
+                  <UnitField
+                    label="Metabolic basal rate"
+                    unit="kcal"
+                    value={preferences.bmr}
+                    onChange={(bmr) => updatePreferences({ bmr })}
+                    min={0}
+                    step={10}
+                    disabled={isLoading}
+                  />
+                  <BmrCalculatorCard
+                    onSave={({ bmr: calculated }) =>
+                      updatePreferences({ bmr: String(calculated ?? '') })
+                    }
+                  />
+                </SettingsSection>
+              </div>
+            )}
+
+            {activeView === VIEWS.DETAILS && (
+              <UserDetailsView user={user} onBack={navigateBack} onSave={updateUser} />
+            )}
+
+            {activeView === VIEWS.PASSWORD && (
+              <ChangePasswordView onBack={navigateBack} onSave={changePassword} />
+            )}
+
+            {activeView === VIEWS.DELETE && (
+              <DeleteAccountView onBack={navigateBack} onDelete={deleteUser} />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <div className="account-page-navigation">
