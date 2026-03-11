@@ -25,15 +25,14 @@
 }
 
 .choice-tile-selected {
-  background: var(--color-fill-brand-strong);
-  border-color: var(--color-fill-brand-strong);
-  color: var(--color-text-inverted);
+  background: var(--color-fill-brand-weak);
+  border-color: var(--color-stroke-brand-strong);
+  color: var(--color-text-brand);
 }
 
 .choice-tile-selected:hover:not([disabled]) {
-  background: linear-gradient(var(--color-fill-hover), var(--color-fill-hover)),
-              var(--color-fill-brand-strong);
-  border-color: var(--color-fill-brand-strong);
+  background: var(--color-fill-brand-weak);
+  border-color: var(--color-stroke-brand-strong);
 }
 
 .choice-tile-label {
