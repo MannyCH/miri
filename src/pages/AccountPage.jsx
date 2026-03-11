@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { CheckCircle, ChevronLeft, Circle, X } from 'react-feather';
 import { useAuth } from '../context/AuthContext';
+import { useApp } from '../context/AppContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { AccountCard } from '../components/AccountCard/AccountCard';
 import { SettingsSection } from '../components/SettingsSection/SettingsSection';
@@ -60,27 +61,17 @@ function SubViewBack({ onBack }) {
   );
 }
 
-function UserDetailsView({ user, onBack, onSaveName, onChangeEmail }) {
+function UserDetailsView({ user, onBack, onSaveName }) {
   const [name, setName] = useState(user?.name ?? '');
-  const [email, setEmail] = useState(user?.email ?? '');
   const [error, setError] = useState('');
-  const [info, setInfo] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-
-  const emailChanged = email.trim().toLowerCase() !== (user?.email ?? '').toLowerCase();
 
   const handleSave = async () => {
     setIsSaving(true);
     setError('');
-    setInfo('');
     try {
       await onSaveName({ name });
-      if (emailChanged) {
-        await onChangeEmail({ newEmail: email.trim().toLowerCase() });
-        setInfo('A verification link has been sent to your new email address.');
-      } else {
-        onBack();
-      }
+      onBack();
     } catch (err) {
       setError(err.message || 'Could not save changes.');
     } finally {
@@ -101,17 +92,20 @@ function UserDetailsView({ user, onBack, onSaveName, onChangeEmail }) {
         <TextField
           label="Email address"
           type="email"
-          value={email}
-          onChange={setEmail}
+          value={user?.email ?? ''}
+          readOnly
+          disabled
         />
-        {info ? <p className="account-subview-info text-body-small-regular">{info}</p> : null}
+        <p className="account-subview-note text-body-small-regular">
+          Email address cannot be changed at this time.
+        </p>
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
         <div className="account-subview-actions">
           <Button variant="primary" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Saving…' : 'Save'}
           </Button>
-          <Button variant="secondary" onClick={info ? onBack : onBack} disabled={isSaving}>
-            {info ? 'Close' : 'Cancel'}
+          <Button variant="secondary" onClick={onBack} disabled={isSaving}>
+            Cancel
           </Button>
         </div>
       </div>
@@ -120,7 +114,9 @@ function UserDetailsView({ user, onBack, onSaveName, onChangeEmail }) {
 }
 
 function ChangePasswordView({ onBack, onSave }) {
+  const { showToast } = useApp();
   const [currentPassword, setCurrentPassword] = useState('');
+  const [currentPasswordError, setCurrentPasswordError] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [requirementsTouched, setRequirementsTouched] = useState(false);
@@ -137,17 +133,37 @@ function ChangePasswordView({ onBack, onSave }) {
   const allChecksMet = Object.values(checks).every(Boolean);
   const passwordsMatch = newPassword === confirmPassword;
 
+  const handleCurrentPasswordBlur = () => {
+    if (!currentPassword) {
+      setCurrentPasswordError('Enter your current password.');
+    } else {
+      setCurrentPasswordError('');
+    }
+  };
+
   const handleSave = async () => {
     setRequirementsTouched(true);
     setConfirmTouched(true);
-    if (!currentPassword || !allChecksMet || !confirmPassword || !passwordsMatch) return;
+    if (!currentPassword) {
+      setCurrentPasswordError('Enter your current password.');
+      return;
+    }
+    if (!allChecksMet || !confirmPassword || !passwordsMatch) return;
     setIsSaving(true);
     setError('');
+    setCurrentPasswordError('');
     try {
       await onSave({ currentPassword, newPassword });
+      showToast('Success', 'Password updated successfully.');
       onBack();
     } catch (err) {
-      setError(err.message || 'Could not change password.');
+      const msg = err.message || 'Could not change password.';
+      const isCurrentPasswordError = /incorrect|invalid|wrong|current password/i.test(msg);
+      if (isCurrentPasswordError) {
+        setCurrentPasswordError('Incorrect password. Please try again.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -168,7 +184,9 @@ function ChangePasswordView({ onBack, onSave }) {
           label="Current password"
           type="password"
           value={currentPassword}
-          onChange={setCurrentPassword}
+          onChange={(v) => { setCurrentPassword(v); if (currentPasswordError) setCurrentPasswordError(''); }}
+          onBlur={handleCurrentPasswordBlur}
+          error={currentPasswordError}
           autoComplete="current-password"
         />
 
@@ -268,7 +286,7 @@ function DeleteAccountView({ onBack, onDelete }) {
 }
 
 export function AccountPage() {
-  const { user, signOut, updateUser, changePassword, changeEmail, deleteUser } = useAuth();
+  const { user, signOut, updateUser, changePassword, deleteUser } = useAuth();
   const { preferences, updatePreferences, isLoading } = usePreferences();
   const [activeView, setActiveView] = useState(VIEWS.MAIN);
   const [direction, setDirection] = useState(1);
@@ -361,7 +379,6 @@ export function AccountPage() {
                 user={user}
                 onBack={navigateBack}
                 onSaveName={updateUser}
-                onChangeEmail={changeEmail}
               />
             )}
 
