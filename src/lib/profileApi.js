@@ -1,43 +1,60 @@
-const NEON_AUTH_URL = import.meta.env.VITE_NEON_AUTH_URL;
+import { dataClient } from './dataClient';
+
+const TABLE = 'user_preferences';
+
+/** PostgREST error code when a .single() query matches no rows. */
+const NO_ROWS_CODE = 'PGRST116';
 
 /**
- * Request a fresh JWT from the Neon Auth /token endpoint.
- * The browser sends the Neon Auth session cookie automatically because
- * this request goes directly to the Neon Auth domain (same origin as where
- * the cookie was set). Returns the JWT string or throws if not authenticated.
+ * Fetch the current user's preferences directly from Neon via the Data API.
+ * RLS ensures only the authenticated user's row is returned — no filter needed.
+ * Returns null if no preferences have been saved yet.
  */
-async function getJwt() {
-  const res = await fetch(`${NEON_AUTH_URL}/token`, {
-    credentials: 'include',
-  });
-  if (!res.ok) throw new Error('Not authenticated');
-  const data = await res.json();
-  const token = data?.token ?? data?.jwt ?? data?.access_token;
-  if (!token) throw new Error('No token in response');
-  return token;
-}
-
 export async function fetchPreferences() {
-  const jwt = await getJwt();
-  const res = await fetch('/api/profile', {
-    headers: { Authorization: `Bearer ${jwt}` },
-  });
-  const data = await res.json();
-  if (!data.ok) throw new Error(data.error);
-  return data.preferences;
+  const { data, error } = await dataClient.from(TABLE).select('*').single();
+
+  if (error) {
+    if (error.code === NO_ROWS_CODE) return null;
+    throw new Error(error.message);
+  }
+  return data;
 }
 
+/**
+ * Upsert the current user's preferences.
+ * The user_id comes from the active Neon Auth session; RLS enforces ownership.
+ */
 export async function savePreferences({ servings, eatingStyle, goal, bmrKcal }) {
-  const jwt = await getJwt();
-  const res = await fetch('/api/profile', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ servings, eatingStyle, goal, bmrKcal }),
-  });
-  const data = await res.json();
-  if (!data.ok) throw new Error(data.error);
-  return data.preferences;
+  const { data: sessionData } = await dataClient.auth.getSession();
+  const userId = sessionData?.session?.user?.id;
+  if (!userId) throw new Error('Not authenticated');
+
+  const payload = {
+    user_id: userId,
+    servings: servings ?? 2,
+    eating_style: eatingStyle || null,
+    goal: goal || null,
+    bmr_kcal: bmrKcal ?? null,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Try updating the existing row first; if there is no row yet, insert one.
+  const { data: updated, error: updateError } = await dataClient
+    .from(TABLE)
+    .update(payload)
+    .eq('user_id', userId)
+    .select()
+    .single();
+
+  if (!updateError) return updated;
+  if (updateError.code !== NO_ROWS_CODE) throw new Error(updateError.message);
+
+  const { data: inserted, error: insertError } = await dataClient
+    .from(TABLE)
+    .insert(payload)
+    .select()
+    .single();
+
+  if (insertError) throw new Error(insertError.message);
+  return inserted;
 }
