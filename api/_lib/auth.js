@@ -1,22 +1,25 @@
+import { createRemoteJWKSet, jwtVerify } from 'jose';
+
+const JWKS_URI = `${process.env.NEON_AUTH_BASE_URL}/.well-known/jwks.json`;
+
+let jwks;
+function getJwks() {
+  if (!jwks) jwks = createRemoteJWKSet(new URL(JWKS_URI));
+  return jwks;
+}
+
 /**
- * Validate the current user session by forwarding the browser's session cookie
- * to the Neon Auth server. Returns the user ID or throws on failure.
- *
- * This works because the frontend (miri-meal.vercel.app) and the API functions
- * (/api/*) share the same origin, so the Better Auth session cookie is sent
- * automatically with every fetch({ credentials: 'include' }) call.
+ * Verify the JWT sent as Bearer token and return the user ID (sub claim).
+ * The JWT is obtained by the client calling Neon Auth's /token endpoint,
+ * which issues a proper signed JWT (EdDSA/Ed25519) verifiable via JWKS.
  */
-export async function getUserId(cookieHeader) {
-  if (!cookieHeader) throw new Error('No session cookie');
-
-  const res = await fetch(`${process.env.NEON_AUTH_BASE_URL}/get-session`, {
-    headers: { Cookie: cookieHeader },
-  });
-
-  if (!res.ok) throw new Error(`Session validation failed: ${res.status}`);
-
-  const data = await res.json();
-  const userId = data?.user?.id ?? data?.session?.userId;
-  if (!userId) throw new Error('No user ID in session response');
+export async function getUserId(authHeader) {
+  if (!authHeader || !String(authHeader).startsWith('Bearer ')) {
+    throw new Error('Missing bearer token');
+  }
+  const token = authHeader.slice(7);
+  const { payload } = await jwtVerify(token, getJwks());
+  const userId = payload.sub ?? payload.userId ?? payload.id;
+  if (!userId) throw new Error('No user ID in JWT payload');
   return userId;
 }
