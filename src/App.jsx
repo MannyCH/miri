@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { PreferencesProvider } from './context/PreferencesContext';
 import { ToastContainer } from './components/ToastContainer';
 import './index.css';
 
@@ -79,11 +80,13 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <AppProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </AppProvider>
+      <PreferencesProvider>
+        <AppProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </AppProvider>
+      </PreferencesProvider>
     </AuthProvider>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useUserPreferences } from '../hooks/useUserPreferences';
+import { usePreferences } from '../context/PreferencesContext';
 import { AccountCard } from '../components/AccountCard/AccountCard';
 import { SettingsSection } from '../components/SettingsSection/SettingsSection';
 import { Stepper } from '../components/Stepper/Stepper';
@@ -26,8 +26,8 @@ const GOAL_OPTIONS = [
 ];
 
 export function AccountPage() {
-  const { user, signOut, isAuthenticated } = useAuth();
-  const { preferences, updatePreferences, isLoading } = useUserPreferences(isAuthenticated);
+  const { user, signOut } = useAuth();
+  const { preferences, updatePreferences, isLoading } = usePreferences();
 
   return (
     <main className="account-page">
