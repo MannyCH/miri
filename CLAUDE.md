@@ -75,10 +75,8 @@ claude mcp add figma-console -s user \
   -- npx -y figma-console-mcp@latest
 
 # Neon MCP — for database tasks (schema changes, queries, inspection)
-# Authenticate via browser first:
+# Authenticate via browser (sets up HTTP MCP automatically):
 npx neonctl@latest init
-# Then add:
-claude mcp add neon -s user -- npx -y @neondatabase/mcp-server-neon start
 ```
 
 **Figma Console MCP tools:** `figma_execute`, `figma_capture_screenshot`, `figma_get_variables`, `figma_get_styles`, `figma_search_components`, `figma_get_status`
