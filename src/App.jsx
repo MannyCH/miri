@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { PreferencesProvider } from './context/PreferencesContext';
+import { PreferencesProvider, usePreferences } from './context/PreferencesContext';
 import { ToastContainer } from './components/ToastContainer';
 import './index.css';
 
@@ -12,6 +12,7 @@ const RecipeDetailPage = lazy(() => import('./pages/RecipeDetailPage').then((mod
 const ShoppingListPage = lazy(() => import('./pages/ShoppingListPage').then((module) => ({ default: module.ShoppingListPage })));
 const AuthPage = lazy(() => import('./pages/AuthPage').then((module) => ({ default: module.AuthPage })));
 const AccountPage = lazy(() => import('./pages/AccountPage').then((module) => ({ default: module.AccountPage })));
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage').then((module) => ({ default: module.OnboardingPage })));
 
 /**
  * Miri - Meal Planning App
@@ -25,22 +26,40 @@ const AccountPage = lazy(() => import('./pages/AccountPage').then((module) => ({
  * 
  * Built with Storybook patterns as single source of truth
  */
+function useNeedsOnboarding() {
+  const { user } = useAuth();
+  const { preferences, isLoading } = usePreferences();
+  if (!user || isLoading) return false;
+  const done = localStorage.getItem(`miri_onboarding_${user.id}`);
+  if (done) return false;
+  return !preferences.goal && !preferences.eatingStyle;
+}
+
 function AppContent() {
   const { toasts, dismissToast } = useApp();
   const { isAuthenticated, isAuthReady } = useAuth();
+  const needsOnboarding = useNeedsOnboarding();
 
   if (!isAuthReady) {
     return <div>Loading authentication...</div>;
   }
-  
+
+  const defaultRoute = isAuthenticated
+    ? (needsOnboarding ? '/onboarding' : '/planning')
+    : '/auth';
+
   return (
     <>
       <Suspense fallback={<div>Loading page...</div>}>
         <Routes>
-          <Route path="/" element={<Navigate to={isAuthenticated ? '/planning' : '/auth'} replace />} />
+          <Route path="/" element={<Navigate to={defaultRoute} replace />} />
           <Route
             path="/auth"
-            element={isAuthenticated ? <Navigate to="/planning" replace /> : <AuthPage />}
+            element={isAuthenticated ? <Navigate to={needsOnboarding ? '/onboarding' : '/planning'} replace /> : <AuthPage />}
+          />
+          <Route
+            path="/onboarding"
+            element={isAuthenticated ? <OnboardingPage /> : <Navigate to="/auth" replace />}
           />
           <Route
             path="/auth/reset-password"

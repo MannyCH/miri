@@ -1,0 +1,41 @@
+.choice-tile {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-16) var(--spacing-24);
+  border-radius: var(--corner-radius-12);
+  border: 1px solid var(--color-stroke-brand-weak);
+  background: var(--color-background-base);
+  color: var(--color-text-strong);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  text-align: center;
+}
+
+.choice-tile:hover:not([disabled]) {
+  background: var(--color-fill-brand-weak);
+  border-color: var(--color-stroke-brand-strong);
+}
+
+.choice-tile:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.choice-tile-selected {
+  background: var(--color-fill-brand-strong);
+  border-color: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+}
+
+.choice-tile-selected:hover:not([disabled]) {
+  background: linear-gradient(var(--color-fill-hover), var(--color-fill-hover)),
+              var(--color-fill-brand-strong);
+  border-color: var(--color-fill-brand-strong);
+}
+
+.choice-tile-label {
+  pointer-events: none;
+}
