@@ -13,6 +13,7 @@ export const RecipesView = ({
   searchQuery = '',
   onSearchChange,
   onRecipeClick,
+  onImportRequest,
   className,
   style,
   ...props
@@ -43,6 +44,16 @@ export const RecipesView = ({
     >
       <header className="recipes-header">
         <h1 className="text-h1-bold">Recipes</h1>
+        {onImportRequest && (
+          <button
+            type="button"
+            className="recipes-import-btn"
+            onClick={onImportRequest}
+            aria-label="Import recipe from file"
+          >
+            <ImportIcon />
+          </button>
+        )}
       </header>
 
       <div className="recipes-content">
@@ -90,6 +101,14 @@ const SearchIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="11" cy="11" r="8"/>
     <path d="m21 21-4.35-4.35"/>
+  </svg>
+);
+
+const ImportIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
 );
 

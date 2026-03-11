@@ -12,10 +12,10 @@ import { getRecipeById } from '../data/recipes';
 export function RecipeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addRecipeToShoppingList } = useApp();
+  const { addRecipeToShoppingList, userRecipes } = useApp();
   const [isAdded, setIsAdded] = useState(false);
 
-  const recipe = getRecipeById(id);
+  const recipe = getRecipeById(id) ?? userRecipes.find((r) => r.id === id);
 
   if (!recipe) {
     return (

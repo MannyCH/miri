@@ -1,0 +1,276 @@
+/* RecipeImportView Pattern - Editable recipe import form */
+
+.recipe-import-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--color-background-base);
+  max-width: 390px;
+  margin: 0 auto;
+  overflow: hidden;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+
+.recipe-import-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-12) var(--spacing-16);
+  border-bottom: 1px solid var(--color-stroke-weak);
+  background: var(--color-background-base);
+}
+
+.recipe-import-header-title {
+  color: var(--color-text-strong);
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recipe-import-nav-btn {
+  border: none;
+  background: transparent;
+  color: var(--color-text-brand);
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--spacing-4) 0;
+  min-width: 64px;
+}
+
+.recipe-import-nav-btn:first-child {
+  text-align: left;
+}
+
+.recipe-import-nav-btn:last-child {
+  text-align: right;
+}
+
+.recipe-import-nav-btn:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}
+
+.recipe-import-save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Scrollable content ──────────────────────────────────────────────── */
+
+.recipe-import-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--spacing-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+/* ── Image zone ──────────────────────────────────────────────────────── */
+
+.recipe-import-image-zone {
+  width: 100%;
+  flex-shrink: 0;
+  height: 160px;
+  border-radius: var(--corner-radius-4);
+  border: 2px dashed var(--color-stroke-weak);
+  background: var(--color-background-sunken);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.recipe-import-image-zone:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.recipe-import-image-zone--drag-over {
+  border-color: var(--color-icon-brand);
+  background: var(--color-background-raised);
+}
+
+.recipe-import-image-zone--has-image {
+  height: 240px;
+  border: none;
+}
+
+.recipe-import-image-preview {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.recipe-import-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-8);
+  color: var(--color-text-weak);
+  pointer-events: none;
+}
+
+.recipe-import-image-label {
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  color: var(--color-text-weak);
+}
+
+.recipe-import-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Title input ─────────────────────────────────────────────────────── */
+
+.recipe-import-title-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-strong);
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+
+.recipe-import-title-input::placeholder {
+  color: var(--color-text-weak);
+  opacity: 0.5;
+}
+
+/* ── Section ─────────────────────────────────────────────────────────── */
+
+.recipe-import-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.recipe-import-section-title {
+  margin: 0;
+  color: var(--color-text-weak);
+  letter-spacing: 2px;
+}
+
+/* ── Lists ───────────────────────────────────────────────────────────── */
+
+.recipe-import-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.recipe-import-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.recipe-import-directions-list {
+  gap: var(--spacing-12);
+}
+
+.recipe-import-direction-item {
+  display: flex;
+  gap: var(--spacing-12);
+  align-items: flex-start;
+}
+
+.recipe-import-direction-item .badge {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* ── Input / Textarea ────────────────────────────────────────────────── */
+
+.recipe-import-field {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--color-stroke-weak);
+  background: transparent;
+  color: var(--color-text-strong);
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  line-height: 1.5;
+  padding: var(--spacing-4) 0;
+  outline: none;
+  width: 100%;
+}
+
+.recipe-import-field:focus-visible {
+  border-bottom-color: var(--color-stroke-focus);
+  outline: none;
+}
+
+.recipe-import-field::placeholder {
+  color: var(--color-text-weak);
+  opacity: 0.5;
+}
+
+.recipe-import-textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 44px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+
+.recipe-import-remove-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-weak);
+  cursor: pointer;
+  border-radius: var(--corner-radius-4);
+  padding: 0;
+}
+
+.recipe-import-remove-btn:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.recipe-import-add-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text-brand);
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--spacing-4) 0;
+  align-self: flex-start;
+}
+
+.recipe-import-add-btn:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}

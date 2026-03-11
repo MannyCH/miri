@@ -1,9 +1,43 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { generateMealPlan, generateCalendarDays, getRecipeById, formatDayTitle } from '../data/recipes';
+import { fetchUserRecipes } from '../lib/recipesApi';
+import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
+  const { isAuthenticated } = useAuth();
+
+  // User-imported recipes from Neon DB
+  const [userRecipes, setUserRecipes] = useState([]);
+
+  const loadUserRecipes = useCallback(async () => {
+    try {
+      const fetched = await fetchUserRecipes();
+      setUserRecipes(fetched);
+    } catch (err) {
+      console.error('[recipes] load failed:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUserRecipes([]);
+      return;
+    }
+    loadUserRecipes();
+  }, [isAuthenticated, loadUserRecipes]);
+
+  const addUserRecipe = useCallback((recipe) => {
+    setUserRecipes((prev) => [recipe, ...prev]);
+  }, []);
+
+  // Looks up a recipe in both static mock data and user-imported recipes
+  const lookupRecipe = useCallback(
+    (id) => getRecipeById(id) ?? userRecipes.find((r) => r.id === id) ?? null,
+    [userRecipes]
+  );
+
   // Meal Plan State (7 days from today)
   const [mealPlan, setMealPlan] = useState([]);
   const [calendarDays] = useState(() => generateCalendarDays(28));
@@ -118,7 +152,7 @@ export function AppProvider({ children }) {
   
   // Add ingredients from a specific recipe to shopping list
   const addRecipeToShoppingList = (recipeId) => {
-    const recipe = getRecipeById(recipeId);
+    const recipe = lookupRecipe(recipeId);
     if (!recipe) return;
     
     const newItems = recipe.ingredients.map((ingredient, idx) => ({
@@ -195,6 +229,11 @@ export function AppProvider({ children }) {
   };
   
   const value = {
+    // User Recipes
+    userRecipes,
+    addUserRecipe,
+    loadUserRecipes,
+
     // Meal Plan
     mealPlan,
     calendarDays,

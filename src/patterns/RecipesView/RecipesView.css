@@ -18,11 +18,34 @@
   flex-shrink: 0;
   padding: var(--spacing-24) var(--spacing-16) var(--spacing-16);
   background: var(--color-background-base);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .recipes-header h1 {
   margin: 0;
   color: var(--color-text-strong);
+}
+
+.recipes-import-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-icon-brand);
+  cursor: pointer;
+  border-radius: var(--corner-radius-8);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.recipes-import-btn:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
 }
 
 /* Scrollable content */

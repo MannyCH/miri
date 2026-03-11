@@ -53,6 +53,17 @@ export const Default = {
   },
 };
 
+/**
+ * With import button — shows the ↓ icon in the header that triggers TXT file import
+ */
+export const WithImportButton = {
+  args: {
+    recipes: sampleRecipes,
+    searchQuery: '',
+    onImportRequest: () => console.log('Import requested'),
+  },
+};
+
 export const Interactive = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   
