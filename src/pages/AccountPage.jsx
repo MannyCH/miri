@@ -60,17 +60,27 @@ function SubViewBack({ onBack }) {
   );
 }
 
-function UserDetailsView({ user, onBack, onSave }) {
+function UserDetailsView({ user, onBack, onSaveName, onChangeEmail }) {
   const [name, setName] = useState(user?.name ?? '');
+  const [email, setEmail] = useState(user?.email ?? '');
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  const emailChanged = email.trim().toLowerCase() !== (user?.email ?? '').toLowerCase();
 
   const handleSave = async () => {
     setIsSaving(true);
     setError('');
+    setInfo('');
     try {
-      await onSave({ name });
-      onBack();
+      await onSaveName({ name });
+      if (emailChanged) {
+        await onChangeEmail({ newEmail: email.trim().toLowerCase() });
+        setInfo('A verification link has been sent to your new email address.');
+      } else {
+        onBack();
+      }
     } catch (err) {
       setError(err.message || 'Could not save changes.');
     } finally {
@@ -91,17 +101,17 @@ function UserDetailsView({ user, onBack, onSave }) {
         <TextField
           label="Email address"
           type="email"
-          value={user?.email ?? ''}
-          readOnly
-          disabled
+          value={email}
+          onChange={setEmail}
         />
+        {info ? <p className="account-subview-info text-body-small-regular">{info}</p> : null}
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
         <div className="account-subview-actions">
           <Button variant="primary" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Saving…' : 'Save'}
           </Button>
-          <Button variant="secondary" onClick={onBack} disabled={isSaving}>
-            Cancel
+          <Button variant="secondary" onClick={info ? onBack : onBack} disabled={isSaving}>
+            {info ? 'Close' : 'Cancel'}
           </Button>
         </div>
       </div>
@@ -110,6 +120,7 @@ function UserDetailsView({ user, onBack, onSave }) {
 }
 
 function ChangePasswordView({ onBack, onSave }) {
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [requirementsTouched, setRequirementsTouched] = useState(false);
@@ -129,11 +140,11 @@ function ChangePasswordView({ onBack, onSave }) {
   const handleSave = async () => {
     setRequirementsTouched(true);
     setConfirmTouched(true);
-    if (!allChecksMet || !confirmPassword || !passwordsMatch) return;
+    if (!currentPassword || !allChecksMet || !confirmPassword || !passwordsMatch) return;
     setIsSaving(true);
     setError('');
     try {
-      await onSave({ newPassword });
+      await onSave({ currentPassword, newPassword });
       onBack();
     } catch (err) {
       setError(err.message || 'Could not change password.');
@@ -154,10 +165,27 @@ function ChangePasswordView({ onBack, onSave }) {
       <SubViewBack onBack={onBack} />
       <div className="account-subview-body">
         <TextField
+          label="Current password"
+          type="password"
+          value={currentPassword}
+          onChange={setCurrentPassword}
+          autoComplete="current-password"
+        />
+
+        <TextField
           label="New password"
           type="password"
           value={newPassword}
           onChange={setNewPassword}
+          autoComplete="new-password"
+        />
+
+        <TextField
+          label="Confirm new password"
+          type="password"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+          error={confirmError()}
           autoComplete="new-password"
         />
 
@@ -187,15 +215,6 @@ function ChangePasswordView({ onBack, onSave }) {
             );
           })}
         </ul>
-
-        <TextField
-          label="Confirm new password"
-          type="password"
-          value={confirmPassword}
-          onChange={setConfirmPassword}
-          error={confirmError()}
-          autoComplete="new-password"
-        />
 
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
         <div className="account-subview-actions">
@@ -249,7 +268,7 @@ function DeleteAccountView({ onBack, onDelete }) {
 }
 
 export function AccountPage() {
-  const { user, signOut, updateUser, changePassword, deleteUser } = useAuth();
+  const { user, signOut, updateUser, changePassword, changeEmail, deleteUser } = useAuth();
   const { preferences, updatePreferences, isLoading } = usePreferences();
   const [activeView, setActiveView] = useState(VIEWS.MAIN);
   const [direction, setDirection] = useState(1);
@@ -338,7 +357,12 @@ export function AccountPage() {
             )}
 
             {activeView === VIEWS.DETAILS && (
-              <UserDetailsView user={user} onBack={navigateBack} onSave={updateUser} />
+              <UserDetailsView
+                user={user}
+                onBack={navigateBack}
+                onSaveName={updateUser}
+                onChangeEmail={changeEmail}
+              />
             )}
 
             {activeView === VIEWS.PASSWORD && (

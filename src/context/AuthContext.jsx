@@ -164,9 +164,19 @@ export function AuthProvider({ children }) {
     return result?.data ?? null;
   }, [refreshSession]);
 
-  const changePassword = useCallback(async ({ newPassword }) => {
-    const result = await authClient.changePassword({ newPassword, revokeOtherSessions: false });
+  const changePassword = useCallback(async ({ currentPassword, newPassword }) => {
+    const result = await authClient.changePassword({ currentPassword, newPassword, revokeOtherSessions: false });
     const message = getErrorMessage(result, 'Could not change password.');
+    if (message) throw new Error(message);
+    return result?.data ?? null;
+  }, []);
+
+  const changeEmail = useCallback(async ({ newEmail }) => {
+    const result = await authClient.changeEmail({
+      newEmail,
+      callbackURL: `${window.location.origin}/account`,
+    });
+    const message = getErrorMessage(result, 'Could not initiate email change.');
     if (message) throw new Error(message);
     return result?.data ?? null;
   }, []);
@@ -197,9 +207,10 @@ export function AuthProvider({ children }) {
       signOut,
       updateUser,
       changePassword,
+      changeEmail,
       deleteUser,
     };
-  }, [isAuthReady, refreshSession, sessionData, signIn, signOut, signUp, verifyEmail, sendVerificationCode, requestPasswordReset, resetPassword, updateUser, changePassword, deleteUser]);
+  }, [isAuthReady, refreshSession, sessionData, signIn, signOut, signUp, verifyEmail, sendVerificationCode, requestPasswordReset, resetPassword, updateUser, changePassword, changeEmail, deleteUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

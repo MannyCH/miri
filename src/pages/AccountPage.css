@@ -105,6 +105,11 @@
   color: var(--color-text-weak);
 }
 
+.account-subview-info {
+  margin: 0;
+  color: var(--color-text-success);
+}
+
 .account-subview-error {
   margin: 0;
   color: var(--color-text-error);
