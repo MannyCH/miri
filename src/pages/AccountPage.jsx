@@ -118,11 +118,13 @@ function ChangePasswordView({ onBack, onSave }) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [currentPasswordError, setCurrentPasswordError] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [newPasswordError, setNewPasswordError] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [requirementsTouched, setRequirementsTouched] = useState(false);
   const [confirmTouched, setConfirmTouched] = useState(false);
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [rejectedCurrentPassword, setRejectedCurrentPassword] = useState('');
 
   const checks = {
     minLength: newPassword.length >= 8,
@@ -136,6 +138,8 @@ function ChangePasswordView({ onBack, onSave }) {
   const handleCurrentPasswordBlur = () => {
     if (!currentPassword) {
       setCurrentPasswordError('Enter your current password.');
+    } else if (rejectedCurrentPassword && currentPassword === rejectedCurrentPassword) {
+      setCurrentPasswordError('Incorrect password. Please try again.');
     } else {
       setCurrentPasswordError('');
     }
@@ -149,20 +153,26 @@ function ChangePasswordView({ onBack, onSave }) {
       return;
     }
     if (!allChecksMet || !confirmPassword || !passwordsMatch) return;
+    if (newPassword === currentPassword) {
+      setNewPasswordError('New password must be different from your current password.');
+      return;
+    }
     setIsSaving(true);
     setError('');
     setCurrentPasswordError('');
+    setNewPasswordError('');
     try {
       await onSave({ currentPassword, newPassword });
       showToast('Success', 'Password updated successfully.');
       onBack();
     } catch (err) {
       const msg = err.message || 'Could not change password.';
-      const isCurrentPasswordError = /incorrect|invalid|wrong|current password/i.test(msg);
-      if (isCurrentPasswordError) {
-        setCurrentPasswordError('Incorrect password. Please try again.');
+      const isSamePasswordError = /same|different|old password/i.test(msg);
+      if (isSamePasswordError) {
+        setNewPasswordError('New password must be different from your current password.');
       } else {
-        setError(msg);
+        setRejectedCurrentPassword(currentPassword);
+        setCurrentPasswordError('Incorrect password. Please try again.');
       }
     } finally {
       setIsSaving(false);
@@ -184,7 +194,7 @@ function ChangePasswordView({ onBack, onSave }) {
           label="Current password"
           type="password"
           value={currentPassword}
-          onChange={(v) => { setCurrentPassword(v); if (currentPasswordError) setCurrentPasswordError(''); }}
+          onChange={(v) => { setCurrentPassword(v); setCurrentPasswordError(''); setRejectedCurrentPassword(''); }}
           onBlur={handleCurrentPasswordBlur}
           error={currentPasswordError}
           autoComplete="current-password"
@@ -194,7 +204,8 @@ function ChangePasswordView({ onBack, onSave }) {
           label="New password"
           type="password"
           value={newPassword}
-          onChange={setNewPassword}
+          onChange={(v) => { setNewPassword(v); if (newPasswordError) setNewPasswordError(''); }}
+          error={newPasswordError}
           autoComplete="new-password"
         />
 

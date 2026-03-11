@@ -73,6 +73,7 @@ export function AuthPage() {
   const [signInEmailError, setSignInEmailError] = useState('');
   const [signUpEmailError, setSignUpEmailError] = useState('');
   const [signUpPasswordRulesTouched, setSignUpPasswordRulesTouched] = useState(false);
+  const [resetPasswordRulesTouched, setResetPasswordRulesTouched] = useState(false);
   const [resetNewPasswordError, setResetNewPasswordError] = useState('');
   const [resetConfirmPasswordError, setResetConfirmPasswordError] = useState('');
   const [showForgotLoadingIcon, setShowForgotLoadingIcon] = useState(false);
@@ -219,6 +220,10 @@ export function AuthPage() {
           setResetNewPasswordError('Missing reset token. Open the reset link from your email again.');
           return;
         }
+        if (!allResetPasswordChecksMet) {
+          setResetPasswordRulesTouched(true);
+          return;
+        }
         if (newPassword !== confirmPassword) {
           setResetConfirmPasswordError('Passwords do not match.');
           return;
@@ -229,10 +234,8 @@ export function AuthPage() {
         }
         await resetPassword({ token: verifyToken, newPassword });
         setResetActionState('success');
+        setResetPasswordRulesTouched(false);
         setSignInToastMessage('Password has been updated successfully.');
-        setTimeout(() => {
-          setSignInToastMessage('');
-        }, 4000);
         setMode(AUTH_MODES.SIGN_IN);
         setPassword('');
         setNewPassword('');
@@ -352,6 +355,7 @@ export function AuthPage() {
     setSignInEmailError('');
     setSignUpEmailError('');
     setSignUpPasswordRulesTouched(false);
+    setResetPasswordRulesTouched(false);
     setResetNewPasswordError('');
     setResetConfirmPasswordError('');
     setShowForgotLoadingIcon(false);
@@ -484,6 +488,14 @@ export function AuthPage() {
     hasUppercase: PASSWORD_HAS_UPPERCASE_REGEX.test(password),
     hasSpecial: PASSWORD_HAS_SPECIAL_REGEX.test(password),
   };
+
+  const resetPasswordChecks = {
+    minLength: newPassword.length >= 8,
+    hasNumber: PASSWORD_HAS_NUMBER_REGEX.test(newPassword),
+    hasUppercase: PASSWORD_HAS_UPPERCASE_REGEX.test(newPassword),
+    hasSpecial: PASSWORD_HAS_SPECIAL_REGEX.test(newPassword),
+  };
+  const allResetPasswordChecksMet = Object.values(resetPasswordChecks).every(Boolean);
 
   const animatedIcon = (type) => {
     if (type === 'success') {
@@ -841,6 +853,34 @@ export function AuthPage() {
           error={resetNewPasswordError}
           autoComplete="new-password"
         />
+
+        <ul className="auth-password-requirements" aria-live="polite">
+          {[
+            { key: 'minLength', label: 'at least 8 characters' },
+            { key: 'hasNumber', label: 'at least 1 number' },
+            { key: 'hasUppercase', label: 'at least 1 uppercase letter' },
+            { key: 'hasSpecial', label: 'at least 1 special sign' },
+          ].map(({ key, label }) => {
+            const met = resetPasswordChecks[key];
+            const hasError = !met && resetPasswordRulesTouched;
+            return (
+              <li
+                key={key}
+                className={`auth-password-requirement${met ? ' is-met' : ''}${hasError ? ' is-error' : ''}`}
+              >
+                {met
+                  ? <CheckCircle size={14} aria-hidden="true" />
+                  : hasError
+                    ? <X size={14} aria-hidden="true" />
+                    : <Circle size={14} aria-hidden="true" />}
+                <span className={met || hasError ? 'text-body-small-bold' : 'text-body-small-regular'}>
+                  {label}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+
         <TextField
           label="Retype password"
           type="password"
