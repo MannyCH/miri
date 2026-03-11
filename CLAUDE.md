@@ -63,6 +63,30 @@ All visual values come from CSS variables in `src/design-tokens.css`, `src/typog
 
 ---
 
+## MCP Servers
+
+Two MCP servers are used in this project. Set them up once at user scope:
+
+```bash
+# Figma Console MCP — for reading Figma designs, extracting tokens and specs
+claude mcp add figma-console -s user \
+  -e FIGMA_ACCESS_TOKEN=<your_token> \
+  -e ENABLE_MCP_APPS=true \
+  -- npx -y figma-console-mcp@latest
+
+# Neon MCP — for database tasks (schema changes, queries, inspection)
+# Authenticate via browser first:
+npx neonctl@latest init
+# Then add:
+claude mcp add neon -s user -- npx -y @neondatabase/mcp-server-neon start
+```
+
+**Figma Console MCP tools:** `figma_execute`, `figma_capture_screenshot`, `figma_get_variables`, `figma_get_styles`, `figma_search_components`, `figma_get_status`
+
+**Neon MCP tools:** `run_sql`, `prepare_database_migration`, `complete_database_migration`, `get_database_tables`, `describe_table_schema`, `list_slow_queries`, `explain_sql_statement`, `provision_neon_data_api`
+
+---
+
 ## Rules
 
 ### 1. Minimal Changes (minimal-changes)
