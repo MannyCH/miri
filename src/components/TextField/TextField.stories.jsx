@@ -24,7 +24,7 @@ export default {
 | Text / email / password input | **\`TextField\`** ← you are here |
 | Dropdown select | [\`SelectField\`](?path=/docs/components-selectfield--docs) |
 | Number + unit (e.g. kg, cm, kcal) | [\`UnitField\`](?path=/docs/components-unitfield--docs) |
-| Custom / composite control | [\`FormField\`](?path=/docs/components-formfield--docs) as a wrapper |
+| Custom / composite control | Compose your own using the same CSS tokens |
 
 > ⚠️ Never use \`FormField + <input>\` for plain text inputs. Use \`TextField\` instead.
         `.trim(),
