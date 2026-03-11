@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { CheckCircle, ChevronLeft, Circle, X } from 'react-feather';
 import { useAuth } from '../context/AuthContext';
@@ -113,7 +113,7 @@ function UserDetailsView({ user, onBack, onSaveName }) {
   );
 }
 
-function ChangePasswordView({ onBack, onSave }) {
+function ChangePasswordView({ onBack, onSave, onVerifyCurrentPassword }) {
   const { showToast } = useApp();
   const [currentPassword, setCurrentPassword] = useState('');
   const [currentPasswordError, setCurrentPasswordError] = useState('');
@@ -124,7 +124,7 @@ function ChangePasswordView({ onBack, onSave }) {
   const [confirmTouched, setConfirmTouched] = useState(false);
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [rejectedCurrentPassword, setRejectedCurrentPassword] = useState('');
+  const currentPasswordCheckRef = useRef(0);
 
   const checks = {
     minLength: newPassword.length >= 8,
@@ -135,13 +135,27 @@ function ChangePasswordView({ onBack, onSave }) {
   const allChecksMet = Object.values(checks).every(Boolean);
   const passwordsMatch = newPassword === confirmPassword;
 
-  const handleCurrentPasswordBlur = () => {
+  const handleCurrentPasswordBlur = async () => {
     if (!currentPassword) {
       setCurrentPasswordError('Enter your current password.');
-    } else if (rejectedCurrentPassword && currentPassword === rejectedCurrentPassword) {
-      setCurrentPasswordError('Incorrect password. Please try again.');
-    } else {
+      return;
+    }
+    const valueOnBlur = currentPassword;
+    const validationRunId = currentPasswordCheckRef.current + 1;
+    currentPasswordCheckRef.current = validationRunId;
+
+    try {
+      await onVerifyCurrentPassword({ password: valueOnBlur });
+      if (currentPasswordCheckRef.current !== validationRunId || valueOnBlur !== currentPassword) return;
       setCurrentPasswordError('');
+    } catch (err) {
+      if (currentPasswordCheckRef.current !== validationRunId || valueOnBlur !== currentPassword) return;
+      const message = String(err?.message || '');
+      if (/incorrect|invalid|wrong|current password/i.test(message)) {
+        setCurrentPasswordError('Incorrect password. Please try again.');
+      } else {
+        setError(message || 'Could not verify current password.');
+      }
     }
   };
 
@@ -171,7 +185,6 @@ function ChangePasswordView({ onBack, onSave }) {
       if (isSamePasswordError) {
         setNewPasswordError('New password must be different from your current password.');
       } else {
-        setRejectedCurrentPassword(currentPassword);
         setCurrentPasswordError('Incorrect password. Please try again.');
       }
     } finally {
@@ -194,7 +207,7 @@ function ChangePasswordView({ onBack, onSave }) {
           label="Current password"
           type="password"
           value={currentPassword}
-          onChange={(v) => { setCurrentPassword(v); setCurrentPasswordError(''); setRejectedCurrentPassword(''); }}
+          onChange={(v) => { setCurrentPassword(v); setCurrentPasswordError(''); }}
           onBlur={handleCurrentPasswordBlur}
           error={currentPasswordError}
           autoComplete="current-password"
@@ -297,7 +310,7 @@ function DeleteAccountView({ onBack, onDelete }) {
 }
 
 export function AccountPage() {
-  const { user, signOut, updateUser, changePassword, deleteUser } = useAuth();
+  const { user, signOut, updateUser, changePassword, verifyCurrentPassword, deleteUser } = useAuth();
   const { preferences, updatePreferences, isLoading } = usePreferences();
   const [activeView, setActiveView] = useState(VIEWS.MAIN);
   const [direction, setDirection] = useState(1);
@@ -394,7 +407,11 @@ export function AccountPage() {
             )}
 
             {activeView === VIEWS.PASSWORD && (
-              <ChangePasswordView onBack={navigateBack} onSave={changePassword} />
+              <ChangePasswordView
+                onBack={navigateBack}
+                onSave={changePassword}
+                onVerifyCurrentPassword={verifyCurrentPassword}
+              />
             )}
 
             {activeView === VIEWS.DELETE && (

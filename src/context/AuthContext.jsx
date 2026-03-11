@@ -171,6 +171,18 @@ export function AuthProvider({ children }) {
     return result?.data ?? null;
   }, []);
 
+  const verifyCurrentPassword = useCallback(async ({ password }) => {
+    const result = await authClient.verifyPassword({ password });
+    const message = getErrorMessage(result, 'Could not verify current password.');
+    if (message) throw new Error(message);
+
+    const verified = typeof result?.data === 'boolean' ? result.data : result?.data?.verified;
+    if (verified === false) {
+      throw new Error('Incorrect password. Please try again.');
+    }
+    return result?.data ?? null;
+  }, []);
+
   const changeEmail = useCallback(async ({ newEmail }) => {
     const result = await authClient.changeEmail({
       newEmail,
@@ -207,10 +219,11 @@ export function AuthProvider({ children }) {
       signOut,
       updateUser,
       changePassword,
+      verifyCurrentPassword,
       changeEmail,
       deleteUser,
     };
-  }, [isAuthReady, refreshSession, sessionData, signIn, signOut, signUp, verifyEmail, sendVerificationCode, requestPasswordReset, resetPassword, updateUser, changePassword, changeEmail, deleteUser]);
+  }, [isAuthReady, refreshSession, sessionData, signIn, signOut, signUp, verifyEmail, sendVerificationCode, requestPasswordReset, resetPassword, updateUser, changePassword, verifyCurrentPassword, changeEmail, deleteUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
