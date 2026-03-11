@@ -95,7 +95,8 @@
 
 .account-subview-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: var(--spacing-8);
   margin-top: var(--spacing-8);
 }

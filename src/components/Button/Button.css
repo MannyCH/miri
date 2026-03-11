@@ -66,6 +66,35 @@
   outline-offset: 2px;
 }
 
+/* ─── Primary Delete ─────────────────────────────────────────────────────────
+  Default  : Fill/Error strong
+  Hover    : Fill/Hover + Fill/Error strong
+  Pressed  : Fill/Press + Fill/Error strong
+  Focus    : Fill/Error strong + Stroke/Error strong ring
+*/
+.button-primary-delete {
+  background: var(--color-fill-error-strong);
+  color: var(--color-text-inverted);
+  border: none;
+}
+
+.button-primary-delete:hover:not([disabled]):not(:disabled) {
+  background: linear-gradient(var(--color-fill-hover), var(--color-fill-hover)),
+              var(--color-fill-error-strong);
+}
+
+.button-primary-delete[data-active],
+.button-primary-delete:active:not([disabled]):not(:disabled) {
+  background: linear-gradient(var(--color-fill-press), var(--color-fill-press)),
+              var(--color-fill-error-strong);
+}
+
+.button-primary-delete:focus-visible,
+.button-primary-delete[data-focus-visible] {
+  outline: 2px solid var(--color-stroke-error-strong);
+  outline-offset: 2px;
+}
+
 /* ─── Secondary ──────────────────────────────────────────────────────────────
    Default  : Transparent + Stroke/Brand strong
    Hover    : Fill/Hover + no stroke
@@ -185,6 +214,13 @@
   background: var(--color-stroke-weak);
   border: 1px solid var(--color-stroke-weak);
   color: var(--color-stroke-weak);
+}
+
+.button-primary-delete[disabled],
+.button-primary-delete:disabled {
+  background: var(--color-stroke-error-weak);
+  border: 1px solid var(--color-stroke-error-weak);
+  color: var(--color-text-inverted);
 }
 
 .button-secondary[disabled],

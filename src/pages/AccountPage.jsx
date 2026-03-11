@@ -297,7 +297,7 @@ function DeleteAccountView({ onBack, onDelete }) {
         </p>
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
         <div className="account-subview-actions">
-          <Button variant="tertiary-delete" onClick={handleDelete} disabled={isDeleting}>
+          <Button variant="primary-delete" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting ? 'Deleting…' : 'Delete account'}
           </Button>
           <Button variant="secondary" onClick={onBack} disabled={isDeleting}>
