@@ -1,0 +1,48 @@
+---
+description: When and how to use the Neon MCP server for database tasks
+alwaysApply: true
+---
+
+# Neon MCP Server Usage
+
+The Neon MCP server (`user-Neon`) connects directly to the Neon project.
+Use it instead of writing scripts or SQL files whenever possible.
+
+## When to Use Neon MCP
+
+| Task | Use Neon MCP tool | NOT this |
+|------|-------------------|----------|
+| Schema change (add table/column) | `prepare_database_migration` → `complete_database_migration` | Writing migration .js files |
+| Inspect tables / columns | `get_database_tables`, `describe_table_schema` | Reading schema.sql |
+| One-off SQL query | `run_sql` | Writing a temp script |
+| Debug slow queries | `list_slow_queries`, `explain_sql_statement` | Manual EXPLAIN |
+| Enable Data API on a branch | `provision_neon_data_api` | Clicking in Neon Console |
+
+## Key Tools
+
+- **`run_sql`** – Execute any SQL against the `neondb` database
+- **`prepare_database_migration`** – Creates a safe temp branch, applies schema change, tests it
+- **`complete_database_migration`** – Merges tested migration to main branch
+- **`get_database_tables`** / **`describe_table_schema`** – Inspect live schema
+- **`list_slow_queries`** – Find performance bottlenecks (needs `pg_stat_statements`)
+- **`provision_neon_data_api`** – Enable Data API programmatically
+
+## Migration Workflow (ALWAYS use branching)
+
+```
+prepare_database_migration  →  test SQL on temp branch  →  complete_database_migration
+```
+Never apply schema changes directly with `run_sql` to the main branch.
+
+## Project Details
+
+- Project ID: `rapid-wildflower-52568597`
+- Main database: `neondb`
+- Branch: `main`
+
+## App Data Access Pattern
+
+Neon MCP = developer tooling (schema, admin queries)
+`src/lib/dataClient.js` = runtime app queries (Data API + RLS)
+
+Never use MCP tools in application code. MCP is for dev/admin tasks only.
