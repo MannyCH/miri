@@ -1,14 +1,33 @@
 import React, { useState } from 'react';
 import { TextField } from './TextField';
 
+/**
+ * TextField is the go-to component for all text, email, and password inputs.
+ *
+ * It replaces the old pattern of composing FormField + <input> manually.
+ * Use this everywhere a user types freeform text — never FormField + raw input.
+ *
+ * For dropdowns use SelectField. For number + unit inputs use UnitField.
+ * For completely custom controls (e.g. date pickers) use FormField as a wrapper.
+ */
 export default {
   title: 'Components/TextField',
   component: TextField,
   parameters: {
     docs: {
       description: {
-        component:
-          'Text input field with label, auto-derived variant state, and optional eye toggle for password fields. Use instead of composing FormField + raw input manually.',
+        component: `
+**The standard text input component.** Handles label, variant state, font class, and — for \`type="password"\` — an eye toggle, all automatically.
+
+| Need | Use |
+|------|-----|
+| Text / email / password input | **\`TextField\`** ← you are here |
+| Dropdown select | [\`SelectField\`](?path=/docs/components-selectfield--docs) |
+| Number + unit (e.g. kg, cm, kcal) | [\`UnitField\`](?path=/docs/components-unitfield--docs) |
+| Custom / composite control | [\`FormField\`](?path=/docs/components-formfield--docs) as a wrapper |
+
+> ⚠️ Never use \`FormField + <input>\` for plain text inputs. Use \`TextField\` instead.
+        `.trim(),
       },
     },
   },

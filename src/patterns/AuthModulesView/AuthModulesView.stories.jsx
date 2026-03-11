@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { AlertTriangle, Check, Circle, EyeOff } from 'react-feather';
+import { AlertTriangle, Check, Circle } from 'react-feather';
 import { Button } from '../../components/Button/Button';
-import { FormField } from '../../components/FormField/FormField';
+import { TextField } from '../../components/TextField/TextField';
 import './AuthModulesView.css';
 
 export default {
@@ -38,16 +38,18 @@ export const SignInModule = {
       <h1 className="auth-modules-title text-h2-bold">Log in to Miri</h1>
 
       <form className="auth-modules-form">
-        <FormField label="Email" variant="filled">
-          <input className="text-body-regular" type="email" value="laura@anicelydone.club" readOnly />
-        </FormField>
-        <FormField label="Password" variant="filled">
-          <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
-          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
-            <EyeOff size={18} />
-          </button>
-          <span className="auth-modules-inline-link text-tiny-regular">Forgot password?</span>
-        </FormField>
+        <TextField
+          label="Email"
+          type="email"
+          value="laura@anicelydone.club"
+          onChange={() => {}}
+        />
+        <TextField
+          label="Password"
+          type="password"
+          value="correcthorsebatterystaple"
+          onChange={() => {}}
+        />
         <div className="auth-modules-button-row">
           <Button variant="primary" showIcon={false}>Log in</Button>
         </div>
@@ -66,18 +68,23 @@ export const SignUpModule = {
       <p className="auth-modules-subtitle text-body-regular">Start planning meals with Miri.</p>
 
       <form className="auth-modules-form">
-        <FormField label="First name" variant="filled">
-          <input className="text-body-regular" type="text" value="Laura" readOnly />
-        </FormField>
-        <FormField label="Email" variant="filled">
-          <input className="text-body-regular" type="email" value="laura@nicelydone.club" readOnly />
-        </FormField>
-        <FormField label="Password" variant="filled">
-          <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
-          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
-            <EyeOff size={18} />
-          </button>
-        </FormField>
+        <TextField
+          label="First name"
+          value="Laura"
+          onChange={() => {}}
+        />
+        <TextField
+          label="Email"
+          type="email"
+          value="laura@nicelydone.club"
+          onChange={() => {}}
+        />
+        <TextField
+          label="Password"
+          type="password"
+          value="correcthorsebatterystaple"
+          onChange={() => {}}
+        />
         <ul className="auth-modules-password-requirements" aria-live="polite">
           <li className="auth-modules-password-requirement">
             <Circle size={14} aria-hidden="true" />
@@ -117,17 +124,17 @@ export const VerifyEmailModule = {
       </p>
 
       <form className="auth-modules-form auth-modules-verify-form">
-          <div className="auth-modules-code-group" role="group" aria-label="Verification code">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <input key={index} className="auth-modules-code-input text-body-regular" value="" readOnly />
-            ))}
-          </div>
+        <div className="auth-modules-code-group" role="group" aria-label="Verification code">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <input key={index} className="auth-modules-code-input text-body-regular" value="" readOnly />
+          ))}
+        </div>
         <div className="auth-modules-verify-actions">
           <Button variant="primary" showIcon={false}>Continue</Button>
           <p className="auth-modules-footer-copy text-body-small-regular">
             Code not received? <span className="auth-modules-footer-link text-body-small-bold-underlined">Resend code</span>
           </p>
-          </div>
+        </div>
         <span className="auth-modules-back-link text-body-small-bold-underlined">Back to login</span>
       </form>
     </Card>
@@ -208,9 +215,12 @@ export const ForgotPasswordModule = {
       <h1 className="auth-modules-title text-h2-bold">Forgot password</h1>
       <p className="auth-modules-subtitle text-body-regular">We&apos;ll send a reset link to your email.</p>
       <form className="auth-modules-form">
-        <FormField label="Email" variant="filled">
-          <input className="text-body-regular" type="email" value="laura@anicelydone.club" readOnly />
-        </FormField>
+        <TextField
+          label="Email"
+          type="email"
+          value="laura@anicelydone.club"
+          onChange={() => {}}
+        />
         <div className="auth-modules-button-row">
           <Button variant="primary" showIcon={false}>Send reset mail</Button>
         </div>
@@ -225,9 +235,12 @@ export const ForgotPasswordSuccess = {
       <h1 className="auth-modules-title text-h2-bold">Forgot password</h1>
       <p className="auth-modules-subtitle text-body-regular">We&apos;ll send a reset link to your email.</p>
       <form className="auth-modules-form">
-        <FormField label="Email" variant="filled">
-          <input className="text-body-regular" type="email" value="laura@anicelydone.club" readOnly />
-        </FormField>
+        <TextField
+          label="Email"
+          type="email"
+          value="laura@anicelydone.club"
+          onChange={() => {}}
+        />
         <div className="auth-modules-button-row">
           <Button
             variant="primary"
@@ -249,18 +262,18 @@ export const ResetPasswordModule = {
       <p className="auth-modules-subtitle text-body-regular">Create a new password to continue.</p>
 
       <form className="auth-modules-form">
-        <FormField label="New password" variant="filled">
-          <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
-          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
-            <EyeOff size={18} />
-          </button>
-        </FormField>
-        <FormField label="Retype password" variant="filled">
-          <input className="text-body-regular" type="password" value="••••••••••••••••" readOnly />
-          <button type="button" className="auth-modules-password-toggle" aria-label="Show password">
-            <EyeOff size={18} />
-          </button>
-        </FormField>
+        <TextField
+          label="New password"
+          type="password"
+          value="correcthorsebatterystaple"
+          onChange={() => {}}
+        />
+        <TextField
+          label="Retype password"
+          type="password"
+          value="correcthorsebatterystaple"
+          onChange={() => {}}
+        />
         <div className="auth-modules-button-row">
           <Button variant="primary" showIcon={false}>Update Password</Button>
         </div>
