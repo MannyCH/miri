@@ -109,3 +109,43 @@
   margin: 0;
   color: var(--color-text-error);
 }
+
+/* ─── Password eye toggle ─── */
+
+.account-password-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--color-icon-neutral);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ─── Password requirements list ─── */
+
+.account-password-requirements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.account-password-requirement {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  color: var(--color-text-weak);
+}
+
+.account-password-requirement.is-met {
+  color: var(--color-text-success);
+}
+
+.account-password-requirement.is-error {
+  color: var(--color-text-error);
+}

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ChevronLeft } from 'react-feather';
+import { CheckCircle, ChevronLeft, Circle, Eye, EyeOff, X } from 'react-feather';
+
+const PASSWORD_HAS_NUMBER_REGEX = /\d/;
+const PASSWORD_HAS_UPPERCASE_REGEX = /[A-Z]/;
+const PASSWORD_HAS_SPECIAL_REGEX = /[^A-Za-z0-9]/;
 import { useAuth } from '../context/AuthContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { AccountCard } from '../components/AccountCard/AccountCard';
@@ -58,7 +62,6 @@ function SubViewBack({ onBack }) {
 
 function UserDetailsView({ user, onBack, onSave }) {
   const [name, setName] = useState(user?.name ?? '');
-  const [email, setEmail] = useState(user?.email ?? '');
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -66,7 +69,7 @@ function UserDetailsView({ user, onBack, onSave }) {
     setIsSaving(true);
     setError('');
     try {
-      await onSave({ name, email });
+      await onSave({ name });
       onBack();
     } catch (err) {
       setError(err.message || 'Could not save changes.');
@@ -82,17 +85,19 @@ function UserDetailsView({ user, onBack, onSave }) {
         <FormField label="Name" variant={name ? 'filled' : 'empty'}>
           <input
             type="text"
+            className="text-body-regular"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
           />
         </FormField>
-        <FormField label="Email address" variant={email ? 'filled' : 'empty'}>
+        <FormField label="Email address" variant="filled">
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Your email"
+            className="text-body-regular"
+            value={user?.email ?? ''}
+            readOnly
+            disabled
           />
         </FormField>
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
@@ -112,18 +117,26 @@ function UserDetailsView({ user, onBack, onSave }) {
 function ChangePasswordView({ onBack, onSave }) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [requirementsTouched, setRequirementsTouched] = useState(false);
+  const [confirmTouched, setConfirmTouched] = useState(false);
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  const checks = {
+    minLength: newPassword.length >= 8,
+    hasNumber: PASSWORD_HAS_NUMBER_REGEX.test(newPassword),
+    hasUppercase: PASSWORD_HAS_UPPERCASE_REGEX.test(newPassword),
+    hasSpecial: PASSWORD_HAS_SPECIAL_REGEX.test(newPassword),
+  };
+  const allChecksMet = Object.values(checks).every(Boolean);
+  const passwordsMatch = newPassword === confirmPassword;
+
   const handleSave = async () => {
-    if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+    setRequirementsTouched(true);
+    setConfirmTouched(true);
+    if (!allChecksMet || !confirmPassword || !passwordsMatch) return;
     setIsSaving(true);
     setError('');
     try {
@@ -136,33 +149,93 @@ function ChangePasswordView({ onBack, onSave }) {
     }
   };
 
+  const confirmVariant = () => {
+    if (!confirmPassword && !confirmTouched) return 'empty';
+    if (confirmTouched && (!confirmPassword || !passwordsMatch)) return 'error';
+    return 'filled';
+  };
+
+  const confirmErrorMessage = () => {
+    if (!confirmTouched) return '';
+    if (!confirmPassword) return 'Please confirm your password.';
+    if (!passwordsMatch) return 'Passwords do not match.';
+    return '';
+  };
+
   return (
     <div className="account-subview">
       <SubViewBack onBack={onBack} />
       <div className="account-subview-body">
         <FormField label="New password" variant={newPassword ? 'filled' : 'empty'}>
           <input
-            type="password"
+            type={showNew ? 'text' : 'password'}
+            className="text-body-regular"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="New password"
+            autoComplete="new-password"
           />
+          <button
+            type="button"
+            className="account-password-toggle"
+            onClick={() => setShowNew((prev) => !prev)}
+            aria-label={showNew ? 'Hide password' : 'Show password'}
+          >
+            {showNew ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
+          </button>
         </FormField>
-        <FormField label="Confirm new password" variant={confirmPassword ? 'filled' : 'empty'}>
+
+        <ul className="account-password-requirements" aria-live="polite">
+          {[
+            { key: 'minLength', label: 'at least 8 characters' },
+            { key: 'hasNumber', label: 'at least 1 number' },
+            { key: 'hasUppercase', label: 'at least 1 uppercase letter' },
+            { key: 'hasSpecial', label: 'at least 1 special sign' },
+          ].map(({ key, label }) => {
+            const met = checks[key];
+            const hasError = !met && requirementsTouched;
+            return (
+              <li
+                key={key}
+                className={`account-password-requirement${met ? ' is-met' : ''}${hasError ? ' is-error' : ''}`}
+              >
+                {met
+                  ? <CheckCircle size={14} aria-hidden="true" />
+                  : hasError
+                    ? <X size={14} aria-hidden="true" />
+                    : <Circle size={14} aria-hidden="true" />}
+                <span className={met || hasError ? 'text-body-small-bold' : 'text-body-small-regular'}>
+                  {label}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+
+        <FormField
+          label="Confirm new password"
+          variant={confirmVariant()}
+          message={confirmErrorMessage()}
+        >
           <input
-            type="password"
+            type={showConfirm ? 'text' : 'password'}
+            className="text-body-regular"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Retype new password"
+            autoComplete="new-password"
           />
+          <button
+            type="button"
+            className="account-password-toggle"
+            onClick={() => setShowConfirm((prev) => !prev)}
+            aria-label={showConfirm ? 'Hide password' : 'Show password'}
+          >
+            {showConfirm ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
+          </button>
         </FormField>
+
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
         <div className="account-subview-actions">
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={isSaving || !newPassword || !confirmPassword}
-          >
+          <Button variant="primary" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Saving…' : 'Save'}
           </Button>
           <Button variant="secondary" onClick={onBack} disabled={isSaving}>
