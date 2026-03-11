@@ -101,6 +101,10 @@
   margin-top: var(--spacing-8);
 }
 
+.account-subview-actions-equal .button {
+  flex: 1;
+}
+
 .account-subview-warning {
   margin: 0;
   color: var(--color-text-weak);

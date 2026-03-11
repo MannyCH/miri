@@ -100,7 +100,7 @@ function UserDetailsView({ user, onBack, onSaveName }) {
           Email address cannot be changed at this time.
         </p>
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
-        <div className="account-subview-actions">
+        <div className="account-subview-actions account-subview-actions-equal">
           <Button variant="primary" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Saving…' : 'Save'}
           </Button>
@@ -259,7 +259,7 @@ function ChangePasswordView({ onBack, onSave, onVerifyCurrentPassword }) {
         </ul>
 
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
-        <div className="account-subview-actions">
+        <div className="account-subview-actions account-subview-actions-equal">
           <Button variant="primary" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Saving…' : 'Save'}
           </Button>
