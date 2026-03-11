@@ -57,22 +57,6 @@
   gap: var(--spacing-8);
 }
 
-.auth-field span {
-  color: var(--color-text-weak, #6f6f6f);
-  font-family: var(--font-family-body);
-  font-weight: 400;
-}
-
-.auth-field input {
-  height: 56px;
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-8);
-  background: var(--color-fill-brand-weak);
-  color: var(--color-text-strong);
-  padding: 0 var(--spacing-16);
-  box-sizing: border-box;
-  font-family: var(--font-family-body);
-}
 
 .auth-form .button.button-primary {
   width: 100%;
@@ -125,16 +109,6 @@
   animation: auth-spin 1s linear infinite;
 }
 
-.auth-password-toggle {
-  border: 0;
-  background: transparent;
-  color: var(--color-icon-neutral);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-}
 
 @keyframes auth-spin {
   from {

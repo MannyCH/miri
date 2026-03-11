@@ -1,11 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { AlertTriangle, Check, CheckCircle, Circle, Eye, EyeOff, Loader, X } from 'react-feather';
+import { AlertTriangle, Check, CheckCircle, Circle, Loader, X } from 'react-feather';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Button } from '../components/Button/Button';
-import { FormField } from '../components/FormField/FormField';
+import { TextField } from '../components/TextField/TextField';
 import './AuthPage.css';
 
 const AUTH_MODES = {
@@ -75,10 +75,6 @@ export function AuthPage() {
   const [signUpPasswordRulesTouched, setSignUpPasswordRulesTouched] = useState(false);
   const [resetNewPasswordError, setResetNewPasswordError] = useState('');
   const [resetConfirmPasswordError, setResetConfirmPasswordError] = useState('');
-  const [showSignInPassword, setShowSignInPassword] = useState(false);
-  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
-  const [showResetNewPassword, setShowResetNewPassword] = useState(false);
-  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
   const [showForgotLoadingIcon, setShowForgotLoadingIcon] = useState(false);
   const [verifyInfoMessage, setVerifyInfoMessage] = useState('');
   const [pendingSignUpNamesByEmail, setPendingSignUpNamesByEmail] = useState(() => {
@@ -405,9 +401,8 @@ export function AuthPage() {
     return { email: '', generic: rawMessage };
   };
 
-  const handleSignInEmailChange = (event) => {
-    const nextEmailValue = event.target.value;
-    setEmail(nextEmailValue);
+  const handleSignInEmailChange = (value) => {
+    setEmail(value);
     if (signInEmailError) {
       setSignInEmailError('');
     }
@@ -430,9 +425,8 @@ export function AuthPage() {
     setSignInEmailError('');
   };
 
-  const handleSignUpEmailChange = (event) => {
-    const nextEmailValue = event.target.value;
-    setEmail(nextEmailValue);
+  const handleSignUpEmailChange = (value) => {
+    setEmail(value);
     if (signUpEmailError) {
       setSignUpEmailError('');
     }
@@ -451,8 +445,8 @@ export function AuthPage() {
     setSignUpEmailError('');
   };
 
-  const handleResetNewPasswordChange = (event) => {
-    setNewPassword(event.target.value);
+  const handleResetNewPasswordChange = (value) => {
+    setNewPassword(value);
     if (resetNewPasswordError) {
       setResetNewPasswordError('');
     }
@@ -461,8 +455,8 @@ export function AuthPage() {
     }
   };
 
-  const handleResetConfirmPasswordChange = (event) => {
-    setConfirmPassword(event.target.value);
+  const handleResetConfirmPasswordChange = (value) => {
+    setConfirmPassword(value);
     if (resetConfirmPasswordError) {
       setResetConfirmPasswordError('');
     }
@@ -561,44 +555,24 @@ export function AuthPage() {
       ) : null}
 
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <FormField
+        <TextField
           label="Email"
-          variant={(signInEmailError || resolveSignInFieldError(errorMessage).email) ? 'error' : 'filled'}
-          message={signInEmailError || resolveSignInFieldError(errorMessage).email}
-        >
-          <input
-            type="email"
-            className="text-body-regular"
-            value={email}
-            onChange={handleSignInEmailChange}
-            onBlur={handleSignInEmailBlur}
-            required
-            autoComplete="email"
-          />
-        </FormField>
+          type="email"
+          value={email}
+          onChange={handleSignInEmailChange}
+          onBlur={handleSignInEmailBlur}
+          error={signInEmailError || resolveSignInFieldError(errorMessage).email}
+          autoComplete="email"
+        />
 
-        <FormField
+        <TextField
           label="Password"
-          variant={resolveSignInFieldError(errorMessage).password ? 'error' : 'filled'}
-          message={resolveSignInFieldError(errorMessage).password}
-        >
-          <input
-            type={showSignInPassword ? 'text' : 'password'}
-            className="text-body-regular"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            autoComplete="current-password"
-          />
-          <button
-            type="button"
-            className="auth-password-toggle"
-            onClick={() => setShowSignInPassword((prev) => !prev)}
-            aria-label={showSignInPassword ? 'Hide password' : 'Show password'}
-          >
-            {showSignInPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
-          </button>
-        </FormField>
+          type="password"
+          value={password}
+          onChange={setPassword}
+          error={resolveSignInFieldError(errorMessage).password}
+          autoComplete="current-password"
+        />
 
         <div className="auth-field-meta">
           <button
@@ -653,16 +627,13 @@ export function AuthPage() {
       ) : null}
 
       {!verifyEmailAddress ? (
-        <FormField label="Email" variant="filled">
-          <input
-            type="email"
-            className="text-body-regular"
-            value={verifyEmailAddress}
-            onChange={(event) => setVerifyEmailAddress(event.target.value)}
-            autoComplete="email"
-            required
-          />
-        </FormField>
+        <TextField
+          label="Email"
+          type="email"
+          value={verifyEmailAddress}
+          onChange={setVerifyEmailAddress}
+          autoComplete="email"
+        />
       ) : null}
 
       <form className="auth-form auth-verify-form" onSubmit={handleSubmit}>
@@ -687,14 +658,11 @@ export function AuthPage() {
         </div>
 
         {hasTokenParam ? (
-          <FormField label="Verification token" variant="filled">
-            <input
-              type="text"
-              className="text-body-regular"
-              value={verifyToken}
-              onChange={(event) => setVerifyToken(event.target.value)}
-            />
-          </FormField>
+          <TextField
+            label="Verification token"
+            value={verifyToken}
+            onChange={setVerifyToken}
+          />
         ) : null}
 
         {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
@@ -745,87 +713,56 @@ export function AuthPage() {
       <p className="auth-subtitle text-body-regular">Start planning meals with Miri.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <FormField label="First name" variant="filled">
-          <input
-            type="text"
-            className="text-body-regular"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-            autoComplete="name"
-          />
-        </FormField>
+        <TextField
+          label="First name"
+          value={name}
+          onChange={setName}
+          autoComplete="name"
+        />
 
-        <FormField
+        <TextField
           label="Email"
-          variant={(signUpEmailError || resolveSignUpFieldError(errorMessage).email) ? 'error' : 'filled'}
-          message={signUpEmailError || resolveSignUpFieldError(errorMessage).email}
-        >
-          <input
-            type="email"
-            className="text-body-regular"
-            value={email}
-            onChange={handleSignUpEmailChange}
-            onBlur={handleSignUpEmailBlur}
-            required
-            autoComplete="email"
-          />
-        </FormField>
+          type="email"
+          value={email}
+          onChange={handleSignUpEmailChange}
+          onBlur={handleSignUpEmailBlur}
+          error={signUpEmailError || resolveSignUpFieldError(errorMessage).email}
+          autoComplete="email"
+        />
 
-        <FormField label="Password" variant="filled">
-          <input
-            type={showSignUpPassword ? 'text' : 'password'}
-            className="text-body-regular"
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
-            }}
-            required
-            autoComplete="new-password"
-          />
-          <button
-            type="button"
-            className="auth-password-toggle"
-            onClick={() => setShowSignUpPassword((prev) => !prev)}
-            aria-label={showSignUpPassword ? 'Hide password' : 'Show password'}
-          >
-            {showSignUpPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
-          </button>
-        </FormField>
+        <TextField
+          label="Password"
+          type="password"
+          value={password}
+          onChange={setPassword}
+          autoComplete="new-password"
+        />
 
         <ul className="auth-password-requirements" aria-live="polite">
-          <li className={`auth-password-requirement ${signUpPasswordChecks.minLength ? 'is-met' : ''} ${!signUpPasswordChecks.minLength && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
-            {signUpPasswordChecks.minLength
-              ? <CheckCircle size={14} aria-hidden="true" />
-              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
-            <span className={signUpPasswordChecks.minLength ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
-              at least 8 characters
-            </span>
-          </li>
-          <li className={`auth-password-requirement ${signUpPasswordChecks.hasNumber ? 'is-met' : ''} ${!signUpPasswordChecks.hasNumber && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
-            {signUpPasswordChecks.hasNumber
-              ? <CheckCircle size={14} aria-hidden="true" />
-              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
-            <span className={signUpPasswordChecks.hasNumber ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
-              at least 1 number
-            </span>
-          </li>
-          <li className={`auth-password-requirement ${signUpPasswordChecks.hasUppercase ? 'is-met' : ''} ${!signUpPasswordChecks.hasUppercase && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
-            {signUpPasswordChecks.hasUppercase
-              ? <CheckCircle size={14} aria-hidden="true" />
-              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
-            <span className={signUpPasswordChecks.hasUppercase ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
-              at least 1 uppercase letter
-            </span>
-          </li>
-          <li className={`auth-password-requirement ${signUpPasswordChecks.hasSpecial ? 'is-met' : ''} ${!signUpPasswordChecks.hasSpecial && signUpPasswordRulesTouched ? 'is-error' : ''}`}>
-            {signUpPasswordChecks.hasSpecial
-              ? <CheckCircle size={14} aria-hidden="true" />
-              : (signUpPasswordRulesTouched ? <X size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />)}
-            <span className={signUpPasswordChecks.hasSpecial ? 'text-body-small-bold' : (signUpPasswordRulesTouched ? 'text-body-small-bold' : 'text-body-small-regular')}>
-              at least 1 special sign
-            </span>
-          </li>
+          {[
+            { key: 'minLength', label: 'at least 8 characters' },
+            { key: 'hasNumber', label: 'at least 1 number' },
+            { key: 'hasUppercase', label: 'at least 1 uppercase letter' },
+            { key: 'hasSpecial', label: 'at least 1 special sign' },
+          ].map(({ key, label }) => {
+            const met = signUpPasswordChecks[key];
+            const hasError = !met && signUpPasswordRulesTouched;
+            return (
+              <li
+                key={key}
+                className={`auth-password-requirement${met ? ' is-met' : ''}${hasError ? ' is-error' : ''}`}
+              >
+                {met
+                  ? <CheckCircle size={14} aria-hidden="true" />
+                  : hasError
+                    ? <X size={14} aria-hidden="true" />
+                    : <Circle size={14} aria-hidden="true" />}
+                <span className={met || hasError ? 'text-body-small-bold' : 'text-body-small-regular'}>
+                  {label}
+                </span>
+              </li>
+            );
+          })}
         </ul>
 
         {resolveSignUpFieldError(errorMessage).generic ? <p className="auth-error">{resolveSignUpFieldError(errorMessage).generic}</p> : null}
@@ -857,16 +794,13 @@ export function AuthPage() {
       <p className="auth-subtitle text-body-regular">We&apos;ll send a reset link to your email.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <FormField label="Email" variant="filled">
-          <input
-            type="email"
-            className="text-body-regular"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            autoComplete="email"
-          />
-        </FormField>
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={setEmail}
+          autoComplete="email"
+        />
 
         {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
 
@@ -899,51 +833,23 @@ export function AuthPage() {
       <p className="auth-subtitle text-body-regular">Create a new password to continue.</p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <FormField
+        <TextField
           label="New password"
-          variant={resetNewPasswordError ? 'error' : 'filled'}
-          message={resetNewPasswordError}
-        >
-          <input
-            type={showResetNewPassword ? 'text' : 'password'}
-            className="text-body-regular"
-            value={newPassword}
-            onChange={handleResetNewPasswordChange}
-            required
-            autoComplete="new-password"
-          />
-          <button
-            type="button"
-            className="auth-password-toggle"
-            onClick={() => setShowResetNewPassword((prev) => !prev)}
-            aria-label={showResetNewPassword ? 'Hide password' : 'Show password'}
-          >
-            {showResetNewPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
-          </button>
-        </FormField>
-        <FormField
+          type="password"
+          value={newPassword}
+          onChange={handleResetNewPasswordChange}
+          error={resetNewPasswordError}
+          autoComplete="new-password"
+        />
+        <TextField
           label="Retype password"
-          variant={resetConfirmPasswordError ? 'error' : 'filled'}
-          message={resetConfirmPasswordError}
-        >
-          <input
-            type={showResetConfirmPassword ? 'text' : 'password'}
-            className="text-body-regular"
-            value={confirmPassword}
-            onChange={handleResetConfirmPasswordChange}
-            onBlur={handleResetConfirmPasswordBlur}
-            required
-            autoComplete="new-password"
-          />
-          <button
-            type="button"
-            className="auth-password-toggle"
-            onClick={() => setShowResetConfirmPassword((prev) => !prev)}
-            aria-label={showResetConfirmPassword ? 'Hide password' : 'Show password'}
-          >
-            {showResetConfirmPassword ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
-          </button>
-        </FormField>
+          type="password"
+          value={confirmPassword}
+          onChange={handleResetConfirmPasswordChange}
+          onBlur={handleResetConfirmPasswordBlur}
+          error={resetConfirmPasswordError}
+          autoComplete="new-password"
+        />
 
         {errorMessage && !resetNewPasswordError && !resetConfirmPasswordError ? <p className="auth-error">{errorMessage}</p> : null}
 
