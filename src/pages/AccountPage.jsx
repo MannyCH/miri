@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { CheckCircle, ChevronLeft, Circle, Eye, EyeOff, X } from 'react-feather';
-
-const PASSWORD_HAS_NUMBER_REGEX = /\d/;
-const PASSWORD_HAS_UPPERCASE_REGEX = /[A-Z]/;
-const PASSWORD_HAS_SPECIAL_REGEX = /[^A-Za-z0-9]/;
+import { CheckCircle, ChevronLeft, Circle, X } from 'react-feather';
 import { useAuth } from '../context/AuthContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { AccountCard } from '../components/AccountCard/AccountCard';
@@ -13,10 +9,14 @@ import { Stepper } from '../components/Stepper/Stepper';
 import { SelectField } from '../components/SelectField/SelectField';
 import { UnitField } from '../components/UnitField/UnitField';
 import { BmrCalculatorCard } from '../components/BmrCalculatorCard/BmrCalculatorCard';
-import { FormField } from '../components/FormField/FormField';
+import { TextField } from '../components/TextField/TextField';
 import { Button } from '../components/Button/Button';
 import { NavigationBarConnected } from '../components/NavigationBar/NavigationBarConnected';
 import './AccountPage.css';
+
+const PASSWORD_HAS_NUMBER_REGEX = /\d/;
+const PASSWORD_HAS_UPPERCASE_REGEX = /[A-Z]/;
+const PASSWORD_HAS_SPECIAL_REGEX = /[^A-Za-z0-9]/;
 
 const EATING_OPTIONS = [
   { value: 'no-preference', label: 'No preference' },
@@ -82,24 +82,19 @@ function UserDetailsView({ user, onBack, onSave }) {
     <div className="account-subview">
       <SubViewBack onBack={onBack} />
       <div className="account-subview-body">
-        <FormField label="Name" variant={name ? 'filled' : 'empty'}>
-          <input
-            type="text"
-            className="text-body-regular"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-          />
-        </FormField>
-        <FormField label="Email address" variant="filled">
-          <input
-            type="email"
-            className="text-body-regular"
-            value={user?.email ?? ''}
-            readOnly
-            disabled
-          />
-        </FormField>
+        <TextField
+          label="Name"
+          value={name}
+          placeholder="Your name"
+          onChange={setName}
+        />
+        <TextField
+          label="Email address"
+          type="email"
+          value={user?.email ?? ''}
+          readOnly
+          disabled
+        />
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
         <div className="account-subview-actions">
           <Button variant="primary" onClick={handleSave} disabled={isSaving}>
@@ -117,8 +112,6 @@ function UserDetailsView({ user, onBack, onSave }) {
 function ChangePasswordView({ onBack, onSave }) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [requirementsTouched, setRequirementsTouched] = useState(false);
   const [confirmTouched, setConfirmTouched] = useState(false);
   const [error, setError] = useState('');
@@ -149,13 +142,7 @@ function ChangePasswordView({ onBack, onSave }) {
     }
   };
 
-  const confirmVariant = () => {
-    if (!confirmPassword && !confirmTouched) return 'empty';
-    if (confirmTouched && (!confirmPassword || !passwordsMatch)) return 'error';
-    return 'filled';
-  };
-
-  const confirmErrorMessage = () => {
+  const confirmError = () => {
     if (!confirmTouched) return '';
     if (!confirmPassword) return 'Please confirm your password.';
     if (!passwordsMatch) return 'Passwords do not match.';
@@ -166,23 +153,13 @@ function ChangePasswordView({ onBack, onSave }) {
     <div className="account-subview">
       <SubViewBack onBack={onBack} />
       <div className="account-subview-body">
-        <FormField label="New password" variant={newPassword ? 'filled' : 'empty'}>
-          <input
-            type={showNew ? 'text' : 'password'}
-            className="text-body-regular"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            autoComplete="new-password"
-          />
-          <button
-            type="button"
-            className="account-password-toggle"
-            onClick={() => setShowNew((prev) => !prev)}
-            aria-label={showNew ? 'Hide password' : 'Show password'}
-          >
-            {showNew ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
-          </button>
-        </FormField>
+        <TextField
+          label="New password"
+          type="password"
+          value={newPassword}
+          onChange={setNewPassword}
+          autoComplete="new-password"
+        />
 
         <ul className="account-password-requirements" aria-live="polite">
           {[
@@ -211,27 +188,14 @@ function ChangePasswordView({ onBack, onSave }) {
           })}
         </ul>
 
-        <FormField
+        <TextField
           label="Confirm new password"
-          variant={confirmVariant()}
-          message={confirmErrorMessage()}
-        >
-          <input
-            type={showConfirm ? 'text' : 'password'}
-            className="text-body-regular"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            autoComplete="new-password"
-          />
-          <button
-            type="button"
-            className="account-password-toggle"
-            onClick={() => setShowConfirm((prev) => !prev)}
-            aria-label={showConfirm ? 'Hide password' : 'Show password'}
-          >
-            {showConfirm ? <Eye size={18} aria-hidden="true" /> : <EyeOff size={18} aria-hidden="true" />}
-          </button>
-        </FormField>
+          type="password"
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+          error={confirmError()}
+          autoComplete="new-password"
+        />
 
         {error ? <p className="account-subview-error text-body-small-regular">{error}</p> : null}
         <div className="account-subview-actions">

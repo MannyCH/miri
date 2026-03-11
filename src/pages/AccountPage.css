@@ -110,20 +110,6 @@
   color: var(--color-text-error);
 }
 
-/* ─── Password eye toggle ─── */
-
-.account-password-toggle {
-  border: 0;
-  background: transparent;
-  color: var(--color-icon-neutral);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
 /* ─── Password requirements list ─── */
 
 .account-password-requirements {

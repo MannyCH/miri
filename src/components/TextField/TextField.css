@@ -1,0 +1,79 @@
+/*
+ * TextField — Token mapping from Figma:
+ *   Fill/Brand weak        → --color-fill-brand-weak    (control background)
+ *   Fill/Error weak        → --color-fill-error-weak    (error background)
+ *   Stroke/Weak            → --color-stroke-weak        (border default)
+ *   Stroke/Error strong    → --color-stroke-error-strong (border error)
+ *   Text/Strong            → --color-text-strong        (input value)
+ *   Text/Weak              → --color-text-weak          (label, placeholder)
+ *   Text/Error             → --color-text-error         (error message)
+ *   Icon/Neutral           → --color-icon-neutral       (eye toggle)
+ *   corner-radius-8        → border radius
+ *   height 45px            → field height (Figma updated spec)
+ */
+
+.text-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.text-field-label {
+  color: var(--color-text-weak);
+}
+
+.text-field-error-message {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  color: var(--color-text-error);
+}
+
+.text-field-control {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-8);
+  background: var(--color-fill-brand-weak);
+  padding: 0 var(--spacing-16);
+  box-sizing: border-box;
+}
+
+.text-field-error .text-field-control {
+  border-color: var(--color-stroke-error-strong);
+  background: var(--color-fill-error-weak);
+}
+
+.text-field-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: var(--color-text-strong);
+}
+
+.text-field-empty .text-field-input::placeholder {
+  color: var(--color-text-weak);
+}
+
+.text-field-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.text-field-eye-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--color-icon-neutral);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: var(--spacing-8);
+}
