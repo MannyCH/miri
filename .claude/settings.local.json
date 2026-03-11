@@ -11,7 +11,8 @@
       "mcp__Neon__get_database_tables",
       "Bash(curl -s http://localhost:6006/index.json 2>/dev/null | python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(k\\) for k in d.get\\('entries', {}\\).keys\\(\\)]\" 2>/dev/null | head -50)",
       "mcp__Neon__describe_table_schema",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git push:*)"
     ]
   }
 }
