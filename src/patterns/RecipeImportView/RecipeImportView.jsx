@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Badge } from '../../components/Badge';
+import { Stepper } from '../../components/Stepper/Stepper';
 import './RecipeImportView.css';
 
 /**
@@ -13,6 +14,20 @@ import './RecipeImportView.css';
  *   onCancel()     – called when user taps Cancel
  *   isSaving       – disables Save button while async save is in progress
  */
+
+// Split a raw ingredient string into { quantity, name }.
+// e.g. "320g Asparagus" → { quantity: "320g", name: "Asparagus" }
+// Falls back to { quantity: "", name: fullString } when no leading token.
+const parseIngredient = (str) => {
+  const match = String(str).match(/^(\S+)\s+(.+)$/);
+  return match ? { quantity: match[1], name: match[2] } : { quantity: '', name: str };
+};
+
+const parseServings = (val) => {
+  const n = parseInt(val, 10);
+  return isNaN(n) || n < 1 ? 2 : n;
+};
+
 export const RecipeImportView = ({
   initialRecipe = {},
   onSave,
@@ -21,20 +36,33 @@ export const RecipeImportView = ({
 }) => {
   const [title, setTitle] = useState(initialRecipe.title ?? '');
   const [ingredients, setIngredients] = useState(
-    initialRecipe.ingredients?.length ? initialRecipe.ingredients : ['']
+    initialRecipe.ingredients?.length
+      ? initialRecipe.ingredients.map(parseIngredient)
+      : [{ quantity: '', name: '' }]
   );
   const [directions, setDirections] = useState(
     initialRecipe.directions?.length ? initialRecipe.directions : ['']
   );
-  const [servings, setServings] = useState(initialRecipe.servings ?? '');
+  const [servings, setServings] = useState(parseServings(initialRecipe.servings));
   const [categories, setCategories] = useState(
-    initialRecipe.categories?.length ? initialRecipe.categories.join(', ') : ''
+    initialRecipe.categories?.length ? [...initialRecipe.categories] : []
   );
+  const [categoryInput, setCategoryInput] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
   const fileInputRef = useRef(null);
+  const categoryInputRef = useRef(null);
+  const directionsListRef = useRef(null);
+
+  // Auto-resize all direction textareas when content is pre-filled on mount
+  useLayoutEffect(() => {
+    directionsListRef.current?.querySelectorAll('textarea').forEach((el) => {
+      el.style.height = 'auto';
+      el.style.height = `${el.scrollHeight}px`;
+    });
+  }, [directions]);
 
   const handleImageFile = (file) => {
     if (!file || !file.type.startsWith('image/')) return;
@@ -49,9 +77,11 @@ export const RecipeImportView = ({
   };
 
   // ── Ingredient helpers ──────────────────────────────────────────────────
-  const updateIngredient = (i, val) =>
-    setIngredients((prev) => prev.map((item, idx) => (idx === i ? val : item)));
-  const addIngredient = () => setIngredients((prev) => [...prev, '']);
+  const updateIngredientQuantity = (i, val) =>
+    setIngredients((prev) => prev.map((item, idx) => idx === i ? { ...item, quantity: val } : item));
+  const updateIngredientName = (i, val) =>
+    setIngredients((prev) => prev.map((item, idx) => idx === i ? { ...item, name: val } : item));
+  const addIngredient = () => setIngredients((prev) => [...prev, { quantity: '', name: '' }]);
   const removeIngredient = (i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i));
 
   // ── Direction helpers ───────────────────────────────────────────────────
@@ -60,16 +90,33 @@ export const RecipeImportView = ({
   const addDirection = () => setDirections((prev) => [...prev, '']);
   const removeDirection = (i) => setDirections((prev) => prev.filter((_, idx) => idx !== i));
 
+  // ── Category helpers ────────────────────────────────────────────────────
+  const addCategory = (value) => {
+    const tag = value.trim();
+    if (tag && !categories.includes(tag)) {
+      setCategories((prev) => [...prev, tag]);
+    }
+    setCategoryInput('');
+  };
+  const removeCategory = (i) => setCategories((prev) => prev.filter((_, idx) => idx !== i));
+  const handleCategoryKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addCategory(categoryInput);
+    } else if (e.key === 'Backspace' && categoryInput === '' && categories.length > 0) {
+      removeCategory(categories.length - 1);
+    }
+  };
+
   const handleSave = () => {
     onSave?.({
       title: title.trim(),
-      ingredients: ingredients.filter((s) => s.trim()),
-      directions: directions.filter((s) => s.trim()),
-      servings: servings.trim(),
-      categories: categories
-        .split(',')
-        .map((c) => c.trim())
+      ingredients: ingredients
+        .map(({ quantity, name }) => [quantity, name].filter(Boolean).join(' ').trim())
         .filter(Boolean),
+      directions: directions.filter((s) => s.trim()),
+      servings: String(servings),
+      categories,
       imageFile,
     });
   };
@@ -100,7 +147,7 @@ export const RecipeImportView = ({
       {/* ── Scrollable content ───────────────────────────────────────── */}
       <div className="recipe-import-content">
 
-        {/* Image zone — above title */}
+        {/* Image zone */}
         <div
           className={[
             'recipe-import-image-zone',
@@ -145,14 +192,22 @@ export const RecipeImportView = ({
           <h2 className="text-tiny-bold recipe-import-section-title">INGREDIENTS</h2>
           <ul className="recipe-import-list">
             {ingredients.map((ingredient, i) => (
-              <li key={i} className="recipe-import-list-item">
+              <li key={i} className="recipe-import-ingredient-row">
                 <input
                   type="text"
-                  value={ingredient}
-                  onChange={(e) => updateIngredient(i, e.target.value)}
-                  placeholder="e.g. 200 g tomatoes"
-                  className="recipe-import-field"
-                  aria-label={`Ingredient ${i + 1}`}
+                  value={ingredient.quantity}
+                  onChange={(e) => updateIngredientQuantity(i, e.target.value)}
+                  placeholder="Qty"
+                  className="recipe-import-field recipe-import-ingredient-quantity"
+                  aria-label={`Quantity for ingredient ${i + 1}`}
+                />
+                <input
+                  type="text"
+                  value={ingredient.name}
+                  onChange={(e) => updateIngredientName(i, e.target.value)}
+                  placeholder="Ingredient name"
+                  className="recipe-import-field recipe-import-ingredient-name"
+                  aria-label={`Ingredient ${i + 1} name`}
                 />
                 <button
                   type="button"
@@ -173,7 +228,7 @@ export const RecipeImportView = ({
         {/* Directions */}
         <div className="recipe-import-section">
           <h2 className="text-tiny-bold recipe-import-section-title">DIRECTIONS</h2>
-          <ol className="recipe-import-list recipe-import-directions-list">
+          <ol ref={directionsListRef} className="recipe-import-list recipe-import-directions-list">
             {directions.map((direction, i) => (
               <li key={i} className="recipe-import-direction-item">
                 <Badge>{i + 1}</Badge>
@@ -186,7 +241,7 @@ export const RecipeImportView = ({
                   }}
                   placeholder="Describe this step…"
                   className="recipe-import-field recipe-import-textarea"
-                  rows={2}
+                  rows={1}
                   aria-label={`Direction step ${i + 1}`}
                 />
                 <button
@@ -208,27 +263,44 @@ export const RecipeImportView = ({
         {/* Servings */}
         <div className="recipe-import-section">
           <h2 className="text-tiny-bold recipe-import-section-title">SERVINGS</h2>
-          <input
-            type="text"
-            value={servings}
-            onChange={(e) => setServings(e.target.value)}
-            placeholder="e.g. 2 persons"
-            className="recipe-import-field"
-            aria-label="Servings"
-          />
+          <Stepper value={servings} min={1} max={99} onChange={setServings} />
         </div>
 
         {/* Categories */}
         <div className="recipe-import-section">
           <h2 className="text-tiny-bold recipe-import-section-title">CATEGORIES</h2>
-          <input
-            type="text"
-            value={categories}
-            onChange={(e) => setCategories(e.target.value)}
-            placeholder="e.g. healthy, vegetarian"
-            className="recipe-import-field"
-            aria-label="Categories, comma-separated"
-          />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+          <div
+            className="recipe-import-categories-field"
+            onClick={() => categoryInputRef.current?.focus()}
+            role="group"
+            aria-label="Categories"
+          >
+            {categories.map((cat, i) => (
+              <span key={cat} className="recipe-import-category-chip">
+                <span className="text-body-small-regular recipe-import-category-chip-label">{cat}</span>
+                <button
+                  type="button"
+                  className="recipe-import-category-chip-remove"
+                  onClick={(e) => { e.stopPropagation(); removeCategory(i); }}
+                  aria-label={`Remove category ${cat}`}
+                >
+                  <RemoveIcon />
+                </button>
+              </span>
+            ))}
+            <input
+              ref={categoryInputRef}
+              type="text"
+              value={categoryInput}
+              onChange={(e) => setCategoryInput(e.target.value)}
+              onKeyDown={handleCategoryKeyDown}
+              onBlur={() => addCategory(categoryInput)}
+              placeholder={categories.length === 0 ? 'e.g. healthy, vegetarian' : 'Add category…'}
+              className="recipe-import-categories-input"
+              aria-label="Add category"
+            />
+          </div>
         </div>
 
       </div>
@@ -256,5 +328,6 @@ const AddIcon = () => (
     <line x1="5" y1="12" x2="19" y2="12"/>
   </svg>
 );
+
 
 RecipeImportView.displayName = 'RecipeImportView';

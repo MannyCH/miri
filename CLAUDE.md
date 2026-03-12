@@ -385,3 +385,32 @@ Target WCAG 2.1 Level AA compliance. Check Storybook a11y addon tab — resolve 
 - Form inputs always have associated labels
 - Icon-only buttons always have `aria-label`
 - Respect `prefers-reduced-motion` for animations
+
+### 22. Dynamic Content Initial Render (dynamic-content-initial-render)
+
+When implementing components with pre-filled or async-loaded content:
+- Test the component with real data at initial render, not just the empty/idle state
+- Auto-resize patterns (textarea, dynamic lists) must work without user interaction — use `useLayoutEffect` to apply on mount
+- Verify: no content clipped, no overflow-hidden text, all populated rows have correct spacing
+
+This applies to both Storybook stories and web app pages — always check the pre-filled/loaded state, not just the empty default.
+
+### 23. CSS Value Traceability (css-value-traceability)
+
+Every spacing, margin, padding, and border-radius value in CSS — and every token or component used in web app code — must be traced to either:
+- A design token (`var(--spacing-*)`, `var(--corner-radius-*)`, etc.)
+- An explicit Figma spec extracted via `figma_execute` or `figma_capture_screenshot`
+- A Storybook story inspected via the MCP or HTTP API (`http://localhost:6006`)
+
+**Never** write a raw pixel value (`3px`, `12px`, etc.) for spacing or radius. If the token doesn't exist, stop and ask.
+
+This applies equally to CSS files and web app JSX — when composing pages or patterns, inspect the relevant Storybook story to confirm which tokens and components are used. Never write from memory.
+
+### 24. Shared CSS Class Audit (shared-css-class-audit)
+
+When a CSS class is applied to multiple elements:
+- Verify the full ruleset is correct for **every** element using it
+- If any element needs an exception, use a modifier class or more specific selector — never patch with a late override
+- Before completing: mentally list every element using the shared class and confirm each one renders correctly
+
+This applies equally when composing Storybook components in web app code — if a component prop or variant is reused across contexts, verify it is appropriate in each context, not just the first one.

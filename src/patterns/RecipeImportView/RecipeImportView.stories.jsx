@@ -27,19 +27,18 @@ export default {
 const parsedRecipe = {
   title: 'Auberginensalat Mit Ohne Alles',
   ingredients: [
-    'Etwa 1/2 Aubergine feines Meersalz',
-    'etwa 100 g Naturjoghurt',
-    'Knoblauch, gepresst, nach persönlichem Geschmack',
-    'Pul Biber (türkische Chiliflocken)',
+    '1/2 Aubergine',
+    '100g Naturjoghurt',
+    '1 Knoblauchzehe',
+    '1 TL Pul Biber',
   ],
   directions: [
-    'Den Backofen auf 230 Grad vorheizen',
-    'Die Aubergine waschen, mehrmals mit einem spitzen Messer einstechen (damit sie nicht platzt)',
-    'Im Ofen so lange backen, bis die Haut schrumpelig und schwarz ist; das dauert etwa 30 bis 45 Minuten',
-    'Die Aubergine herausnehmen, der Länge nach halbieren und das weiche Fruchtfleisch mit einem Löffel in eine Schüssel kratzen. Salzen, mit Joghurt und Knoblauch mischen und nach Belieben Chiliflocken darüberstreuen',
+    'Den Backofen auf 230 Grad vorheizen.',
+    'Die Aubergine waschen, mehrmals mit einem spitzen Messer einstechen und im Ofen 30–45 Minuten backen, bis die Haut schwarz und schrumpelig ist.',
+    'Aubergine halbieren, Fruchtfleisch herausschaben. Mit Joghurt, Knoblauch und Salz mischen. Nach Belieben Chiliflocken darüberstreuen.',
   ],
-  servings: '1 person',
-  categories: ['healthy', 'Vegetable'],
+  servings: 2,
+  categories: ['healthy', 'vegetarian'],
 };
 
 /**
