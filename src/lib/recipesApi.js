@@ -1,3 +1,4 @@
+import { authClient } from './authClient';
 import { dataClient } from './dataClient';
 
 /**
@@ -45,8 +46,8 @@ export async function fetchUserRecipes() {
  * Persist a new user recipe (with ingredients) and return its generated ID.
  */
 export async function createRecipe({ title, ingredients, directions, servings, categories, image }) {
-  const { data: sessionData } = await dataClient.auth.getSession();
-  const userId = sessionData?.session?.user?.id;
+  const { data: sessionData } = await authClient.getSession();
+  const userId = sessionData?.user?.id;
   if (!userId) throw new Error('Not authenticated');
 
   const id = `user-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
