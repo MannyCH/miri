@@ -34,6 +34,12 @@ const GOAL_OPTIONS = [
   { value: 'eat-healthier', label: 'Eat healthier' },
 ];
 
+const COOKING_FREQUENCY_OPTIONS = [
+  { value: 'daily', label: 'Cook fresh daily' },
+  { value: 'few-times', label: 'A few times a week' },
+  { value: 'minimal', label: 'Minimal cooking' },
+];
+
 const VIEWS = { MAIN: 'main', DETAILS: 'details', PASSWORD: 'password', DELETE: 'delete' };
 
 const slideVariants = {
@@ -375,6 +381,13 @@ export function AccountPage() {
                     options={GOAL_OPTIONS}
                     value={preferences.goal}
                     onChange={(goal) => updatePreferences({ goal })}
+                    disabled={isLoading}
+                  />
+                  <SelectField
+                    label="How often do you cook?"
+                    options={COOKING_FREQUENCY_OPTIONS}
+                    value={preferences.cookingFrequency}
+                    onChange={(cookingFrequency) => updatePreferences({ cookingFrequency })}
                     disabled={isLoading}
                   />
                 </SettingsSection>

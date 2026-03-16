@@ -9,6 +9,7 @@ const DEFAULT_PREFERENCES = {
   eatingStyle: '',
   goal: '',
   bmr: '',
+  cookingFrequency: 'daily',
 };
 
 const SAVE_DEBOUNCE_MS = 1000;
@@ -20,6 +21,7 @@ function rowToState(row) {
     eatingStyle: row.eating_style ?? '',
     goal: row.goal ?? '',
     bmr: row.bmr_kcal != null ? String(row.bmr_kcal) : '',
+    cookingFrequency: row.cooking_frequency ?? 'daily',
   };
 }
 
@@ -29,6 +31,7 @@ function stateToPayload(state) {
     eatingStyle: state.eatingStyle || null,
     goal: state.goal || null,
     bmrKcal: state.bmr ? parseInt(state.bmr, 10) : null,
+    cookingFrequency: state.cookingFrequency || 'daily',
   };
 }
 

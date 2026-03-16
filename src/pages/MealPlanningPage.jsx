@@ -3,11 +3,13 @@ import { AnimatePresence } from 'motion/react';
 import { MealPlanningView } from '../patterns/MealPlanningView';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useApp } from '../context/AppContext';
+import { usePreferences } from '../context/PreferencesContext';
 import { formatDayTitle } from '../data/recipes';
 
 export function MealPlanningPage() {
   const {
     mealPlan,
+    isMealPlanGenerating,
     calendarDays,
     selectedFullDate,
     setSelectedFullDate,
@@ -18,6 +20,7 @@ export function MealPlanningPage() {
     addRecipeToShoppingList,
     shoppingList,
   } = useApp();
+  const { preferences } = usePreferences();
   
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [hasAddedToList, setHasAddedToList] = useState(false);
@@ -38,12 +41,12 @@ export function MealPlanningPage() {
   };
   
   const handlePlanMeals = () => {
-    regenerateMealPlan();
+    regenerateMealPlan(preferences);
     setHasAddedToList(false);
   };
 
   const handleReplan = () => {
-    regenerateMealPlan();
+    regenerateMealPlan(preferences);
     setHasAddedToList(false);
   };
 
@@ -96,6 +99,7 @@ export function MealPlanningPage() {
         hasPlan={hasPlan}
         hasMealsForDay={!!dailyMeals}
         hasAddedToList={hasAddedToList}
+        isGenerating={isMealPlanGenerating}
         onPlanMeals={handlePlanMeals}
         onAddMeals={handleAddMeals}
         onReplan={handleReplan}

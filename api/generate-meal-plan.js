@@ -1,0 +1,99 @@
+import Anthropic from '@anthropic-ai/sdk';
+
+/**
+ * POST /api/generate-meal-plan
+ * Body: {
+ *   preferences: { goal, eatingStyle, bmr, cookingFrequency, servings },
+ *   recipes: [{ id, title, category }],
+ * }
+ *
+ * Returns: { days: [{ date, meals: { breakfast, lunch, dinner } }] }
+ * where each meal value is a recipe id or null.
+ */
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).end();
+
+  const { preferences = {}, recipes = [] } = req.body ?? {};
+  if (recipes.length === 0) return res.status(400).json({ error: 'recipes are required' });
+
+  const {
+    goal = '',
+    eatingStyle = '',
+    bmr = '',
+    cookingFrequency = 'daily',
+    servings = 2,
+  } = preferences;
+
+  const cookingFrequencyDescriptions = {
+    daily: 'The user cooks fresh every day — each meal should ideally be a different recipe. Avoid repeating the same recipe more than once per week.',
+    'few-times': 'The user cooks a few times a week — it is fine and encouraged to repeat lunch or dinner recipes 2–3 times during the week to minimise cooking sessions.',
+    minimal: 'The user does meal prep and cooks as little as possible — repeat lunch and dinner recipes heavily (cook once, eat 3–4 times). Aim for only 2–3 unique dinner recipes and 1–2 unique lunch recipes for the whole week.',
+  };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dates = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    return d.toISOString().split('T')[0];
+  });
+
+  const recipeList = recipes
+    .map(r => `- id: "${r.id}" | title: "${r.title}" | suitable for: ${r.category}`)
+    .join('\n');
+
+  const prompt = `You are a smart meal planner. Create a personalised 7-day meal plan using ONLY the recipes listed below.
+
+User profile:
+- Goal: ${goal || 'not specified'}
+- Eating style: ${eatingStyle || 'no preference'}
+- Metabolic basal rate: ${bmr ? `${bmr} kcal/day` : 'not specified'}
+- Cooking for: ${servings} ${servings === 1 ? 'person' : 'people'}
+- Cooking frequency: ${cookingFrequencyDescriptions[cookingFrequency] || cookingFrequencyDescriptions.daily}
+
+Available recipes:
+${recipeList}
+
+Rules:
+1. Use ONLY recipe IDs from the list above — never invent new IDs.
+2. Assign recipes to the correct meal slot based on their "suitable for" category. A recipe marked "breakfast" must only appear in breakfast slots, etc.
+3. Apply the cooking frequency guideline strictly.
+4. If there are not enough breakfast recipes to fill all 7 days without repetition, repeating breakfast is fine.
+5. Prefer recipes that match the user's eating style and goal where possible.
+6. Return ONLY valid JSON — no explanation, no markdown.
+
+Dates: ${dates.join(', ')}
+
+Return this exact JSON shape:
+{
+  "days": [
+    {
+      "date": "YYYY-MM-DD",
+      "meals": {
+        "breakfast": "recipe-id-or-null",
+        "lunch": "recipe-id-or-null",
+        "dinner": "recipe-id-or-null"
+      }
+    }
+  ]
+}`;
+
+  try {
+    const client = new Anthropic();
+    const message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const text = message.content[0].text.trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON in response');
+
+    const result = JSON.parse(jsonMatch[0]);
+    return res.json(result);
+  } catch (err) {
+    console.error('generate-meal-plan error:', err);
+    return res.status(500).json({ error: 'Failed to generate meal plan' });
+  }
+}

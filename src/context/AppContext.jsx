@@ -40,6 +40,7 @@ export function AppProvider({ children }) {
 
   // Meal Plan State (7 days from today)
   const [mealPlan, setMealPlan] = useState([]);
+  const [isMealPlanGenerating, setIsMealPlanGenerating] = useState(false);
   const [calendarDays] = useState(() => generateCalendarDays(28));
   const todayStr = calendarDays[0]?.fullDate;
   const [selectedFullDate, setSelectedFullDate] = useState(todayStr);
@@ -111,10 +112,57 @@ export function AppProvider({ children }) {
     });
   };
   
-  // Auto-generate new meal plan
-  const regenerateMealPlan = () => {
-    const newPlan = generateMealPlan();
-    setMealPlan(newPlan);
+  // Generate meal plan — tries AI first, falls back to random
+  const regenerateMealPlan = async (preferences = {}) => {
+    setIsMealPlanGenerating(true);
+    try {
+      const recipeList = [...recipes, ...userRecipes].map(r => ({
+        id: r.id,
+        title: r.title,
+        category: r.category ?? 'dinner',
+      }));
+
+      const response = await fetch('/api/generate-meal-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferences, recipes: recipeList }),
+      });
+
+      if (!response.ok) throw new Error('API error');
+
+      const { days } = await response.json();
+
+      const allRecipes = [...recipes, ...userRecipes];
+      const findRecipe = (id) => allRecipes.find(r => r.id === id) ?? null;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const plan = days.map((day, i) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        return {
+          day: date.toLocaleDateString('en-US', { weekday: 'long' }),
+          date: date.getDate(),
+          weekday: date.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2),
+          fullDate: day.date,
+          month: date.toLocaleDateString('en-US', { month: 'long' }),
+          isToday: i === 0,
+          meals: {
+            breakfast: findRecipe(day.meals?.breakfast),
+            lunch: findRecipe(day.meals?.lunch),
+            dinner: findRecipe(day.meals?.dinner),
+          },
+        };
+      });
+
+      setMealPlan(plan);
+    } catch {
+      // Fallback to random plan if API fails
+      setMealPlan(generateMealPlan());
+    } finally {
+      setIsMealPlanGenerating(false);
+    }
   };
   
   // Add all ingredients from meal plan to shopping list
@@ -236,6 +284,7 @@ export function AppProvider({ children }) {
 
     // Meal Plan
     mealPlan,
+    isMealPlanGenerating,
     calendarDays,
     selectedFullDate,
     setSelectedFullDate,

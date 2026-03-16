@@ -16,6 +16,7 @@ export const MealPlanningView = ({
   hasPlan = false,
   hasMealsForDay = false,
   hasAddedToList = false,
+  isGenerating = false,
   onPlanMeals,
   onAddMeals,
   onReplan,
@@ -65,8 +66,9 @@ export const MealPlanningView = ({
                     className="context-menu-item text-body-base-regular"
                     role="menuitem"
                     onClick={() => handleMenuAction(onReplan)}
+                    disabled={isGenerating}
                   >
-                    Replan week
+                    {isGenerating ? 'Planning…' : 'Replan week'}
                   </button>
                   <button
                     className="context-menu-item context-menu-item-danger text-body-base-regular"
@@ -119,8 +121,8 @@ export const MealPlanningView = ({
             <p className="text-body-base-regular" style={{ color: 'var(--color-text-weak)' }}>
               No meals planned yet.
             </p>
-            <Button variant="primary" onClick={onPlanMeals}>
-              Plan my week
+            <Button variant="primary" onClick={onPlanMeals} disabled={isGenerating}>
+              {isGenerating ? 'Planning…' : 'Plan my week'}
             </Button>
           </div>
         )}

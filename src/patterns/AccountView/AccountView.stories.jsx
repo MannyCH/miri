@@ -36,10 +36,17 @@ const GOAL_OPTIONS = [
   { value: 'eat-healthier', label: 'Eat healthier' },
 ];
 
+const COOKING_FREQUENCY_OPTIONS = [
+  { value: 'daily', label: 'Cook fresh daily' },
+  { value: 'few-times', label: 'A few times a week' },
+  { value: 'minimal', label: 'Minimal cooking' },
+];
+
 function AccountViewTemplate() {
   const [servings, setServings] = useState(2);
   const [eatingStyle, setEatingStyle] = useState('');
   const [goal, setGoal] = useState('');
+  const [cookingFrequency, setCookingFrequency] = useState('daily');
   const [bmr, setBmr] = useState('');
 
   return (
@@ -78,6 +85,12 @@ function AccountViewTemplate() {
             value={goal}
             onChange={setGoal}
           />
+          <SelectField
+            label="How often do you cook?"
+            options={COOKING_FREQUENCY_OPTIONS}
+            value={cookingFrequency}
+            onChange={setCookingFrequency}
+          />
         </SettingsSection>
 
         <SettingsSection title="Advanced - Health" spacing="section">
@@ -111,6 +124,7 @@ export const WithValues = {
     const [servings, setServings] = useState(4);
     const [eatingStyle, setEatingStyle] = useState('plant-forward');
     const [goal, setGoal] = useState('lose-weight');
+    const [cookingFrequency, setCookingFrequency] = useState('few-times');
     const [bmr, setBmr] = useState('1600');
 
     return (
@@ -148,6 +162,12 @@ export const WithValues = {
               options={GOAL_OPTIONS}
               value={goal}
               onChange={setGoal}
+            />
+            <SelectField
+              label="How often do you cook?"
+              options={COOKING_FREQUENCY_OPTIONS}
+              value={cookingFrequency}
+              onChange={setCookingFrequency}
             />
           </SettingsSection>
 
