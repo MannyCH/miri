@@ -173,9 +173,10 @@ Before ANY UI change, in this order:
 
 After any UI change, before considering work complete:
 1. Capture Figma screenshot reference (`figma_capture_screenshot`)
-2. Test in browser (`npm run dev` → `http://localhost:5173`)
-3. Compare side-by-side with Figma
-4. Verify all of: typography classes, color tokens, spacing tokens, border-radius tokens
+2. Run `figma_lint_design` on the relevant node or page — catches WCAG contrast, touch target size, hardcoded values, detached components, and layout issues
+3. Test in browser (`npm run dev` → `http://localhost:5173`)
+4. Compare side-by-side with Figma
+5. Verify all of: typography classes, color tokens, spacing tokens, border-radius tokens
 
 **Mandatory checks before committing:**
 - `color: var(--color-text-strong)` ✅ not `color: #260B00` ❌

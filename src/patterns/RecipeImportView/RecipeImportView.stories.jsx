@@ -17,7 +17,7 @@ export default {
     docs: {
       description: {
         component:
-          'Editable recipe form shown after importing a TXT file. All fields are pre-populated from the parser and can be adjusted before saving.',
+          'Editable recipe form shown after a recipe import (URL, photo, or file). All fields are pre-populated from the parser and can be adjusted before saving. The title field auto-expands to multiple lines for long titles.',
       },
     },
   },
@@ -58,6 +58,20 @@ export const ParsedImport = {
 export const EmptyForm = {
   args: {
     initialRecipe: {},
+    onSave: (data) => console.log('Save:', data),
+    onCancel: () => console.log('Cancel'),
+  },
+};
+
+/**
+ * Long title — demonstrates multi-line auto-expanding title textarea
+ */
+export const LongTitle = {
+  args: {
+    initialRecipe: {
+      ...parsedRecipe,
+      title: 'Gerösteter Auberginensalat mit Naturjoghurt, Knoblauch und Pul Biber',
+    },
     onSave: (data) => console.log('Save:', data),
     onCancel: () => console.log('Cancel'),
   },
