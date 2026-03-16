@@ -16,7 +16,7 @@ export default {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Recipe detail view matching Figma "Recipes - Detailed" pattern. Non-interactive ingredient list, Badge-numbered directions, and full-width "Add to list" button at bottom.',
+        component: 'Recipe detail view matching Figma "Recipes - Detailed" pattern. Title → image → interactive servings counter → non-interactive ingredient list → Badge-numbered directions → full-width "Add to list" button.',
       },
     },
   },
@@ -26,6 +26,7 @@ export default {
 const sampleRecipe = {
   title: 'Salmon with tomato and asparagus',
   image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop',
+  servings: 2,
   ingredients: [
     '2 salmon fillets (about 6 oz each)',
     '1 bunch asparagus',

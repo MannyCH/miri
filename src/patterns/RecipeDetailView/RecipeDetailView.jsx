@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
+import { Stepper } from '../../components/Stepper/Stepper';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './RecipeDetailView.css';
 
@@ -19,6 +20,10 @@ export const RecipeDetailView = ({
   isAdded = false,
   ...props
 }) => {
+  const [servings, setServings] = useState(() => {
+    const n = parseInt(recipe.servings, 10);
+    return isNaN(n) || n < 1 ? 2 : n;
+  });
   const fractionMap = {
     '1/2': '½',
     '1/3': '⅓',
@@ -97,6 +102,12 @@ export const RecipeDetailView = ({
             <img src={recipe.image} alt={recipe.title} />
           </div>
         )}
+
+        {/* Servings Section */}
+        <div className="recipe-detail-section">
+          <h2 className="text-tiny-bold recipe-detail-section-title">SERVINGS</h2>
+          <Stepper value={servings} min={1} max={99} onChange={setServings} />
+        </div>
 
         {/* Ingredients Section — non-interactive list */}
         <div className="recipe-detail-section recipe-ingredients-section">
