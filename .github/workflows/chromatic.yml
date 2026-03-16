@@ -1,7 +1,7 @@
 name: Chromatic Visual Testing
 
 on:
-  push:
+  pull_request:
     branches:
       - main
     paths:
@@ -42,7 +42,6 @@ jobs:
           exitOnceUploaded: true  # Don't wait for test results
           
       - name: Publish Storybook to Chromatic
-        if: github.ref == 'refs/heads/main'
         run: |
           echo "✅ Chromatic build complete"
           echo "📊 Review changes at: https://www.chromatic.com"
