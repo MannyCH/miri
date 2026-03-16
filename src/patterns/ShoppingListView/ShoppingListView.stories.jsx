@@ -17,7 +17,7 @@ export default {
     docs: {
       description: {
         component: `
-Shopping list screen with two view modes: simple list or grouped by recipe. Composition of IngredientList, SearchBar, Button, and NavigationBar components.
+Shopping list screen with three view modes: simple list, grouped by recipe, or smart AI-organised view. The smart view deduplicates and merges ingredients (e.g. "1 onion + 2 Zwiebeln → 3 Onions"), assigns supermarket categories, and lets you check items off locally while shopping. Composition of IngredientList, SearchBar, Button, and NavigationBar components.
 
 ## Elevation token usage
 - Floating search FAB uses \`--elevation-overlay\`.
@@ -79,6 +79,63 @@ export const RecipeView = {
   args: {
     viewMode: 'recipe',
     recipeGroups: sampleRecipeGroups,
+  },
+};
+
+const sampleSmartGroups = [
+  {
+    category: 'Vegetables',
+    emoji: '🥦',
+    items: [
+      { name: 'Onions', quantity: '3' },
+      { name: 'Asparagus', quantity: '320g' },
+      { name: 'Cherry tomatoes', quantity: '2 cups' },
+      { name: 'Garlic', quantity: '3 cloves' },
+    ],
+  },
+  {
+    category: 'Fruits',
+    emoji: '🍎',
+    items: [
+      { name: 'Lemon', quantity: '2' },
+    ],
+  },
+  {
+    category: 'Meat & Fish',
+    emoji: '🥩',
+    items: [
+      { name: 'Salmon fillets', quantity: '2' },
+    ],
+  },
+  {
+    category: 'Dairy & Eggs',
+    emoji: '🥛',
+    items: [
+      { name: 'Milk', quantity: '1.5l' },
+      { name: 'Butter', quantity: '50g' },
+    ],
+  },
+];
+
+/**
+ * Smart AI-organised view — deduplicated and grouped by supermarket category
+ */
+export const SmartView = {
+  args: {
+    viewMode: 'smart',
+    smartGroups: sampleSmartGroups,
+    smartStatus: 'idle',
+  },
+};
+
+/**
+ * Smart view loading state — while the API call is in progress
+ */
+export const SmartViewLoading = {
+  args: {
+    viewMode: 'smart',
+    smartGroups: [],
+    smartStatus: 'loading',
   },
 };
 

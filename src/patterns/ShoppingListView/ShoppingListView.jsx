@@ -23,10 +23,17 @@ export const ShoppingListView = ({
   onItemDelete,
   onClearList,
   onViewModeChange,
+  onSmartRefresh,
+  smartGroups = [],
+  smartStatus = 'idle',
   searchQuery = '',
   onSearch,
   ...props
 }) => {
+  const [smartChecked, setSmartChecked] = useState({});
+
+  const toggleSmartItem = (key) =>
+    setSmartChecked(prev => ({ ...prev, [key]: !prev[key] }));
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -167,6 +174,13 @@ export const ShoppingListView = ({
             aria-label="Simple list"
           >
             <ListIcon />
+          </button>
+          <button
+            className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
+            onClick={() => onViewModeChange?.('smart')}
+            aria-label="Smart grouped list"
+          >
+            <SparkleIcon />
           </button>
         </div>
       </header>
@@ -325,6 +339,70 @@ export const ShoppingListView = ({
             )}
           </>
         )}
+
+        {viewMode === 'smart' && (
+          <div className="shopping-list-smart">
+            {smartStatus === 'loading' && (
+              <div className="shopping-list-smart-loading">
+                <SparkleIcon />
+                <span className="text-body-regular">Organising your list…</span>
+              </div>
+            )}
+            {smartStatus === 'error' && (
+              <div className="shopping-list-smart-error">
+                <p className="text-body-regular">Could not organise list.</p>
+                <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
+                  Try again
+                </button>
+              </div>
+            )}
+            {smartStatus === 'idle' && smartGroups.length === 0 && (
+              <p className="shopping-list-smart-empty text-body-regular">
+                Your list is empty.
+              </p>
+            )}
+            {smartStatus === 'idle' && smartGroups.length > 0 && (
+              <>
+                {smartGroups.map((group, groupIdx) => (
+                  <div key={group.category} className="smart-group">
+                    <h2 className="smart-group-header text-tiny-bold">
+                      <span aria-hidden="true">{group.emoji}</span> {group.category.toUpperCase()}
+                    </h2>
+                    <ul className="smart-group-items">
+                      {group.items.map((item, itemIdx) => {
+                        const key = `${groupIdx}-${itemIdx}`;
+                        const checked = !!smartChecked[key];
+                        return (
+                          <li key={key}>
+                            <button
+                              type="button"
+                              className={`smart-item${checked ? ' smart-item--checked' : ''}`}
+                              onClick={() => toggleSmartItem(key)}
+                              aria-pressed={checked}
+                            >
+                              {item.quantity && (
+                                <span className="smart-item-quantity text-body-regular">
+                                  {item.quantity}
+                                </span>
+                              )}
+                              <span className="smart-item-name text-body-regular">{item.name}</span>
+                              {checked && <CheckSmallIcon />}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+                <div className="shopping-list-smart-refresh">
+                  <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
+                    Refresh
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Bottom Navigation */}
@@ -398,6 +476,20 @@ const SearchIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="11" cy="11" r="8"/>
     <path d="m21 21-4.35-4.35"/>
+  </svg>
+);
+
+const SparkleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/>
+    <path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75z"/>
+    <path d="M5 3l.5 1.5L7 5l-1.5.5L5 7l-.5-1.5L3 5l1.5-.5z"/>
+  </svg>
+);
+
+const CheckSmallIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
   </svg>
 );
 

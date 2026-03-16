@@ -23,6 +23,40 @@ export function ShoppingListPage() {
     clearShoppingList,
   } = useApp();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [smartGroups, setSmartGroups] = React.useState([]);
+  const [smartStatus, setSmartStatus] = React.useState('idle');
+
+  const fetchSmartGroups = React.useCallback(() => {
+    const uncheckedItems = shoppingList
+      .filter(item => !item.checked)
+      .map(item => item.name);
+
+    if (uncheckedItems.length === 0) {
+      setSmartGroups([]);
+      setSmartStatus('idle');
+      return;
+    }
+
+    setSmartStatus('loading');
+    fetch('/api/normalize-shopping-list', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: uncheckedItems }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        setSmartGroups(data.groups ?? []);
+        setSmartStatus('idle');
+      })
+      .catch(() => setSmartStatus('error'));
+  }, [shoppingList]);
+
+  React.useEffect(() => {
+    if (shoppingListViewMode === 'smart') {
+      fetchSmartGroups();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shoppingListViewMode]);
   
   // Group ingredients by recipe for recipe view mode
   const groupedByRecipe = shoppingList.reduce((acc, item) => {
@@ -99,6 +133,9 @@ export function ShoppingListPage() {
     <ShoppingListView
       viewMode={shoppingListViewMode}
       onViewModeChange={setShoppingListViewMode}
+      smartGroups={smartGroups}
+      smartStatus={smartStatus}
+      onSmartRefresh={fetchSmartGroups}
       items={items}
       itemKeys={itemKeys}
       itemIds={itemIds}

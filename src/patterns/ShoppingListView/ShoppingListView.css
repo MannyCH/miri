@@ -152,6 +152,124 @@
   outline-offset: 2px;
 }
 
+/* ── Smart grouped view ──────────────────────────────────────────────── */
+
+.shopping-list-smart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-24);
+}
+
+.shopping-list-smart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-12);
+  padding: var(--spacing-32) 0;
+  color: var(--color-text-weak);
+}
+
+.shopping-list-smart-error,
+.shopping-list-smart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-12);
+  padding: var(--spacing-32) 0;
+  color: var(--color-text-weak);
+  text-align: center;
+}
+
+.shopping-list-smart-retry {
+  border: none;
+  background: transparent;
+  color: var(--color-text-brand);
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--spacing-4) 0;
+}
+
+.shopping-list-smart-retry:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}
+
+.shopping-list-smart-refresh {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--spacing-8);
+}
+
+.smart-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.smart-group-header {
+  margin: 0 0 var(--spacing-4);
+  color: var(--color-text-weak);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.smart-group-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.smart-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12) 0;
+  border: none;
+  border-bottom: 1px solid var(--color-stroke-weak);
+  background: transparent;
+  color: var(--color-text-strong);
+  text-align: left;
+  cursor: pointer;
+}
+
+.smart-item:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}
+
+.smart-item--checked {
+  color: var(--color-text-weak);
+  text-decoration: line-through;
+}
+
+.smart-item-quantity {
+  min-width: 48px;
+  flex-shrink: 0;
+  color: var(--color-text-weak);
+}
+
+.smart-item--checked .smart-item-quantity {
+  color: var(--color-text-weak);
+}
+
+.smart-item-name {
+  flex: 1;
+}
+
+.smart-item svg:last-child {
+  flex-shrink: 0;
+  color: var(--color-icon-brand);
+}
+
 /* Floating search FAB — anchored to container */
 .shopping-list-search-fab {
   position: absolute;
