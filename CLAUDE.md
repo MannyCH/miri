@@ -406,6 +406,39 @@ Every spacing, margin, padding, and border-radius value in CSS — and every tok
 
 This applies equally to CSS files and web app JSX — when composing pages or patterns, inspect the relevant Storybook story to confirm which tokens and components are used. Never write from memory.
 
+### 25. Figma Creation Preflight (figma-creation-preflight)
+
+Before writing ANY `figma_execute` code that creates or styles Figma nodes, you MUST resolve every token and component from the live design system. Never guess, hardcode, or skip this step.
+
+**Mandatory lookups — run ALL of these before writing creation code:**
+
+| What you need | How to resolve it |
+|---|---|
+| Text style | `await figma.getLocalTextStylesAsync()` → map name → `id`, use `setTextStyleIdAsync` |
+| Color / fill variable | `await figma.variables.getLocalVariablesAsync()` → find by name, bind with `setBoundVariableForPaint` |
+| Spacing / padding / gap | Same variable lookup — never write raw `px` values |
+| Corner radius variable | Same variable lookup — never write raw `px` values |
+| Icon or any UI component | `figma_search_components` → get component `key`, use `importComponentByKeyAsync` |
+| Existing pattern/layout component (e.g. list item, row, card) | `figma_search_components` first — reuse if it exists, never recreate manually |
+
+**Hard rules:**
+- Never set `fontName`, `fontSize`, or `fontWeight` directly — always use `setTextStyleIdAsync`
+- Never set `fills` with hardcoded hex or RGB — always bind a variable or use a resolved paint
+- Never use `createNodeFromSvg` or `createVector` for icons that exist in the component library
+- Never recreate a layout component (list row, card, chip, etc.) if one already exists — instantiate it
+- If a needed token or component is not found in the lookup, **stop and ask** — do not approximate
+
+**Completion check before running any creation code:**
+```
+Text styles mapped:    ✅ / ❌
+Color variables mapped: ✅ / ❌
+Spacing variables mapped: ✅ / ❌
+Radius variables mapped: ✅ / ❌
+Icons sourced from library: ✅ / ❌
+Existing components reused: ✅ / ❌
+```
+All must be ✅ before proceeding.
+
 ### 24. Shared CSS Class Audit (shared-css-class-audit)
 
 When a CSS class is applied to multiple elements:
