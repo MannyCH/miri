@@ -1,0 +1,87 @@
+/* ImportMethodSheet — Bottom sheet for recipe import method selection */
+
+.import-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--color-fill-overlay);
+  z-index: 200;
+}
+
+.import-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 390px;
+  margin: 0 auto;
+  background: var(--color-background-raised);
+  border-radius: var(--corner-radius-24) var(--corner-radius-24) 0 0;
+  padding: var(--spacing-12) var(--spacing-16) calc(var(--spacing-32) + env(safe-area-inset-bottom, 0px));
+  z-index: 201;
+  box-shadow: var(--elevation-overlay);
+}
+
+.import-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--color-stroke-weak);
+  border-radius: var(--corner-radius-4);
+  margin: 0 auto var(--spacing-16);
+}
+
+.import-sheet-title {
+  margin: 0 0 var(--spacing-8);
+  color: var(--color-text-strong);
+}
+
+.import-sheet-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.import-sheet-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-16);
+  padding: var(--spacing-12) var(--spacing-8);
+  border: none;
+  background: transparent;
+  color: var(--color-text-strong);
+  border-radius: var(--corner-radius-12);
+  cursor: pointer;
+  text-align: left;
+}
+
+.import-sheet-option:hover {
+  background: var(--color-fill-hover);
+}
+
+.import-sheet-option:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.import-sheet-option-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill-brand-weak);
+  border-radius: var(--corner-radius-12);
+  color: var(--color-icon-brand);
+}
+
+.import-sheet-option-label {
+  flex: 1;
+}
+
+.import-sheet-option > svg:last-child {
+  color: var(--color-icon-neutral);
+  flex-shrink: 0;
+}
