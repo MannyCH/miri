@@ -1,5 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { authClient } from '../lib/authClient';
+import { dataClient } from '../lib/dataClient';
+
+// Use dataClient.auth as the single auth client so it shares the same session
+// as all Data API requests. Having a separate authClient causes two different
+// user IDs to be issued by the different adapters, breaking RLS.
+const authClient = dataClient.auth;
 
 const AuthContext = createContext(null);
 
