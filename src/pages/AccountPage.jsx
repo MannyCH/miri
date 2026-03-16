@@ -12,6 +12,7 @@ import { UnitField } from '../components/UnitField/UnitField';
 import { BmrCalculatorCard } from '../components/BmrCalculatorCard/BmrCalculatorCard';
 import { TextField } from '../components/TextField/TextField';
 import { Button } from '../components/Button/Button';
+import { BatchImportSection } from '../components/BatchImportSection/BatchImportSection';
 import { NavigationBarConnected } from '../components/NavigationBar/NavigationBarConnected';
 import './AccountPage.css';
 
@@ -317,6 +318,7 @@ function DeleteAccountView({ onBack, onDelete }) {
 
 export function AccountPage() {
   const { user, signOut, updateUser, changePassword, verifyCurrentPassword, deleteUser } = useAuth();
+  const { addUserRecipe } = useApp();
   const { preferences, updatePreferences, isLoading } = usePreferences();
   const [activeView, setActiveView] = useState(VIEWS.MAIN);
   const [direction, setDirection] = useState(1);
@@ -390,6 +392,10 @@ export function AccountPage() {
                     onChange={(cookingFrequency) => updatePreferences({ cookingFrequency })}
                     disabled={isLoading}
                   />
+                </SettingsSection>
+
+                <SettingsSection title="Recipes" spacing="section">
+                  <BatchImportSection onRecipeImported={addUserRecipe} />
                 </SettingsSection>
 
                 <SettingsSection title="Advanced - Health" spacing="section">

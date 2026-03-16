@@ -1,0 +1,66 @@
+.batch-import-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.batch-import-input {
+  display: none;
+}
+
+.batch-import-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.batch-import-description {
+  color: var(--color-text-weak);
+}
+
+.batch-import-description code {
+  font-family: monospace;
+  background: var(--color-background-raised);
+  padding: 1px var(--spacing-4);
+  border-radius: var(--corner-radius-4);
+}
+
+/* Progress bar */
+.batch-import-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.batch-import-progress-bar {
+  height: 4px;
+  background: var(--color-stroke-weak);
+  border-radius: var(--corner-radius-4);
+  overflow: hidden;
+}
+
+.batch-import-progress-fill {
+  height: 100%;
+  background: var(--color-icon-brand);
+  border-radius: var(--corner-radius-4);
+  transition: width 0.2s ease;
+}
+
+.batch-import-status-text {
+  color: var(--color-text-weak);
+}
+
+/* Result */
+.batch-import-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.batch-import-count-success {
+  color: var(--color-text-strong);
+}
+
+.batch-import-count-failed {
+  color: var(--color-text-weak);
+}
