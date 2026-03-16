@@ -16,11 +16,28 @@ import './RecipeImportView.css';
  */
 
 // Split a raw ingredient string into { quantity, name }.
-// e.g. "320g Asparagus" → { quantity: "320g", name: "Asparagus" }
-// Falls back to { quantity: "", name: fullString } when no leading token.
+// Handles both attached units ("320g Asparagus") and separate units ("2 kg Asparagus").
+const INGREDIENT_UNITS = new Set([
+  'g', 'kg', 'mg',
+  'ml', 'l', 'dl', 'cl',
+  'pcs', 'pc', 'piece', 'pieces',
+  'tbsp', 'tsp', 'cup', 'cups',
+  'oz', 'lb', 'lbs',
+  'bunch', 'pinch', 'slice', 'slices',
+  'can', 'cans', 'bottle', 'bottles',
+  'dash', 'handful',
+]);
+
 const parseIngredient = (str) => {
-  const match = String(str).match(/^(\S+)\s+(.+)$/);
-  return match ? { quantity: match[1], name: match[2] } : { quantity: '', name: str };
+  const parts = String(str).trim().split(/\s+/);
+  if (parts.length < 2) return { quantity: '', name: str };
+  const [first, second, ...rest] = parts;
+  // "2 kg Asparagus" → quantity includes the unit token
+  if (/^\d/.test(first) && INGREDIENT_UNITS.has(second.toLowerCase()) && rest.length > 0) {
+    return { quantity: `${first} ${second}`, name: rest.join(' ') };
+  }
+  // "320g Asparagus" or fallback
+  return { quantity: first, name: parts.slice(1).join(' ') };
 };
 
 const parseServings = (val) => {
