@@ -480,10 +480,11 @@ const SearchIcon = () => (
 );
 
 const SparkleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/>
-    <path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75z"/>
-    <path d="M5 3l.5 1.5L7 5l-1.5.5L5 7l-.5-1.5L3 5l1.5-.5z"/>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <line x1="3" y1="5" x2="10" y2="5"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+    <line x1="3" y1="15" x2="21" y2="15"/>
+    <line x1="3" y1="20" x2="10" y2="20"/>
   </svg>
 );
 

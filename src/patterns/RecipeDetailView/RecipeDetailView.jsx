@@ -20,10 +20,26 @@ export const RecipeDetailView = ({
   isAdded = false,
   ...props
 }) => {
-  const [servings, setServings] = useState(() => {
+  const originalServings = (() => {
     const n = parseInt(recipe.servings, 10);
-    return isNaN(n) || n < 1 ? 2 : n;
-  });
+    return isNaN(n) || n < 1 ? null : n;
+  })();
+  const [servings, setServings] = useState(originalServings ?? 2);
+
+  const scaleQuantity = (quantityStr, factor) => {
+    if (!quantityStr || factor === 1) return quantityStr;
+    const match = quantityStr.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)(\s*.*)$/);
+    if (!match) return quantityStr;
+    const [, numStr, rest] = match;
+    const num = numStr.includes('/')
+      ? (() => { const [a, b] = numStr.split('/'); return parseFloat(a) / parseFloat(b); })()
+      : parseFloat(numStr.replace(',', '.'));
+    if (isNaN(num) || num === 0) return quantityStr;
+    const scaled = num * factor;
+    const formatted = Number.isInteger(scaled) ? String(scaled) : parseFloat(scaled.toFixed(2)).toString();
+    return formatted + rest;
+  };
+
   const fractionMap = {
     '1/2': '½',
     '1/3': '⅓',
@@ -118,9 +134,12 @@ export const RecipeDetailView = ({
           <ul className="recipe-ingredient-list">
             {recipe.ingredients.map((ingredient, index) => {
               const { amount, name } = splitIngredient(ingredient);
+              const scaledAmount = originalServings
+                ? scaleQuantity(amount, servings / originalServings)
+                : amount;
               return (
                 <li key={index} className="recipe-ingredient-item text-body-regular">
-                  <span className="recipe-ingredient-amount">{amount}</span>
+                  <span className="recipe-ingredient-amount">{scaledAmount}</span>
                   <span className="recipe-ingredient-name">{name}</span>
                 </li>
               );

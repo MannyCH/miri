@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   const prompt = `You are a smart shopping list assistant. Normalize and group the following ingredients.
 
 Rules:
-1. Merge duplicates regardless of language or plural form (e.g. "1 onion", "2 onions", "Zwiebel", "Zwiebeln" → name "Onions", quantity "3")
+1. Merge duplicates only when they are truly the same ingredient — same language, same variety, same type. Plurals and multilingual synonyms count as the same (e.g. "1 onion", "2 onions", "Zwiebel", "Zwiebeln" → "Onions", quantity "3"). DO NOT merge ingredients that differ by colour, variety, or type — e.g. "red pepper" and "yellow pepper" are different ingredients and must remain separate entries.
 2. Sum quantities where units match (100g + 200g = 300g, 1l + 500ml = 1.5l). If units differ and can't be converted, keep the largest unit.
 3. Assign each ingredient to exactly one of these categories (in this shopping order):
    Vegetables | Fruits | Herbs & Spices | Dairy & Eggs | Meat & Fish | Bakery | Canned & Dry Goods | Frozen | Beverages | Other

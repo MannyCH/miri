@@ -25,18 +25,25 @@ export function ShoppingListPage() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [smartGroups, setSmartGroups] = React.useState([]);
   const [smartStatus, setSmartStatus] = React.useState('idle');
+  const lastFetchedKeyRef = React.useRef(null);
 
-  const fetchSmartGroups = React.useCallback(() => {
+  const fetchSmartGroups = React.useCallback((force = false) => {
     const uncheckedItems = shoppingList
       .filter(item => !item.checked)
       .map(item => item.name);
 
+    const key = uncheckedItems.join('||');
+
+    if (!force && key === lastFetchedKeyRef.current) return;
+
     if (uncheckedItems.length === 0) {
+      lastFetchedKeyRef.current = key;
       setSmartGroups([]);
       setSmartStatus('idle');
       return;
     }
 
+    lastFetchedKeyRef.current = key;
     setSmartStatus('loading');
     fetch('/api/normalize-shopping-list', {
       method: 'POST',
@@ -56,7 +63,7 @@ export function ShoppingListPage() {
       fetchSmartGroups();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shoppingListViewMode]);
+  }, [shoppingListViewMode, shoppingList]);
   
   // Group ingredients by recipe for recipe view mode
   const groupedByRecipe = shoppingList.reduce((acc, item) => {
@@ -135,7 +142,7 @@ export function ShoppingListPage() {
       onViewModeChange={setShoppingListViewMode}
       smartGroups={smartGroups}
       smartStatus={smartStatus}
-      onSmartRefresh={fetchSmartGroups}
+      onSmartRefresh={() => fetchSmartGroups(true)}
       items={items}
       itemKeys={itemKeys}
       itemIds={itemIds}
