@@ -4,6 +4,7 @@ import { RecipeImportView } from '../patterns/RecipeImportView';
 import { createRecipe } from '../lib/recipesApi';
 import { compressImageToDataUrl } from '../lib/recipeParser';
 import { useApp } from '../context/AppContext';
+import { usePreferences } from '../context/PreferencesContext';
 
 /**
  * Recipe Import Page
@@ -14,6 +15,7 @@ export function RecipeImportPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { addUserRecipe, showToast } = useApp();
+  const { preferences } = usePreferences();
   const [isSaving, setIsSaving] = useState(false);
 
   const initialRecipe = location.state?.recipe ?? {};
@@ -57,6 +59,7 @@ export function RecipeImportPage() {
       onSave={handleSave}
       onCancel={handleCancel}
       isSaving={isSaving}
+      preferredServings={preferences.servings}
     />
   );
 }

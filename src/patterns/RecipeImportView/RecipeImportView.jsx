@@ -42,7 +42,23 @@ const parseIngredient = (str) => {
 
 const parseServings = (val) => {
   const n = parseInt(val, 10);
-  return isNaN(n) || n < 1 ? 2 : n;
+  return isNaN(n) || n < 1 ? null : n;
+};
+
+// Scale a quantity string by a numeric factor.
+// Handles attached units ("320g"), space-separated units ("2 kg"), plain numbers ("3"), fractions ("1/2").
+const scaleQuantity = (quantityStr, factor) => {
+  if (!quantityStr || factor === 1) return quantityStr;
+  const match = quantityStr.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)(\s*.*)$/);
+  if (!match) return quantityStr;
+  const [, numStr, rest] = match;
+  const num = numStr.includes('/')
+    ? (() => { const [a, b] = numStr.split('/'); return parseFloat(a) / parseFloat(b); })()
+    : parseFloat(numStr.replace(',', '.'));
+  if (isNaN(num) || num === 0) return quantityStr;
+  const scaled = num * factor;
+  const formatted = Number.isInteger(scaled) ? String(scaled) : parseFloat(scaled.toFixed(2)).toString();
+  return formatted + rest;
 };
 
 export const RecipeImportView = ({
@@ -50,17 +66,28 @@ export const RecipeImportView = ({
   onSave,
   onCancel,
   isSaving = false,
+  preferredServings,
 }) => {
   const [title, setTitle] = useState(initialRecipe.title ?? '');
-  const [ingredients, setIngredients] = useState(
-    initialRecipe.ingredients?.length
+
+  const originalServings = parseServings(initialRecipe.servings);
+  const targetServings = preferredServings ?? originalServings ?? 2;
+
+  const [ingredients, setIngredients] = useState(() => {
+    const parsed = initialRecipe.ingredients?.length
       ? initialRecipe.ingredients.map(parseIngredient)
-      : [{ quantity: '', name: '' }]
-  );
+      : [{ quantity: '', name: '' }];
+    if (originalServings && originalServings !== targetServings) {
+      const factor = targetServings / originalServings;
+      return parsed.map((ing) => ({ ...ing, quantity: scaleQuantity(ing.quantity, factor) }));
+    }
+    return parsed;
+  });
   const [directions, setDirections] = useState(
     initialRecipe.directions?.length ? initialRecipe.directions : ['']
   );
-  const [servings, setServings] = useState(parseServings(initialRecipe.servings));
+  const [servings, setServings] = useState(targetServings);
+  const prevServingsRef = useRef(targetServings);
   const [categories, setCategories] = useState(
     initialRecipe.categories?.length ? [...initialRecipe.categories] : []
   );
@@ -106,6 +133,16 @@ export const RecipeImportView = ({
     setDirections((prev) => prev.map((item, idx) => (idx === i ? val : item)));
   const addDirection = () => setDirections((prev) => [...prev, '']);
   const removeDirection = (i) => setDirections((prev) => prev.filter((_, idx) => idx !== i));
+
+  // ── Servings change: scale quantities relative to previous value ─────────
+  const handleServingsChange = (newServings) => {
+    const factor = newServings / prevServingsRef.current;
+    setIngredients((prev) =>
+      prev.map((ing) => ({ ...ing, quantity: scaleQuantity(ing.quantity, factor) }))
+    );
+    prevServingsRef.current = newServings;
+    setServings(newServings);
+  };
 
   // ── Category helpers ────────────────────────────────────────────────────
   const addCategory = (value) => {
@@ -280,7 +317,7 @@ export const RecipeImportView = ({
         {/* Servings */}
         <div className="recipe-import-section">
           <h2 className="text-tiny-bold recipe-import-section-title">SERVINGS</h2>
-          <Stepper value={servings} min={1} max={99} onChange={setServings} />
+          <Stepper value={servings} min={1} max={99} onChange={handleServingsChange} />
         </div>
 
         {/* Categories */}
