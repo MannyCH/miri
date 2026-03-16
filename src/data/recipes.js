@@ -1,9 +1,6 @@
-/**
- * Mock Recipe Database
- * Complete recipes with ingredients and cooking directions
- */
+// Removed static mock recipes — all recipes come from the user's DB account.
 
-export const recipes = [
+const _REMOVED = [
   {
     id: 'salmon-asparagus',
     title: 'Salmon with tomato and asparagus',
@@ -197,28 +194,6 @@ export const recipes = [
   },
 ];
 
-/**
- * Get random recipes for auto-generating meal plans
- */
-export function getRandomRecipes(count, category = null) {
-  let filtered = recipes;
-  
-  if (category) {
-    filtered = recipes.filter(r => r.category === category);
-  }
-  
-  // Shuffle and take first 'count' items
-  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-}
-
-/**
- * Get recipe by ID
- */
-export function getRecipeById(id) {
-  return recipes.find(r => r.id === id);
-}
-
 const WEEKDAY_LABELS_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const WEEKDAY_LABELS_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -228,33 +203,6 @@ function toLocalDateStr(date) {
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
-}
-
-/**
- * Generate a 7-day meal plan starting from today
- */
-export function generateMealPlan() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  return Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
-    
-    return {
-      day: WEEKDAY_LABELS_LONG[date.getDay()],
-      date: date.getDate(),
-      weekday: WEEKDAY_LABELS_SHORT[date.getDay()],
-      fullDate: toLocalDateStr(date),
-      month: MONTH_NAMES[date.getMonth()],
-      isToday: i === 0,
-      meals: {
-        breakfast: getRandomRecipes(1, 'breakfast')[0],
-        lunch: getRandomRecipes(1, 'lunch')[0],
-        dinner: getRandomRecipes(1, 'dinner')[0],
-      },
-    };
-  });
 }
 
 /**

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { RecipesView } from '../patterns/RecipesView';
 import { ImportMethodSheet } from '../components/ImportMethodSheet';
 import './RecipesPage.css';
-import { recipes } from '../data/recipes';
 import { useApp } from '../context/AppContext';
 import { parseRecipeTxt } from '../lib/recipeParser';
 import { compressImageToDataUrl } from '../lib/recipeParser';
@@ -33,10 +32,9 @@ export function RecipesPage() {
   const fileInputRef = useRef(null);
   const photoInputRef = useRef(null);
 
-  const allRecipes = [...recipes, ...userRecipes];
   const filteredRecipes = searchQuery
-    ? allRecipes.filter((r) => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    : allRecipes;
+    ? userRecipes.filter((r) => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    : userRecipes;
 
   const handleRecipeClick = (recipeId) => navigate(`/recipes/${recipeId}`);
 

@@ -46,6 +46,15 @@
   object-position: center;
 }
 
+.recipe-detail-placeholder-icon {
+  display: block;
+  width: 100%;
+  height: 240px;
+  color: var(--color-icon-weak);
+  padding: var(--spacing-16);
+  box-sizing: border-box;
+}
+
 /* Section container */
 .recipe-detail-section {
   display: flex;

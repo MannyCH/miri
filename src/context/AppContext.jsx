@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
-import { generateMealPlan, generateCalendarDays, getRecipeById, formatDayTitle } from '../data/recipes';
+import { generateCalendarDays, formatDayTitle } from '../data/recipes';
 import { fetchUserRecipes } from '../lib/recipesApi';
 import { useAuth } from './AuthContext';
 
@@ -32,9 +32,8 @@ export function AppProvider({ children }) {
     setUserRecipes((prev) => [recipe, ...prev]);
   }, []);
 
-  // Looks up a recipe in both static mock data and user-imported recipes
   const lookupRecipe = useCallback(
-    (id) => getRecipeById(id) ?? userRecipes.find((r) => r.id === id) ?? null,
+    (id) => userRecipes.find((r) => r.id === id) ?? null,
     [userRecipes]
   );
 
@@ -116,7 +115,7 @@ export function AppProvider({ children }) {
   const regenerateMealPlan = async (preferences = {}) => {
     setIsMealPlanGenerating(true);
     try {
-      const recipeList = [...recipes, ...userRecipes].map(r => ({
+      const recipeList = userRecipes.map(r => ({
         id: r.id,
         title: r.title,
         category: r.category ?? 'dinner',
@@ -132,8 +131,7 @@ export function AppProvider({ children }) {
 
       const { days } = await response.json();
 
-      const allRecipes = [...recipes, ...userRecipes];
-      const findRecipe = (id) => allRecipes.find(r => r.id === id) ?? null;
+      const findRecipe = (id) => userRecipes.find(r => r.id === id) ?? null;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -158,8 +156,7 @@ export function AppProvider({ children }) {
 
       setMealPlan(plan);
     } catch {
-      // Fallback to random plan if API fails
-      setMealPlan(generateMealPlan());
+      setMealPlan([]);
     } finally {
       setIsMealPlanGenerating(false);
     }

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RecipeDetailView } from '../patterns/RecipeDetailView';
 import { useApp } from '../context/AppContext';
-import { getRecipeById } from '../data/recipes';
 
 /**
  * Recipe Detail Page
@@ -15,7 +14,7 @@ export function RecipeDetailPage() {
   const { addRecipeToShoppingList, userRecipes } = useApp();
   const [isAdded, setIsAdded] = useState(false);
 
-  const recipe = getRecipeById(id) ?? userRecipes.find((r) => r.id === id);
+  const recipe = userRecipes.find((r) => r.id === id);
 
   if (!recipe) {
     return (
