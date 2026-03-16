@@ -1,0 +1,115 @@
+/* RecipesPage — overlay styles for URL input and loading state */
+
+.recipes-url-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-fill-overlay);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.recipes-url-sheet {
+  width: 100%;
+  max-width: 390px;
+  background: var(--color-background-raised);
+  border-radius: var(--corner-radius-24) var(--corner-radius-24) 0 0;
+  padding: var(--spacing-12) var(--spacing-16) calc(var(--spacing-32) + env(safe-area-inset-bottom, 0px));
+  box-shadow: var(--elevation-overlay);
+}
+
+.recipes-url-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--color-stroke-weak);
+  border-radius: var(--corner-radius-4);
+  margin: 0 auto var(--spacing-16);
+}
+
+.recipes-url-title {
+  margin: 0 0 var(--spacing-16);
+  color: var(--color-text-strong);
+}
+
+.recipes-url-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-12);
+  padding: var(--spacing-12) var(--spacing-16);
+  background: var(--color-background-base);
+  color: var(--color-text-strong);
+  outline: none;
+}
+
+.recipes-url-input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.recipes-url-input:focus-visible {
+  border-color: var(--color-stroke-focus);
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.recipes-url-actions {
+  display: flex;
+  gap: var(--spacing-12);
+  margin-top: var(--spacing-16);
+}
+
+.recipes-url-cancel {
+  flex: 1;
+  padding: var(--spacing-12) var(--spacing-16);
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-12);
+  background: transparent;
+  color: var(--color-text-strong);
+  cursor: pointer;
+  font-family: var(--font-family-body);
+  font-size: 16px;
+}
+
+.recipes-url-cancel:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.recipes-url-import-btn {
+  flex: 2;
+  padding: var(--spacing-12) var(--spacing-16);
+  border: none;
+  border-radius: var(--corner-radius-12);
+  background: var(--color-fill-brand-strong);
+  color: var(--color-fill-white);
+  cursor: pointer;
+  font-family: var(--font-family-body);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recipes-url-import-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.recipes-url-import-btn:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+/* Full-screen loading overlay for photo import */
+.recipes-import-loading {
+  position: fixed;
+  inset: 0;
+  background: var(--color-fill-overlay);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipes-import-loading-text {
+  color: var(--color-fill-white);
+}

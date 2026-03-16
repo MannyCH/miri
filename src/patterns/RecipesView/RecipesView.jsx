@@ -49,7 +49,7 @@ export const RecipesView = ({
             type="button"
             className="recipes-import-btn"
             onClick={onImportRequest}
-            aria-label="Import recipe from file"
+            aria-label="Import recipe"
           >
             <ImportIcon />
           </button>

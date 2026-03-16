@@ -99,6 +99,15 @@ export const RecipeImportView = ({
   const fileInputRef = useRef(null);
   const categoryInputRef = useRef(null);
   const directionsListRef = useRef(null);
+  const titleRef = useRef(null);
+
+  // Auto-resize title textarea when content is pre-filled on mount
+  useLayoutEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [title]);
 
   // Auto-resize all direction textareas when content is pre-filled on mount
   useLayoutEffect(() => {
@@ -236,13 +245,18 @@ export const RecipeImportView = ({
         </div>
 
         {/* Title */}
-        <input
-          type="text"
+        <textarea
+          ref={titleRef}
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            e.target.style.height = 'auto';
+            e.target.style.height = `${e.target.scrollHeight}px`;
+            setTitle(e.target.value);
+          }}
           placeholder="Recipe title"
           className="text-h1-bold recipe-import-title-input"
           aria-label="Recipe title"
+          rows={1}
         />
 
         {/* Ingredients */}
