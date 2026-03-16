@@ -136,11 +136,15 @@ export const RecipeImportView = ({
 
   // ── Servings change: scale quantities relative to previous value ─────────
   const handleServingsChange = (newServings) => {
-    const factor = newServings / prevServingsRef.current;
-    setIngredients((prev) =>
-      prev.map((ing) => ({ ...ing, quantity: scaleQuantity(ing.quantity, factor) }))
-    );
-    prevServingsRef.current = newServings;
+    // Only rescale if the TXT file provided a servings value — without it we
+    // don't know what serving size the quantities were written for.
+    if (originalServings !== null) {
+      const factor = newServings / prevServingsRef.current;
+      setIngredients((prev) =>
+        prev.map((ing) => ({ ...ing, quantity: scaleQuantity(ing.quantity, factor) }))
+      );
+      prevServingsRef.current = newServings;
+    }
     setServings(newServings);
   };
 
