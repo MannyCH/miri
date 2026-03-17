@@ -63,16 +63,29 @@ export async function fetchRecipeById(id) {
 /**
  * Persist a new user recipe (with ingredients) and return its generated ID.
  */
+/**
+ * Generates a stable recipe ID from userId + title so re-importing the
+ * same file updates the existing record instead of creating a duplicate.
+ */
+function stableRecipeId(userId, title) {
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 50);
+  return `${userId.slice(0, 8)}-${slug}`;
+}
+
 export async function createRecipe({ title, ingredients, directions, servings, categories, image, thumbnail }) {
   const { data: sessionData } = await dataClient.auth.getSession();
   const userId = sessionData?.user?.id;
   if (!userId) throw new Error('Not authenticated');
 
-  const id = `user-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  const id = stableRecipeId(userId, title);
   const category = categories?.[0] ?? 'other';
   const servingsNum = parseInt(servings, 10) || 2;
 
-  const { error: recipeError } = await dataClient.from('recipes').insert({
+  const { error: recipeError } = await dataClient.from('recipes').upsert({
     id,
     user_id: userId,
     title,
@@ -82,9 +95,12 @@ export async function createRecipe({ title, ingredients, directions, servings, c
     thumbnail_url: thumbnail ?? null,
     servings: servingsNum,
     directions: directions ?? [],
-  });
+  }, { onConflict: 'id' });
 
   if (recipeError) throw new Error(recipeError.message);
+
+  // Replace ingredients on upsert
+  await dataClient.from('recipe_ingredients').delete().eq('recipe_id', id);
 
   if (ingredients?.length) {
     const ingredientRows = ingredients.map((name, idx) => ({
