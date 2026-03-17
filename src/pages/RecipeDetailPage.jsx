@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RecipeDetailView } from '../patterns/RecipeDetailView';
 import { useApp } from '../context/AppContext';
+import { fetchRecipeById } from '../lib/recipesApi';
 
 /**
  * Recipe Detail Page
- * Displays recipe image, title, ingredients (read-only), and directions
- * Button at bottom to add ingredients to shopping list — shows "Added ✓" on press
+ * Fetches the full recipe (including image) individually so the list
+ * fetch can skip image_url and stay under the 10 MB Data API limit.
  */
 export function RecipeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addRecipeToShoppingList, userRecipes } = useApp();
+  const { addRecipeToShoppingList } = useApp();
   const [isAdded, setIsAdded] = useState(false);
+  const [recipe, setRecipe] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const recipe = userRecipes.find((r) => r.id === id);
+  useEffect(() => {
+    setIsLoading(true);
+    fetchRecipeById(id)
+      .then(setRecipe)
+      .catch(() => setRecipe(null))
+      .finally(() => setIsLoading(false));
+  }, [id]);
+
+  if (isLoading) {
+    return null;
+  }
 
   if (!recipe) {
     return (

@@ -5,10 +5,11 @@ import { dataClient } from './dataClient';
  * Returns an array shaped like the mock recipe objects in src/data/recipes.js.
  */
 export async function fetchUserRecipes() {
-  // Single query with nested select avoids a large .in() URL for many recipes
+  // Exclude image_url — base64 images make the response exceed the 10 MB Data API limit.
+  // Images are loaded individually when the detail page opens.
   const { data: rows, error } = await dataClient
     .from('recipes')
-    .select('*, recipe_ingredients(name, sort_order)')
+    .select('id, title, category, categories, servings, directions, created_at, recipe_ingredients(name, sort_order)')
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -24,13 +25,39 @@ export async function fetchUserRecipes() {
       title: row.title,
       category: row.category,
       categories: row.categories ?? [],
-      image: row.image_url ?? null,
-      thumbnail: row.image_url ?? null,
+      image: null,
+      thumbnail: null,
       servings: row.servings,
       directions: row.directions ?? [],
       ingredients,
     };
   });
+}
+
+export async function fetchRecipeById(id) {
+  const { data: row, error } = await dataClient
+    .from('recipes')
+    .select('*, recipe_ingredients(name, sort_order)')
+    .eq('id', id)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  const ingredients = (row.recipe_ingredients ?? [])
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((i) => i.name);
+
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    categories: row.categories ?? [],
+    image: row.image_url ?? null,
+    thumbnail: row.image_url ?? null,
+    servings: row.servings,
+    directions: row.directions ?? [],
+    ingredients,
+  };
 }
 
 /**
