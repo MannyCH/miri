@@ -9,7 +9,7 @@ export async function fetchUserRecipes() {
   // Images are loaded individually when the detail page opens.
   const { data: rows, error } = await dataClient
     .from('recipes')
-    .select('id, title, category, categories, servings, directions, created_at, recipe_ingredients(name, sort_order)')
+    .select('id, title, category, categories, servings, directions, thumbnail_url, created_at, recipe_ingredients(name, sort_order)')
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -26,7 +26,7 @@ export async function fetchUserRecipes() {
       category: row.category,
       categories: row.categories ?? [],
       image: null,
-      thumbnail: null,
+      thumbnail: row.thumbnail_url ?? null,
       servings: row.servings,
       directions: row.directions ?? [],
       ingredients,
@@ -63,7 +63,7 @@ export async function fetchRecipeById(id) {
 /**
  * Persist a new user recipe (with ingredients) and return its generated ID.
  */
-export async function createRecipe({ title, ingredients, directions, servings, categories, image }) {
+export async function createRecipe({ title, ingredients, directions, servings, categories, image, thumbnail }) {
   const { data: sessionData } = await dataClient.auth.getSession();
   const userId = sessionData?.user?.id;
   if (!userId) throw new Error('Not authenticated');
@@ -79,6 +79,7 @@ export async function createRecipe({ title, ingredients, directions, servings, c
     category,
     categories: categories ?? [],
     image_url: image ?? null,
+    thumbnail_url: thumbnail ?? null,
     servings: servingsNum,
     directions: directions ?? [],
   });

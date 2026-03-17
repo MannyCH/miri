@@ -80,17 +80,21 @@ export function BatchImportSection({ onRecipeImported }) {
         const recipe = parseRecipeTxt(text);
 
         let image = null;
+        let thumbnail = null;
         if (imageFile) {
-          image = await compressImageToDataUrl(imageFile);
+          [image, thumbnail] = await Promise.all([
+            compressImageToDataUrl(imageFile),
+            compressImageToDataUrl(imageFile, 200, 0.7),
+          ]);
         }
 
-        const id = await createRecipe({ ...recipe, image });
+        const id = await createRecipe({ ...recipe, image, thumbnail });
 
         onRecipeImported?.({
           ...recipe,
           id,
           image,
-          thumbnail: image,
+          thumbnail,
           directions: recipe.directions ?? [],
           ingredients: recipe.ingredients ?? [],
         });

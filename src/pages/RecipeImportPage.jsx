@@ -24,18 +24,22 @@ export function RecipeImportPage() {
     setIsSaving(true);
     try {
       let image = null;
+      let thumbnail = null;
       if (imageFile) {
-        image = await compressImageToDataUrl(imageFile);
+        [image, thumbnail] = await Promise.all([
+          compressImageToDataUrl(imageFile),
+          compressImageToDataUrl(imageFile, 200, 0.7),
+        ]);
       }
 
-      const id = await createRecipe({ ...recipeData, image });
+      const id = await createRecipe({ ...recipeData, image, thumbnail });
 
       // Optimistically add to local state so the detail page renders immediately
       addUserRecipe({
         ...recipeData,
         id,
         image,
-        thumbnail: image,
+        thumbnail,
         directions: recipeData.directions ?? [],
         ingredients: recipeData.ingredients ?? [],
       });

@@ -59,8 +59,9 @@ export function parseRecipeTxt(text) {
 }
 
 /**
- * Compresses an image File to a JPEG data URL (max 800px wide, 0.75 quality).
- * Keeps storage size manageable when saving to the DB image_url field.
+ * Compresses an image File to a JPEG data URL.
+ * Default: 800px wide, 0.75 quality — for full-res image_url storage.
+ * Pass maxWidth=200, quality=0.7 for thumbnail_url storage (~5 KB each).
  */
 export async function compressImageToDataUrl(file, maxWidth = 800, quality = 0.75) {
   return new Promise((resolve) => {
