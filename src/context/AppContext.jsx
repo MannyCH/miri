@@ -115,11 +115,10 @@ export function AppProvider({ children }) {
   const regenerateMealPlan = async (preferences = {}) => {
     setIsMealPlanGenerating(true);
     try {
-      const MEAL_SLOTS = new Set(['breakfast', 'lunch', 'dinner']);
       const recipeList = userRecipes.map(r => ({
         id: r.id,
         title: r.title,
-        category: MEAL_SLOTS.has(r.category) ? r.category : 'lunch or dinner',
+        meal_type: r.meal_type ?? 'any',
       }));
 
       const response = await fetch('/api/generate-meal-plan', {

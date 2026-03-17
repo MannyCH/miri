@@ -9,7 +9,7 @@ export async function fetchUserRecipes() {
   // Images are loaded individually when the detail page opens.
   const { data: rows, error } = await dataClient
     .from('recipes')
-    .select('id, title, category, categories, servings, directions, thumbnail_url, created_at, recipe_ingredients(name, sort_order)')
+    .select('id, title, category, categories, meal_type, servings, directions, thumbnail_url, created_at, recipe_ingredients(name, sort_order)')
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -25,6 +25,7 @@ export async function fetchUserRecipes() {
       title: row.title,
       category: row.category,
       categories: row.categories ?? [],
+      meal_type: row.meal_type ?? 'any',
       image: null,
       thumbnail: row.thumbnail_url ?? null,
       servings: row.servings,
@@ -85,6 +86,19 @@ export async function createRecipe({ title, ingredients, directions, servings, c
   const category = categories?.[0] ?? 'other';
   const servingsNum = parseInt(servings, 10) || 2;
 
+  // Classify meal type via AI (best-effort — defaults to 'any' on failure)
+  let meal_type = 'any';
+  try {
+    const clf = await fetch('/api/classify-meal-type', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, ingredients: ingredients ?? [] }),
+    });
+    if (clf.ok) ({ meal_type } = await clf.json());
+  } catch {
+    // non-critical — keep default 'any'
+  }
+
   // Delete existing record first (stable ID means re-import = update)
   await dataClient.from('recipe_ingredients').delete().eq('recipe_id', id);
   await dataClient.from('recipes').delete().eq('id', id);
@@ -95,6 +109,7 @@ export async function createRecipe({ title, ingredients, directions, servings, c
     title,
     category,
     categories: categories ?? [],
+    meal_type,
     image_url: image ?? null,
     thumbnail_url: thumbnail ?? null,
     servings: servingsNum,

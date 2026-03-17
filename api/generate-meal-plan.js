@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   });
 
   const recipeList = recipes
-    .map(r => `- id: "${r.id}" | title: "${r.title}" | suitable for: ${r.category}`)
+    .map(r => `- id: "${r.id}" | title: "${r.title}" | meal type: ${r.meal_type}`)
     .join('\n');
 
   const prompt = `You are a smart meal planner. Create a personalised 7-day meal plan using ONLY the recipes listed below.
@@ -56,7 +56,7 @@ ${recipeList}
 
 Rules:
 1. Use ONLY recipe IDs from the list above — never invent new IDs.
-2. Assign recipes to the correct meal slot based on their "suitable for" category. A recipe marked "breakfast" must only appear in breakfast slots; "lunch or dinner" may appear in either lunch or dinner slots.
+2. Respect the meal type tag: "breakfast" → breakfast slot only, "lunch" → lunch slot only, "dinner" → dinner slot only, "any" → any slot.
 3. Cooking frequency affects only how much recipes repeat — never whether a slot is filled.
 4. ALL 21 slots (7 days × 3 meals) must have a recipe ID. Using null is not allowed under any circumstances. If you run out of variety, repeat recipes.
 5. Prefer recipes that match the user's eating style and goal where possible.
