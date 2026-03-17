@@ -5,40 +5,32 @@ import { dataClient } from './dataClient';
  * Returns an array shaped like the mock recipe objects in src/data/recipes.js.
  */
 export async function fetchUserRecipes() {
+  // Single query with nested select avoids a large .in() URL for many recipes
   const { data: rows, error } = await dataClient
     .from('recipes')
-    .select('*')
+    .select('*, recipe_ingredients(name, sort_order)')
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
   if (!rows?.length) return [];
 
-  const recipeIds = rows.map((r) => r.id);
-  const { data: ingredientRows, error: ingError } = await dataClient
-    .from('recipe_ingredients')
-    .select('*')
-    .in('recipe_id', recipeIds)
-    .order('sort_order', { ascending: true });
+  return rows.map((row) => {
+    const ingredients = (row.recipe_ingredients ?? [])
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((i) => i.name);
 
-  if (ingError) throw new Error(ingError.message);
-
-  const byRecipe = {};
-  for (const row of ingredientRows ?? []) {
-    if (!byRecipe[row.recipe_id]) byRecipe[row.recipe_id] = [];
-    byRecipe[row.recipe_id].push(row.name);
-  }
-
-  return rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    category: row.category,
-    categories: row.categories ?? [],
-    image: row.image_url ?? null,
-    thumbnail: row.image_url ?? null,
-    servings: row.servings,
-    directions: row.directions ?? [],
-    ingredients: byRecipe[row.id] ?? [],
-  }));
+    return {
+      id: row.id,
+      title: row.title,
+      category: row.category,
+      categories: row.categories ?? [],
+      image: row.image_url ?? null,
+      thumbnail: row.image_url ?? null,
+      servings: row.servings,
+      directions: row.directions ?? [],
+      ingredients,
+    };
+  });
 }
 
 /**
