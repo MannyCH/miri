@@ -11,6 +11,14 @@ export const RecipeList = ({
   onRecipeClick,
   ...props 
 }) => {
+  if (recipes.length === 0) {
+    return (
+      <div className="recipe-list-empty">
+        <p className="text-body-base-regular">No recipes yet. Import one to get started.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="recipe-list" {...props}>
       {recipes.map((recipe, index) => (
