@@ -28,6 +28,41 @@ export function AppProvider({ children }) {
     loadUserRecipes();
   }, [isAuthenticated, loadUserRecipes]);
 
+  // Restore meal plan from localStorage once recipes are loaded
+  useEffect(() => {
+    if (!userRecipes.length) return;
+    const stored = localStorage.getItem(MEAL_PLAN_KEY);
+    if (!stored) return;
+    try {
+      const days = JSON.parse(stored);
+      const findRecipe = (id) => (id ? userRecipes.find(r => r.id === id) ?? null : null);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const restored = days.map((day, i) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        return {
+          day: date.toLocaleDateString('en-US', { weekday: 'long' }),
+          date: date.getDate(),
+          weekday: date.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2),
+          fullDate: day.fullDate,
+          month: date.toLocaleDateString('en-US', { month: 'long' }),
+          isToday: i === 0,
+          meals: {
+            breakfast: findRecipe(day.meals.breakfast),
+            lunch: findRecipe(day.meals.lunch),
+            dinner: findRecipe(day.meals.dinner),
+          },
+        };
+      });
+      setMealPlanState(restored);
+    } catch {
+      localStorage.removeItem(MEAL_PLAN_KEY);
+    }
+  // Only run once after recipes first load — not on every recipe change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userRecipes.length > 0]);
+
   const addUserRecipe = useCallback((recipe) => {
     setUserRecipes((prev) => [recipe, ...prev]);
   }, []);
@@ -38,8 +73,27 @@ export function AppProvider({ children }) {
   );
 
   // Meal Plan State (7 days from today)
-  const [mealPlan, setMealPlan] = useState([]);
+  // Persisted to localStorage as { fullDate, meals: { breakfast: id, lunch: id, dinner: id } }[]
+  const MEAL_PLAN_KEY = 'miri-meal-plan';
+  const [mealPlan, setMealPlanState] = useState([]);
   const [isMealPlanGenerating, setIsMealPlanGenerating] = useState(false);
+
+  const setMealPlan = useCallback((plan) => {
+    setMealPlanState(plan);
+    if (plan.length === 0) {
+      localStorage.removeItem(MEAL_PLAN_KEY);
+    } else {
+      const stored = plan.map(day => ({
+        fullDate: day.fullDate,
+        meals: {
+          breakfast: day.meals.breakfast?.id ?? null,
+          lunch: day.meals.lunch?.id ?? null,
+          dinner: day.meals.dinner?.id ?? null,
+        },
+      }));
+      localStorage.setItem(MEAL_PLAN_KEY, JSON.stringify(stored));
+    }
+  }, []);
   const [calendarDays] = useState(() => generateCalendarDays(28));
   const todayStr = calendarDays[0]?.fullDate;
   const [selectedFullDate, setSelectedFullDate] = useState(todayStr);
