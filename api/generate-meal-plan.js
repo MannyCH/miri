@@ -56,9 +56,9 @@ ${recipeList}
 
 Rules:
 1. Use ONLY recipe IDs from the list above — never invent new IDs.
-2. Assign recipes to the correct meal slot based on their "suitable for" category. A recipe marked "breakfast" must only appear in breakfast slots, etc.
-3. Apply the cooking frequency guideline strictly.
-4. If there are not enough breakfast recipes to fill all 7 days without repetition, repeating breakfast is fine.
+2. Assign recipes to the correct meal slot based on their "suitable for" category. A recipe marked "breakfast" must only appear in breakfast slots; "lunch or dinner" may appear in either lunch or dinner slots.
+3. Cooking frequency affects only how much recipes repeat — never whether a slot is filled.
+4. ALL 21 slots (7 days × 3 meals) must have a recipe ID. Using null is not allowed under any circumstances. If you run out of variety, repeat recipes.
 5. Prefer recipes that match the user's eating style and goal where possible.
 6. Return ONLY valid JSON — no explanation, no markdown.
 

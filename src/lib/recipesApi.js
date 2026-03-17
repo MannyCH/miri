@@ -85,7 +85,11 @@ export async function createRecipe({ title, ingredients, directions, servings, c
   const category = categories?.[0] ?? 'other';
   const servingsNum = parseInt(servings, 10) || 2;
 
-  const { error: recipeError } = await dataClient.from('recipes').upsert({
+  // Delete existing record first (stable ID means re-import = update)
+  await dataClient.from('recipe_ingredients').delete().eq('recipe_id', id);
+  await dataClient.from('recipes').delete().eq('id', id);
+
+  const { error: recipeError } = await dataClient.from('recipes').insert({
     id,
     user_id: userId,
     title,
@@ -95,12 +99,9 @@ export async function createRecipe({ title, ingredients, directions, servings, c
     thumbnail_url: thumbnail ?? null,
     servings: servingsNum,
     directions: directions ?? [],
-  }, { onConflict: 'id' });
+  });
 
   if (recipeError) throw new Error(recipeError.message);
-
-  // Replace ingredients on upsert
-  await dataClient.from('recipe_ingredients').delete().eq('recipe_id', id);
 
   if (ingredients?.length) {
     const ingredientRows = ingredients.map((name, idx) => ({
