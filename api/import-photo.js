@@ -54,7 +54,9 @@ If a field is not present, use an empty string or empty array. Output only the J
   try {
     const jsonMatch = message.content[0].text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('no JSON in response');
-    return res.json(JSON.parse(jsonMatch[0]));
+    const recipe = JSON.parse(jsonMatch[0]);
+    if (!recipe.title) recipe.title = 'Recipe Title';
+    return res.json(recipe);
   } catch {
     return res.status(422).json({ error: 'Could not parse recipe from image' });
   }

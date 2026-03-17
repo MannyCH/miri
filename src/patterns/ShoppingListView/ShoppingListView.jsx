@@ -380,11 +380,9 @@ export const ShoppingListView = ({
                               onClick={() => toggleSmartItem(key)}
                               aria-pressed={checked}
                             >
-                              {item.quantity && (
-                                <span className="smart-item-quantity text-body-regular">
-                                  {item.quantity}
-                                </span>
-                              )}
+                              <span className="smart-item-quantity text-body-regular">
+                                {item.quantity || ''}
+                              </span>
                               <span className="smart-item-name text-body-regular">{item.name}</span>
                               {checked && <CheckSmallIcon />}
                             </button>
