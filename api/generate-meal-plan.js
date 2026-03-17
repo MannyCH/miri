@@ -56,7 +56,7 @@ ${recipeList}
 
 Rules:
 1. Use ONLY recipe IDs from the list above — never invent new IDs.
-2. Respect the meal type tag: "breakfast" → breakfast slot only, "lunch" → lunch slot only, "dinner" → dinner slot only, "any" → any slot.
+2. Respect the meal type tag: "breakfast" → any slot (breakfast food also works for lunch/dinner), "lunch" → lunch slot only, "dinner" → dinner slot only, "any" → lunch or dinner slots only (never breakfast).
 3. Cooking frequency affects only how much recipes repeat — never whether a slot is filled.
 4. ALL 21 slots (7 days × 3 meals) must have a recipe ID. Using null is not allowed under any circumstances. If you run out of variety, repeat recipes.
 5. Prefer recipes that match the user's eating style and goal where possible.
