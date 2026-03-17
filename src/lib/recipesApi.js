@@ -46,7 +46,7 @@ export async function fetchUserRecipes() {
  */
 export async function createRecipe({ title, ingredients, directions, servings, categories, image }) {
   const { data: sessionData } = await dataClient.auth.getSession();
-  const userId = sessionData?.session?.user?.id;
+  const userId = sessionData?.user?.id;
   if (!userId) throw new Error('Not authenticated');
 
   const id = `user-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;

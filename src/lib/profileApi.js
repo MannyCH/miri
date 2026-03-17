@@ -26,7 +26,7 @@ export async function fetchPreferences() {
  */
 export async function savePreferences({ servings, eatingStyle, goal, bmrKcal, cookingFrequency }) {
   const { data: sessionData } = await dataClient.auth.getSession();
-  const userId = sessionData?.session?.user?.id;
+  const userId = sessionData?.user?.id;
   if (!userId) throw new Error('Not authenticated');
 
   const payload = {
