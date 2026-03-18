@@ -22,6 +22,9 @@ export const MealPlanningView = ({
   onReplan,
   onClearPlan,
   onAddRecipeToList,
+  onRecipeClick,
+  replacingMealType = null,
+  onReplaceMeal,
   ...props
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -103,6 +106,9 @@ export const MealPlanningView = ({
                 label={mealType.charAt(0).toUpperCase() + mealType.slice(1)}
                 meal={meals[mealType]}
                 onAddToList={() => onAddRecipeToList?.(meals[mealType]?.id)}
+                onRecipeClick={() => onRecipeClick?.(meals[mealType]?.id)}
+                isReplacing={replacingMealType === mealType}
+                onReplace={() => onReplaceMeal?.(mealType)}
               />
             ))}
           </>
@@ -146,15 +152,20 @@ export const MealPlanningView = ({
   );
 };
 
-const MealSection = ({ label, meal, onAddToList }) => (
+const MealSection = ({ label, meal, onAddToList, onRecipeClick, isReplacing, onReplace }) => (
   <>
     <div className="meal-section-header">
       <h3 className="text-body-base-bold" style={{ color: 'var(--color-text-strong)' }}>
         {label}
       </h3>
       <div className="meal-actions">
-        <button className="icon-button" aria-label={`Refresh ${label.toLowerCase()}`}>
-          <RefreshIcon />
+        <button
+          className="icon-button"
+          aria-label={`Refresh ${label.toLowerCase()}`}
+          onClick={onReplace}
+          disabled={isReplacing}
+        >
+          {isReplacing ? <SpinnerIcon /> : <RefreshIcon />}
         </button>
         <button className="icon-button" aria-label={`Add ${label.toLowerCase()} to list`} onClick={onAddToList}>
           <ShoppingCartIcon />
@@ -168,6 +179,7 @@ const MealSection = ({ label, meal, onAddToList }) => (
         thumbnail={meal.thumbnail}
         showUpperDivider={false}
         showBelowDivider={false}
+        onClick={onRecipeClick}
       />
     )}
   </>
@@ -194,6 +206,12 @@ const ShoppingCartIcon = () => (
     <circle cx="9" cy="21" r="1"/>
     <circle cx="20" cy="21" r="1"/>
     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  </svg>
+);
+
+const SpinnerIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
+    <path d="M12 2a10 10 0 0 1 10 10"/>
   </svg>
 );
 

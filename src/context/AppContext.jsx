@@ -249,20 +249,33 @@ export function AppProvider({ children }) {
     }
   };
   
-  // Add ingredients from a specific recipe to shopping list
-  const addRecipeToShoppingList = (recipeId) => {
+  // Add ingredients from a specific recipe to shopping list.
+  // When mealPlan is provided, counts how many times the recipe appears
+  // across the week and adds ingredients proportionally (one set per occurrence).
+  const addRecipeToShoppingList = (recipeId, plan = []) => {
     const recipe = lookupRecipe(recipeId);
     if (!recipe) return;
-    
-    const newItems = recipe.ingredients.map((ingredient, idx) => ({
-      id: `${recipe.id}-${idx}`,
-      entryId: createEntryId(),
-      name: ingredient,
-      recipeId: recipe.id,
-      recipeName: recipe.title,
-      checked: false,
-    }));
-    
+
+    const occurrences = plan.length > 0
+      ? plan.reduce((count, day) =>
+          count + Object.values(day.meals).filter(m => m?.id === recipeId).length, 0)
+      : 1;
+    const times = Math.max(1, occurrences);
+
+    const newItems = [];
+    for (let t = 0; t < times; t++) {
+      recipe.ingredients.forEach((ingredient, idx) => {
+        newItems.push({
+          id: `${recipe.id}-${idx}-${t}`,
+          entryId: createEntryId(),
+          name: ingredient,
+          recipeId: recipe.id,
+          recipeName: recipe.title,
+          checked: false,
+        });
+      });
+    }
+
     setShoppingList(prev => [...prev, ...newItems]);
   };
   
@@ -316,6 +329,53 @@ export function AppProvider({ children }) {
     setShoppingList([]);
   };
   
+  // Replace a specific meal slot across the entire plan with an AI-suggested alternative
+  const replaceMealInPlan = async (fullDate, mealType, currentRecipeId, preferences = {}) => {
+    const recipeList = userRecipes.map(r => ({
+      id: r.id,
+      title: r.title,
+      meal_type: r.meal_type ?? 'any',
+    }));
+
+    try {
+      const response = await fetch('/api/replace-meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mealType, currentRecipeId, recipes: recipeList, preferences }),
+      });
+
+      if (!response.ok) throw new Error('API error');
+      const { recipeId } = await response.json();
+      const newRecipe = userRecipes.find(r => r.id === recipeId);
+      if (!newRecipe) throw new Error('Recipe not found');
+
+      const oldTitle = userRecipes.find(r => r.id === currentRecipeId)?.title ?? 'Recipe';
+
+      setMealPlan(prev => {
+        const updated = prev.map(day => {
+          if (day.meals[mealType]?.id !== currentRecipeId) return day;
+          return { ...day, meals: { ...day.meals, [mealType]: newRecipe } };
+        });
+        // Persist to localStorage
+        const stored = updated.map(day => ({
+          fullDate: day.fullDate,
+          meals: {
+            breakfast: day.meals.breakfast?.id ?? null,
+            lunch: day.meals.lunch?.id ?? null,
+            dinner: day.meals.dinner?.id ?? null,
+          },
+        }));
+        localStorage.setItem('miri-meal-plan', JSON.stringify(stored));
+        return updated;
+      });
+
+      showToast('success', `${oldTitle} replaced with ${newRecipe.title}`);
+    } catch {
+      showToast('error', 'No other recipes available for this slot');
+      throw new Error('replace failed');
+    }
+  };
+
   // Clear entire meal plan
   const clearMealPlan = () => {
     setMealPlan([]);
@@ -340,6 +400,7 @@ export function AppProvider({ children }) {
     selectedFullDate,
     setSelectedFullDate,
     regenerateMealPlan,
+    replaceMealInPlan,
     clearMealPlan,
     getDailyMeals,
     addAllToShoppingList,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import { MealPlanningView } from '../patterns/MealPlanningView';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -7,6 +8,7 @@ import { usePreferences } from '../context/PreferencesContext';
 import { formatDayTitle } from '../data/recipes';
 
 export function MealPlanningPage() {
+  const navigate = useNavigate();
   const {
     mealPlan,
     isMealPlanGenerating,
@@ -18,12 +20,17 @@ export function MealPlanningPage() {
     getDailyMeals,
     addAllToShoppingList,
     addRecipeToShoppingList,
+    replaceMealInPlan,
     shoppingList,
+    showToast,
   } = useApp();
   const { preferences } = usePreferences();
-  
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [hasAddedToList, setHasAddedToList] = useState(false);
+  const [replacingMealType, setReplacingMealType] = useState(null);
+  const [showAddToListDialog, setShowAddToListDialog] = useState(false);
+  const [pendingAddRecipeId, setPendingAddRecipeId] = useState(null);
   
   const hasPlan = mealPlan.length > 0;
   const dailyMeals = getDailyMeals();
@@ -80,9 +87,48 @@ export function MealPlanningPage() {
     setShowConfirmDialog(false);
   };
 
+  const handleRecipeClick = (recipeId) => {
+    if (recipeId) navigate(`/recipes/${recipeId}`);
+  };
+
   const handleAddRecipeToList = (recipeId) => {
-    if (recipeId) {
-      addRecipeToShoppingList(recipeId);
+    if (!recipeId) return;
+    const alreadyInList = shoppingList.some(item => item.recipeId === recipeId);
+    if (alreadyInList) {
+      setPendingAddRecipeId(recipeId);
+      setShowAddToListDialog(true);
+    } else {
+      addRecipeToShoppingList(recipeId, mealPlan);
+      const recipe = mealPlan.flatMap(d => Object.values(d.meals)).find(m => m?.id === recipeId);
+      showToast('success', `${recipe?.title ?? 'Recipe'} added to list`);
+    }
+  };
+
+  const handleConfirmAddAgain = () => {
+    if (pendingAddRecipeId) {
+      addRecipeToShoppingList(pendingAddRecipeId, mealPlan);
+      const recipe = mealPlan.flatMap(d => Object.values(d.meals)).find(m => m?.id === pendingAddRecipeId);
+      showToast('success', `${recipe?.title ?? 'Recipe'} added to list`);
+    }
+    setPendingAddRecipeId(null);
+    setShowAddToListDialog(false);
+  };
+
+  const handleCancelAddAgain = () => {
+    setPendingAddRecipeId(null);
+    setShowAddToListDialog(false);
+  };
+
+  const handleReplaceMeal = async (mealType) => {
+    const currentMeal = meals[mealType];
+    if (!currentMeal) return;
+    setReplacingMealType(mealType);
+    try {
+      await replaceMealInPlan(selectedFullDate, mealType, currentMeal.id, preferences);
+    } catch {
+      // error toast handled inside replaceMealInPlan
+    } finally {
+      setReplacingMealType(null);
     }
   };
   
@@ -105,6 +151,9 @@ export function MealPlanningPage() {
         onReplan={handleReplan}
         onClearPlan={handleClearPlan}
         onAddRecipeToList={handleAddRecipeToList}
+        onRecipeClick={handleRecipeClick}
+        replacingMealType={replacingMealType}
+        onReplaceMeal={handleReplaceMeal}
       />
       
       <AnimatePresence>
@@ -120,6 +169,18 @@ export function MealPlanningPage() {
             onSecondary={handleConfirmAdd}
             onTertiary={handleCancel}
             onCancel={handleCancel}
+          />
+        )}
+        {showAddToListDialog && (
+          <ConfirmDialog
+            isOpen={showAddToListDialog}
+            title="Already in list"
+            message="This meal is already in your shopping list. Add it again?"
+            confirmLabel="Add again"
+            tertiaryLabel="Cancel"
+            onConfirm={handleConfirmAddAgain}
+            onTertiary={handleCancelAddAgain}
+            onCancel={handleCancelAddAgain}
           />
         )}
       </AnimatePresence>
