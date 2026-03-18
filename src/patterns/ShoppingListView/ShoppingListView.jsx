@@ -361,44 +361,83 @@ export const ShoppingListView = ({
                 Your list is empty.
               </p>
             )}
-            {smartStatus === 'idle' && smartGroups.length > 0 && (
-              <>
-                {smartGroups.map((group, groupIdx) => (
-                  <div key={group.category} className="smart-group">
-                    <h2 className="smart-group-header text-tiny-bold">
-                      <span aria-hidden="true">{group.emoji}</span> {group.category.toUpperCase()}
-                    </h2>
-                    <ul className="smart-group-items">
-                      {group.items.map((item, itemIdx) => {
-                        const key = `${groupIdx}-${itemIdx}`;
-                        const checked = !!smartChecked[key];
-                        return (
+            {smartStatus === 'idle' && smartGroups.length > 0 && (() => {
+              // Collect all checked items across groups for the bottom "Eingekauft" section
+              const allCheckedItems = [];
+              smartGroups.forEach((group, groupIdx) => {
+                group.items.forEach((item, itemIdx) => {
+                  const key = `${groupIdx}-${itemIdx}`;
+                  if (smartChecked[key]) allCheckedItems.push({ item, key });
+                });
+              });
+
+              return (
+                <>
+                  {smartGroups.map((group, groupIdx) => {
+                    const uncheckedItems = group.items.filter((_, itemIdx) => !smartChecked[`${groupIdx}-${itemIdx}`]);
+                    if (uncheckedItems.length === 0) return null;
+                    return (
+                      <div key={group.category} className="smart-group">
+                        <h2 className="smart-group-header text-tiny-bold">
+                          <span aria-hidden="true">{group.emoji}</span> {group.category.toUpperCase()}
+                        </h2>
+                        <ul className="smart-group-items">
+                          {uncheckedItems.map((item) => {
+                            const itemIdx = group.items.indexOf(item);
+                            const key = `${groupIdx}-${itemIdx}`;
+                            return (
+                              <li key={key}>
+                                <button
+                                  type="button"
+                                  className="smart-item"
+                                  onClick={() => toggleSmartItem(key)}
+                                  aria-pressed={false}
+                                >
+                                  <span className="smart-item-quantity text-body-regular">
+                                    {item.quantity || ''}
+                                  </span>
+                                  <span className="smart-item-name text-body-regular">{item.name}</span>
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    );
+                  })}
+
+                  {allCheckedItems.length > 0 && (
+                    <div className="smart-group">
+                      <h2 className="smart-group-header text-tiny-bold">{PURCHASED_SECTION_TITLE.toUpperCase()}</h2>
+                      <ul className="smart-group-items">
+                        {allCheckedItems.map(({ item, key }) => (
                           <li key={key}>
                             <button
                               type="button"
-                              className={`smart-item${checked ? ' smart-item--checked' : ''}`}
+                              className="smart-item smart-item--checked"
                               onClick={() => toggleSmartItem(key)}
-                              aria-pressed={checked}
+                              aria-pressed={true}
                             >
                               <span className="smart-item-quantity text-body-regular">
                                 {item.quantity || ''}
                               </span>
                               <span className="smart-item-name text-body-regular">{item.name}</span>
-                              {checked && <CheckSmallIcon />}
+                              <CheckSmallIcon />
                             </button>
                           </li>
-                        );
-                      })}
-                    </ul>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="shopping-list-smart-refresh">
+                    <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
+                      Refresh
+                    </button>
                   </div>
-                ))}
-                <div className="shopping-list-smart-refresh">
-                  <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
-                    Refresh
-                  </button>
-                </div>
-              </>
-            )}
+                </>
+              );
+            })()}
           </div>
         )}
       </div>
