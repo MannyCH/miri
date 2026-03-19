@@ -25,6 +25,7 @@ export const ShoppingListView = ({
   onClearList,
   onViewModeChange,
   onSmartRefresh,
+  onSmartItemDelete,
   smartGroups = [],
   smartStatus = 'idle',
   searchQuery = '',
@@ -387,6 +388,7 @@ export const ShoppingListView = ({
                 toggleSmartItem={toggleSmartItem}
                 pantryStaples={pantryStaples}
                 onTogglePantryStaple={onTogglePantryStaple}
+                onSmartItemDelete={onSmartItemDelete}
                 onSmartRefresh={onSmartRefresh}
                 PURCHASED_SECTION_TITLE={PURCHASED_SECTION_TITLE}
               />
@@ -434,11 +436,13 @@ export const ShoppingListView = ({
 };
 
 /**
- * SmartListItem — mirrors IngredientListItem design:
- * tap to check/uncheck, swipe left to mark/unmark as pantry staple.
+ * SmartListItem — tap to check/uncheck,
+ * swipe RIGHT → pantry staple zone (brand colour, left side),
+ * swipe LEFT  → delete zone (error colour, right side).
  */
-function SmartListItem({ item, itemKey, checked, isPantry, onToggle, onTogglePantryStaple, isFirst }) {
-  const [swipeOffset, setSwipeOffset] = React.useState(0);
+function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple, onDelete, isFirst }) {
+  // positive = swiping left (delete), negative = swiping right (pantry)
+  const [swipeX, setSwipeX] = React.useState(0);
   const [isSwiping, setIsSwiping] = React.useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = React.useState(false);
   const startXRef = React.useRef(0);
@@ -448,14 +452,26 @@ function SmartListItem({ item, itemKey, checked, isPantry, onToggle, onTogglePan
   const SWIPE_TRANSITION = '360ms cubic-bezier(0.22, 0.61, 0.36, 1)';
   const ANIMATE_OUT_MS = 320;
 
+  const triggerDelete = React.useCallback(() => {
+    if (isAnimatingOut) return;
+    setSwipeX(MAX_SWIPE);
+    setIsSwiping(false);
+    setIsAnimatingOut(true);
+    window.setTimeout(() => {
+      onDelete?.();
+      setSwipeX(0);
+      setIsAnimatingOut(false);
+    }, ANIMATE_OUT_MS);
+  }, [isAnimatingOut, onDelete]);
+
   const triggerPantryToggle = React.useCallback(() => {
     if (isAnimatingOut) return;
-    setSwipeOffset(MAX_SWIPE);
+    setSwipeX(-MAX_SWIPE);
     setIsSwiping(false);
     setIsAnimatingOut(true);
     window.setTimeout(() => {
       onTogglePantryStaple?.(item.name?.toLowerCase());
-      setSwipeOffset(0);
+      setSwipeX(0);
       setIsAnimatingOut(false);
     }, ANIMATE_OUT_MS);
   }, [isAnimatingOut, item.name, onTogglePantryStaple]);
@@ -469,21 +485,24 @@ function SmartListItem({ item, itemKey, checked, isPantry, onToggle, onTogglePan
   const handleTouchMove = (e) => {
     if (!isSwiping) return;
     const diff = startXRef.current - e.touches[0].clientX;
-    if (diff > 0) setSwipeOffset(Math.min(diff, MAX_SWIPE));
+    setSwipeX(Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, diff)));
   };
 
   const handleTouchEnd = () => {
     if (isAnimatingOut) return;
-    if (swipeOffset > SWIPE_THRESHOLD) { triggerPantryToggle(); return; }
-    setSwipeOffset(0);
+    if (swipeX > SWIPE_THRESHOLD) { triggerDelete(); return; }
+    if (swipeX < -SWIPE_THRESHOLD) { triggerPantryToggle(); return; }
+    setSwipeX(0);
     setIsSwiping(false);
   };
 
   const handleClick = () => {
-    if (isSwiping || swipeOffset > 0 || isAnimatingOut || isPantry) return;
+    if (isSwiping || swipeX !== 0 || isAnimatingOut || isPantry) return;
     onToggle?.();
   };
 
+  const leftProgress = Math.min(1, Math.max(0, swipeX) / MAX_SWIPE);   // left-swipe → delete
+  const rightProgress = Math.min(1, Math.max(0, -swipeX) / MAX_SWIPE); // right-swipe → pantry
   const label = `${item.quantity ? item.quantity + ' ' : ''}${item.name}`;
 
   return (
@@ -503,22 +522,35 @@ function SmartListItem({ item, itemKey, checked, isPantry, onToggle, onTogglePan
     >
       {isFirst && <Divider />}
       <div
-        className={`smart-list-item-wrapper${swipeOffset > 0 ? ' is-swiping' : ''}`}
-        style={{ '--swipe-progress': Math.min(1, swipeOffset / MAX_SWIPE) }}
+        className={`smart-list-item-wrapper${swipeX !== 0 ? ' is-swiping' : ''}`}
+        style={{ '--left-swipe-progress': leftProgress, '--right-swipe-progress': rightProgress }}
       >
+        {/* Pantry zone — sits on the LEFT, revealed by swiping RIGHT */}
         <button
           type="button"
-          className="smart-list-item-action-zone"
+          className="smart-list-item-pantry-zone"
           aria-label={isPantry ? `Remove ${item.name} from pantry staples` : `Mark ${item.name} as pantry staple`}
           onClick={triggerPantryToggle}
-          tabIndex={swipeOffset > 0 ? 0 : -1}
+          tabIndex={rightProgress > 0 ? 0 : -1}
         >
           {isPantry ? <PantryRemoveIcon /> : <PantryIcon />}
         </button>
+
+        {/* Delete zone — sits on the RIGHT, revealed by swiping LEFT */}
+        <button
+          type="button"
+          className="smart-list-item-delete-zone"
+          aria-label={`Delete ${label}`}
+          onClick={triggerDelete}
+          tabIndex={leftProgress > 0 ? 0 : -1}
+        >
+          <TrashIcon />
+        </button>
+
         <div
           className={`smart-list-item-container${checked || isPantry ? ' is-checked' : ''}`}
           style={{
-            transform: `translateX(-${swipeOffset}px)`,
+            transform: `translateX(${-swipeX}px)`,
             transition: isSwiping ? 'none' : `transform ${SWIPE_TRANSITION}`,
           }}
           onClick={handleClick}
@@ -531,6 +563,7 @@ function SmartListItem({ item, itemKey, checked, isPantry, onToggle, onTogglePan
           aria-label={`${checked ? 'Uncheck' : 'Check'} ${label}`}
           onKeyDown={(e) => {
             if ((e.key === ' ' || e.key === 'Enter') && !isPantry) { e.preventDefault(); onToggle?.(); }
+            if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); triggerDelete(); }
           }}
         >
           <span className="smart-list-item-quantity text-body-small-regular">{item.quantity || ''}</span>
@@ -543,7 +576,7 @@ function SmartListItem({ item, itemKey, checked, isPantry, onToggle, onTogglePan
   );
 }
 
-function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantryStaples, onTogglePantryStaple, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
+function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
   const allCheckedItems = [];
   const pantryItems = [];
 
@@ -572,11 +605,11 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
               <SmartListItem
                 key={key}
                 item={item}
-                itemKey={key}
                 checked={false}
                 isPantry={false}
                 onToggle={() => toggleSmartItem(key)}
                 onTogglePantryStaple={onTogglePantryStaple}
+                onDelete={() => onSmartItemDelete?.(item.name)}
                 isFirst={idx === 0}
               />
             ))}
@@ -591,11 +624,11 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
             <SmartListItem
               key={key}
               item={item}
-              itemKey={key}
               checked={true}
               isPantry={false}
               onToggle={() => toggleSmartItem(key)}
               onTogglePantryStaple={onTogglePantryStaple}
+              onDelete={() => onSmartItemDelete?.(item.name)}
               isFirst={idx === 0}
             />
           ))}
@@ -609,10 +642,10 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
             <SmartListItem
               key={key}
               item={item}
-              itemKey={key}
               checked={true}
               isPantry={true}
               onTogglePantryStaple={onTogglePantryStaple}
+              onDelete={() => onSmartItemDelete?.(item.name)}
               isFirst={idx === 0}
             />
           ))}

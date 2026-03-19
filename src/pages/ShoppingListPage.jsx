@@ -175,6 +175,12 @@ export function ShoppingListPage() {
       smartGroups={smartGroups}
       smartStatus={smartStatus}
       onSmartRefresh={() => fetchSmartGroups(true)}
+      onSmartItemDelete={(itemName) => {
+        const match = shoppingList.find(
+          item => item.name.toLowerCase() === itemName.toLowerCase()
+        );
+        if (match) deleteIngredient(match.entryId ?? match.id);
+      }}
       items={items}
       itemKeys={itemKeys}
       itemIds={itemIds}

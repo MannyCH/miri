@@ -391,10 +391,10 @@
   overflow: hidden;
 }
 
-/* Pantry action zone revealed on swipe left */
-.smart-list-item-action-zone {
+/* Pantry zone — LEFT side, revealed by swiping RIGHT */
+.smart-list-item-pantry-zone {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 0;
   bottom: 0;
   width: 120px;
@@ -404,13 +404,36 @@
   background: var(--color-fill-brand-strong);
   color: var(--color-text-inverted);
   border: none;
-  opacity: calc(var(--swipe-progress, 0));
+  opacity: calc(var(--right-swipe-progress, 0));
   transition: opacity 0.24s ease;
   pointer-events: none;
   cursor: pointer;
 }
 
-.smart-list-item-wrapper.is-swiping .smart-list-item-action-zone {
+.smart-list-item-wrapper.is-swiping .smart-list-item-pantry-zone {
+  pointer-events: auto;
+}
+
+/* Delete zone — RIGHT side, revealed by swiping LEFT */
+.smart-list-item-delete-zone {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill-error-strong);
+  color: var(--color-text-inverted);
+  border: none;
+  opacity: calc(var(--left-swipe-progress, 0));
+  transition: opacity 0.24s ease;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.smart-list-item-wrapper.is-swiping .smart-list-item-delete-zone {
   pointer-events: auto;
 }
 
