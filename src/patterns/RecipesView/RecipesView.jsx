@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { LogIn } from 'react-feather';
+import { Plus } from 'react-feather';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
@@ -55,7 +55,7 @@ export const RecipesView = ({
             onClick={onImportRequest}
             aria-label="Import recipe"
           >
-            <LogIn size={22} aria-hidden="true" />
+            <Plus size={22} aria-hidden="true" />
           </button>
         )}
       </header>
