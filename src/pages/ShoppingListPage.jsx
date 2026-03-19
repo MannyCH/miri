@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingListView } from '../patterns/ShoppingListView';
 import { useApp } from '../context/AppContext';
+import { usePreferences } from '../context/PreferencesContext';
 
 /**
  * Shopping List Page
@@ -22,7 +23,20 @@ export function ShoppingListPage() {
     markRecipeAsUnpurchased,
     clearShoppingList,
   } = useApp();
+  const { preferences } = usePreferences();
   const [searchQuery, setSearchQuery] = React.useState('');
+
+  // Compute summary: unique recipes in the list with serving count
+  const summaryEntries = React.useMemo(() => {
+    const recipeMap = new Map();
+    shoppingList.forEach(item => {
+      if (!item.recipeName) return;
+      if (!recipeMap.has(item.recipeName)) {
+        recipeMap.set(item.recipeName, preferences.servings ?? 2);
+      }
+    });
+    return Array.from(recipeMap.entries()).map(([recipeName, servings]) => ({ recipeName, servings }));
+  }, [shoppingList, preferences.servings]);
   const [smartGroups, setSmartGroups] = React.useState([]);
   const [smartStatus, setSmartStatus] = React.useState('idle');
   const lastFetchedKeyRef = React.useRef(null);
@@ -140,6 +154,7 @@ export function ShoppingListPage() {
     <ShoppingListView
       viewMode={shoppingListViewMode}
       onViewModeChange={setShoppingListViewMode}
+      summaryEntries={summaryEntries}
       smartGroups={smartGroups}
       smartStatus={smartStatus}
       onSmartRefresh={() => fetchSmartGroups(true)}
