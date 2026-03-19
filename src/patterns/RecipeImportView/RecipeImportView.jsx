@@ -36,8 +36,12 @@ const parseIngredient = (str) => {
   if (/^\d/.test(first) && INGREDIENT_UNITS.has(second.toLowerCase()) && rest.length > 0) {
     return { quantity: `${first} ${second}`, name: rest.join(' ') };
   }
-  // "320g Asparagus" or fallback
-  return { quantity: first, name: parts.slice(1).join(' ') };
+  // "320g Asparagus" — starts with digit
+  if (/^\d/.test(first)) {
+    return { quantity: first, name: parts.slice(1).join(' ') };
+  }
+  // No leading number — entire string is the ingredient name, no quantity
+  return { quantity: '', name: str };
 };
 
 const parseServings = (val) => {
