@@ -7,14 +7,16 @@ import './IngredientList.css';
  * Container for interactive ingredient list items
  * Supports tap to toggle and swipe to delete
  */
-export const IngredientList = ({ 
+export const IngredientList = ({
   ingredients = [],
   itemKeys = [],
   itemIds = [],
   checkedItems = {},
   onCheckedChange,
-  onDelete, // Callback when item is deleted (swipe or keyboard)
-  ...props 
+  onDelete,
+  pantryStaples = [],     // optional — array of staple name strings
+  onPantryToggle,         // optional — (index, ingredientText) => void
+  ...props
 }) => {
   return (
     <div className="ingredient-list" {...props}>
@@ -24,6 +26,8 @@ export const IngredientList = ({
           checked={checkedItems[index]}
           onCheckedChange={(checked) => onCheckedChange?.(index, checked, itemIds[index])}
           onDelete={() => onDelete?.(index, itemIds[index])}
+          onPantryToggle={onPantryToggle ? () => onPantryToggle(index, ingredient) : undefined}
+          isPantryStaple={pantryStaples.some(s => ingredient?.toLowerCase().includes(s))}
           showUpperDivider={index === 0}
           showBelowDivider={true}
         >

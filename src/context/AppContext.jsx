@@ -106,7 +106,7 @@ export function AppProvider({ children }) {
       return stored ? JSON.parse(stored) : [];
     } catch { return []; }
   });
-  const [shoppingListViewMode, setShoppingListViewMode] = useState('list');
+  const [shoppingListViewMode, setShoppingListViewMode] = useState('recipe');
   const nextEntryIdRef = useRef(0);
   const createEntryId = React.useCallback(() => `sl-${nextEntryIdRef.current++}`, []);
 

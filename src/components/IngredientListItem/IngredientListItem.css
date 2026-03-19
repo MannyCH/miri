@@ -10,7 +10,30 @@
   overflow: hidden;
 }
 
-/* Delete zone revealed on swipe left */
+/* Pantry zone — LEFT side, revealed by swiping RIGHT */
+.ingredient-list-item-pantry-zone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+  border: none;
+  opacity: calc(var(--right-swipe-progress, 0));
+  transition: opacity 0.24s ease;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.ingredient-list-item-wrapper.is-swiping .ingredient-list-item-pantry-zone {
+  pointer-events: auto;
+}
+
+/* Delete zone — RIGHT side, revealed by swiping LEFT */
 .ingredient-list-item-delete-zone {
   position: absolute;
   right: 0;

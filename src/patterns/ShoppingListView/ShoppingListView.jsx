@@ -174,13 +174,6 @@ export const ShoppingListView = ({
             <GridIcon />
           </button>
           <button
-            className={`view-toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('list')}
-            aria-label="Simple list"
-          >
-            <ListIcon />
-          </button>
-          <button
             className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
             onClick={() => onViewModeChange?.('smart')}
             aria-label="Smart grouped list"
@@ -204,52 +197,6 @@ export const ShoppingListView = ({
               ))}
             </ul>
           </div>
-        )}
-
-        {viewMode === 'list' && (
-          <>
-            <IngredientList
-              ingredients={uncheckedItems.ingredients}
-              itemKeys={uncheckedItems.itemKeys}
-              itemIds={uncheckedItems.itemIds}
-              checkedItems={{}}
-              onCheckedChange={(sectionIndex, checked, itemId) =>
-                onItemCheck?.(uncheckedItems.originalIndices[sectionIndex], checked, itemId)
-              }
-              onDelete={(sectionIndex, itemId) =>
-                onItemDelete?.(uncheckedItems.originalIndices[sectionIndex], itemId)
-              }
-            />
-            {checkedListItems.ingredients.length > 0 && (
-              <>
-                <h2 className="shopping-list-purchased-title text-body-small-bold">
-                  {PURCHASED_SECTION_TITLE}
-                </h2>
-                <IngredientList
-                  ingredients={checkedListItems.ingredients}
-                  itemKeys={checkedListItems.itemKeys}
-                  itemIds={checkedListItems.itemIds}
-                  checkedItems={checkedListItems.ingredients.reduce((acc, _, index) => {
-                    acc[index] = true;
-                    return acc;
-                  }, {})}
-                  onCheckedChange={(sectionIndex, checked, itemId) =>
-                    onItemCheck?.(checkedListItems.originalIndices[sectionIndex], checked, itemId)
-                  }
-                  onDelete={(sectionIndex, itemId) =>
-                    onItemDelete?.(checkedListItems.originalIndices[sectionIndex], itemId)
-                  }
-                />
-              </>
-            )}
-            {items.length > 0 && (
-              <div className="shopping-list-clear">
-                <Button variant="tertiary-delete" onClick={onClearList}>
-                  Clear whole list
-                </Button>
-              </div>
-            )}
-          </>
         )}
 
         {viewMode === 'recipe' && (
@@ -298,6 +245,8 @@ export const ShoppingListView = ({
                     onDelete={(index, itemId) =>
                       group.onIngredientDelete?.(group.originalIndices[index], itemId)
                     }
+                    pantryStaples={pantryStaples}
+                    onPantryToggle={(_, ingredient) => onTogglePantryStaple?.(ingredient?.toLowerCase())}
                   />
                 </motion.div>
               ))}
@@ -343,6 +292,8 @@ export const ShoppingListView = ({
                         onDelete={(index, itemId) =>
                           group.onIngredientDelete?.(group.originalIndices[index], itemId)
                         }
+                        pantryStaples={pantryStaples}
+                        onPantryToggle={(_, ingredient) => onTogglePantryStaple?.(ingredient?.toLowerCase())}
                       />
                     </motion.div>
                   ))}

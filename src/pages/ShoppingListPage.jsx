@@ -101,12 +101,14 @@ export function ShoppingListPage() {
       .catch(() => setSmartStatus('error'));
   }, [shoppingList]);
 
+  // Only fetch when switching TO smart view — not on every list change.
+  // Optimistic updates handle in-view changes (delete, pantry toggle).
   React.useEffect(() => {
     if (shoppingListViewMode === 'smart') {
       fetchSmartGroups();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shoppingListViewMode, shoppingList]);
+  }, [shoppingListViewMode]);
   
   // Group ingredients by recipe for recipe view mode
   const groupedByRecipe = shoppingList.reduce((acc, item) => {
