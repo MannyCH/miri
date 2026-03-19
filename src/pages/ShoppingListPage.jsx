@@ -169,14 +169,13 @@ export function ShoppingListPage() {
             items: group.items.filter(i => i.name.toLowerCase() !== itemName.toLowerCase()),
           })).filter(group => group.items.length > 0)
         );
-        // Fuzzy-match against raw ingredient strings (smart names are normalized)
+        // Match shopping list items whose name contains the smart name.
+        // One direction only — avoids short smart names (e.g. "salt") accidentally
+        // matching unrelated items (e.g. "sea salt", "garlic salt").
         const needle = itemName.toLowerCase();
-        const matches = shoppingList.filter(item => {
-          const hay = item.name.toLowerCase();
-          // Strip leading quantity ("200g ", "1 1/2 cups ") for comparison
-          const hayStripped = hay.replace(/^[\d\s.,/½¼¾⅓⅔⅛⅜⅝⅞]+\s*[a-z]*\s+/i, '');
-          return hay.includes(needle) || hayStripped.includes(needle) || needle.includes(hayStripped);
-        });
+        const matches = shoppingList.filter(item =>
+          item.name.toLowerCase().includes(needle)
+        );
         matches.forEach(match => deleteIngredient(match.entryId ?? match.id));
       }}
       items={items}
