@@ -14,6 +14,7 @@ import { TextField } from '../components/TextField/TextField';
 import { Button } from '../components/Button/Button';
 import { BatchImportSection } from '../components/BatchImportSection/BatchImportSection';
 import { NavigationBarConnected } from '../components/NavigationBar/NavigationBarConnected';
+import { RadioButton } from '../components/RadioButton/RadioButton';
 import './AccountPage.css';
 
 const PASSWORD_HAS_NUMBER_REGEX = /\d/;
@@ -392,6 +393,30 @@ export function AccountPage() {
                     onChange={(cookingFrequency) => updatePreferences({ cookingFrequency })}
                     disabled={isLoading}
                   />
+                </SettingsSection>
+
+                <SettingsSection title="Units" spacing="section">
+                  <fieldset className="account-unit-fieldset">
+                    <legend className="text-body-small-regular account-unit-legend">
+                      Measurement system
+                    </legend>
+                    <div className="account-unit-options">
+                      <RadioButton
+                        name="unitSystem"
+                        label="Metric (ml, g, l)"
+                        value="metric"
+                        checked={preferences.unitSystem === 'metric'}
+                        onChange={(v) => updatePreferences({ unitSystem: v })}
+                      />
+                      <RadioButton
+                        name="unitSystem"
+                        label="Imperial (cups, oz, lbs)"
+                        value="imperial"
+                        checked={preferences.unitSystem === 'imperial'}
+                        onChange={(v) => updatePreferences({ unitSystem: v })}
+                      />
+                    </div>
+                  </fieldset>
                 </SettingsSection>
 
                 <SettingsSection title="Recipes" spacing="section">

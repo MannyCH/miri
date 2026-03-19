@@ -10,7 +10,10 @@ const DEFAULT_PREFERENCES = {
   goal: '',
   bmr: '',
   cookingFrequency: 'daily',
+  unitSystem: 'metric',
 };
+
+const UNIT_SYSTEM_KEY = 'miri-unit-system';
 
 const SAVE_DEBOUNCE_MS = 1000;
 
@@ -37,7 +40,10 @@ function stateToPayload(state) {
 
 export function PreferencesProvider({ children }) {
   const { isAuthenticated } = useAuth();
-  const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
+  const [preferences, setPreferences] = useState(() => ({
+    ...DEFAULT_PREFERENCES,
+    unitSystem: localStorage.getItem(UNIT_SYSTEM_KEY) ?? 'metric',
+  }));
   const [isLoading, setIsLoading] = useState(false);
   const saveTimeoutRef = useRef(null);
 
@@ -61,6 +67,11 @@ export function PreferencesProvider({ children }) {
   const updatePreferences = useCallback((updates) => {
     setPreferences((prev) => {
       const next = { ...prev, ...updates };
+
+      // unitSystem is stored in localStorage only (no DB column yet)
+      if (updates.unitSystem !== undefined) {
+        localStorage.setItem(UNIT_SYSTEM_KEY, updates.unitSystem);
+      }
 
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(() => {

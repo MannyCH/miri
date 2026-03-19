@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RecipeDetailView } from '../patterns/RecipeDetailView';
 import { useApp } from '../context/AppContext';
+import { usePreferences } from '../context/PreferencesContext';
 import { fetchRecipeById } from '../lib/recipesApi';
+import { convertIngredients } from '../lib/unitConverter';
 
 /**
  * Recipe Detail Page
@@ -13,6 +15,7 @@ export function RecipeDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addRecipeToShoppingList } = useApp();
+  const { preferences } = usePreferences();
   const [isAdded, setIsAdded] = useState(false);
   const [recipe, setRecipe] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,9 +48,13 @@ export function RecipeDetailPage() {
     setTimeout(() => setIsAdded(false), 2500);
   };
 
+  const displayRecipe = preferences.unitSystem && preferences.unitSystem !== 'metric'
+    ? { ...recipe, ingredients: convertIngredients(recipe.ingredients, preferences.unitSystem) }
+    : recipe;
+
   return (
     <RecipeDetailView
-      recipe={recipe}
+      recipe={displayRecipe}
       onAddToList={handleAddToList}
       isAdded={isAdded}
     />
