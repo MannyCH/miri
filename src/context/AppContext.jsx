@@ -335,6 +335,7 @@ export function AppProvider({ children }) {
       id: r.id,
       title: r.title,
       meal_type: r.meal_type ?? 'any',
+      categories: r.categories ?? [],
     }));
 
     // Collect recipe IDs already used in the plan so the API can avoid repeats
@@ -357,7 +358,7 @@ export function AppProvider({ children }) {
       const oldTitle = userRecipes.find(r => r.id === currentRecipeId)?.title ?? 'Recipe';
 
       const updatedPlan = mealPlan.map(day => {
-        if (day.fullDate !== fullDate) return day;
+        if (day.meals[mealType]?.id !== currentRecipeId) return day;
         return { ...day, meals: { ...day.meals, [mealType]: newRecipe } };
       });
       setMealPlan(updatedPlan);
