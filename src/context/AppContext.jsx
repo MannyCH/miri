@@ -337,11 +337,16 @@ export function AppProvider({ children }) {
       meal_type: r.meal_type ?? 'any',
     }));
 
+    // Collect recipe IDs already used in the plan so the API can avoid repeats
+    const usedRecipeIds = mealPlan.flatMap(day =>
+      Object.values(day.meals ?? {}).map(m => m?.id).filter(Boolean)
+    );
+
     try {
       const response = await fetch('/api/replace-meal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mealType, currentRecipeId, recipes: recipeList, preferences }),
+        body: JSON.stringify({ mealType, currentRecipeId, recipes: recipeList, preferences, usedRecipeIds }),
       });
 
       if (!response.ok) throw new Error('API error');
@@ -352,7 +357,7 @@ export function AppProvider({ children }) {
       const oldTitle = userRecipes.find(r => r.id === currentRecipeId)?.title ?? 'Recipe';
 
       const updatedPlan = mealPlan.map(day => {
-        if (day.meals[mealType]?.id !== currentRecipeId) return day;
+        if (day.fullDate !== fullDate) return day;
         return { ...day, meals: { ...day.meals, [mealType]: newRecipe } };
       });
       setMealPlan(updatedPlan);
