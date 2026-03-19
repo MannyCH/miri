@@ -61,6 +61,9 @@
 .shopping-list-summary-servings {
   color: var(--color-text-weak);
   flex-shrink: 0;
+  min-width: var(--spacing-32);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .shopping-list-view-toggle {
