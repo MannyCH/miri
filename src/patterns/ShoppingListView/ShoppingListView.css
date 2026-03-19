@@ -371,3 +371,14 @@
   outline-offset: 2px;
   border-radius: var(--corner-radius-4);
 }
+
+/* Pantry staples */
+.smart-group-header--pantry {
+  color: var(--color-text-weak);
+  opacity: 0.7;
+}
+
+.smart-item--pantry {
+  opacity: 0.5;
+  cursor: default;
+}

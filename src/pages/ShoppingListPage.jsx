@@ -26,6 +26,21 @@ export function ShoppingListPage() {
   const { preferences } = usePreferences();
   const [searchQuery, setSearchQuery] = React.useState('');
 
+  // Pantry staples persisted to localStorage
+  const [pantryStaples, setPantryStaples] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('miri-pantry-staples') ?? '[]'); } catch { return []; }
+  });
+
+  const togglePantryStaple = React.useCallback((itemName) => {
+    setPantryStaples(prev => {
+      const next = prev.includes(itemName)
+        ? prev.filter(s => s !== itemName)
+        : [...prev, itemName];
+      localStorage.setItem('miri-pantry-staples', JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   // Compute summary: unique recipes in the list with serving count
   const summaryEntries = React.useMemo(() => {
     const recipeMap = new Map();
@@ -155,6 +170,8 @@ export function ShoppingListPage() {
       viewMode={shoppingListViewMode}
       onViewModeChange={setShoppingListViewMode}
       summaryEntries={summaryEntries}
+      pantryStaples={pantryStaples}
+      onTogglePantryStaple={togglePantryStaple}
       smartGroups={smartGroups}
       smartStatus={smartStatus}
       onSmartRefresh={() => fetchSmartGroups(true)}

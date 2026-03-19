@@ -29,6 +29,8 @@ export const ShoppingListView = ({
   searchQuery = '',
   onSearch,
   summaryEntries = [],
+  pantryStaples = [],
+  onTogglePantryStaple,
   ...props
 }) => {
   const [smartChecked, setSmartChecked] = useState({});
@@ -377,83 +379,17 @@ export const ShoppingListView = ({
                 Your list is empty.
               </p>
             )}
-            {smartStatus === 'idle' && smartGroups.length > 0 && (() => {
-              // Collect all checked items across groups for the bottom "Eingekauft" section
-              const allCheckedItems = [];
-              smartGroups.forEach((group, groupIdx) => {
-                group.items.forEach((item, itemIdx) => {
-                  const key = `${groupIdx}-${itemIdx}`;
-                  if (smartChecked[key]) allCheckedItems.push({ item, key });
-                });
-              });
-
-              return (
-                <>
-                  {smartGroups.map((group, groupIdx) => {
-                    const uncheckedItems = group.items.filter((_, itemIdx) => !smartChecked[`${groupIdx}-${itemIdx}`]);
-                    if (uncheckedItems.length === 0) return null;
-                    return (
-                      <div key={group.category} className="smart-group">
-                        <h2 className="smart-group-header text-tiny-bold">
-                          <span aria-hidden="true">{group.emoji}</span> {group.category.toUpperCase()}
-                        </h2>
-                        <ul className="smart-group-items">
-                          {uncheckedItems.map((item) => {
-                            const itemIdx = group.items.indexOf(item);
-                            const key = `${groupIdx}-${itemIdx}`;
-                            return (
-                              <li key={key}>
-                                <button
-                                  type="button"
-                                  className="smart-item"
-                                  onClick={() => toggleSmartItem(key)}
-                                  aria-pressed={false}
-                                >
-                                  <span className="smart-item-quantity text-body-regular">
-                                    {item.quantity || ''}
-                                  </span>
-                                  <span className="smart-item-name text-body-regular">{item.name}</span>
-                                </button>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </div>
-                    );
-                  })}
-
-                  {allCheckedItems.length > 0 && (
-                    <div className="smart-group">
-                      <h2 className="smart-group-header text-tiny-bold">{PURCHASED_SECTION_TITLE.toUpperCase()}</h2>
-                      <ul className="smart-group-items">
-                        {allCheckedItems.map(({ item, key }) => (
-                          <li key={key}>
-                            <button
-                              type="button"
-                              className="smart-item smart-item--checked"
-                              onClick={() => toggleSmartItem(key)}
-                              aria-pressed={true}
-                            >
-                              <span className="smart-item-quantity text-body-regular">
-                                {item.quantity || ''}
-                              </span>
-                              <span className="smart-item-name text-body-regular">{item.name}</span>
-                              <CheckSmallIcon />
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  <div className="shopping-list-smart-refresh">
-                    <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
-                      Refresh
-                    </button>
-                  </div>
-                </>
-              );
-            })()}
+            {smartStatus === 'idle' && smartGroups.length > 0 && (
+              <SmartListContent
+                smartGroups={smartGroups}
+                smartChecked={smartChecked}
+                toggleSmartItem={toggleSmartItem}
+                pantryStaples={pantryStaples}
+                onTogglePantryStaple={onTogglePantryStaple}
+                onSmartRefresh={onSmartRefresh}
+                PURCHASED_SECTION_TITLE={PURCHASED_SECTION_TITLE}
+              />
+            )}
           </div>
         )}
       </div>
@@ -495,6 +431,139 @@ export const ShoppingListView = ({
     </div>
   );
 };
+
+const LONG_PRESS_MS = 500;
+
+function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantryStaples, onTogglePantryStaple, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
+  const longPressTimerRef = React.useRef(null);
+
+  const startLongPress = (itemName) => {
+    longPressTimerRef.current = setTimeout(() => {
+      onTogglePantryStaple?.(itemName);
+    }, LONG_PRESS_MS);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const allCheckedItems = [];
+  const pantryItems = [];
+
+  smartGroups.forEach((group, groupIdx) => {
+    group.items.forEach((item, itemIdx) => {
+      const key = `${groupIdx}-${itemIdx}`;
+      const isPantry = pantryStaples.includes(item.name?.toLowerCase());
+      if (isPantry) {
+        pantryItems.push({ item, key, groupIdx, itemIdx });
+      } else if (smartChecked[key]) {
+        allCheckedItems.push({ item, key });
+      }
+    });
+  });
+
+  return (
+    <>
+      {smartGroups.map((group, groupIdx) => {
+        const visibleItems = group.items.filter((item, itemIdx) => {
+          const key = `${groupIdx}-${itemIdx}`;
+          const isPantry = pantryStaples.includes(item.name?.toLowerCase());
+          return !isPantry && !smartChecked[key];
+        });
+        if (visibleItems.length === 0) return null;
+        return (
+          <div key={group.category} className="smart-group">
+            <h2 className="smart-group-header text-tiny-bold">
+              <span aria-hidden="true">{group.emoji}</span> {group.category.toUpperCase()}
+            </h2>
+            <ul className="smart-group-items">
+              {visibleItems.map((item) => {
+                const itemIdx = group.items.indexOf(item);
+                const key = `${groupIdx}-${itemIdx}`;
+                return (
+                  <li key={key}>
+                    <button
+                      type="button"
+                      className="smart-item"
+                      onClick={() => toggleSmartItem(key)}
+                      onPointerDown={() => startLongPress(item.name?.toLowerCase())}
+                      onPointerUp={cancelLongPress}
+                      onPointerLeave={cancelLongPress}
+                      aria-pressed={false}
+                    >
+                      <span className="smart-item-quantity text-body-regular">{item.quantity || ''}</span>
+                      <span className="smart-item-name text-body-regular">{item.name}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
+
+      {allCheckedItems.length > 0 && (
+        <div className="smart-group">
+          <h2 className="smart-group-header text-tiny-bold">{PURCHASED_SECTION_TITLE.toUpperCase()}</h2>
+          <ul className="smart-group-items">
+            {allCheckedItems.map(({ item, key }) => (
+              <li key={key}>
+                <button
+                  type="button"
+                  className="smart-item smart-item--checked"
+                  onClick={() => toggleSmartItem(key)}
+                  onPointerDown={() => startLongPress(item.name?.toLowerCase())}
+                  onPointerUp={cancelLongPress}
+                  onPointerLeave={cancelLongPress}
+                  aria-pressed={true}
+                >
+                  <span className="smart-item-quantity text-body-regular">{item.quantity || ''}</span>
+                  <span className="smart-item-name text-body-regular">{item.name}</span>
+                  <CheckSmallIcon />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {pantryItems.length > 0 && (
+        <div className="smart-group">
+          <h2 className="smart-group-header text-tiny-bold smart-group-header--pantry">
+            PANTRY STAPLES
+          </h2>
+          <ul className="smart-group-items">
+            {pantryItems.map(({ item, key }) => (
+              <li key={key}>
+                <button
+                  type="button"
+                  className="smart-item smart-item--checked smart-item--pantry"
+                  onPointerDown={() => startLongPress(item.name?.toLowerCase())}
+                  onPointerUp={cancelLongPress}
+                  onPointerLeave={cancelLongPress}
+                  aria-label={`${item.name} – pantry staple. Long press to remove.`}
+                >
+                  <span className="smart-item-quantity text-body-regular">{item.quantity || ''}</span>
+                  <span className="smart-item-name text-body-regular">{item.name}</span>
+                  <CheckSmallIcon />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="shopping-list-smart-refresh">
+        <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
+          Refresh
+        </button>
+      </div>
+    </>
+  );
+}
 
 const GridIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
