@@ -18,6 +18,27 @@ export function RecipesPage() {
   const navigate = useNavigate();
   const { userRecipes, showToast } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState([]);
+
+  // Build available filters from recipes (meal_type + categories)
+  const availableFilters = React.useMemo(() => {
+    const MEAL_TYPE_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', any: 'Any' };
+    const mealTypes = new Set();
+    const categories = new Set();
+    userRecipes.forEach(r => {
+      if (r.meal_type && r.meal_type !== 'any') mealTypes.add(r.meal_type);
+      (r.categories ?? []).forEach(c => categories.add(c));
+    });
+    const mealFilters = [...mealTypes].map(v => ({ value: `meal:${v}`, label: MEAL_TYPE_LABELS[v] ?? v, type: 'meal_type' }));
+    const categoryFilters = [...categories].map(v => ({ value: `cat:${v}`, label: v, type: 'category' }));
+    return [...mealFilters, ...categoryFilters];
+  }, [userRecipes]);
+
+  const handleFilterToggle = (value) => {
+    setActiveFilters(prev =>
+      prev.includes(value) ? prev.filter(f => f !== value) : [...prev, value]
+    );
+  };
 
   // Import sheet
   const [showImportSheet, setShowImportSheet] = useState(false);
@@ -32,9 +53,22 @@ export function RecipesPage() {
   const fileInputRef = useRef(null);
   const photoInputRef = useRef(null);
 
-  const filteredRecipes = searchQuery
-    ? userRecipes.filter((r) => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    : userRecipes;
+  const filteredRecipes = React.useMemo(() => {
+    let result = userRecipes;
+    if (searchQuery) {
+      result = result.filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+    if (activeFilters.length > 0) {
+      const mealFilters = activeFilters.filter(f => f.startsWith('meal:')).map(f => f.slice(5));
+      const catFilters = activeFilters.filter(f => f.startsWith('cat:')).map(f => f.slice(4));
+      result = result.filter(r => {
+        const mealMatch = mealFilters.length === 0 || mealFilters.includes(r.meal_type);
+        const catMatch = catFilters.length === 0 || catFilters.some(c => (r.categories ?? []).includes(c));
+        return mealMatch && catMatch;
+      });
+    }
+    return result;
+  }, [userRecipes, searchQuery, activeFilters]);
 
   const handleRecipeClick = (recipeId) => navigate(`/recipes/${recipeId}`);
 
@@ -158,6 +192,9 @@ export function RecipesPage() {
         onSearchChange={setSearchQuery}
         onRecipeClick={handleRecipeClick}
         onImportRequest={handleImportRequest}
+        availableFilters={availableFilters}
+        activeFilters={activeFilters}
+        onFilterToggle={handleFilterToggle}
       />
 
       <ImportMethodSheet

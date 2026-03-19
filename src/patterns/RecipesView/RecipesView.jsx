@@ -14,6 +14,9 @@ export const RecipesView = ({
   onSearchChange,
   onRecipeClick,
   onImportRequest,
+  availableFilters = [],
+  activeFilters = [],
+  onFilterToggle,
   className,
   style,
   ...props
@@ -56,6 +59,26 @@ export const RecipesView = ({
         )}
       </header>
 
+      {activeFilters.length > 0 && !isSearchOpen && (
+        <div className="recipes-active-filters">
+          {activeFilters.map(value => {
+            const filter = availableFilters.find(f => f.value === value);
+            return (
+              <button
+                key={value}
+                type="button"
+                className="recipes-filter-chip recipes-filter-chip--active text-body-small-regular"
+                onClick={() => onFilterToggle?.(value)}
+                aria-label={`Remove filter: ${filter?.label ?? value}`}
+              >
+                {filter?.label ?? value}
+                <span className="recipes-filter-chip-close" aria-hidden="true">×</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div className="recipes-content">
         <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
       </div>
@@ -65,22 +88,43 @@ export const RecipesView = ({
       {/* Search overlay — slides in from top, Cancel always visible above keyboard */}
       {isSearchOpen && (
         <div className="recipes-search-overlay">
-          <SearchBar
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            inputRef={searchInputRef}
-            placeholder="Rezepte suchen..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange?.(e.target.value)}
-            showTrailingIcon={false}
-          />
-          <button
-            type="button"
-            className="recipes-search-cancel"
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
+          <div className="recipes-search-row">
+            <SearchBar
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              inputRef={searchInputRef}
+              placeholder="Search recipes..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              showTrailingIcon={false}
+            />
+            <button
+              type="button"
+              className="recipes-search-cancel"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+          {availableFilters.length > 0 && (
+            <div className="recipes-filter-chips" role="group" aria-label="Filter recipes">
+              {availableFilters.map(filter => {
+                const isActive = activeFilters.includes(filter.value);
+                return (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    className={`recipes-filter-chip text-body-small-regular${isActive ? ' recipes-filter-chip--active' : ''}`}
+                    onClick={() => onFilterToggle?.(filter.value)}
+                    aria-pressed={isActive}
+                  >
+                    {filter.label}
+                    {isActive && <span className="recipes-filter-chip-close" aria-hidden="true">×</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
