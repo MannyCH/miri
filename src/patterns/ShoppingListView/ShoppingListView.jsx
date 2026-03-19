@@ -527,8 +527,8 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
   const pantryItems = [];
 
   smartGroups.forEach((group, groupIdx) => {
-    group.items.forEach((item, itemIdx) => {
-      const key = `${groupIdx}-${itemIdx}`;
+    group.items.forEach((item) => {
+      const key = `${groupIdx}-${item.name}`;
       const isPantry = pantryStaples.includes(item.name?.toLowerCase());
       if (isPantry) pantryItems.push({ item, key });
       else if (smartChecked[key]) allCheckedItems.push({ item, key });
@@ -539,7 +539,7 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
     <>
       {smartGroups.map((group, groupIdx) => {
         const visibleItems = group.items
-          .map((item, itemIdx) => ({ item, key: `${groupIdx}-${itemIdx}` }))
+          .map((item) => ({ item, key: `${groupIdx}-${item.name}` }))
           .filter(({ item, key }) => !pantryStaples.includes(item.name?.toLowerCase()) && !smartChecked[key]);
         if (visibleItems.length === 0) return null;
         return (
