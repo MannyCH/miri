@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { LogIn } from 'react-feather';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
@@ -14,6 +15,9 @@ export const RecipesView = ({
   onSearchChange,
   onRecipeClick,
   onImportRequest,
+  availableFilters = [],
+  activeFilters = [],
+  onFilterToggle,
   className,
   style,
   ...props
@@ -51,10 +55,30 @@ export const RecipesView = ({
             onClick={onImportRequest}
             aria-label="Import recipe"
           >
-            <ImportIcon />
+            <LogIn size={22} aria-hidden="true" />
           </button>
         )}
       </header>
+
+      {activeFilters.length > 0 && !isSearchOpen && (
+        <div className="recipes-active-filters">
+          {activeFilters.map(value => {
+            const filter = availableFilters.find(f => f.value === value);
+            return (
+              <button
+                key={value}
+                type="button"
+                className="recipes-filter-chip recipes-filter-chip--active text-body-small-regular"
+                onClick={() => onFilterToggle?.(value)}
+                aria-label={`Remove filter: ${filter?.label ?? value}`}
+              >
+                {filter?.label ?? value}
+                <span className="recipes-filter-chip-close" aria-hidden="true">×</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <div className="recipes-content">
         <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
@@ -65,22 +89,43 @@ export const RecipesView = ({
       {/* Search overlay — slides in from top, Cancel always visible above keyboard */}
       {isSearchOpen && (
         <div className="recipes-search-overlay">
-          <SearchBar
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            inputRef={searchInputRef}
-            placeholder="Rezepte suchen..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange?.(e.target.value)}
-            showTrailingIcon={false}
-          />
-          <button
-            type="button"
-            className="recipes-search-cancel"
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
+          <div className="recipes-search-row">
+            <SearchBar
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              inputRef={searchInputRef}
+              placeholder="Search recipes..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              showTrailingIcon={false}
+            />
+            <button
+              type="button"
+              className="recipes-search-cancel"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+          {availableFilters.length > 0 && (
+            <div className="recipes-filter-chips" role="group" aria-label="Filter recipes">
+              {availableFilters.map(filter => {
+                const isActive = activeFilters.includes(filter.value);
+                return (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    className={`recipes-filter-chip text-body-small-regular${isActive ? ' recipes-filter-chip--active' : ''}`}
+                    onClick={() => onFilterToggle?.(filter.value)}
+                    aria-pressed={isActive}
+                  >
+                    {filter.label}
+                    {isActive && <span className="recipes-filter-chip-close" aria-hidden="true">×</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -104,12 +149,5 @@ const SearchIcon = () => (
   </svg>
 );
 
-const ImportIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/>
-    <line x1="12" y1="15" x2="12" y2="3"/>
-  </svg>
-);
 
 RecipesView.displayName = 'RecipesView';

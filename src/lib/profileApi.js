@@ -24,7 +24,7 @@ export async function fetchPreferences() {
  * Upsert the current user's preferences.
  * The user_id comes from the active Neon Auth session; RLS enforces ownership.
  */
-export async function savePreferences({ servings, eatingStyle, goal, bmrKcal, cookingFrequency }) {
+export async function savePreferences({ servings, eatingStyle, goal, bmrKcal, cookingFrequency, unitSystem }) {
   const { data: sessionData } = await dataClient.auth.getSession();
   const userId = sessionData?.user?.id;
   if (!userId) throw new Error('Not authenticated');
@@ -36,6 +36,7 @@ export async function savePreferences({ servings, eatingStyle, goal, bmrKcal, co
     goal: goal || null,
     bmr_kcal: bmrKcal ?? null,
     cooking_frequency: cookingFrequency || 'daily',
+    unit_system: unitSystem || 'metric',
     updated_at: new Date().toISOString(),
   };
 

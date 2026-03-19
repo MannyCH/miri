@@ -98,12 +98,58 @@ export function AppProvider({ children }) {
   const todayStr = calendarDays[0]?.fullDate;
   const [selectedFullDate, setSelectedFullDate] = useState(todayStr);
   
-  // Shopping List State
-  const [shoppingList, setShoppingList] = useState([]);
-  const [shoppingListViewMode, setShoppingListViewMode] = useState('list'); // 'list' or 'recipe'
+  // Shopping List State — persisted to localStorage
+  const SHOPPING_LIST_KEY = 'miri-shopping-list';
+  const [shoppingList, setShoppingList] = useState(() => {
+    try {
+      const stored = localStorage.getItem(SHOPPING_LIST_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+  const [shoppingListViewMode, setShoppingListViewMode] = useState('recipe');
   const nextEntryIdRef = useRef(0);
   const createEntryId = React.useCallback(() => `sl-${nextEntryIdRef.current++}`, []);
-  
+
+  // Persist shopping list whenever it changes
+  useEffect(() => {
+    localStorage.setItem(SHOPPING_LIST_KEY, JSON.stringify(shoppingList));
+  }, [shoppingList]);
+
+  // Smart groups — kept in context so they survive navigation
+  const [smartGroups, setSmartGroups] = useState([]);
+  const [smartStatus, setSmartStatus] = useState('idle');
+  const lastSmartKeyRef = useRef(null);
+
+  const fetchSmartGroups = useCallback((force = false) => {
+    const uncheckedItems = shoppingList
+      .filter(item => !item.checked)
+      .map(item => item.name);
+    const key = uncheckedItems.join('||');
+
+    if (!force && key === lastSmartKeyRef.current) return;
+
+    if (uncheckedItems.length === 0) {
+      lastSmartKeyRef.current = key;
+      setSmartGroups([]);
+      setSmartStatus('idle');
+      return;
+    }
+
+    lastSmartKeyRef.current = key;
+    setSmartStatus('loading');
+    fetch('/api/normalize-shopping-list', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: uncheckedItems }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        setSmartGroups(data.groups ?? []);
+        setSmartStatus('idle');
+      })
+      .catch(() => setSmartStatus('error'));
+  }, [shoppingList]);
+
   // Toast State
   const [toasts, setToasts] = useState([]);
   const pendingToastsRef = useRef(new Set());
@@ -249,20 +295,33 @@ export function AppProvider({ children }) {
     }
   };
   
-  // Add ingredients from a specific recipe to shopping list
-  const addRecipeToShoppingList = (recipeId) => {
+  // Add ingredients from a specific recipe to shopping list.
+  // When mealPlan is provided, counts how many times the recipe appears
+  // across the week and adds ingredients proportionally (one set per occurrence).
+  const addRecipeToShoppingList = (recipeId, plan = []) => {
     const recipe = lookupRecipe(recipeId);
     if (!recipe) return;
-    
-    const newItems = recipe.ingredients.map((ingredient, idx) => ({
-      id: `${recipe.id}-${idx}`,
-      entryId: createEntryId(),
-      name: ingredient,
-      recipeId: recipe.id,
-      recipeName: recipe.title,
-      checked: false,
-    }));
-    
+
+    const occurrences = plan.length > 0
+      ? plan.reduce((count, day) =>
+          count + Object.values(day.meals).filter(m => m?.id === recipeId).length, 0)
+      : 1;
+    const times = Math.max(1, occurrences);
+
+    const newItems = [];
+    for (let t = 0; t < times; t++) {
+      recipe.ingredients.forEach((ingredient, idx) => {
+        newItems.push({
+          id: `${recipe.id}-${idx}-${t}`,
+          entryId: createEntryId(),
+          name: ingredient,
+          recipeId: recipe.id,
+          recipeName: recipe.title,
+          checked: false,
+        });
+      });
+    }
+
     setShoppingList(prev => [...prev, ...newItems]);
   };
   
@@ -316,6 +375,47 @@ export function AppProvider({ children }) {
     setShoppingList([]);
   };
   
+  // Replace a specific meal slot across the entire plan with an AI-suggested alternative
+  const replaceMealInPlan = async (fullDate, mealType, currentRecipeId, preferences = {}) => {
+    const recipeList = userRecipes.map(r => ({
+      id: r.id,
+      title: r.title,
+      meal_type: r.meal_type ?? 'any',
+      categories: r.categories ?? [],
+    }));
+
+    // Collect recipe IDs already used in the plan so the API can avoid repeats
+    const usedRecipeIds = mealPlan.flatMap(day =>
+      Object.values(day.meals ?? {}).map(m => m?.id).filter(Boolean)
+    );
+
+    try {
+      const response = await fetch('/api/replace-meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mealType, currentRecipeId, recipes: recipeList, preferences, usedRecipeIds }),
+      });
+
+      if (!response.ok) throw new Error('API error');
+      const { recipeId } = await response.json();
+      const newRecipe = userRecipes.find(r => r.id === recipeId);
+      if (!newRecipe) throw new Error('Recipe not found');
+
+      const oldTitle = userRecipes.find(r => r.id === currentRecipeId)?.title ?? 'Recipe';
+
+      const updatedPlan = mealPlan.map(day => {
+        if (day.meals[mealType]?.id !== currentRecipeId) return day;
+        return { ...day, meals: { ...day.meals, [mealType]: newRecipe } };
+      });
+      setMealPlan(updatedPlan);
+
+      showToast('success', `${oldTitle} replaced with ${newRecipe.title}`);
+    } catch {
+      showToast('error', 'No other recipes available for this slot');
+      throw new Error('replace failed');
+    }
+  };
+
   // Clear entire meal plan
   const clearMealPlan = () => {
     setMealPlan([]);
@@ -340,6 +440,7 @@ export function AppProvider({ children }) {
     selectedFullDate,
     setSelectedFullDate,
     regenerateMealPlan,
+    replaceMealInPlan,
     clearMealPlan,
     getDailyMeals,
     addAllToShoppingList,
@@ -356,6 +457,10 @@ export function AppProvider({ children }) {
     markRecipeAsPurchased,
     markRecipeAsUnpurchased,
     clearShoppingList,
+    smartGroups,
+    setSmartGroups,
+    smartStatus,
+    fetchSmartGroups,
     
     // Toast
     toasts,

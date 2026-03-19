@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingListView } from '../patterns/ShoppingListView';
 import { useApp } from '../context/AppContext';
+import { usePreferences } from '../context/PreferencesContext';
 
 /**
  * Shopping List Page
@@ -13,6 +14,7 @@ import { useApp } from '../context/AppContext';
 export function ShoppingListPage() {
   const {
     shoppingList,
+    mealPlan,
     shoppingListViewMode,
     setShoppingListViewMode,
     toggleIngredientCheck,
@@ -21,49 +23,62 @@ export function ShoppingListPage() {
     markRecipeAsPurchased,
     markRecipeAsUnpurchased,
     clearShoppingList,
+    smartGroups,
+    setSmartGroups,
+    smartStatus,
+    fetchSmartGroups,
   } = useApp();
+  const { preferences } = usePreferences();
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [smartGroups, setSmartGroups] = React.useState([]);
-  const [smartStatus, setSmartStatus] = React.useState('idle');
-  const lastFetchedKeyRef = React.useRef(null);
 
-  const fetchSmartGroups = React.useCallback((force = false) => {
-    const uncheckedItems = shoppingList
-      .filter(item => !item.checked)
-      .map(item => item.name);
+  // Pantry staples persisted to localStorage
+  const [pantryStaples, setPantryStaples] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('miri-pantry-staples') ?? '[]'); } catch { return []; }
+  });
 
-    const key = uncheckedItems.join('||');
+  const togglePantryStaple = React.useCallback((itemName) => {
+    setPantryStaples(prev => {
+      const next = prev.includes(itemName)
+        ? prev.filter(s => s !== itemName)
+        : [...prev, itemName];
+      localStorage.setItem('miri-pantry-staples', JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
-    if (!force && key === lastFetchedKeyRef.current) return;
+  // Count how many times each recipe appears in the meal plan this week
+  const mealPlanOccurrences = React.useMemo(() => {
+    const map = new Map();
+    mealPlan.forEach(day => {
+      Object.values(day.meals ?? {}).forEach(meal => {
+        if (meal?.id) map.set(meal.id, (map.get(meal.id) ?? 0) + 1);
+      });
+    });
+    return map;
+  }, [mealPlan]);
 
-    if (uncheckedItems.length === 0) {
-      lastFetchedKeyRef.current = key;
-      setSmartGroups([]);
-      setSmartStatus('idle');
-      return;
-    }
+  // Summary: unique recipes in the list × occurrences in plan × servings per meal
+  const summaryEntries = React.useMemo(() => {
+    const seen = new Map(); // recipeId → recipeName
+    shoppingList.forEach(item => {
+      if (item.recipeName && item.recipeId && !seen.has(item.recipeId)) {
+        seen.set(item.recipeId, item.recipeName);
+      }
+    });
+    return Array.from(seen.entries()).map(([recipeId, recipeName]) => {
+      const occurrences = mealPlanOccurrences.get(recipeId) ?? 1;
+      return { recipeName, servings: occurrences * (preferences.servings ?? 2) };
+    });
+  }, [shoppingList, mealPlanOccurrences, preferences.servings]);
 
-    lastFetchedKeyRef.current = key;
-    setSmartStatus('loading');
-    fetch('/api/normalize-shopping-list', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: uncheckedItems }),
-    })
-      .then(r => r.json())
-      .then(data => {
-        setSmartGroups(data.groups ?? []);
-        setSmartStatus('idle');
-      })
-      .catch(() => setSmartStatus('error'));
-  }, [shoppingList]);
-
+  // Only fetch when switching TO smart view — not on every list change.
+  // Optimistic updates handle in-view changes (delete, pantry toggle).
   React.useEffect(() => {
     if (shoppingListViewMode === 'smart') {
       fetchSmartGroups();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shoppingListViewMode, shoppingList]);
+  }, [shoppingListViewMode]);
   
   // Group ingredients by recipe for recipe view mode
   const groupedByRecipe = shoppingList.reduce((acc, item) => {
@@ -140,9 +155,29 @@ export function ShoppingListPage() {
     <ShoppingListView
       viewMode={shoppingListViewMode}
       onViewModeChange={setShoppingListViewMode}
+      summaryEntries={summaryEntries}
+      pantryStaples={pantryStaples}
+      onTogglePantryStaple={togglePantryStaple}
       smartGroups={smartGroups}
       smartStatus={smartStatus}
       onSmartRefresh={() => fetchSmartGroups(true)}
+      onSmartItemDelete={(itemName) => {
+        // Optimistically remove from smart groups so the item disappears immediately
+        setSmartGroups(prev =>
+          prev.map(group => ({
+            ...group,
+            items: group.items.filter(i => i.name.toLowerCase() !== itemName.toLowerCase()),
+          })).filter(group => group.items.length > 0)
+        );
+        // Match shopping list items whose name contains the smart name.
+        // One direction only — avoids short smart names (e.g. "salt") accidentally
+        // matching unrelated items (e.g. "sea salt", "garlic salt").
+        const needle = itemName.toLowerCase();
+        const matches = shoppingList.filter(item =>
+          item.name.toLowerCase().includes(needle)
+        );
+        matches.forEach(match => deleteIngredient(match.entryId ?? match.id));
+      }}
       items={items}
       itemKeys={itemKeys}
       itemIds={itemIds}

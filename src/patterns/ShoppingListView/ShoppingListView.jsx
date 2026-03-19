@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { RotateCcw } from 'react-feather';
+import { Divider } from '../../components/Divider';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
@@ -24,10 +25,14 @@ export const ShoppingListView = ({
   onClearList,
   onViewModeChange,
   onSmartRefresh,
+  onSmartItemDelete,
   smartGroups = [],
   smartStatus = 'idle',
   searchQuery = '',
   onSearch,
+  summaryEntries = [],
+  pantryStaples = [],
+  onTogglePantryStaple,
   ...props
 }) => {
   const [smartChecked, setSmartChecked] = useState({});
@@ -111,9 +116,10 @@ export const ShoppingListView = ({
     const uncheckedIndices = [];
     const checkedIndices = [];
 
-    (group.ingredients || []).forEach((_, index) => {
+    (group.ingredients || []).forEach((ingredient, index) => {
       const checkedValue = group.checkedItems?.[index];
-      if (checkedValue === true) {
+      const isPantry = pantryStaples.some(s => ingredient?.toLowerCase().includes(s));
+      if (checkedValue === true || isPantry) {
         checkedIndices.push(index);
       } else {
         uncheckedIndices.push(index);
@@ -169,13 +175,6 @@ export const ShoppingListView = ({
             <GridIcon />
           </button>
           <button
-            className={`view-toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('list')}
-            aria-label="Simple list"
-          >
-            <ListIcon />
-          </button>
-          <button
             className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
             onClick={() => onViewModeChange?.('smart')}
             aria-label="Smart grouped list"
@@ -187,50 +186,18 @@ export const ShoppingListView = ({
 
       {/* Content */}
       <div className="shopping-list-content">
-        {viewMode === 'list' && (
-          <>
-            <IngredientList
-              ingredients={uncheckedItems.ingredients}
-              itemKeys={uncheckedItems.itemKeys}
-              itemIds={uncheckedItems.itemIds}
-              checkedItems={{}}
-              onCheckedChange={(sectionIndex, checked, itemId) =>
-                onItemCheck?.(uncheckedItems.originalIndices[sectionIndex], checked, itemId)
-              }
-              onDelete={(sectionIndex, itemId) =>
-                onItemDelete?.(uncheckedItems.originalIndices[sectionIndex], itemId)
-              }
-            />
-            {checkedListItems.ingredients.length > 0 && (
-              <>
-                <h2 className="shopping-list-purchased-title text-body-small-bold">
-                  {PURCHASED_SECTION_TITLE}
-                </h2>
-                <IngredientList
-                  ingredients={checkedListItems.ingredients}
-                  itemKeys={checkedListItems.itemKeys}
-                  itemIds={checkedListItems.itemIds}
-                  checkedItems={checkedListItems.ingredients.reduce((acc, _, index) => {
-                    acc[index] = true;
-                    return acc;
-                  }, {})}
-                  onCheckedChange={(sectionIndex, checked, itemId) =>
-                    onItemCheck?.(checkedListItems.originalIndices[sectionIndex], checked, itemId)
-                  }
-                  onDelete={(sectionIndex, itemId) =>
-                    onItemDelete?.(checkedListItems.originalIndices[sectionIndex], itemId)
-                  }
-                />
-              </>
-            )}
-            {items.length > 0 && (
-              <div className="shopping-list-clear">
-                <Button variant="tertiary-delete" onClick={onClearList}>
-                  Clear whole list
-                </Button>
-              </div>
-            )}
-          </>
+        {summaryEntries.length > 0 && (
+          <div className="shopping-list-summary">
+            <p className="text-body-small-bold shopping-list-summary-title">For this week</p>
+            <ul className="shopping-list-summary-list">
+              {summaryEntries.map(({ recipeName, servings }) => (
+                <li key={recipeName} className="text-body-small-regular shopping-list-summary-item">
+                  <span className="shopping-list-summary-servings">×{servings}</span>
+                  <span>{recipeName}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
 
         {viewMode === 'recipe' && (
@@ -279,6 +246,8 @@ export const ShoppingListView = ({
                     onDelete={(index, itemId) =>
                       group.onIngredientDelete?.(group.originalIndices[index], itemId)
                     }
+                    pantryStaples={pantryStaples}
+                    onPantryToggle={(_, ingredient) => onTogglePantryStaple?.(ingredient?.toLowerCase())}
                   />
                 </motion.div>
               ))}
@@ -324,6 +293,8 @@ export const ShoppingListView = ({
                         onDelete={(index, itemId) =>
                           group.onIngredientDelete?.(group.originalIndices[index], itemId)
                         }
+                        pantryStaples={pantryStaples}
+                        onPantryToggle={(_, ingredient) => onTogglePantryStaple?.(ingredient?.toLowerCase())}
                       />
                     </motion.div>
                   ))}
@@ -362,42 +333,16 @@ export const ShoppingListView = ({
               </p>
             )}
             {smartStatus === 'idle' && smartGroups.length > 0 && (
-              <>
-                {smartGroups.map((group, groupIdx) => (
-                  <div key={group.category} className="smart-group">
-                    <h2 className="smart-group-header text-tiny-bold">
-                      <span aria-hidden="true">{group.emoji}</span> {group.category.toUpperCase()}
-                    </h2>
-                    <ul className="smart-group-items">
-                      {group.items.map((item, itemIdx) => {
-                        const key = `${groupIdx}-${itemIdx}`;
-                        const checked = !!smartChecked[key];
-                        return (
-                          <li key={key}>
-                            <button
-                              type="button"
-                              className={`smart-item${checked ? ' smart-item--checked' : ''}`}
-                              onClick={() => toggleSmartItem(key)}
-                              aria-pressed={checked}
-                            >
-                              <span className="smart-item-quantity text-body-regular">
-                                {item.quantity || ''}
-                              </span>
-                              <span className="smart-item-name text-body-regular">{item.name}</span>
-                              {checked && <CheckSmallIcon />}
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                ))}
-                <div className="shopping-list-smart-refresh">
-                  <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
-                    Refresh
-                  </button>
-                </div>
-              </>
+              <SmartListContent
+                smartGroups={smartGroups}
+                smartChecked={smartChecked}
+                toggleSmartItem={toggleSmartItem}
+                pantryStaples={pantryStaples}
+                onTogglePantryStaple={onTogglePantryStaple}
+                onSmartItemDelete={onSmartItemDelete}
+                onSmartRefresh={onSmartRefresh}
+                PURCHASED_SECTION_TITLE={PURCHASED_SECTION_TITLE}
+              />
             )}
           </div>
         )}
@@ -440,6 +385,256 @@ export const ShoppingListView = ({
     </div>
   );
 };
+
+/**
+ * SmartListItem — tap to check/uncheck,
+ * swipe RIGHT → pantry staple zone (brand colour, left side),
+ * swipe LEFT  → delete zone (error colour, right side).
+ */
+function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple, onDelete, isFirst }) {
+  // positive = swiping left (delete), negative = swiping right (pantry)
+  const [swipeX, setSwipeX] = React.useState(0);
+  const [isSwiping, setIsSwiping] = React.useState(false);
+  const [isAnimatingOut, setIsAnimatingOut] = React.useState(false);
+  const startXRef = React.useRef(0);
+  const startYRef = React.useRef(0);
+  const swipeDirectionRef = React.useRef(null); // 'horizontal' | 'vertical' | null
+
+  const MAX_SWIPE = 120;
+  const SWIPE_THRESHOLD = 84;
+  const SWIPE_TRANSITION = '360ms cubic-bezier(0.22, 0.61, 0.36, 1)';
+  const ANIMATE_OUT_MS = 320;
+
+  const triggerDelete = React.useCallback(() => {
+    if (isAnimatingOut) return;
+    setSwipeX(MAX_SWIPE);
+    setIsSwiping(false);
+    setIsAnimatingOut(true);
+    window.setTimeout(() => onDelete?.(), ANIMATE_OUT_MS);
+  }, [isAnimatingOut, onDelete]);
+
+  const triggerPantryToggle = React.useCallback(() => {
+    if (isAnimatingOut) return;
+    setSwipeX(-MAX_SWIPE);
+    setIsSwiping(false);
+    setIsAnimatingOut(true);
+    window.setTimeout(() => {
+      onTogglePantryStaple?.(item.name?.toLowerCase());
+      setSwipeX(0);
+      setIsAnimatingOut(false);
+    }, ANIMATE_OUT_MS);
+  }, [isAnimatingOut, item.name, onTogglePantryStaple]);
+
+  const handleTouchStart = (e) => {
+    if (isAnimatingOut) return;
+    startXRef.current = e.touches[0].clientX;
+    startYRef.current = e.touches[0].clientY;
+    swipeDirectionRef.current = null;
+    setIsSwiping(true);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isSwiping) return;
+    const dx = startXRef.current - e.touches[0].clientX;
+    const dy = startYRef.current - e.touches[0].clientY;
+
+    if (swipeDirectionRef.current === null) {
+      if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+      swipeDirectionRef.current = Math.abs(dy) > Math.abs(dx) ? 'vertical' : 'horizontal';
+    }
+
+    if (swipeDirectionRef.current === 'vertical') return;
+
+    e.preventDefault();
+    setSwipeX(Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, dx)));
+  };
+
+  const handleTouchEnd = () => {
+    if (isAnimatingOut) return;
+    swipeDirectionRef.current = null;
+    if (swipeX > SWIPE_THRESHOLD) { triggerDelete(); return; }
+    if (swipeX < -SWIPE_THRESHOLD) { triggerPantryToggle(); return; }
+    setSwipeX(0);
+    setIsSwiping(false);
+  };
+
+  const handleClick = () => {
+    if (isSwiping || swipeX !== 0 || isAnimatingOut || isPantry) return;
+    onToggle?.();
+  };
+
+  const leftProgress = Math.min(1, Math.max(0, swipeX) / MAX_SWIPE);   // left-swipe → delete
+  const rightProgress = Math.min(1, Math.max(0, -swipeX) / MAX_SWIPE); // right-swipe → pantry
+  const label = `${item.quantity ? item.quantity + ' ' : ''}${item.name}`;
+
+  return (
+    <motion.div
+      className="smart-list-item"
+      initial={false}
+      layout="position"
+      style={isAnimatingOut ? { pointerEvents: 'none', overflow: 'hidden' } : { overflow: 'hidden' }}
+      animate={isAnimatingOut
+        ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, x: -16, scale: 0.98 }
+        : { opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0, x: 0, scale: 1 }}
+      transition={{
+        duration: ANIMATE_OUT_MS / 1000,
+        ease: [0.22, 0.61, 0.36, 1],
+        layout: { type: 'spring', stiffness: 420, damping: 34, mass: 0.65 },
+      }}
+    >
+      {isFirst && <Divider />}
+      <div
+        className={`smart-list-item-wrapper${swipeX !== 0 ? ' is-swiping' : ''}`}
+        style={{ '--left-swipe-progress': leftProgress, '--right-swipe-progress': rightProgress }}
+      >
+        {/* Pantry zone — sits on the LEFT, revealed by swiping RIGHT */}
+        <button
+          type="button"
+          className="smart-list-item-pantry-zone"
+          aria-label={isPantry ? `Remove ${item.name} from pantry staples` : `Mark ${item.name} as pantry staple`}
+          onClick={triggerPantryToggle}
+          tabIndex={rightProgress > 0 ? 0 : -1}
+        >
+          {isPantry ? <PantryRemoveIcon /> : <PantryIcon />}
+        </button>
+
+        {/* Delete zone — sits on the RIGHT, revealed by swiping LEFT */}
+        <button
+          type="button"
+          className="smart-list-item-delete-zone"
+          aria-label={`Delete ${label}`}
+          onClick={triggerDelete}
+          tabIndex={leftProgress > 0 ? 0 : -1}
+        >
+          <TrashIcon />
+        </button>
+
+        <div
+          className={`smart-list-item-container${checked || isPantry ? ' is-checked' : ''}`}
+          style={{
+            transform: `translateX(${-swipeX}px)`,
+            transition: isSwiping ? 'none' : `transform ${SWIPE_TRANSITION}`,
+          }}
+          onClick={handleClick}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          role="button"
+          tabIndex={0}
+          aria-pressed={checked}
+          aria-label={`${checked ? 'Uncheck' : 'Check'} ${label}`}
+          onKeyDown={(e) => {
+            if ((e.key === ' ' || e.key === 'Enter') && !isPantry) { e.preventDefault(); onToggle?.(); }
+            if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); triggerDelete(); }
+          }}
+        >
+          <span className="smart-list-item-quantity text-body-small-regular">{item.quantity || ''}</span>
+          <span className="smart-list-item-name text-body-small-regular">{item.name}</span>
+          {(checked || isPantry) && <CheckSmallIcon />}
+        </div>
+      </div>
+      <Divider />
+    </motion.div>
+  );
+}
+
+function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
+  const allCheckedItems = [];
+  const pantryItems = [];
+
+  smartGroups.forEach((group, groupIdx) => {
+    group.items.forEach((item) => {
+      const key = `${groupIdx}-${item.name}`;
+      const isPantry = pantryStaples.includes(item.name?.toLowerCase());
+      if (isPantry) pantryItems.push({ item, key });
+      else if (smartChecked[key]) allCheckedItems.push({ item, key });
+    });
+  });
+
+  return (
+    <>
+      {smartGroups.map((group, groupIdx) => {
+        const visibleItems = group.items
+          .map((item) => ({ item, key: `${groupIdx}-${item.name}` }))
+          .filter(({ item, key }) => !pantryStaples.includes(item.name?.toLowerCase()) && !smartChecked[key]);
+        if (visibleItems.length === 0) return null;
+        return (
+          <div key={group.category} className="smart-group">
+            <h2 className="smart-group-header text-tiny-bold">
+              <span aria-hidden="true">{group.emoji}</span> {group.category.toUpperCase()}
+            </h2>
+            {visibleItems.map(({ item, key }, idx) => (
+              <SmartListItem
+                key={key}
+                item={item}
+                checked={false}
+                isPantry={false}
+                onToggle={() => toggleSmartItem(key)}
+                onTogglePantryStaple={onTogglePantryStaple}
+                onDelete={() => onSmartItemDelete?.(item.name)}
+                isFirst={idx === 0}
+              />
+            ))}
+          </div>
+        );
+      })}
+
+      {allCheckedItems.length > 0 && (
+        <div className="smart-group">
+          <h2 className="smart-group-header text-tiny-bold">{PURCHASED_SECTION_TITLE.toUpperCase()}</h2>
+          {allCheckedItems.map(({ item, key }, idx) => (
+            <SmartListItem
+              key={key}
+              item={item}
+              checked={true}
+              isPantry={false}
+              onToggle={() => toggleSmartItem(key)}
+              onTogglePantryStaple={onTogglePantryStaple}
+              onDelete={() => onSmartItemDelete?.(item.name)}
+              isFirst={idx === 0}
+            />
+          ))}
+        </div>
+      )}
+
+      {pantryItems.length > 0 && (
+        <div className="smart-group">
+          <h2 className="smart-group-header text-tiny-bold smart-group-header--pantry">PANTRY STAPLES</h2>
+          {pantryItems.map(({ item, key }, idx) => (
+            <SmartListItem
+              key={key}
+              item={item}
+              checked={true}
+              isPantry={true}
+              onTogglePantryStaple={onTogglePantryStaple}
+              onDelete={() => onSmartItemDelete?.(item.name)}
+              isFirst={idx === 0}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="shopping-list-smart-refresh">
+        <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>Refresh</button>
+      </div>
+    </>
+  );
+}
+
+const PantryIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
+
+const PantryRemoveIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <line x1="9" y1="12" x2="15" y2="18"/>
+    <line x1="15" y1="12" x2="9" y2="18"/>
+  </svg>
+);
 
 const GridIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -28,6 +28,44 @@
   color: var(--color-text-strong);
 }
 
+/* Summary card */
+.shopping-list-summary {
+  margin-bottom: var(--spacing-12);
+  padding: var(--spacing-12) var(--spacing-16);
+  background: var(--color-background-sunken);
+  border-radius: var(--corner-radius-12);
+  border: 1px solid var(--color-stroke-weak);
+}
+
+.shopping-list-summary-title {
+  margin: 0 0 var(--spacing-8);
+  color: var(--color-text-strong);
+}
+
+.shopping-list-summary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.shopping-list-summary-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-8);
+  color: var(--color-text-strong);
+}
+
+.shopping-list-summary-servings {
+  color: var(--color-text-weak);
+  flex-shrink: 0;
+  min-width: var(--spacing-32);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .shopping-list-view-toggle {
   display: flex;
   gap: var(--spacing-4);
@@ -336,4 +374,117 @@
   outline: 2px solid var(--color-stroke-focus);
   outline-offset: 2px;
   border-radius: var(--corner-radius-4);
+}
+
+/* Pantry staples section header */
+.smart-group-header--pantry {
+  color: var(--color-text-weak);
+  opacity: 0.7;
+}
+
+/* ── SmartListItem — mirrors IngredientListItem layout ───────────────────── */
+
+.smart-list-item {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Swipe wrapper — contains pantry action zone and content */
+.smart-list-item-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pantry zone — LEFT side, revealed by swiping RIGHT */
+.smart-list-item-pantry-zone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+  border: none;
+  opacity: calc(var(--right-swipe-progress, 0));
+  transition: opacity 0.24s ease;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.smart-list-item-wrapper.is-swiping .smart-list-item-pantry-zone {
+  pointer-events: auto;
+}
+
+/* Delete zone — RIGHT side, revealed by swiping LEFT */
+.smart-list-item-delete-zone {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill-error-strong);
+  color: var(--color-text-inverted);
+  border: none;
+  opacity: calc(var(--left-swipe-progress, 0));
+  transition: opacity 0.24s ease;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.smart-list-item-wrapper.is-swiping .smart-list-item-delete-zone {
+  pointer-events: auto;
+}
+
+/* Interactive container — supports tap and swipe */
+.smart-list-item-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-12);
+  padding: var(--spacing-16) 0;
+  background: var(--color-background-raised);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+}
+
+.smart-list-item-container:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}
+
+/* Quantity column — fixed-width so names align */
+.smart-list-item-quantity {
+  min-width: 48px;
+  flex-shrink: 0;
+  color: var(--color-text-weak);
+}
+
+/* Name — fills remaining space */
+.smart-list-item-name {
+  flex: 1;
+  color: var(--color-text-strong);
+  transition: all 0.2s ease;
+}
+
+/* Checked/pantry state */
+.smart-list-item-container.is-checked .smart-list-item-name,
+.smart-list-item-container.is-checked .smart-list-item-quantity {
+  text-decoration: line-through;
+  color: var(--color-text-weak);
+}
+
+.smart-list-item-container.is-checked svg:last-child {
+  flex-shrink: 0;
+  color: var(--color-icon-brand);
 }

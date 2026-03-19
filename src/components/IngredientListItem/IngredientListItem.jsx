@@ -5,22 +5,27 @@ import './IngredientListItem.css';
 
 /**
  * IngredientListItem component - Exactly as designed in Figma
- * Interactive ingredient item - tap to toggle strikethrough, swipe left to delete
- * Uses role="button" with aria-pressed for accessible toggle state
+ * Interactive ingredient item - tap to toggle strikethrough, swipe left to delete.
+ * Optional: pass onPantryToggle to enable swipe-right → pantry staple.
  */
-export const IngredientListItem = ({ 
+export const IngredientListItem = ({
   children = '2l Milch',
   checked = false,
   onCheckedChange,
-  onDelete, // Callback when item is deleted (swipe left)
+  onDelete,
+  onPantryToggle,     // optional — enables swipe-right pantry zone
+  isPantryStaple = false,
   showUpperDivider = true,
   showBelowDivider = true,
-  ...props 
+  ...props
 }) => {
-  const [swipeOffset, setSwipeOffset] = React.useState(0);
+  // positive = swiping left (delete), negative = swiping right (pantry)
+  const [swipeX, setSwipeX] = React.useState(0);
   const [isSwiping, setIsSwiping] = React.useState(false);
   const [isRemoving, setIsRemoving] = React.useState(false);
   const startXRef = React.useRef(0);
+  const startYRef = React.useRef(0);
+  const swipeDirectionRef = React.useRef(null); // 'horizontal' | 'vertical' | null
 
   const MAX_SWIPE = 120;
   const SWIPE_THRESHOLD = 84;
@@ -29,54 +34,66 @@ export const IngredientListItem = ({
 
   const triggerDelete = React.useCallback(() => {
     if (isRemoving) return;
-
-    // Animate out immediately and remove from state after Motion finishes.
-    setSwipeOffset(Math.max(swipeOffset, MAX_SWIPE));
+    setSwipeX(MAX_SWIPE);
     setIsSwiping(false);
     setIsRemoving(true);
     window.setTimeout(() => onDelete?.(), REMOVE_ANIMATION_MS);
-  }, [isRemoving, onDelete, swipeOffset]);
+  }, [isRemoving, onDelete]);
+
+  const triggerPantry = React.useCallback(() => {
+    if (isRemoving) return;
+    setSwipeX(-MAX_SWIPE);
+    setIsSwiping(false);
+    window.setTimeout(() => {
+      onPantryToggle?.();
+      setSwipeX(0);
+    }, REMOVE_ANIMATION_MS);
+  }, [isRemoving, onPantryToggle]);
 
   const handleTouchStart = (e) => {
     if (isRemoving) return;
     startXRef.current = e.touches[0].clientX;
+    startYRef.current = e.touches[0].clientY;
+    swipeDirectionRef.current = null;
     setIsSwiping(true);
   };
 
   const handleTouchMove = (e) => {
     if (!isSwiping) return;
-    
-    const currentX = e.touches[0].clientX;
-    const diff = startXRef.current - currentX;
-    
-    // Only allow left swipe (positive diff)
-    if (diff > 0) {
-      setSwipeOffset(Math.min(diff, MAX_SWIPE));
+    const dx = startXRef.current - e.touches[0].clientX;
+    const dy = startYRef.current - e.touches[0].clientY;
+
+    if (swipeDirectionRef.current === null) {
+      if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+      swipeDirectionRef.current = Math.abs(dy) > Math.abs(dx) ? 'vertical' : 'horizontal';
+    }
+
+    if (swipeDirectionRef.current === 'vertical') return;
+
+    e.preventDefault();
+    if (onPantryToggle) {
+      setSwipeX(Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, dx)));
+    } else {
+      if (dx > 0) setSwipeX(Math.min(dx, MAX_SWIPE));
     }
   };
 
   const handleTouchEnd = () => {
     if (isRemoving) return;
-
-    if (swipeOffset > SWIPE_THRESHOLD) {
-      triggerDelete();
-      return;
-    }
-
-    setSwipeOffset(0);
+    swipeDirectionRef.current = null;
+    if (swipeX > SWIPE_THRESHOLD) { triggerDelete(); return; }
+    if (onPantryToggle && swipeX < -SWIPE_THRESHOLD) { triggerPantry(); return; }
+    setSwipeX(0);
     setIsSwiping(false);
   };
 
-  // Handle click on entire list item to toggle checkbox
-  const handleItemClick = (event) => {
-    // Don't toggle if swiping
-    if (isSwiping || swipeOffset > 0 || isRemoving) {
-      return;
-    }
-    
-    // Toggle the checkbox when tapping
+  const handleItemClick = () => {
+    if (isSwiping || swipeX !== 0 || isRemoving) return;
     onCheckedChange?.(!checked);
   };
+
+  const leftProgress = Math.min(1, Math.max(0, swipeX) / MAX_SWIPE);
+  const rightProgress = Math.min(1, Math.max(0, -swipeX) / MAX_SWIPE);
 
   return (
     <motion.div
@@ -96,29 +113,41 @@ export const IngredientListItem = ({
       }}
     >
       {showUpperDivider && <Divider />}
-      
-      {/* Swipe container wrapper */}
-      <div 
-        className={`ingredient-list-item-wrapper ${swipeOffset > 0 ? 'is-swiping' : ''}`}
-        style={{ '--swipe-progress': Math.min(1, swipeOffset / MAX_SWIPE) }}
+
+      <div
+        className={`ingredient-list-item-wrapper ${swipeX !== 0 ? 'is-swiping' : ''}`}
+        style={{ '--swipe-progress': leftProgress, '--right-swipe-progress': rightProgress }}
       >
-        {/* Delete button revealed on swipe */}
+        {/* Pantry zone — LEFT side, revealed by swiping RIGHT */}
+        {onPantryToggle && (
+          <button
+            type="button"
+            className="ingredient-list-item-pantry-zone"
+            aria-label={isPantryStaple ? 'Remove from pantry staples' : 'Mark as pantry staple'}
+            onClick={triggerPantry}
+            tabIndex={rightProgress > 0 ? 0 : -1}
+          >
+            {isPantryStaple ? <PantryRemoveIcon /> : <PantryIcon />}
+          </button>
+        )}
+
+        {/* Delete zone — RIGHT side, revealed by swiping LEFT */}
         <button
           type="button"
           className="ingredient-list-item-delete-zone"
           aria-label={`Delete ${children}`}
           onClick={triggerDelete}
-          tabIndex={swipeOffset > 0 ? 0 : -1}
+          tabIndex={leftProgress > 0 ? 0 : -1}
         >
           <TrashIcon />
         </button>
 
-        {/* Interactive container - supports tap and swipe */}
-        <div 
+        {/* Interactive container */}
+        <div
           className={`ingredient-list-item-container ${checked ? 'is-checked' : ''}`}
           style={{
-            transform: `translateX(-${swipeOffset}px)`,
-            transition: isSwiping ? 'none' : `transform ${SWIPE_TRANSITION}`
+            transform: `translateX(${-swipeX}px)`,
+            transition: isSwiping ? 'none' : `transform ${SWIPE_TRANSITION}`,
           }}
           onClick={handleItemClick}
           onTouchStart={handleTouchStart}
@@ -129,23 +158,15 @@ export const IngredientListItem = ({
           aria-pressed={checked}
           aria-label={`${checked ? 'Uncheck' : 'Check'} ${children}`}
           onKeyDown={(e) => {
-            // Support keyboard: Space/Enter to toggle
-            if (e.key === ' ' || e.key === 'Enter') {
-              e.preventDefault();
-              onCheckedChange?.(!checked);
-            }
-            // Delete key to remove
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-              e.preventDefault();
-              onDelete?.();
-            }
+            if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onCheckedChange?.(!checked); }
+            if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); onDelete?.(); }
           }}
           {...props}
         >
           <span className="ingredient-list-item-text text-body-small-regular">{children}</span>
         </div>
       </div>
-      
+
       {showBelowDivider && <Divider />}
     </motion.div>
   );
@@ -157,6 +178,21 @@ const TrashIcon = () => (
     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
     <line x1="10" y1="11" x2="10" y2="17"/>
     <line x1="14" y1="11" x2="14" y2="17"/>
+  </svg>
+);
+
+const PantryIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
+
+const PantryRemoveIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <line x1="9" y1="12" x2="15" y2="18"/>
+    <line x1="15" y1="12" x2="9" y2="18"/>
   </svg>
 );
 
