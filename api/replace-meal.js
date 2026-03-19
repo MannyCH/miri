@@ -31,23 +31,20 @@ export default async function handler(req, res) {
   const { mealType, currentRecipeId, recipes = [], usedRecipeIds = [], preferences = {} } = req.body ?? {};
   if (!mealType || !currentRecipeId) return res.status(400).json({ error: 'mealType and currentRecipeId are required' });
 
-  // Slot rules: tags determine eligibility; 'any' recipes fit every slot.
-  const SLOT_RULES = {
-    breakfast: (r) => r.meal_type === 'breakfast' || r.meal_type === 'any',
-    lunch:     (r) => r.meal_type === 'lunch' || r.meal_type === 'any' || r.meal_type === 'dinner',
-    dinner:    (r) => r.meal_type === 'dinner' || r.meal_type === 'any' || r.meal_type === 'lunch',
-  };
+  // Use the recipe's own meal_type tag as the filter — no cross-slot guessing.
+  // 'any' recipes fit every slot; otherwise the tag must match exactly.
+  const matchesSlot = (r) => r.meal_type === mealType || r.meal_type === 'any';
 
   const usedSet = new Set(usedRecipeIds);
 
   // Prefer recipes not already in the plan this week
   let candidates = recipes.filter(
-    r => r.id !== currentRecipeId && !usedSet.has(r.id) && SLOT_RULES[mealType]?.(r)
+    r => r.id !== currentRecipeId && !usedSet.has(r.id) && matchesSlot(r)
   );
 
   // Fallback: allow already-used recipes if no fresh candidates exist
   if (candidates.length === 0) {
-    candidates = recipes.filter(r => r.id !== currentRecipeId && SLOT_RULES[mealType]?.(r));
+    candidates = recipes.filter(r => r.id !== currentRecipeId && matchesSlot(r));
   }
 
   if (candidates.length === 0) {
