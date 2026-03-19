@@ -114,7 +114,42 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem(SHOPPING_LIST_KEY, JSON.stringify(shoppingList));
   }, [shoppingList]);
-  
+
+  // Smart groups — kept in context so they survive navigation
+  const [smartGroups, setSmartGroups] = useState([]);
+  const [smartStatus, setSmartStatus] = useState('idle');
+  const lastSmartKeyRef = useRef(null);
+
+  const fetchSmartGroups = useCallback((force = false) => {
+    const uncheckedItems = shoppingList
+      .filter(item => !item.checked)
+      .map(item => item.name);
+    const key = uncheckedItems.join('||');
+
+    if (!force && key === lastSmartKeyRef.current) return;
+
+    if (uncheckedItems.length === 0) {
+      lastSmartKeyRef.current = key;
+      setSmartGroups([]);
+      setSmartStatus('idle');
+      return;
+    }
+
+    lastSmartKeyRef.current = key;
+    setSmartStatus('loading');
+    fetch('/api/normalize-shopping-list', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: uncheckedItems }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        setSmartGroups(data.groups ?? []);
+        setSmartStatus('idle');
+      })
+      .catch(() => setSmartStatus('error'));
+  }, [shoppingList]);
+
   // Toast State
   const [toasts, setToasts] = useState([]);
   const pendingToastsRef = useRef(new Set());
@@ -422,6 +457,10 @@ export function AppProvider({ children }) {
     markRecipeAsPurchased,
     markRecipeAsUnpurchased,
     clearShoppingList,
+    smartGroups,
+    setSmartGroups,
+    smartStatus,
+    fetchSmartGroups,
     
     // Toast
     toasts,

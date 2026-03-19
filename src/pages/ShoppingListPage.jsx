@@ -23,6 +23,10 @@ export function ShoppingListPage() {
     markRecipeAsPurchased,
     markRecipeAsUnpurchased,
     clearShoppingList,
+    smartGroups,
+    setSmartGroups,
+    smartStatus,
+    fetchSmartGroups,
   } = useApp();
   const { preferences } = usePreferences();
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -66,40 +70,6 @@ export function ShoppingListPage() {
       return { recipeName, servings: occurrences * (preferences.servings ?? 2) };
     });
   }, [shoppingList, mealPlanOccurrences, preferences.servings]);
-  const [smartGroups, setSmartGroups] = React.useState([]);
-  const [smartStatus, setSmartStatus] = React.useState('idle');
-  const lastFetchedKeyRef = React.useRef(null);
-
-  const fetchSmartGroups = React.useCallback((force = false) => {
-    const uncheckedItems = shoppingList
-      .filter(item => !item.checked)
-      .map(item => item.name);
-
-    const key = uncheckedItems.join('||');
-
-    if (!force && key === lastFetchedKeyRef.current) return;
-
-    if (uncheckedItems.length === 0) {
-      lastFetchedKeyRef.current = key;
-      setSmartGroups([]);
-      setSmartStatus('idle');
-      return;
-    }
-
-    lastFetchedKeyRef.current = key;
-    setSmartStatus('loading');
-    fetch('/api/normalize-shopping-list', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: uncheckedItems }),
-    })
-      .then(r => r.json())
-      .then(data => {
-        setSmartGroups(data.groups ?? []);
-        setSmartStatus('idle');
-      })
-      .catch(() => setSmartStatus('error'));
-  }, [shoppingList]);
 
   // Only fetch when switching TO smart view — not on every list change.
   // Optimistic updates handle in-view changes (delete, pantry toggle).
