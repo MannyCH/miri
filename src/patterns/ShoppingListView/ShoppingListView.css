@@ -55,7 +55,7 @@
 .shopping-list-summary-item {
   display: flex;
   justify-content: space-between;
-  color: var(--color-text-base);
+  color: var(--color-text-strong);
 }
 
 .shopping-list-summary-servings {
