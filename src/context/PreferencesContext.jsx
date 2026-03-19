@@ -13,8 +13,6 @@ const DEFAULT_PREFERENCES = {
   unitSystem: 'metric',
 };
 
-const UNIT_SYSTEM_KEY = 'miri-unit-system';
-
 const SAVE_DEBOUNCE_MS = 1000;
 
 function rowToState(row) {
@@ -25,6 +23,7 @@ function rowToState(row) {
     goal: row.goal ?? '',
     bmr: row.bmr_kcal != null ? String(row.bmr_kcal) : '',
     cookingFrequency: row.cooking_frequency ?? 'daily',
+    unitSystem: row.unit_system ?? 'metric',
   };
 }
 
@@ -35,15 +34,13 @@ function stateToPayload(state) {
     goal: state.goal || null,
     bmrKcal: state.bmr ? parseInt(state.bmr, 10) : null,
     cookingFrequency: state.cookingFrequency || 'daily',
+    unitSystem: state.unitSystem || 'metric',
   };
 }
 
 export function PreferencesProvider({ children }) {
   const { isAuthenticated } = useAuth();
-  const [preferences, setPreferences] = useState(() => ({
-    ...DEFAULT_PREFERENCES,
-    unitSystem: localStorage.getItem(UNIT_SYSTEM_KEY) ?? 'metric',
-  }));
+  const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(false);
   const saveTimeoutRef = useRef(null);
 
@@ -67,11 +64,6 @@ export function PreferencesProvider({ children }) {
   const updatePreferences = useCallback((updates) => {
     setPreferences((prev) => {
       const next = { ...prev, ...updates };
-
-      // unitSystem is stored in localStorage only (no DB column yet)
-      if (updates.unitSystem !== undefined) {
-        localStorage.setItem(UNIT_SYSTEM_KEY, updates.unitSystem);
-      }
 
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(() => {

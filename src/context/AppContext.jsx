@@ -351,23 +351,11 @@ export function AppProvider({ children }) {
 
       const oldTitle = userRecipes.find(r => r.id === currentRecipeId)?.title ?? 'Recipe';
 
-      setMealPlan(prev => {
-        const updated = prev.map(day => {
-          if (day.meals[mealType]?.id !== currentRecipeId) return day;
-          return { ...day, meals: { ...day.meals, [mealType]: newRecipe } };
-        });
-        // Persist to localStorage
-        const stored = updated.map(day => ({
-          fullDate: day.fullDate,
-          meals: {
-            breakfast: day.meals.breakfast?.id ?? null,
-            lunch: day.meals.lunch?.id ?? null,
-            dinner: day.meals.dinner?.id ?? null,
-          },
-        }));
-        localStorage.setItem('miri-meal-plan', JSON.stringify(stored));
-        return updated;
+      const updatedPlan = mealPlan.map(day => {
+        if (day.meals[mealType]?.id !== currentRecipeId) return day;
+        return { ...day, meals: { ...day.meals, [mealType]: newRecipe } };
       });
+      setMealPlan(updatedPlan);
 
       showToast('success', `${oldTitle} replaced with ${newRecipe.title}`);
     } catch {

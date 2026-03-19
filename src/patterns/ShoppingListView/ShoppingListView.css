@@ -33,7 +33,7 @@
   flex-shrink: 0;
   margin: 0 var(--spacing-16) var(--spacing-12);
   padding: var(--spacing-12) var(--spacing-16);
-  background: var(--color-background-raised);
+  background: var(--color-background-sunken);
   border-radius: var(--corner-radius-12);
   border: 1px solid var(--color-stroke-weak);
 }
@@ -372,13 +372,92 @@
   border-radius: var(--corner-radius-4);
 }
 
-/* Pantry staples */
+/* Pantry staples section header */
 .smart-group-header--pantry {
   color: var(--color-text-weak);
   opacity: 0.7;
 }
 
-.smart-item--pantry {
-  opacity: 0.5;
-  cursor: default;
+/* ── SmartListItem — mirrors IngredientListItem layout ───────────────────── */
+
+.smart-list-item {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Swipe wrapper — contains pantry action zone and content */
+.smart-list-item-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pantry action zone revealed on swipe left */
+.smart-list-item-action-zone {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+  border: none;
+  opacity: calc(var(--swipe-progress, 0));
+  transition: opacity 0.24s ease;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.smart-list-item-wrapper.is-swiping .smart-list-item-action-zone {
+  pointer-events: auto;
+}
+
+/* Interactive container — supports tap and swipe */
+.smart-list-item-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-12);
+  padding: var(--spacing-16) 0;
+  background: var(--color-background-raised);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+}
+
+.smart-list-item-container:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}
+
+/* Quantity column — fixed-width so names align */
+.smart-list-item-quantity {
+  min-width: 48px;
+  flex-shrink: 0;
+  color: var(--color-text-weak);
+}
+
+/* Name — fills remaining space */
+.smart-list-item-name {
+  flex: 1;
+  color: var(--color-text-strong);
+  transition: all 0.2s ease;
+}
+
+/* Checked/pantry state */
+.smart-list-item-container.is-checked .smart-list-item-name,
+.smart-list-item-container.is-checked .smart-list-item-quantity {
+  text-decoration: line-through;
+  color: var(--color-text-weak);
+}
+
+.smart-list-item-container.is-checked svg:last-child {
+  flex-shrink: 0;
+  color: var(--color-icon-brand);
 }

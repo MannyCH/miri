@@ -48,7 +48,7 @@ export function RecipeDetailPage() {
     setTimeout(() => setIsAdded(false), 2500);
   };
 
-  const displayRecipe = preferences.unitSystem && preferences.unitSystem !== 'metric'
+  const displayRecipe = preferences.unitSystem
     ? { ...recipe, ingredients: convertIngredients(recipe.ingredients, preferences.unitSystem) }
     : recipe;
 

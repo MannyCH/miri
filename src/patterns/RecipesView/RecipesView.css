@@ -128,8 +128,8 @@
   padding: var(--spacing-4) var(--spacing-12);
   border: 1px solid var(--color-stroke-weak);
   border-radius: 999px;
-  background: var(--color-background-raised);
-  color: var(--color-text-base);
+  background: var(--color-background-sunken);
+  color: var(--color-text-strong);
   cursor: pointer;
   white-space: nowrap;
 }
@@ -140,15 +140,15 @@
 }
 
 .recipes-filter-chip--active {
-  background: var(--color-fill-brand-weak);
-  border-color: var(--color-stroke-brand);
-  color: var(--color-text-brand);
+  background: var(--color-fill-brand-strong);
+  border-color: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
 }
 
 .recipes-filter-chip-close {
   font-size: 16px;
   line-height: 1;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 @keyframes search-slide-down {
