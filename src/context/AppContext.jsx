@@ -1,6 +1,16 @@
 import React, { createContext, useCallback, useContext, useState, useEffect, useRef } from 'react';
 import { generateCalendarDays, formatDayTitle } from '../data/recipes';
 import { fetchUserRecipes } from '../lib/recipesApi';
+import {
+  fetchShoppingList,
+  addListItem,
+  patchListItem,
+  removeListItem,
+  clearListItems,
+  replaceListItems,
+  getAuthToken,
+} from '../lib/shoppingListApi';
+import { dataClient } from '../lib/dataClient';
 import { useAuth } from './AuthContext';
 
 const AppContext = createContext();
@@ -98,7 +108,7 @@ export function AppProvider({ children }) {
   const todayStr = calendarDays[0]?.fullDate;
   const [selectedFullDate, setSelectedFullDate] = useState(todayStr);
   
-  // Shopping List State — persisted to localStorage
+  // Shopping List State
   const SHOPPING_LIST_KEY = 'miri-shopping-list';
   const [shoppingList, setShoppingList] = useState(() => {
     try {
@@ -108,12 +118,118 @@ export function AppProvider({ children }) {
   });
   const [shoppingListViewMode, setShoppingListViewMode] = useState('recipe');
   const nextEntryIdRef = useRef(0);
-  const createEntryId = React.useCallback(() => `sl-${nextEntryIdRef.current++}`, []);
+  const createEntryId = React.useCallback(() => `sl-${Date.now()}-${nextEntryIdRef.current++}`, []);
 
-  // Persist shopping list whenever it changes
+  // Shared list state: when non-null, we're viewing another user's list
+  const SHARED_LIST_KEY = 'miri-shared-list-owner';
+  const [listOwnerId, setListOwnerIdState] = useState(() => {
+    return localStorage.getItem(SHARED_LIST_KEY) ?? null;
+  });
+
+  // Persist shopping list to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(SHOPPING_LIST_KEY, JSON.stringify(shoppingList));
   }, [shoppingList]);
+
+  // Sync polling ref
+  const pollIntervalRef = useRef(null);
+  const lastPollTimeRef = useRef(null);
+  const isSyncInitializedRef = useRef(false);
+
+  const resolvedOwnerId = useRef(null); // current owner user_id for DB ops
+
+  // ── DB sync helpers ───────────────────────────────────────────────────────
+
+  const loadListFromDb = useCallback(async (ownerUserId) => {
+    try {
+      const items = await fetchShoppingList(ownerUserId ?? null);
+      setShoppingList(items.map(item => ({
+        ...item,
+        entryId: item.entryId ?? createEntryId(),
+      })));
+      lastPollTimeRef.current = new Date().toISOString();
+    } catch (err) {
+      console.error('[shopping-list] load failed:', err);
+    }
+  }, [createEntryId]);
+
+
+  // On auth: initialize DB sync (migrate localStorage if DB is empty)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      clearInterval(pollIntervalRef.current);
+      isSyncInitializedRef.current = false;
+      resolvedOwnerId.current = null;
+      return;
+    }
+
+    const init = async () => {
+      try {
+        const { data: sessionData } = await dataClient.auth.getSession();
+        const userId = sessionData?.user?.id;
+        if (!userId) return;
+
+        resolvedOwnerId.current = userId;
+        const ownerUserId = listOwnerId ?? userId;
+
+        const dbItems = await fetchShoppingList(ownerUserId);
+
+        if (dbItems.length === 0 && !listOwnerId) {
+          // Migrate localStorage items to DB if any exist
+          const stored = shoppingList;
+          if (stored.length > 0) {
+            await replaceListItems(stored.map(item => ({
+              ...item,
+              entryId: item.entryId ?? createEntryId(),
+            })), userId);
+            await loadListFromDb(null);
+          }
+        } else {
+          setShoppingList(dbItems.map(item => ({
+            ...item,
+            entryId: item.entryId ?? createEntryId(),
+          })));
+          lastPollTimeRef.current = new Date().toISOString();
+        }
+
+        isSyncInitializedRef.current = true;
+
+        // Start polling every 5 seconds
+        pollIntervalRef.current = setInterval(async () => {
+          try {
+            const fresh = await fetchShoppingList(listOwnerId ?? null);
+            const freshKey = fresh.map(i => `${i.entryId}:${i.checked}`).join('|');
+            setShoppingList(prev => {
+              const prevKey = prev.map(i => `${i.entryId}:${i.checked}`).join('|');
+              if (prevKey === freshKey) return prev;
+              return fresh.map(item => ({
+                ...item,
+                entryId: item.entryId ?? item.id,
+              }));
+            });
+          } catch {
+            // Ignore poll errors
+          }
+        }, 5000);
+
+      } catch (err) {
+        console.error('[shopping-list] init failed:', err);
+      }
+    };
+
+    init();
+    return () => clearInterval(pollIntervalRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, listOwnerId]);
+
+  const setListOwnerId = useCallback((ownerId) => {
+    if (ownerId) {
+      localStorage.setItem(SHARED_LIST_KEY, ownerId);
+    } else {
+      localStorage.removeItem(SHARED_LIST_KEY);
+    }
+    setListOwnerIdState(ownerId);
+  }, []);
 
   // Smart groups — kept in context so they survive navigation
   const [smartGroups, setSmartGroups] = useState([]);
@@ -154,8 +270,7 @@ export function AppProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const pendingToastsRef = useRef(new Set());
 
-  // Backfill unique row IDs for any existing shopping-list entries.
-  // This keeps swipe/delete identity stable even when items move.
+  // Backfill unique row IDs for any existing shopping-list entries not yet synced.
   useEffect(() => {
     setShoppingList(prev => {
       let changed = false;
@@ -167,6 +282,37 @@ export function AppProvider({ children }) {
       return changed ? next : prev;
     });
   }, [createEntryId]);
+
+  // ── Share list helper ─────────────────────────────────────────────────────
+  const shareList = useCallback(async (inviteeEmail) => {
+    const token = await getAuthToken();
+    const res = await fetch('/api/shopping-list-share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ inviteeEmail }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error ?? 'Share failed');
+    return res.json(); // { token, inviteeEmail }
+  }, []);
+
+  const acceptSharedList = useCallback(async (token) => {
+    const authToken = await getAuthToken();
+    const res = await fetch('/api/shopping-list-accept', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+      body: JSON.stringify({ token }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error ?? 'Accept failed');
+    const { ownerId } = await res.json();
+    setListOwnerId(ownerId);
+    // Force reload
+    isSyncInitializedRef.current = false;
+    return ownerId;
+  }, [setListOwnerId]);
+
+  const leaveSharedList = useCallback(() => {
+    setListOwnerId(null);
+  }, [setListOwnerId]);
   
   // Start with no plan — user taps "Plan my week" to generate
   
@@ -263,9 +409,9 @@ export function AppProvider({ children }) {
   };
   
   // Add all ingredients from meal plan to shopping list
-  const addAllToShoppingList = (replaceExisting = false) => {
+  const addAllToShoppingList = async (replaceExisting = false) => {
     const allIngredients = [];
-    
+
     mealPlan.forEach(day => {
       ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
         const meal = day.meals[mealType];
@@ -283,22 +429,31 @@ export function AppProvider({ children }) {
         }
       });
     });
-    
+
+    let finalList;
     if (replaceExisting) {
       setShoppingList(allIngredients);
+      finalList = allIngredients;
     } else {
       setShoppingList(prev => {
         const existingIds = new Set(prev.map(item => item.id));
         const newItems = allIngredients.filter(item => !existingIds.has(item.id));
-        return [...prev, ...newItems];
+        finalList = [...prev, ...newItems];
+        return finalList;
       });
+    }
+
+    if (isSyncInitializedRef.current && resolvedOwnerId.current) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      replaceListItems(finalList ?? allIngredients, ownerUserId)
+        .catch(err => console.error('[shopping-list] bulk add failed:', err));
     }
   };
   
   // Add ingredients from a specific recipe to shopping list.
   // When mealPlan is provided, counts how many times the recipe appears
   // across the week and adds ingredients proportionally (one set per occurrence).
-  const addRecipeToShoppingList = (recipeId, plan = []) => {
+  const addRecipeToShoppingList = async (recipeId, plan = []) => {
     const recipe = lookupRecipe(recipeId);
     if (!recipe) return;
 
@@ -323,56 +478,121 @@ export function AppProvider({ children }) {
     }
 
     setShoppingList(prev => [...prev, ...newItems]);
+
+    if (isSyncInitializedRef.current && resolvedOwnerId.current) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      for (const item of newItems) {
+        addListItem(item, ownerUserId).catch(err =>
+          console.error('[shopping-list] add failed:', err)
+        );
+      }
+    }
   };
-  
+
   // Toggle ingredient checked state
   const toggleIngredientCheck = (ingredientId) => {
+    let newChecked = null;
+    let targetEntryId = null;
     setShoppingList(prev =>
-      prev.map(item =>
-        (item.entryId ?? item.id) === ingredientId
-          ? { ...item, checked: !item.checked }
-          : item
-      )
+      prev.map(item => {
+        if ((item.entryId ?? item.id) === ingredientId) {
+          newChecked = !item.checked;
+          targetEntryId = item.entryId ?? item.id;
+          return { ...item, checked: newChecked };
+        }
+        return item;
+      })
     );
+
+    if (isSyncInitializedRef.current && resolvedOwnerId.current && targetEntryId !== null) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      // Use a microtask to ensure newChecked is set before calling
+      Promise.resolve().then(() =>
+        patchListItem(targetEntryId, ownerUserId, { checked: newChecked })
+          .catch(err => console.error('[shopping-list] patch failed:', err))
+      );
+    }
   };
-  
+
   // Delete single ingredient from shopping list
   const deleteIngredient = (ingredientId) => {
-    setShoppingList(prev =>
-      prev.filter(item => (item.entryId ?? item.id) !== ingredientId)
-    );
+    let targetEntryId = null;
+    setShoppingList(prev => {
+      const item = prev.find(i => (i.entryId ?? i.id) === ingredientId);
+      if (item) targetEntryId = item.entryId ?? item.id;
+      return prev.filter(i => (i.entryId ?? i.id) !== ingredientId);
+    });
+
+    if (isSyncInitializedRef.current && resolvedOwnerId.current && targetEntryId) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      removeListItem(targetEntryId, ownerUserId)
+        .catch(err => console.error('[shopping-list] delete failed:', err));
+    }
   };
-  
+
   // Delete all ingredients from a specific recipe
   const deleteRecipeFromShoppingList = (recipeId) => {
-    setShoppingList(prev => prev.filter(item => item.recipeId !== recipeId));
+    let removedEntryIds = [];
+    setShoppingList(prev => {
+      removedEntryIds = prev.filter(i => i.recipeId === recipeId).map(i => i.entryId ?? i.id);
+      return prev.filter(item => item.recipeId !== recipeId);
+    });
+
+    if (isSyncInitializedRef.current && resolvedOwnerId.current) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      removedEntryIds.forEach(entryId =>
+        removeListItem(entryId, ownerUserId)
+          .catch(err => console.error('[shopping-list] delete failed:', err))
+      );
+    }
   };
 
   // Mark all ingredients from a specific recipe as purchased
   const markRecipeAsPurchased = (recipeId) => {
-    setShoppingList(prev =>
-      prev.map(item =>
-        item.recipeId === recipeId
-          ? { ...item, checked: true }
-          : item
-      )
-    );
+    let affectedItems = [];
+    setShoppingList(prev => {
+      affectedItems = prev.filter(i => i.recipeId === recipeId);
+      return prev.map(item =>
+        item.recipeId === recipeId ? { ...item, checked: true } : item
+      );
+    });
+
+    if (isSyncInitializedRef.current && resolvedOwnerId.current) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      affectedItems.forEach(item =>
+        patchListItem(item.entryId ?? item.id, ownerUserId, { checked: true })
+          .catch(err => console.error('[shopping-list] patch failed:', err))
+      );
+    }
   };
 
   // Mark all ingredients from a specific recipe as not purchased
   const markRecipeAsUnpurchased = (recipeId) => {
-    setShoppingList(prev =>
-      prev.map(item =>
-        item.recipeId === recipeId
-          ? { ...item, checked: false }
-          : item
-      )
-    );
+    let affectedItems = [];
+    setShoppingList(prev => {
+      affectedItems = prev.filter(i => i.recipeId === recipeId);
+      return prev.map(item =>
+        item.recipeId === recipeId ? { ...item, checked: false } : item
+      );
+    });
+
+    if (isSyncInitializedRef.current && resolvedOwnerId.current) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      affectedItems.forEach(item =>
+        patchListItem(item.entryId ?? item.id, ownerUserId, { checked: false })
+          .catch(err => console.error('[shopping-list] patch failed:', err))
+      );
+    }
   };
-  
+
   // Clear entire shopping list
   const clearShoppingList = () => {
     setShoppingList([]);
+    if (isSyncInitializedRef.current && resolvedOwnerId.current) {
+      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
+      clearListItems(ownerUserId)
+        .catch(err => console.error('[shopping-list] clear failed:', err));
+    }
   };
   
   // Replace a specific meal slot across the entire plan with an AI-suggested alternative
@@ -461,6 +681,13 @@ export function AppProvider({ children }) {
     setSmartGroups,
     smartStatus,
     fetchSmartGroups,
+
+    // Shared list
+    listOwnerId,
+    setListOwnerId,
+    shareList,
+    acceptSharedList,
+    leaveSharedList,
     
     // Toast
     toasts,

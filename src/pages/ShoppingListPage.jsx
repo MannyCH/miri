@@ -27,6 +27,9 @@ export function ShoppingListPage() {
     setSmartGroups,
     smartStatus,
     fetchSmartGroups,
+    listOwnerId,
+    shareList,
+    leaveSharedList,
   } = useApp();
   const { preferences } = usePreferences();
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -205,6 +208,9 @@ export function ShoppingListPage() {
       onClearList={clearShoppingList}
       searchQuery={searchQuery}
       onSearch={setSearchQuery}
+      isSharedList={!!listOwnerId}
+      onShare={shareList}
+      onLeave={leaveSharedList}
     />
   );
 }

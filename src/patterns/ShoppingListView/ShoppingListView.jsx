@@ -5,6 +5,7 @@ import { Divider } from '../../components/Divider';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
+import { ShareListSheet } from '../../components/ShareListSheet/ShareListSheet';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './ShoppingListView.css';
 
@@ -33,8 +34,14 @@ export const ShoppingListView = ({
   summaryEntries = [],
   pantryStaples = [],
   onTogglePantryStaple,
+  // Sharing
+  onShare,
+  onLeave,
+  isSharedList = false,
+  sharedWith = [],
   ...props
 }) => {
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [smartChecked, setSmartChecked] = useState({});
 
   const toggleSmartItem = (key) =>
@@ -163,26 +170,51 @@ export const ShoppingListView = ({
     >
       {/* Header */}
       <header className="shopping-list-header">
-        <h1 className="text-h1-bold">Shopping list</h1>
+        <h1 className="text-h1-bold">
+          Shopping list
+          {isSharedList && <span className="shopping-list-shared-badge text-tiny-bold">SHARED</span>}
+        </h1>
 
-        {/* View Mode Toggle */}
-        <div className="shopping-list-view-toggle">
-          <button
-            className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('recipe')}
-            aria-label="Group by recipe"
-          >
-            <GridIcon />
-          </button>
-          <button
-            className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('smart')}
-            aria-label="Smart grouped list"
-          >
-            <SparkleIcon />
-          </button>
+        <div className="shopping-list-header-actions">
+          {(onShare || isSharedList) && (
+            <button
+              type="button"
+              className="shopping-list-share-btn"
+              onClick={() => setIsShareOpen(true)}
+              aria-label={isSharedList ? 'Shared list options' : 'Share list'}
+            >
+              <ShareIcon />
+            </button>
+          )}
+
+          {/* View Mode Toggle */}
+          <div className="shopping-list-view-toggle">
+            <button
+              className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
+              onClick={() => onViewModeChange?.('recipe')}
+              aria-label="Group by recipe"
+            >
+              <GridIcon />
+            </button>
+            <button
+              className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
+              onClick={() => onViewModeChange?.('smart')}
+              aria-label="Smart grouped list"
+            >
+              <SparkleIcon />
+            </button>
+          </div>
         </div>
       </header>
+
+      <ShareListSheet
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        onShare={onShare}
+        onLeave={onLeave}
+        isSharedList={isSharedList}
+        sharedWith={sharedWith}
+      />
 
       {/* Content */}
       <div className="shopping-list-content">
@@ -684,6 +716,13 @@ const SparkleIcon = () => (
 const CheckSmallIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+const ShareIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
   </svg>
 );
 
