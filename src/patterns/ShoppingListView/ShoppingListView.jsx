@@ -407,11 +407,7 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
     setSwipeX(MAX_SWIPE);
     setIsSwiping(false);
     setIsAnimatingOut(true);
-    window.setTimeout(() => {
-      onDelete?.();
-      setSwipeX(0);
-      setIsAnimatingOut(false);
-    }, ANIMATE_OUT_MS);
+    window.setTimeout(() => onDelete?.(), ANIMATE_OUT_MS);
   }, [isAnimatingOut, onDelete]);
 
   const triggerPantryToggle = React.useCallback(() => {
@@ -460,10 +456,10 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
       className="smart-list-item"
       initial={false}
       layout="position"
-      style={{ overflow: 'hidden' }}
+      style={isAnimatingOut ? { pointerEvents: 'none', overflow: 'hidden' } : { overflow: 'hidden' }}
       animate={isAnimatingOut
-        ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, scale: 0.98 }
-        : { opacity: 1, height: 'auto', scale: 1 }}
+        ? { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, x: -16, scale: 0.98 }
+        : { opacity: 1, height: 'auto', marginTop: 0, marginBottom: 0, x: 0, scale: 1 }}
       transition={{
         duration: ANIMATE_OUT_MS / 1000,
         ease: [0.22, 0.61, 0.36, 1],
