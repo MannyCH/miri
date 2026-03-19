@@ -190,23 +190,22 @@ export const ShoppingListView = ({
         </div>
       </header>
 
-      {/* Summary card */}
-      {summaryEntries.length > 0 && (
-        <div className="shopping-list-summary">
-          <p className="text-body-small-bold shopping-list-summary-title">For this week</p>
-          <ul className="shopping-list-summary-list">
-            {summaryEntries.map(({ recipeName, servings }) => (
-              <li key={recipeName} className="text-body-small-regular shopping-list-summary-item">
-                <span>{recipeName}</span>
-                <span className="shopping-list-summary-servings">{servings} servings</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       {/* Content */}
       <div className="shopping-list-content">
+        {summaryEntries.length > 0 && (
+          <div className="shopping-list-summary">
+            <p className="text-body-small-bold shopping-list-summary-title">For this week</p>
+            <ul className="shopping-list-summary-list">
+              {summaryEntries.map(({ recipeName, servings }) => (
+                <li key={recipeName} className="text-body-small-regular shopping-list-summary-item">
+                  <span>{recipeName}</span>
+                  <span className="shopping-list-summary-servings">{servings} servings</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {viewMode === 'list' && (
           <>
             <IngredientList

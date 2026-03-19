@@ -98,11 +98,22 @@ export function AppProvider({ children }) {
   const todayStr = calendarDays[0]?.fullDate;
   const [selectedFullDate, setSelectedFullDate] = useState(todayStr);
   
-  // Shopping List State
-  const [shoppingList, setShoppingList] = useState([]);
-  const [shoppingListViewMode, setShoppingListViewMode] = useState('list'); // 'list' or 'recipe'
+  // Shopping List State — persisted to localStorage
+  const SHOPPING_LIST_KEY = 'miri-shopping-list';
+  const [shoppingList, setShoppingList] = useState(() => {
+    try {
+      const stored = localStorage.getItem(SHOPPING_LIST_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+  const [shoppingListViewMode, setShoppingListViewMode] = useState('list');
   const nextEntryIdRef = useRef(0);
   const createEntryId = React.useCallback(() => `sl-${nextEntryIdRef.current++}`, []);
+
+  // Persist shopping list whenever it changes
+  useEffect(() => {
+    localStorage.setItem(SHOPPING_LIST_KEY, JSON.stringify(shoppingList));
+  }, [shoppingList]);
   
   // Toast State
   const [toasts, setToasts] = useState([]);

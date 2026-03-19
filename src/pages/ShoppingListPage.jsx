@@ -14,6 +14,7 @@ import { usePreferences } from '../context/PreferencesContext';
 export function ShoppingListPage() {
   const {
     shoppingList,
+    mealPlan,
     shoppingListViewMode,
     setShoppingListViewMode,
     toggleIngredientCheck,
@@ -41,17 +42,30 @@ export function ShoppingListPage() {
     });
   }, []);
 
-  // Compute summary: unique recipes in the list with serving count
+  // Count how many times each recipe appears in the meal plan this week
+  const mealPlanOccurrences = React.useMemo(() => {
+    const map = new Map();
+    mealPlan.forEach(day => {
+      Object.values(day.meals ?? {}).forEach(meal => {
+        if (meal?.id) map.set(meal.id, (map.get(meal.id) ?? 0) + 1);
+      });
+    });
+    return map;
+  }, [mealPlan]);
+
+  // Summary: unique recipes in the list × occurrences in plan × servings per meal
   const summaryEntries = React.useMemo(() => {
-    const recipeMap = new Map();
+    const seen = new Map(); // recipeId → recipeName
     shoppingList.forEach(item => {
-      if (!item.recipeName) return;
-      if (!recipeMap.has(item.recipeName)) {
-        recipeMap.set(item.recipeName, preferences.servings ?? 2);
+      if (item.recipeName && item.recipeId && !seen.has(item.recipeId)) {
+        seen.set(item.recipeId, item.recipeName);
       }
     });
-    return Array.from(recipeMap.entries()).map(([recipeName, servings]) => ({ recipeName, servings }));
-  }, [shoppingList, preferences.servings]);
+    return Array.from(seen.entries()).map(([recipeId, recipeName]) => {
+      const occurrences = mealPlanOccurrences.get(recipeId) ?? 1;
+      return { recipeName, servings: occurrences * (preferences.servings ?? 2) };
+    });
+  }, [shoppingList, mealPlanOccurrences, preferences.servings]);
   const [smartGroups, setSmartGroups] = React.useState([]);
   const [smartStatus, setSmartStatus] = React.useState('idle');
   const lastFetchedKeyRef = React.useRef(null);
@@ -176,10 +190,22 @@ export function ShoppingListPage() {
       smartStatus={smartStatus}
       onSmartRefresh={() => fetchSmartGroups(true)}
       onSmartItemDelete={(itemName) => {
-        const match = shoppingList.find(
-          item => item.name.toLowerCase() === itemName.toLowerCase()
+        // Optimistically remove from smart groups so the item disappears immediately
+        setSmartGroups(prev =>
+          prev.map(group => ({
+            ...group,
+            items: group.items.filter(i => i.name.toLowerCase() !== itemName.toLowerCase()),
+          })).filter(group => group.items.length > 0)
         );
-        if (match) deleteIngredient(match.entryId ?? match.id);
+        // Fuzzy-match against raw ingredient strings (smart names are normalized)
+        const needle = itemName.toLowerCase();
+        const matches = shoppingList.filter(item => {
+          const hay = item.name.toLowerCase();
+          // Strip leading quantity ("200g ", "1 1/2 cups ") for comparison
+          const hayStripped = hay.replace(/^[\d\s.,/½¼¾⅓⅔⅛⅜⅝⅞]+\s*[a-z]*\s+/i, '');
+          return hay.includes(needle) || hayStripped.includes(needle) || needle.includes(hayStripped);
+        });
+        matches.forEach(match => deleteIngredient(match.entryId ?? match.id));
       }}
       items={items}
       itemKeys={itemKeys}
