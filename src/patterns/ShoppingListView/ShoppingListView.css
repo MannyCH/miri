@@ -53,12 +53,14 @@
 
 .shopping-list-summary-item {
   display: flex;
-  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--spacing-8);
   color: var(--color-text-strong);
 }
 
 .shopping-list-summary-servings {
   color: var(--color-text-weak);
+  flex-shrink: 0;
 }
 
 .shopping-list-view-toggle {

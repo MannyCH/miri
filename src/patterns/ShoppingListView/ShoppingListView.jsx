@@ -116,9 +116,10 @@ export const ShoppingListView = ({
     const uncheckedIndices = [];
     const checkedIndices = [];
 
-    (group.ingredients || []).forEach((_, index) => {
+    (group.ingredients || []).forEach((ingredient, index) => {
       const checkedValue = group.checkedItems?.[index];
-      if (checkedValue === true) {
+      const isPantry = pantryStaples.some(s => ingredient?.toLowerCase().includes(s));
+      if (checkedValue === true || isPantry) {
         checkedIndices.push(index);
       } else {
         uncheckedIndices.push(index);
@@ -191,8 +192,8 @@ export const ShoppingListView = ({
             <ul className="shopping-list-summary-list">
               {summaryEntries.map(({ recipeName, servings }) => (
                 <li key={recipeName} className="text-body-small-regular shopping-list-summary-item">
+                  <span className="shopping-list-summary-servings">×{servings}</span>
                   <span>{recipeName}</span>
-                  <span className="shopping-list-summary-servings">{servings} servings</span>
                 </li>
               ))}
             </ul>
