@@ -24,6 +24,8 @@ export const IngredientListItem = ({
   const [isSwiping, setIsSwiping] = React.useState(false);
   const [isRemoving, setIsRemoving] = React.useState(false);
   const startXRef = React.useRef(0);
+  const startYRef = React.useRef(0);
+  const swipeDirectionRef = React.useRef(null); // 'horizontal' | 'vertical' | null
 
   const MAX_SWIPE = 120;
   const SWIPE_THRESHOLD = 84;
@@ -51,21 +53,34 @@ export const IngredientListItem = ({
   const handleTouchStart = (e) => {
     if (isRemoving) return;
     startXRef.current = e.touches[0].clientX;
+    startYRef.current = e.touches[0].clientY;
+    swipeDirectionRef.current = null;
     setIsSwiping(true);
   };
 
   const handleTouchMove = (e) => {
     if (!isSwiping) return;
-    const diff = startXRef.current - e.touches[0].clientX;
+    const dx = startXRef.current - e.touches[0].clientX;
+    const dy = startYRef.current - e.touches[0].clientY;
+
+    if (swipeDirectionRef.current === null) {
+      if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+      swipeDirectionRef.current = Math.abs(dy) > Math.abs(dx) ? 'vertical' : 'horizontal';
+    }
+
+    if (swipeDirectionRef.current === 'vertical') return;
+
+    e.preventDefault();
     if (onPantryToggle) {
-      setSwipeX(Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, diff)));
+      setSwipeX(Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, dx)));
     } else {
-      if (diff > 0) setSwipeX(Math.min(diff, MAX_SWIPE));
+      if (dx > 0) setSwipeX(Math.min(dx, MAX_SWIPE));
     }
   };
 
   const handleTouchEnd = () => {
     if (isRemoving) return;
+    swipeDirectionRef.current = null;
     if (swipeX > SWIPE_THRESHOLD) { triggerDelete(); return; }
     if (onPantryToggle && swipeX < -SWIPE_THRESHOLD) { triggerPantry(); return; }
     setSwipeX(0);

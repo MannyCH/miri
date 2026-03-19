@@ -396,6 +396,8 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
   const [isSwiping, setIsSwiping] = React.useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = React.useState(false);
   const startXRef = React.useRef(0);
+  const startYRef = React.useRef(0);
+  const swipeDirectionRef = React.useRef(null); // 'horizontal' | 'vertical' | null
 
   const MAX_SWIPE = 120;
   const SWIPE_THRESHOLD = 84;
@@ -425,17 +427,30 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
   const handleTouchStart = (e) => {
     if (isAnimatingOut) return;
     startXRef.current = e.touches[0].clientX;
+    startYRef.current = e.touches[0].clientY;
+    swipeDirectionRef.current = null;
     setIsSwiping(true);
   };
 
   const handleTouchMove = (e) => {
     if (!isSwiping) return;
-    const diff = startXRef.current - e.touches[0].clientX;
-    setSwipeX(Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, diff)));
+    const dx = startXRef.current - e.touches[0].clientX;
+    const dy = startYRef.current - e.touches[0].clientY;
+
+    if (swipeDirectionRef.current === null) {
+      if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+      swipeDirectionRef.current = Math.abs(dy) > Math.abs(dx) ? 'vertical' : 'horizontal';
+    }
+
+    if (swipeDirectionRef.current === 'vertical') return;
+
+    e.preventDefault();
+    setSwipeX(Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, dx)));
   };
 
   const handleTouchEnd = () => {
     if (isAnimatingOut) return;
+    swipeDirectionRef.current = null;
     if (swipeX > SWIPE_THRESHOLD) { triggerDelete(); return; }
     if (swipeX < -SWIPE_THRESHOLD) { triggerPantryToggle(); return; }
     setSwipeX(0);
