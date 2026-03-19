@@ -4,7 +4,7 @@ import { RecipeDetailView } from '../patterns/RecipeDetailView';
 import { useApp } from '../context/AppContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { fetchRecipeById } from '../lib/recipesApi';
-import { convertIngredients } from '../lib/unitConverter';
+import { convertIngredients, scaleIngredients } from '../lib/unitConverter';
 
 /**
  * Recipe Detail Page
@@ -48,9 +48,13 @@ export function RecipeDetailPage() {
     setTimeout(() => setIsAdded(false), 2500);
   };
 
-  const displayRecipe = preferences.unitSystem
-    ? { ...recipe, ingredients: convertIngredients(recipe.ingredients, preferences.unitSystem) }
-    : recipe;
+  const scaleFactor = recipe.servings ? preferences.servings / recipe.servings : 1;
+  const scaledIngredients = scaleIngredients(recipe.ingredients, scaleFactor);
+  const displayRecipe = {
+    ...recipe,
+    ingredients: convertIngredients(scaledIngredients, preferences.unitSystem),
+    servings: preferences.servings,
+  };
 
   return (
     <RecipeDetailView
