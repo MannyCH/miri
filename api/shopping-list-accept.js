@@ -7,9 +7,10 @@ const JWKS = createRemoteJWKSet(
 
 async function getUserId(req) {
   const auth = req.headers.authorization;
-  if (!auth?.startsWith('Bearer ')) throw Object.assign(new Error('Unauthorized'), { status: 401 });
+  if (!auth?.startsWith('Bearer ')) throw new Error('Missing Bearer token');
   const token = auth.slice(7);
   const { payload } = await jwtVerify(token, JWKS);
+  if (!payload.sub) throw new Error('No sub in JWT payload');
   return payload.sub;
 }
 
@@ -27,8 +28,9 @@ export default async function handler(req, res) {
   let inviteeId;
   try {
     inviteeId = await getUserId(req);
-  } catch {
-    return res.status(401).json({ error: 'Unauthorized' });
+  } catch (err) {
+    console.error('[shopping-list-accept] auth failed:', err.message);
+    return res.status(401).json({ error: 'Unauthorized', detail: err.message });
   }
 
   const { token } = req.body ?? {};
