@@ -45,8 +45,8 @@
   padding: 0 var(--spacing-16);
   border: none;
   border-radius: var(--corner-radius-12);
-  background: var(--color-fill-brand);
-  color: var(--color-text-on-brand);
+  background: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
   cursor: pointer;
   white-space: nowrap;
 }
