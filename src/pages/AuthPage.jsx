@@ -96,7 +96,8 @@ export function AuthPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/planning" replace />;
+    const destination = location.state?.from ?? { pathname: '/planning' };
+    return <Navigate to={destination} replace />;
   }
 
   const clearFeedback = () => {

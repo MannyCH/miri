@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider, usePreferences } from './context/PreferencesContext';
@@ -28,6 +28,15 @@ const ShoppingListAcceptPage = lazy(() => import('./pages/ShoppingListAcceptPage
  * 
  * Built with Storybook patterns as single source of truth
  */
+function RequireAuth({ children }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+  return children;
+}
+
 function useNeedsOnboarding() {
   const { user } = useAuth();
   const { preferences, isLoading } = usePreferences();
@@ -93,7 +102,7 @@ function AppContent() {
           />
           <Route
             path="/shopping-list/accept"
-            element={isAuthenticated ? <ShoppingListAcceptPage /> : <Navigate to="/auth" replace />}
+            element={<RequireAuth><ShoppingListAcceptPage /></RequireAuth>}
           />
           <Route
             path="/account"
