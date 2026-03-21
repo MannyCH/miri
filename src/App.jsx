@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PreferencesProvider, usePreferences } from './context/PreferencesContext';
@@ -14,6 +14,7 @@ const AuthPage = lazy(() => import('./pages/AuthPage').then((module) => ({ defau
 const AccountPage = lazy(() => import('./pages/AccountPage').then((module) => ({ default: module.AccountPage })));
 const OnboardingPage = lazy(() => import('./pages/OnboardingPage').then((module) => ({ default: module.OnboardingPage })));
 const RecipeImportPage = lazy(() => import('./pages/RecipeImportPage').then((module) => ({ default: module.RecipeImportPage })));
+const ShoppingListAcceptPage = lazy(() => import('./pages/ShoppingListAcceptPage').then((module) => ({ default: module.ShoppingListAcceptPage })));
 
 /**
  * Miri - Meal Planning App
@@ -27,6 +28,15 @@ const RecipeImportPage = lazy(() => import('./pages/RecipeImportPage').then((mod
  * 
  * Built with Storybook patterns as single source of truth
  */
+function RequireAuth({ children }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+  return children;
+}
+
 function useNeedsOnboarding() {
   const { user } = useAuth();
   const { preferences, isLoading } = usePreferences();
@@ -89,6 +99,10 @@ function AppContent() {
           <Route
             path="/shopping-list"
             element={isAuthenticated ? <ShoppingListPage /> : <Navigate to="/auth" replace />}
+          />
+          <Route
+            path="/shopping-list/accept"
+            element={<RequireAuth><ShoppingListAcceptPage /></RequireAuth>}
           />
           <Route
             path="/account"

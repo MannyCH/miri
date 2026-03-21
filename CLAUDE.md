@@ -169,6 +169,13 @@ Before ANY UI change, in this order:
 
 **A UI task is only complete when:** documented components/icons/tokens were used, behavior matches requested scope.
 
+**Hard location-based triggers — no exceptions, regardless of task type:**
+- Creating or editing any file in `src/components/` → full Storybook preflight required, even during bug fixes, feature wiring, or QA work
+- Any `<button>` element written by hand → stop and check if `Button` component covers the use case first
+- Any inline color, spacing, or radius value → stop and look up the token
+
+These triggers apply even when the UI feels incidental to a larger backend or logic task. "It's just a small button" is not an exception.
+
 ### 5. Visual Verification (visual-verification)
 
 After any UI change, before considering work complete:

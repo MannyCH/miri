@@ -27,6 +27,13 @@ export function ShoppingListPage() {
     setSmartGroups,
     smartStatus,
     fetchSmartGroups,
+    sharedListMeta,
+    sharedListItems,
+    toggleSharedItem,
+    addItemToSharedList,
+    removeItemFromSharedList,
+    shareList,
+    leaveSharedList,
   } = useApp();
   const { preferences } = usePreferences();
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -205,6 +212,14 @@ export function ShoppingListPage() {
       onClearList={clearShoppingList}
       searchQuery={searchQuery}
       onSearch={setSearchQuery}
+      isSharedList={!!sharedListMeta}
+      sharedListMeta={sharedListMeta}
+      sharedListItems={sharedListItems}
+      onToggleSharedItem={toggleSharedItem}
+      onAddSharedItem={addItemToSharedList}
+      onDeleteSharedItem={removeItemFromSharedList}
+      onShare={shareList}
+      onLeave={leaveSharedList}
     />
   );
 }

@@ -46,6 +46,84 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
+-- ── Shopping list items ───────────────────────────────────────────────────
+-- Note: this table pre-existed; updated_at was added for live sync.
+
+CREATE TABLE IF NOT EXISTS shopping_list_items (
+  id          BIGSERIAL   PRIMARY KEY,
+  user_id     TEXT        NOT NULL,
+  entry_id    TEXT,
+  item_id     TEXT,
+  name        TEXT        NOT NULL,
+  recipe_id   TEXT,
+  recipe_name TEXT,
+  checked     BOOLEAN     NOT NULL DEFAULT false,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS shopping_list_items_updated_idx ON shopping_list_items (user_id, updated_at);
+
+ALTER TABLE shopping_list_items ENABLE ROW LEVEL SECURITY;
+
+-- Owners can do everything on their own items
+CREATE POLICY shopping_list_items_access ON shopping_list_items
+  FOR SELECT TO authenticated
+  USING (
+    user_id = auth.user_id()
+    OR user_id IN (
+      SELECT owner_id FROM shopping_list_shares
+      WHERE invitee_id = auth.user_id() AND status = 'accepted'
+    )
+  );
+
+-- Owners and accepted shared members can update (e.g. check/uncheck)
+CREATE POLICY shopping_list_items_shared_update ON shopping_list_items
+  FOR UPDATE TO authenticated
+  USING (
+    user_id = auth.user_id()
+    OR user_id IN (
+      SELECT owner_id FROM shopping_list_shares
+      WHERE invitee_id = auth.user_id() AND status = 'accepted'
+    )
+  )
+  WITH CHECK (
+    user_id = auth.user_id()
+    OR user_id IN (
+      SELECT owner_id FROM shopping_list_shares
+      WHERE invitee_id = auth.user_id() AND status = 'accepted'
+    )
+  );
+
+-- Only owner can insert/delete
+CREATE POLICY shopping_list_items_own_write ON shopping_list_items
+  FOR INSERT TO authenticated
+  WITH CHECK (user_id = auth.user_id());
+
+CREATE POLICY shopping_list_items_own_delete ON shopping_list_items
+  FOR DELETE TO authenticated
+  USING (user_id = auth.user_id());
+
+-- ── Shopping list shares ──────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS shopping_list_shares (
+  id            BIGSERIAL   PRIMARY KEY,
+  owner_id      TEXT        NOT NULL,
+  invitee_email TEXT,
+  invitee_id    TEXT,
+  status        TEXT        NOT NULL DEFAULT 'pending',
+  token         TEXT        NOT NULL UNIQUE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (owner_id, invitee_email)
+);
+
+ALTER TABLE shopping_list_shares ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY shopping_list_shares_access ON shopping_list_shares
+  FOR ALL TO authenticated
+  USING (owner_id = auth.user_id() OR invitee_id = auth.user_id());
+
 -- ── User preferences ──────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS user_preferences (
