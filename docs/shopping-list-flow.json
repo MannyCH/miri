@@ -1,0 +1,334 @@
+{
+  "feature": "Shopping List — Sharing & Multi-List",
+  "version": "1.0",
+  "lastUpdated": "2026-03-21",
+  "status": "approved",
+
+  "principles": {
+    "oneListDefault": "Most users have one list. UI is optimized for the single-list case.",
+    "noOwnership": "All members are equal. Anyone can add/check/delete items, rename, invite, leave.",
+    "linkSharing": "Share by link (copy or native OS share sheet). No email/username entry.",
+    "temporaryLists": "Secondary lists are for events (ski trip, party). Not a permanent feature.",
+    "alwaysHaveAList": "User can never be listless. Leaving/deleting last list auto-creates a fresh empty one."
+  },
+
+  "headerStates": [
+    {
+      "id": "solo-single",
+      "condition": "1 list, not shared",
+      "listName": "plain text",
+      "chevron": false,
+      "avatarRow": false,
+      "contextMenu": ["rename", "share", "createNew"]
+    },
+    {
+      "id": "solo-multi",
+      "condition": "2+ lists, current list not shared",
+      "listName": "tappable pill",
+      "chevron": true,
+      "avatarRow": false,
+      "contextMenu": ["rename", "share", "createNew", "---", "delete"]
+    },
+    {
+      "id": "shared-single",
+      "condition": "1 list, shared",
+      "listName": "plain text",
+      "chevron": false,
+      "avatarRow": true,
+      "contextMenu": ["rename", "share", "createNew", "---", "leave"]
+    },
+    {
+      "id": "shared-multi",
+      "condition": "2+ lists, current list shared",
+      "listName": "tappable pill",
+      "chevron": true,
+      "avatarRow": true,
+      "contextMenu": ["rename", "share", "createNew", "---", "leave"]
+    }
+  ],
+
+  "contextMenuItems": {
+    "rename": {
+      "label": "Rename list",
+      "alwaysVisible": true,
+      "action": "openRenameDialog"
+    },
+    "share": {
+      "label": "Share list",
+      "alwaysVisible": true,
+      "action": "openShareSheet"
+    },
+    "createNew": {
+      "label": "Create new list",
+      "alwaysVisible": true,
+      "action": "openCreateDialog"
+    },
+    "delete": {
+      "label": "Delete list",
+      "destructive": true,
+      "visibleWhen": "list is NOT shared AND user has 2+ lists",
+      "action": "openDeleteConfirmation"
+    },
+    "leave": {
+      "label": "Leave list",
+      "destructive": true,
+      "visibleWhen": "list IS shared",
+      "action": "openLeaveConfirmation"
+    }
+  },
+
+  "avatarRow": {
+    "maxVisible": 3,
+    "overflowFormat": "+N",
+    "plusButton": true,
+    "plusButtonAction": "openShareSheet",
+    "avatarTapAction": "none",
+    "displayRule": "Only shown when list has 2+ members"
+  },
+
+  "listSwitcher": {
+    "trigger": "tap list name pill (only when chevron visible)",
+    "displayRule": "Only shown when user has 2+ lists",
+    "items": [
+      {
+        "type": "list",
+        "showCurrentIndicator": true,
+        "showMiniAvatars": "only for shared lists",
+        "tapAction": "switch to list, close dropdown"
+      },
+      {
+        "type": "action",
+        "label": "+ New list",
+        "position": "bottom",
+        "action": "openCreateDialog"
+      }
+    ],
+    "behavior": "App remembers last-used list. On open, shows last-used list. No 'main' or 'default' concept."
+  },
+
+  "flows": {
+    "newUser": {
+      "trigger": "First login / signup",
+      "steps": [
+        "Auto-create list named 'Einkaufsliste' (empty)",
+        "User lands on empty list",
+        "Header: solo-single state"
+      ]
+    },
+
+    "shareList": {
+      "trigger": "context menu → 'Share list' OR tap + on avatar row",
+      "steps": [
+        "Open share sheet (bottom sheet)",
+        "Show list name as title",
+        "Show 'Copy link' button (primary)",
+        "Show 'Share...' button (native OS share sheet)",
+        "Show members list below with remove (✕) per member"
+      ],
+      "shareSheet": {
+        "title": "Share \"{listName}\"",
+        "description": "Anyone with the link can view and edit this list.",
+        "actions": [
+          { "label": "Copy link", "icon": "link", "style": "primary", "action": "copyInviteUrl" },
+          { "label": "Share...", "icon": "share", "style": "secondary", "action": "nativeShareSheet" }
+        ],
+        "membersSection": {
+          "label": "Members",
+          "selfLabel": "(you)",
+          "removable": true,
+          "removeAction": "openRemoveMemberConfirmation"
+        }
+      }
+    },
+
+    "removeMember": {
+      "trigger": "Tap ✕ on member in share sheet",
+      "confirmation": {
+        "message": "Remove {memberName} from this list? They'll lose access to all items.",
+        "confirmLabel": "Remove",
+        "cancelLabel": "Cancel"
+      },
+      "afterConfirm": [
+        "Member removed from list",
+        "Avatar disappears from row",
+        "Removed member: on next app focus/sync, redirected to fresh empty 'Einkaufsliste'",
+        "Removed member sees toast: 'You were removed from {listName}'"
+      ]
+    },
+
+    "receiveShareLink": {
+      "trigger": "User B taps invite link",
+      "scenarios": {
+        "loggedIn": {
+          "steps": [
+            "Show accept screen: inviter name, list name, item count",
+            "Two actions: 'Join list' (primary), 'Not now' (text link)"
+          ]
+        },
+        "notLoggedIn": {
+          "steps": [
+            "Redirect to /auth",
+            "After login, redirect back to accept screen"
+          ]
+        },
+        "alreadyMember": {
+          "message": "You're already on this list.",
+          "action": { "label": "Open list", "navigateTo": "shoppingList" }
+        },
+        "listDeleted": {
+          "message": "This list no longer exists.",
+          "action": { "label": "OK", "navigateTo": "shoppingList" }
+        }
+      }
+    },
+
+    "joinList": {
+      "trigger": "User B taps 'Join list' on accept screen",
+      "scenarios": {
+        "emptyList": {
+          "condition": "User B's current list has 0 items",
+          "behavior": "Shared list replaces User B's empty list. No merge dialog. Result: 1 list.",
+          "afterJoin": "Navigate to shared list. Avatar row shows both members."
+        },
+        "hasItems": {
+          "condition": "User B's current list has 1+ items",
+          "behavior": "Show merge prompt",
+          "mergePrompt": {
+            "message": "You have {N} items on your current list. What do you want to do?",
+            "options": [
+              {
+                "label": "Merge & join",
+                "style": "primary",
+                "behavior": "User B's unchecked items added to shared list. Checked items are NOT transferred. User B's old solo list deleted. Result: 1 list."
+              },
+              {
+                "label": "Keep mine separate",
+                "style": "text",
+                "behavior": "Both lists kept. Shared list becomes active. Chevron appears. Result: 2 lists."
+              }
+            ]
+          }
+        }
+      }
+    },
+
+    "notNow": {
+      "trigger": "User B taps 'Not now' on accept screen",
+      "behavior": "Returns to own list. Nothing changes. Link remains valid for later."
+    },
+
+    "createList": {
+      "trigger": "context menu → 'Create new list' OR list switcher → '+ New list'",
+      "dialog": {
+        "title": "New list",
+        "fields": [
+          { "type": "text", "placeholder": "List name...", "autoFocus": true, "required": true }
+        ],
+        "confirmLabel": "Create",
+        "confirmDisabledWhen": "name is empty"
+      },
+      "afterCreate": [
+        "New empty list created",
+        "Switches to new list",
+        "Chevron appears if now 2+ lists"
+      ],
+      "edgeCases": {
+        "duplicateName": "Allowed. Names are not unique identifiers."
+      }
+    },
+
+    "renameList": {
+      "trigger": "context menu → 'Rename list'",
+      "dialog": {
+        "title": "Rename list",
+        "fields": [
+          { "type": "text", "prefilled": "{currentListName}", "selectAll": true, "autoFocus": true, "required": true }
+        ],
+        "confirmLabel": "Save",
+        "confirmDisabledWhen": "name is empty"
+      },
+      "afterRename": [
+        "Name updates immediately for all members",
+        "Existing share links still work (show new name on accept screen)"
+      ],
+      "edgeCases": {
+        "simultaneousRename": "Last write wins. No conflict resolution."
+      }
+    },
+
+    "leaveList": {
+      "trigger": "context menu → 'Leave list'",
+      "confirmation": {
+        "message": "Leave '{listName}'? You'll lose access to all shared items.",
+        "confirmLabel": "Leave",
+        "cancelLabel": "Cancel"
+      },
+      "scenarios": {
+        "hasOtherLists": {
+          "behavior": "Removed from shared list. Switches to most recently used remaining list. Chevron disappears if only 1 list remains."
+        },
+        "onlyList": {
+          "behavior": "Removed from shared list. Fresh empty 'Einkaufsliste' auto-created. User lands on empty list. No chevron."
+        },
+        "lastPersonLeaves": {
+          "behavior": "User removed (per above). List has 0 members → list deleted from database. All items deleted. Share links become invalid."
+        }
+      },
+      "otherMembersSee": "Avatar disappears on next sync. No notification."
+    },
+
+    "deleteList": {
+      "trigger": "context menu → 'Delete list' (only non-shared, only when 2+ lists)",
+      "confirmation": {
+        "message": "Delete '{listName}'? {N} items will be permanently removed.",
+        "confirmLabel": "Delete",
+        "cancelLabel": "Cancel"
+      },
+      "afterDelete": [
+        "List and all items removed",
+        "Switches to most recently used remaining list",
+        "Chevron disappears if only 1 list remains"
+      ],
+      "edgeCases": {
+        "allOtherListsDeletedConcurrently": "If this was somehow the last list, auto-create fresh 'Einkaufsliste'."
+      }
+    }
+  },
+
+  "linkMechanics": {
+    "format": "/join/{token}",
+    "expiry": "never (until list is deleted)",
+    "revocable": "Yes — regenerating a new link invalidates the old one",
+    "reusable": "Yes — multiple people can join via same link",
+    "maxMembers": "No hard limit",
+    "offlineShare": "Copy link works if token already generated. Share sheet may fail if token needs server call — show error toast."
+  },
+
+  "syncBehavior": {
+    "note": "Sync mechanism TBD. Currently one-time fetch. These define what members see, not how.",
+    "events": {
+      "itemAdded": "Appears in other members' list on next sync",
+      "itemChecked": "Updates in other members' list",
+      "itemDeleted": "Disappears from other members' list",
+      "listRenamed": "Name updates in header for all members",
+      "memberJoined": "Avatar appears in row",
+      "memberLeft": "Avatar disappears from row",
+      "memberRemoved": "Avatar disappears. Removed member sees toast on next focus.",
+      "listCleared": "All items removed for all members"
+    }
+  },
+
+  "stateTransitions": {
+    "description": "Valid transitions between list states",
+    "transitions": [
+      { "from": "signup", "to": "1 solo list", "trigger": "auto-create on first login" },
+      { "from": "1 solo list", "to": "2+ lists", "trigger": "create new list OR join(separate)" },
+      { "from": "2+ lists", "to": "1 list", "trigger": "delete or leave (back to 1)" },
+      { "from": "solo list", "to": "shared list", "trigger": "someone joins via link" },
+      { "from": "shared list", "to": "deleted", "trigger": "last person leaves" },
+      { "from": "shared list (only list)", "to": "1 solo list", "trigger": "user leaves → fresh list auto-created" },
+      { "from": "join(merge)", "to": "same count", "trigger": "shared list replaces solo list" },
+      { "from": "join(separate)", "to": "count + 1", "trigger": "both lists kept" }
+    ]
+  }
+}

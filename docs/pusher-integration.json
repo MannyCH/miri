@@ -1,0 +1,377 @@
+{
+  "feature": "Pusher Channels — Real-Time Sync for Shopping Lists",
+  "version": "1.0",
+  "lastUpdated": "2026-03-21",
+  "status": "approved",
+
+  "overview": {
+    "purpose": "Replace one-time fetch with real-time sync so shared list members see changes instantly.",
+    "architecture": "Client subscribes to private Pusher channel per list. Server triggers events on list mutations. Client updates local state on received events.",
+    "pattern": "Server-authoritative: all writes go through Vercel API → API writes to Neon DB → API triggers Pusher event → all subscribed clients receive update."
+  },
+
+  "dependencies": {
+    "client": {
+      "package": "pusher-js",
+      "version": "^8.0.0",
+      "install": "npm install pusher-js",
+      "note": "Lightweight client library. No React wrapper needed — use a context provider with native pusher-js."
+    },
+    "server": {
+      "package": "pusher",
+      "version": "^5.0.0",
+      "install": "npm install pusher",
+      "note": "Node.js server SDK for triggering events and authorizing channels. Install at project root (not in /api/)."
+    }
+  },
+
+  "pricing": {
+    "freeTier": {
+      "name": "Sandbox",
+      "connections": 200,
+      "messagesPerDay": 200000,
+      "channels": 100,
+      "cost": "$0"
+    },
+    "startup": {
+      "connections": 500,
+      "messagesPerMonth": 30000000,
+      "cost": "$49/mo"
+    },
+    "recommendation": "Sandbox is sufficient for early users. A household of 2-4 people = 2-4 concurrent connections. Shopping list mutations are low-frequency (tens per day, not thousands)."
+  },
+
+  "pusherDashboard": {
+    "steps": [
+      "Create account at pusher.com",
+      "Create a new Channels app",
+      "Select cluster closest to users (eu for Switzerland: eu)",
+      "Note: App ID, Key, Secret, Cluster from App Keys tab"
+    ]
+  },
+
+  "environmentVariables": {
+    "variables": [
+      {
+        "name": "PUSHER_APP_ID",
+        "secret": true,
+        "description": "Pusher app ID from dashboard"
+      },
+      {
+        "name": "PUSHER_KEY",
+        "secret": false,
+        "description": "Pusher app key — safe to expose to client (public)",
+        "clientExposed": true,
+        "vitePrefix": "VITE_PUSHER_KEY"
+      },
+      {
+        "name": "PUSHER_SECRET",
+        "secret": true,
+        "description": "Pusher app secret — server only, never expose to client"
+      },
+      {
+        "name": "PUSHER_CLUSTER",
+        "secret": false,
+        "description": "Pusher cluster region (e.g. 'eu')",
+        "clientExposed": true,
+        "vitePrefix": "VITE_PUSHER_CLUSTER"
+      }
+    ],
+    "setup": {
+      "vercel": "Add via Vercel dashboard or `vercel env add`. PUSHER_APP_ID and PUSHER_SECRET as 'Sensitive'. PUSHER_KEY and PUSHER_CLUSTER as plain.",
+      "local": "Add to .env.local (already in .gitignore): VITE_PUSHER_KEY, VITE_PUSHER_CLUSTER for client. PUSHER_APP_ID, PUSHER_KEY, PUSHER_SECRET, PUSHER_CLUSTER for API."
+    }
+  },
+
+  "channelStrategy": {
+    "naming": {
+      "pattern": "private-list-{listId}",
+      "example": "private-list-abc123",
+      "rationale": "One channel per shopping list. Private prefix requires authorization — only list members can subscribe."
+    },
+    "whyPrivateNotPresence": {
+      "reason": "Presence channels are limited to 100 members and add overhead tracking who's online. We only need event broadcasting, not online awareness. Avatar row shows members from DB, not live presence.",
+      "future": "If 'who's currently shopping' indicator is ever needed, upgrade to presence-list-{listId}."
+    },
+    "whyNotPublic": "Public channels have no authorization. Anyone could subscribe to any list's events if they guessed the channel name."
+  },
+
+  "serverSide": {
+    "sharedInstance": {
+      "file": "api/_lib/pusher.js",
+      "description": "Shared Pusher server instance reused across all API routes.",
+      "code": {
+        "imports": ["pusher"],
+        "initialization": {
+          "appId": "process.env.PUSHER_APP_ID",
+          "key": "process.env.PUSHER_KEY",
+          "secret": "process.env.PUSHER_SECRET",
+          "cluster": "process.env.PUSHER_CLUSTER",
+          "useTLS": true
+        },
+        "export": "Named export: getPusher() with lazy initialization"
+      }
+    },
+
+    "authEndpoint": {
+      "file": "api/pusher-auth.js",
+      "method": "POST",
+      "path": "/api/pusher-auth",
+      "description": "Authorizes client to subscribe to private channels. Verifies JWT, checks list membership, returns signed auth token.",
+      "flow": [
+        "1. Extract Bearer token from Authorization header (same pattern as shopping-list-items.js)",
+        "2. Verify JWT via jose + Neon Auth JWKS",
+        "3. Extract socket_id and channel_name from request body",
+        "4. Parse listId from channel_name (strip 'private-list-' prefix)",
+        "5. Query DB: is this user the list owner OR an accepted share member?",
+        "6. If authorized: return pusher.authorizeChannel(socket_id, channel_name)",
+        "7. If not authorized: return 403"
+      ],
+      "requestBody": {
+        "socket_id": "string — provided by pusher-js client automatically",
+        "channel_name": "string — e.g. 'private-list-abc123'"
+      },
+      "successResponse": {
+        "status": 200,
+        "body": { "auth": "signature_string" }
+      },
+      "errorResponse": {
+        "status": 403,
+        "body": { "error": "Not authorized for this channel" }
+      }
+    },
+
+    "triggerEvents": {
+      "description": "Add Pusher triggers to existing API routes. Each mutation endpoint triggers an event after successful DB write.",
+      "pattern": "pusher.trigger(`private-list-${listId}`, eventName, payload)",
+      "excludeSender": "Pass socket_id from request to exclude the sender from receiving their own event. Client sends X-Pusher-Socket-Id header.",
+      "endpoints": [
+        {
+          "file": "api/shopping-list-items.js",
+          "method": "POST",
+          "existingAction": "Add item to list",
+          "event": "item:added",
+          "payload": { "entryId": "string", "name": "string", "checked": false, "recipeId": "string|null", "recipeName": "string|null" }
+        },
+        {
+          "file": "api/shopping-list-items.js",
+          "method": "PATCH",
+          "existingAction": "Toggle item checked state",
+          "event": "item:updated",
+          "payload": { "entryId": "string", "checked": "boolean" }
+        },
+        {
+          "file": "api/shopping-list-items.js",
+          "method": "DELETE",
+          "existingAction": "Delete item from list",
+          "event": "item:removed",
+          "payload": { "entryId": "string" }
+        },
+        {
+          "file": "future — list clear endpoint",
+          "method": "POST",
+          "existingAction": "Clear all items",
+          "event": "list:cleared",
+          "payload": {}
+        },
+        {
+          "file": "future — list rename endpoint",
+          "method": "PATCH",
+          "existingAction": "Rename list",
+          "event": "list:renamed",
+          "payload": { "name": "string" }
+        },
+        {
+          "file": "future — member management",
+          "method": "POST/DELETE",
+          "existingAction": "Member joins/leaves/removed",
+          "event": "member:joined | member:left | member:removed",
+          "payload": { "userId": "string", "userName": "string|null" }
+        }
+      ]
+    }
+  },
+
+  "clientSide": {
+    "pusherContext": {
+      "file": "src/context/PusherContext.jsx",
+      "description": "React context that initializes pusher-js once, provides subscribe/unsubscribe helpers, and handles reconnection.",
+      "responsibilities": [
+        "Initialize Pusher client with VITE_PUSHER_KEY and VITE_PUSHER_CLUSTER",
+        "Configure channelAuthorization to point to /api/pusher-auth with Bearer token",
+        "Expose pusher instance and connection state",
+        "Clean up on unmount (disconnect)"
+      ],
+      "initialization": {
+        "key": "import.meta.env.VITE_PUSHER_KEY",
+        "cluster": "import.meta.env.VITE_PUSHER_CLUSTER",
+        "forceTLS": true,
+        "channelAuthorization": {
+          "endpoint": "/api/pusher-auth",
+          "transport": "ajax",
+          "headersProvider": "async () => { const token = await getAuthToken(); return { Authorization: `Bearer ${token}` }; }",
+          "note": "headersProvider is async — pusher-js supports this. Reuses getAuthToken from shoppingListApi.js"
+        }
+      },
+      "connectionStates": {
+        "monitor": "pusher.connection.bind('state_change', ...)",
+        "states": ["initialized", "connecting", "connected", "unavailable", "failed", "disconnected"],
+        "reconnection": "pusher-js handles automatic reconnection with exponential backoff. No custom retry logic needed.",
+        "offlineBehavior": "When connection drops, client continues working with local state. On reconnect, do a one-time full fetch to reconcile."
+      }
+    },
+
+    "contextNesting": {
+      "description": "PusherContext wraps inside AuthContext but outside AppContext.",
+      "order": [
+        "AuthContext — provides session/token",
+        "PusherContext — needs auth token for channel authorization",
+        "AppContext — uses Pusher to subscribe to list channels",
+        "PreferencesContext"
+      ]
+    },
+
+    "subscriptionLifecycle": {
+      "where": "AppContext.jsx (or a custom hook used by AppContext)",
+      "flow": [
+        "1. When shoppingList loads (or active list changes), subscribe to private-list-{listId}",
+        "2. Bind event handlers: item:added, item:updated, item:removed, list:cleared, list:renamed, member:*",
+        "3. Each handler updates local React state (shoppingList / sharedListItems)",
+        "4. When switching lists: unsubscribe old channel, subscribe new channel",
+        "5. On logout: unsubscribe all channels, disconnect Pusher"
+      ],
+      "eventHandlers": {
+        "item:added": "Append item to local list state (if not already present by entryId — dedup)",
+        "item:updated": "Find item by entryId, update checked state",
+        "item:removed": "Filter item out of local list state by entryId",
+        "list:cleared": "Set list state to empty array",
+        "list:renamed": "Update list name in local state",
+        "member:joined": "Add member to local members list, update avatar row",
+        "member:left": "Remove member from local members list",
+        "member:removed": "If current user: redirect to fresh list + show toast. If other: remove from members list."
+      }
+    },
+
+    "excludeSender": {
+      "description": "When the local user adds/checks/deletes an item, they already see the optimistic update. They should NOT receive their own Pusher event (would cause flicker or duplicate).",
+      "mechanism": "Client sends its socket_id in API requests via X-Pusher-Socket-Id header. Server passes this to pusher.trigger() to exclude that connection.",
+      "implementation": [
+        "PusherContext exposes getSocketId() → pusher.connection.socket_id",
+        "shoppingListApi.js includes X-Pusher-Socket-Id header on all mutation requests",
+        "Server-side: pusher.trigger(channel, event, data, { socket_id: req.headers['x-pusher-socket-id'] })"
+      ]
+    },
+
+    "reconciliation": {
+      "description": "Handle the gap between disconnect and reconnect. Events fired while offline are lost.",
+      "strategy": "On pusher connection state change to 'connected' (after being disconnected), do a full fetch of the current list from the API. This reconciles any missed events.",
+      "implementation": "Bind to pusher.connection state_change. If previousState was 'unavailable' or 'connecting' and newState is 'connected', trigger fetchShoppingList()."
+    }
+  },
+
+  "dataFlow": {
+    "userAddsItem": [
+      "1. User types item, taps add",
+      "2. Optimistic update: item appears in local state immediately",
+      "3. API call: POST /api/shopping-list-items (with X-Pusher-Socket-Id header)",
+      "4. Server writes to Neon DB",
+      "5. Server calls pusher.trigger('private-list-{listId}', 'item:added', payload, { socket_id })",
+      "6. All OTHER subscribed clients receive 'item:added' event",
+      "7. Their event handler appends item to local state",
+      "8. Sender does NOT receive event (excluded via socket_id)"
+    ],
+    "userChecksItem": [
+      "1. User taps checkbox",
+      "2. Optimistic update: checkbox toggles locally",
+      "3. API call: PATCH /api/shopping-list-items (with X-Pusher-Socket-Id header)",
+      "4. Server writes to Neon DB",
+      "5. Server calls pusher.trigger('private-list-{listId}', 'item:updated', { entryId, checked })",
+      "6. Other clients receive event, update checkbox state"
+    ],
+    "userDeletesItem": [
+      "1. User swipes/taps delete",
+      "2. Optimistic update: item removed from local state",
+      "3. API call: DELETE /api/shopping-list-items (with X-Pusher-Socket-Id header)",
+      "4. Server writes to Neon DB",
+      "5. Server calls pusher.trigger('private-list-{listId}', 'item:removed', { entryId })",
+      "6. Other clients receive event, remove item from state"
+    ]
+  },
+
+  "securityModel": {
+    "channelAuth": "Private channels require server-side authorization. Auth endpoint verifies JWT + checks DB for list membership before returning signed token.",
+    "noSecretOnClient": "PUSHER_SECRET never leaves the server. Client only has PUSHER_KEY (public) and PUSHER_CLUSTER.",
+    "jwtVerification": "Reuses existing Neon Auth JWKS verification pattern from other API routes.",
+    "channelIsolation": "Each list has its own channel. Users can only subscribe to channels for lists they're a member of."
+  },
+
+  "implementationOrder": [
+    {
+      "step": 1,
+      "task": "Pusher account + env vars",
+      "details": "Create Pusher app, add env vars to Vercel and .env.local"
+    },
+    {
+      "step": 2,
+      "task": "Server: shared Pusher instance",
+      "details": "Create api/_lib/pusher.js with lazy-initialized Pusher server SDK"
+    },
+    {
+      "step": 3,
+      "task": "Server: auth endpoint",
+      "details": "Create api/pusher-auth.js — JWT verification + list membership check + channel authorization"
+    },
+    {
+      "step": 4,
+      "task": "Server: add triggers to existing endpoints",
+      "details": "Modify api/shopping-list-items.js to trigger Pusher events after DB writes. Read X-Pusher-Socket-Id header for sender exclusion."
+    },
+    {
+      "step": 5,
+      "task": "Client: PusherContext",
+      "details": "Create src/context/PusherContext.jsx — initialize pusher-js, auth config, expose instance + socketId"
+    },
+    {
+      "step": 6,
+      "task": "Client: wire into AppContext",
+      "details": "Subscribe to list channel, bind event handlers to update local state, handle reconnection reconciliation"
+    },
+    {
+      "step": 7,
+      "task": "Client: send socket_id on mutations",
+      "details": "Update shoppingListApi.js to include X-Pusher-Socket-Id header on POST/PATCH/DELETE"
+    },
+    {
+      "step": 8,
+      "task": "Test",
+      "details": "Open app in two browsers/tabs with different users on a shared list. Verify: add/check/delete syncs in real time. Verify: sender doesn't get duplicate. Verify: reconnection reconciles."
+    }
+  ],
+
+  "edgeCases": {
+    "pusherDown": "App continues working normally — just without real-time sync. All mutations still go through API → DB. Users see updates on next manual refresh or page reload.",
+    "tokenExpiry": "headersProvider fetches a fresh token on each auth request. If session expires, Pusher subscription will fail with 403 — same as any other API call.",
+    "duplicateEvents": "Dedup by entryId in event handlers. If item already exists in state (by entryId), skip the add. Prevents double-add on race conditions.",
+    "eventOrdering": "Pusher delivers events in order per channel. No reordering concern within a single list.",
+    "tabVisibility": "pusher-js automatically manages connection when tab is backgrounded. No custom visibility handling needed.",
+    "multipleListsSubscribed": "Only subscribe to the currently active list's channel. Unsubscribe when switching. Saves connections and messages on the free tier.",
+    "largeLists": "Pusher message size limit: 10KB. A single item event is ~200 bytes. Even list:cleared with 100 items is fine since we just send {} and client clears local state.",
+    "rateLimits": "Pusher free tier: 200K messages/day. At 4 users doing 50 mutations/day = 200 events × 3 recipients = 600 messages/day. Well within limits."
+  },
+
+  "futureConsiderations": {
+    "presenceChannels": "If 'who is currently shopping' indicator is needed, upgrade channel prefix to presence-list-{listId}. Adds member_added/member_removed lifecycle events with user info.",
+    "encryptedChannels": "If list contents are sensitive, use private-encrypted-list-{listId} prefix with encryptionMasterKeyBase64. Pusher cannot read event data.",
+    "webhooks": "Pusher supports server-side webhooks for channel_occupied/channel_vacated events. Useful for analytics (when was list last active?).",
+    "batchTriggers": "If multiple items are added at once (e.g., meal plan → shopping list), use pusher.triggerBatch() to send all events in one API call."
+  },
+
+  "sources": [
+    "https://vercel.com/kb/guide/deploying-pusher-channels-with-vercel",
+    "https://pusher.com/docs/channels/using_channels/private-channels/",
+    "https://pusher.com/docs/channels/using_channels/presence-channels/",
+    "https://pusher.com/docs/channels/server_api/authorizing-users/",
+    "https://github.com/pusher/pusher-http-node",
+    "https://github.com/pusher/pusher-js"
+  ]
+}
