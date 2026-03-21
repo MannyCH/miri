@@ -4,6 +4,7 @@ import { fetchUserRecipes } from '../lib/recipesApi';
 import {
   fetchShoppingList,
   fetchSharedListItems,
+  patchSharedListItem,
   addListItem,
   patchListItem,
   removeListItem,
@@ -231,7 +232,9 @@ export function AppProvider({ children }) {
       try {
         const items = await fetchSharedListItems(sharedListMeta.ownerId);
         setSharedListItems(items.map(item => ({ ...item, entryId: item.entryId ?? item.id })));
-      } catch { /* ignore */ }
+      } catch (err) {
+        console.error('[shared-list] fetch failed:', err.message);
+      }
     };
     load();
     sharedPollRef.current = setInterval(load, 5000);
@@ -341,7 +344,7 @@ export function AppProvider({ children }) {
     }));
     if (sharedListMeta?.ownerId && newChecked !== null) {
       Promise.resolve().then(() =>
-        patchListItem(entryId, sharedListMeta.ownerId, { checked: newChecked })
+        patchSharedListItem(sharedListMeta.ownerId, entryId, newChecked)
           .catch(err => console.error('[shared-list] patch failed:', err))
       );
     }

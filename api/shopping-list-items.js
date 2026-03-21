@@ -15,13 +15,15 @@ async function getUserId(req) {
 }
 
 /**
- * GET /api/shopping-list-items?ownerId=<uid>
- * Returns shopping list items for the given owner.
- * - If ownerId === caller's user id, returns their own items.
- * - Otherwise verifies an accepted share exists before returning.
+ * GET  /api/shopping-list-items?ownerId=<uid>
+ *   Returns items for the given owner (own or shared, verified).
+ *
+ * PATCH /api/shopping-list-items?ownerId=<uid>&entryId=<id>
+ *   Updates checked state on a shared list item.
+ *   Caller must have an accepted share for ownerId.
  */
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).end();
+  if (req.method !== 'GET' && req.method !== 'PATCH') return res.status(405).end();
 
   const sql = neon(process.env.DATABASE_URL);
 
@@ -43,6 +45,24 @@ export default async function handler(req, res) {
     `;
     if (!share.length) {
       return res.status(403).json({ error: 'No accepted share found' });
+    }
+  }
+
+  if (req.method === 'PATCH') {
+    const entryId = req.query.entryId;
+    const { checked } = req.body ?? {};
+    if (!entryId || checked === undefined) {
+      return res.status(400).json({ error: 'entryId and checked are required' });
+    }
+    try {
+      await sql`
+        UPDATE shopping_list_items
+        SET checked = ${Boolean(checked)}
+        WHERE entry_id = ${entryId} AND user_id = ${ownerId}
+      `;
+      return res.json({ ok: true });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
   }
 

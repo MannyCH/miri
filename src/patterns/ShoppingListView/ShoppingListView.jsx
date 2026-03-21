@@ -383,7 +383,7 @@ export const ShoppingListView = ({
       </div>
 
       {/* Secondary shared list — shown below own list when User B has accepted an invite */}
-      {sharedListItems.length > 0 && (
+      {isSharedList && (
         <div className="shopping-list-shared-section">
           <div className="shopping-list-shared-header">
             <h2 className="text-body-base-bold shopping-list-shared-title">
@@ -398,16 +398,22 @@ export const ShoppingListView = ({
               <ShareIcon />
             </button>
           </div>
-          <IngredientList
-            ingredients={sharedListItems.map(i => i.name)}
-            itemKeys={sharedListItems.map(i => i.entryId ?? i.id)}
-            itemIds={sharedListItems.map(i => i.entryId ?? i.id)}
-            checkedItems={sharedListItems.reduce((acc, item, idx) => {
-              acc[idx] = item.checked;
-              return acc;
-            }, {})}
-            onCheckedChange={(_, __, itemId) => onToggleSharedItem?.(itemId)}
-          />
+          {sharedListItems.length > 0 ? (
+            <IngredientList
+              ingredients={sharedListItems.map(i => i.name)}
+              itemKeys={sharedListItems.map(i => i.entryId ?? i.id)}
+              itemIds={sharedListItems.map(i => i.entryId ?? i.id)}
+              checkedItems={sharedListItems.reduce((acc, item, idx) => {
+                acc[idx] = item.checked;
+                return acc;
+              }, {})}
+              onCheckedChange={(_, __, itemId) => onToggleSharedItem?.(itemId)}
+            />
+          ) : (
+            <p className="text-body-small-regular shopping-list-shared-empty">
+              No items yet
+            </p>
+          )}
         </div>
       )}
 

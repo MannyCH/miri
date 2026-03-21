@@ -135,6 +135,23 @@ export async function fetchShares() {
 }
 
 /**
+ * Patch checked state on a shared list item via the serverless API.
+ * Bypasses RLS — the API verifies the accepted share before patching.
+ */
+export async function patchSharedListItem(ownerId, entryId, checked) {
+  const token = await getAuthToken();
+  const res = await fetch(
+    `/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}&entryId=${encodeURIComponent(entryId)}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ checked }),
+    }
+  );
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to patch shared item');
+}
+
+/**
  * Fetch shopping list items for a shared list owner via the serverless API.
  * Bypasses RLS — the API verifies the accepted share before returning rows.
  */

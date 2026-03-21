@@ -169,6 +169,11 @@
   margin: 0;
 }
 
+.shopping-list-shared-empty {
+  color: var(--color-text-weak);
+  margin: 0;
+}
+
 .shopping-list-clear {
   display: flex;
   justify-content: flex-end;
