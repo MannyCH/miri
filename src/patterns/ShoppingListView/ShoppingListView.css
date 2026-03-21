@@ -148,6 +148,27 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Secondary shared list section */
+.shopping-list-shared-section {
+  flex-shrink: 0;
+  padding: var(--spacing-8) var(--spacing-16) var(--spacing-16);
+  border-top: 1px solid var(--color-stroke-weak);
+  overflow-y: auto;
+  max-height: 40vh;
+}
+
+.shopping-list-shared-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-8);
+}
+
+.shopping-list-shared-title {
+  color: var(--color-text-strong);
+  margin: 0;
+}
+
 .shopping-list-clear {
   display: flex;
   justify-content: flex-end;

@@ -1,29 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../Button/Button';
+import { TextField } from '../TextField/TextField';
 import './ShareListSheet.css';
 
 /**
  * ShareListSheet — Bottom sheet for sharing the shopping list.
  *
  * Props:
- *   isOpen          – controls visibility
- *   onClose()       – called when backdrop tapped or Escape pressed
- *   onShare(email)  – called with the invitee email; returns a promise
- *   isSharedList    – true when currently viewing another user's list
- *   onLeave()       – called when user wants to leave the shared list
- *   sharedWith      – array of { invitee_email, status } for owner view
+ *   isOpen       – controls visibility
+ *   onClose()    – called when backdrop tapped or Escape pressed
+ *   onShare(listName) – called with optional list name; returns a promise resolving to { token }
+ *   isSharedList – true when currently viewing another user's list as secondary
+ *   onLeave()    – called when user wants to leave the shared list
+ *   sharedListName – display name of the shared list (for the "leave" view)
  */
-export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave, sharedWith = [] }) {
+export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave, sharedListName }) {
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
   const [errorMsg, setErrorMsg] = useState('');
   const [acceptLink, setAcceptLink] = useState('');
+  const [listName, setListName] = useState('');
 
   useEffect(() => {
     if (!isOpen) {
       setStatus('idle');
       setErrorMsg('');
       setAcceptLink('');
+      setListName('');
     }
   }, [isOpen]);
 
@@ -38,7 +41,7 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
     setStatus('loading');
     setErrorMsg('');
     try {
-      const result = await onShare?.();
+      const result = await onShare?.(listName.trim() || null);
       if (result?.token) {
         setAcceptLink(`${window.location.origin}/shopping-list/accept?token=${result.token}`);
       }
@@ -83,9 +86,11 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
 
             {isSharedList ? (
               <>
-                <h2 className="text-h3-bold share-sheet-title">Shared List</h2>
+                <h2 className="text-h3-bold share-sheet-title">
+                  {sharedListName ?? 'Shared List'}
+                </h2>
                 <p className="text-body-regular share-sheet-description">
-                  You are viewing a shared list. Your changes sync in real time.
+                  You are viewing a shared list. Changes sync every few seconds.
                 </p>
                 <Button
                   variant="tertiary-delete"
@@ -103,14 +108,24 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
                 </p>
 
                 {status !== 'success' && (
-                  <Button
-                    variant="primary"
-                    showIcon={false}
-                    onClick={handleGetLink}
-                    disabled={status === 'loading'}
-                  >
-                    {status === 'loading' ? 'Creating…' : 'Create invite link'}
-                  </Button>
+                  <>
+                    <div className="share-sheet-name-input">
+                      <TextField
+                        label="List name (optional)"
+                        placeholder="e.g. Weekly groceries"
+                        value={listName}
+                        onChange={setListName}
+                      />
+                    </div>
+                    <Button
+                      variant="primary"
+                      showIcon={false}
+                      onClick={handleGetLink}
+                      disabled={status === 'loading'}
+                    >
+                      {status === 'loading' ? 'Creating…' : 'Create invite link'}
+                    </Button>
+                  </>
                 )}
 
                 {status === 'success' && acceptLink && (

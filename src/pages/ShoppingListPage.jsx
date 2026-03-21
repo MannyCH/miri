@@ -27,7 +27,9 @@ export function ShoppingListPage() {
     setSmartGroups,
     smartStatus,
     fetchSmartGroups,
-    listOwnerId,
+    sharedListMeta,
+    sharedListItems,
+    toggleSharedItem,
     shareList,
     leaveSharedList,
   } = useApp();
@@ -208,7 +210,10 @@ export function ShoppingListPage() {
       onClearList={clearShoppingList}
       searchQuery={searchQuery}
       onSearch={setSearchQuery}
-      isSharedList={!!listOwnerId}
+      isSharedList={!!sharedListMeta}
+      sharedListMeta={sharedListMeta}
+      sharedListItems={sharedListItems}
+      onToggleSharedItem={toggleSharedItem}
       onShare={shareList}
       onLeave={leaveSharedList}
     />

@@ -34,12 +34,13 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
+    const { listName } = req.body ?? {};
     const token = crypto.randomUUID().replace(/-/g, '');
 
     try {
       await sql`
-        INSERT INTO shopping_list_shares (owner_id, status, token)
-        VALUES (${ownerId}, 'pending', ${token})
+        INSERT INTO shopping_list_shares (owner_id, status, token, list_name)
+        VALUES (${ownerId}, 'pending', ${token}, ${listName ?? null})
       `;
       return res.json({ token });
     } catch (err) {

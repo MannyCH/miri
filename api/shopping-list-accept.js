@@ -46,17 +46,17 @@ export default async function handler(req, res) {
     `;
 
     if (updated.length) {
-      return res.json({ ownerId: updated[0].owner_id });
+      return res.json({ ownerId: updated[0].owner_id, listName: updated[0].list_name ?? null });
     }
 
     // Already accepted by this user — still return the owner so the app can switch
     const existing = await sql`
-      SELECT owner_id FROM shopping_list_shares
+      SELECT owner_id, list_name FROM shopping_list_shares
       WHERE token = ${token} AND invitee_id = ${inviteeId} AND status = 'accepted'
     `;
 
     if (existing.length) {
-      return res.json({ ownerId: existing[0].owner_id });
+      return res.json({ ownerId: existing[0].owner_id, listName: existing[0].list_name ?? null });
     }
 
     return res.status(404).json({ error: 'Invalid or already used token' });

@@ -120,11 +120,14 @@ export function AppProvider({ children }) {
   const nextEntryIdRef = useRef(0);
   const createEntryId = React.useCallback(() => `sl-${Date.now()}-${nextEntryIdRef.current++}`, []);
 
-  // Shared list state: when non-null, we're viewing another user's list
-  const SHARED_LIST_KEY = 'miri-shared-list-owner';
-  const [listOwnerId, setListOwnerIdState] = useState(() => {
-    return localStorage.getItem(SHARED_LIST_KEY) ?? null;
+  // Shared list state: when non-null, User B is viewing User A's list as secondary
+  const SHARED_LIST_KEY = 'miri-shared-list';
+  const [sharedListMeta, setSharedListMetaState] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(SHARED_LIST_KEY)) ?? null; }
+    catch { return null; }
   });
+  const [sharedListItems, setSharedListItems] = useState([]);
+  const sharedPollRef = useRef(null);
 
   // Persist shopping list to localStorage whenever it changes
   useEffect(() => {
@@ -154,7 +157,7 @@ export function AppProvider({ children }) {
   }, [createEntryId]);
 
 
-  // On auth: initialize DB sync (migrate localStorage if DB is empty)
+  // On auth: initialize DB sync for own list (migrate localStorage if DB is empty)
   useEffect(() => {
     if (!isAuthenticated) {
       clearInterval(pollIntervalRef.current);
@@ -170,12 +173,9 @@ export function AppProvider({ children }) {
         if (!userId) return;
 
         resolvedOwnerId.current = userId;
-        const ownerUserId = listOwnerId ?? userId;
+        const dbItems = await fetchShoppingList(null); // always own list
 
-        const dbItems = await fetchShoppingList(ownerUserId);
-
-        if (dbItems.length === 0 && !listOwnerId) {
-          // Migrate localStorage items to DB if any exist
+        if (dbItems.length === 0) {
           const stored = shoppingList;
           if (stored.length > 0) {
             await replaceListItems(stored.map(item => ({
@@ -194,18 +194,15 @@ export function AppProvider({ children }) {
 
         isSyncInitializedRef.current = true;
 
-        // Start polling every 5 seconds
+        // Poll own list every 5 seconds
         pollIntervalRef.current = setInterval(async () => {
           try {
-            const fresh = await fetchShoppingList(listOwnerId ?? null);
+            const fresh = await fetchShoppingList(null);
             const freshKey = fresh.map(i => `${i.entryId}:${i.checked}`).join('|');
             setShoppingList(prev => {
               const prevKey = prev.map(i => `${i.entryId}:${i.checked}`).join('|');
               if (prevKey === freshKey) return prev;
-              return fresh.map(item => ({
-                ...item,
-                entryId: item.entryId ?? item.id,
-              }));
+              return fresh.map(item => ({ ...item, entryId: item.entryId ?? item.id }));
             });
           } catch {
             // Ignore poll errors
@@ -220,15 +217,33 @@ export function AppProvider({ children }) {
     init();
     return () => clearInterval(pollIntervalRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, listOwnerId]);
+  }, [isAuthenticated]);
 
-  const setListOwnerId = useCallback((ownerId) => {
-    if (ownerId) {
-      localStorage.setItem(SHARED_LIST_KEY, ownerId);
+  // Poll shared list separately when sharedListMeta is set
+  useEffect(() => {
+    clearInterval(sharedPollRef.current);
+    if (!isAuthenticated || !sharedListMeta?.ownerId) {
+      setSharedListItems([]);
+      return;
+    }
+    const load = async () => {
+      try {
+        const items = await fetchShoppingList(sharedListMeta.ownerId);
+        setSharedListItems(items.map(item => ({ ...item, entryId: item.entryId ?? item.id })));
+      } catch { /* ignore */ }
+    };
+    load();
+    sharedPollRef.current = setInterval(load, 5000);
+    return () => clearInterval(sharedPollRef.current);
+  }, [isAuthenticated, sharedListMeta?.ownerId]);
+
+  const setSharedListMeta = useCallback((meta) => {
+    if (meta) {
+      localStorage.setItem(SHARED_LIST_KEY, JSON.stringify(meta));
     } else {
       localStorage.removeItem(SHARED_LIST_KEY);
     }
-    setListOwnerIdState(ownerId);
+    setSharedListMetaState(meta);
   }, []);
 
   // Smart groups — kept in context so they survive navigation
@@ -283,13 +298,13 @@ export function AppProvider({ children }) {
     });
   }, [createEntryId]);
 
-  // ── Share list helper ─────────────────────────────────────────────────────
-  const shareList = useCallback(async () => {
+  // ── Share list helpers ────────────────────────────────────────────────────
+  const shareList = useCallback(async (listName) => {
     const token = await getAuthToken();
     const res = await fetch('/api/shopping-list-share', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ listName: listName || null }),
     });
     if (!res.ok) throw new Error((await res.json()).error ?? 'Share failed');
     return res.json(); // { token }
@@ -303,16 +318,33 @@ export function AppProvider({ children }) {
       body: JSON.stringify({ token }),
     });
     if (!res.ok) throw new Error((await res.json()).error ?? 'Accept failed');
-    const { ownerId } = await res.json();
-    setListOwnerId(ownerId);
-    // Force reload
-    isSyncInitializedRef.current = false;
+    const { ownerId, listName } = await res.json();
+    setSharedListMeta({ ownerId, name: listName ?? null });
     return ownerId;
-  }, [setListOwnerId]);
+  }, [setSharedListMeta]);
 
   const leaveSharedList = useCallback(() => {
-    setListOwnerId(null);
-  }, [setListOwnerId]);
+    setSharedListMeta(null);
+    setSharedListItems([]);
+  }, [setSharedListMeta]);
+
+  // Check/uncheck an item in the shared list (User B can UPDATE but not INSERT/DELETE)
+  const toggleSharedItem = useCallback((entryId) => {
+    let newChecked = null;
+    setSharedListItems(prev => prev.map(item => {
+      if ((item.entryId ?? item.id) === entryId) {
+        newChecked = !item.checked;
+        return { ...item, checked: newChecked };
+      }
+      return item;
+    }));
+    if (sharedListMeta?.ownerId && newChecked !== null) {
+      Promise.resolve().then(() =>
+        patchListItem(entryId, sharedListMeta.ownerId, { checked: newChecked })
+          .catch(err => console.error('[shared-list] patch failed:', err))
+      );
+    }
+  }, [sharedListMeta]);
   
   // Start with no plan — user taps "Plan my week" to generate
   
@@ -444,8 +476,7 @@ export function AppProvider({ children }) {
     }
 
     if (isSyncInitializedRef.current && resolvedOwnerId.current) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
-      replaceListItems(finalList ?? allIngredients, ownerUserId)
+      replaceListItems(finalList ?? allIngredients, resolvedOwnerId.current)
         .catch(err => console.error('[shopping-list] bulk add failed:', err));
     }
   };
@@ -480,9 +511,8 @@ export function AppProvider({ children }) {
     setShoppingList(prev => [...prev, ...newItems]);
 
     if (isSyncInitializedRef.current && resolvedOwnerId.current) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
       for (const item of newItems) {
-        addListItem(item, ownerUserId).catch(err =>
+        addListItem(item, resolvedOwnerId.current).catch(err =>
           console.error('[shopping-list] add failed:', err)
         );
       }
@@ -505,10 +535,8 @@ export function AppProvider({ children }) {
     );
 
     if (isSyncInitializedRef.current && resolvedOwnerId.current && targetEntryId !== null) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
-      // Use a microtask to ensure newChecked is set before calling
       Promise.resolve().then(() =>
-        patchListItem(targetEntryId, ownerUserId, { checked: newChecked })
+        patchListItem(targetEntryId, resolvedOwnerId.current, { checked: newChecked })
           .catch(err => console.error('[shopping-list] patch failed:', err))
       );
     }
@@ -524,8 +552,7 @@ export function AppProvider({ children }) {
     });
 
     if (isSyncInitializedRef.current && resolvedOwnerId.current && targetEntryId) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
-      removeListItem(targetEntryId, ownerUserId)
+      removeListItem(targetEntryId, resolvedOwnerId.current)
         .catch(err => console.error('[shopping-list] delete failed:', err));
     }
   };
@@ -539,9 +566,8 @@ export function AppProvider({ children }) {
     });
 
     if (isSyncInitializedRef.current && resolvedOwnerId.current) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
       removedEntryIds.forEach(entryId =>
-        removeListItem(entryId, ownerUserId)
+        removeListItem(entryId, resolvedOwnerId.current)
           .catch(err => console.error('[shopping-list] delete failed:', err))
       );
     }
@@ -558,9 +584,8 @@ export function AppProvider({ children }) {
     });
 
     if (isSyncInitializedRef.current && resolvedOwnerId.current) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
       affectedItems.forEach(item =>
-        patchListItem(item.entryId ?? item.id, ownerUserId, { checked: true })
+        patchListItem(item.entryId ?? item.id, resolvedOwnerId.current, { checked: true })
           .catch(err => console.error('[shopping-list] patch failed:', err))
       );
     }
@@ -577,9 +602,8 @@ export function AppProvider({ children }) {
     });
 
     if (isSyncInitializedRef.current && resolvedOwnerId.current) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
       affectedItems.forEach(item =>
-        patchListItem(item.entryId ?? item.id, ownerUserId, { checked: false })
+        patchListItem(item.entryId ?? item.id, resolvedOwnerId.current, { checked: false })
           .catch(err => console.error('[shopping-list] patch failed:', err))
       );
     }
@@ -589,8 +613,7 @@ export function AppProvider({ children }) {
   const clearShoppingList = () => {
     setShoppingList([]);
     if (isSyncInitializedRef.current && resolvedOwnerId.current) {
-      const ownerUserId = listOwnerId ?? resolvedOwnerId.current;
-      clearListItems(ownerUserId)
+      clearListItems(resolvedOwnerId.current)
         .catch(err => console.error('[shopping-list] clear failed:', err));
     }
   };
@@ -683,8 +706,9 @@ export function AppProvider({ children }) {
     fetchSmartGroups,
 
     // Shared list
-    listOwnerId,
-    setListOwnerId,
+    sharedListMeta,
+    sharedListItems,
+    toggleSharedItem,
     shareList,
     acceptSharedList,
     leaveSharedList,

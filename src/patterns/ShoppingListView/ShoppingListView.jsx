@@ -38,7 +38,9 @@ export const ShoppingListView = ({
   onShare,
   onLeave,
   isSharedList = false,
-  sharedWith = [],
+  sharedListMeta = null,
+  sharedListItems = [],
+  onToggleSharedItem,
   ...props
 }) => {
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -213,7 +215,7 @@ export const ShoppingListView = ({
         onShare={onShare}
         onLeave={onLeave}
         isSharedList={isSharedList}
-        sharedWith={sharedWith}
+        sharedListName={sharedListMeta?.name ?? null}
       />
 
       {/* Content */}
@@ -379,6 +381,35 @@ export const ShoppingListView = ({
           </div>
         )}
       </div>
+
+      {/* Secondary shared list — shown below own list when User B has accepted an invite */}
+      {sharedListItems.length > 0 && (
+        <div className="shopping-list-shared-section">
+          <div className="shopping-list-shared-header">
+            <h2 className="text-body-base-bold shopping-list-shared-title">
+              {sharedListMeta?.name ?? 'Shared list'}
+            </h2>
+            <button
+              type="button"
+              className="shopping-list-share-btn"
+              onClick={() => setIsShareOpen(true)}
+              aria-label="Shared list options"
+            >
+              <ShareIcon />
+            </button>
+          </div>
+          <IngredientList
+            ingredients={sharedListItems.map(i => i.name)}
+            itemKeys={sharedListItems.map(i => i.entryId ?? i.id)}
+            itemIds={sharedListItems.map(i => i.entryId ?? i.id)}
+            checkedItems={sharedListItems.reduce((acc, item, idx) => {
+              acc[idx] = item.checked;
+              return acc;
+            }, {})}
+            onCheckedChange={(_, __, itemId) => onToggleSharedItem?.(itemId)}
+          />
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <NavigationBarConnected activeItem="shopping-list" />
