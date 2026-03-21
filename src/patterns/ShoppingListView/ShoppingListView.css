@@ -174,6 +174,46 @@
   margin: 0;
 }
 
+.shopping-list-shared-add {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  margin-top: var(--spacing-8);
+  padding: var(--spacing-8) var(--spacing-12);
+  background: var(--color-background-sunken);
+  border-radius: var(--corner-radius-8);
+  border: 1px solid var(--color-stroke-weak);
+}
+
+.shopping-list-shared-add-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--color-text-strong);
+  outline: none;
+}
+
+.shopping-list-shared-add-input::placeholder {
+  color: var(--color-text-weak);
+}
+
+.shopping-list-shared-add-btn {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--color-icon-brand);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.shopping-list-shared-add-btn:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+  border-radius: var(--corner-radius-4);
+}
+
 .shopping-list-clear {
   display: flex;
   justify-content: flex-end;

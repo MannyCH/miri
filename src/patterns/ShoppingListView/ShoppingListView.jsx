@@ -41,10 +41,13 @@ export const ShoppingListView = ({
   sharedListMeta = null,
   sharedListItems = [],
   onToggleSharedItem,
+  onAddSharedItem,
+  onDeleteSharedItem,
   ...props
 }) => {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [smartChecked, setSmartChecked] = useState({});
+  const [sharedItemInput, setSharedItemInput] = useState('');
 
   const toggleSmartItem = (key) =>
     setSmartChecked(prev => ({ ...prev, [key]: !prev[key] }));
@@ -408,12 +411,41 @@ export const ShoppingListView = ({
                 return acc;
               }, {})}
               onCheckedChange={(_, __, itemId) => onToggleSharedItem?.(itemId)}
+              onDelete={(_, itemId) => onDeleteSharedItem?.(itemId)}
             />
           ) : (
             <p className="text-body-small-regular shopping-list-shared-empty">
               No items yet
             </p>
           )}
+          <div className="shopping-list-shared-add">
+            <input
+              type="text"
+              className="text-body-small-regular shopping-list-shared-add-input"
+              placeholder="Add item…"
+              value={sharedItemInput}
+              onChange={(e) => setSharedItemInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && sharedItemInput.trim()) {
+                  onAddSharedItem?.(sharedItemInput.trim());
+                  setSharedItemInput('');
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="shopping-list-shared-add-btn"
+              aria-label="Add item to shared list"
+              onClick={() => {
+                if (sharedItemInput.trim()) {
+                  onAddSharedItem?.(sharedItemInput.trim());
+                  setSharedItemInput('');
+                }
+              }}
+            >
+              <PlusIcon />
+            </button>
+          </div>
         </div>
       )}
 
@@ -753,6 +785,12 @@ const SparkleIcon = () => (
 const CheckSmallIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+const PlusIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
   </svg>
 );
 

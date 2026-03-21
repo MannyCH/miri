@@ -30,6 +30,8 @@ export function ShoppingListPage() {
     sharedListMeta,
     sharedListItems,
     toggleSharedItem,
+    addItemToSharedList,
+    removeItemFromSharedList,
     shareList,
     leaveSharedList,
   } = useApp();
@@ -214,6 +216,8 @@ export function ShoppingListPage() {
       sharedListMeta={sharedListMeta}
       sharedListItems={sharedListItems}
       onToggleSharedItem={toggleSharedItem}
+      onAddSharedItem={addItemToSharedList}
+      onDeleteSharedItem={removeItemFromSharedList}
       onShare={shareList}
       onLeave={leaveSharedList}
     />

@@ -23,7 +23,8 @@ async function getUserId(req) {
  *   Caller must have an accepted share for ownerId.
  */
 export default async function handler(req, res) {
-  if (req.method !== 'GET' && req.method !== 'PATCH') return res.status(405).end();
+  const ALLOWED = ['GET', 'POST', 'PATCH', 'DELETE'];
+  if (!ALLOWED.includes(req.method)) return res.status(405).end();
 
   const sql = neon(process.env.DATABASE_URL);
 
@@ -45,6 +46,36 @@ export default async function handler(req, res) {
     `;
     if (!share.length) {
       return res.status(403).json({ error: 'No accepted share found' });
+    }
+  }
+
+  if (req.method === 'POST') {
+    const { name, entryId, itemId } = req.body ?? {};
+    if (!name) return res.status(400).json({ error: 'name is required' });
+    const newEntryId = entryId ?? crypto.randomUUID().replace(/-/g, '');
+    const newItemId = itemId ?? newEntryId;
+    try {
+      await sql`
+        INSERT INTO shopping_list_items (user_id, entry_id, item_id, name)
+        VALUES (${ownerId}, ${newEntryId}, ${newItemId}, ${name})
+      `;
+      return res.json({ ok: true, entryId: newEntryId });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  if (req.method === 'DELETE') {
+    const entryId = req.query.entryId;
+    if (!entryId) return res.status(400).json({ error: 'entryId is required' });
+    try {
+      await sql`
+        DELETE FROM shopping_list_items
+        WHERE entry_id = ${entryId} AND user_id = ${ownerId}
+      `;
+      return res.json({ ok: true });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
   }
 

@@ -4,6 +4,8 @@ import { fetchUserRecipes } from '../lib/recipesApi';
 import {
   fetchShoppingList,
   fetchSharedListItems,
+  addSharedListItem,
+  removeSharedListItem,
   patchSharedListItem,
   addListItem,
   patchListItem,
@@ -333,6 +335,29 @@ export function AppProvider({ children }) {
   }, [setSharedListMeta]);
 
   // Check/uncheck an item in the shared list (User B can UPDATE but not INSERT/DELETE)
+  const addItemToSharedList = useCallback(async (name) => {
+    if (!sharedListMeta?.ownerId || !name.trim()) return;
+    const entryId = createEntryId();
+    const newItem = { id: entryId, entryId, name: name.trim(), checked: false, recipeId: null, recipeName: null };
+    setSharedListItems(prev => [...prev, newItem]);
+    try {
+      await addSharedListItem(sharedListMeta.ownerId, newItem);
+    } catch (err) {
+      console.error('[shared-list] add failed:', err.message);
+      setSharedListItems(prev => prev.filter(i => (i.entryId ?? i.id) !== entryId));
+    }
+  }, [sharedListMeta, createEntryId]);
+
+  const removeItemFromSharedList = useCallback(async (entryId) => {
+    if (!sharedListMeta?.ownerId) return;
+    setSharedListItems(prev => prev.filter(i => (i.entryId ?? i.id) !== entryId));
+    try {
+      await removeSharedListItem(sharedListMeta.ownerId, entryId);
+    } catch (err) {
+      console.error('[shared-list] remove failed:', err.message);
+    }
+  }, [sharedListMeta]);
+
   const toggleSharedItem = useCallback((entryId) => {
     let newChecked = null;
     setSharedListItems(prev => prev.map(item => {
@@ -713,6 +738,8 @@ export function AppProvider({ children }) {
     sharedListMeta,
     sharedListItems,
     toggleSharedItem,
+    addItemToSharedList,
+    removeItemFromSharedList,
     shareList,
     acceptSharedList,
     leaveSharedList,

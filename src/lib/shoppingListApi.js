@@ -135,6 +135,32 @@ export async function fetchShares() {
 }
 
 /**
+ * Add an item to a shared list via the serverless API.
+ */
+export async function addSharedListItem(ownerId, item) {
+  const token = await getAuthToken();
+  const res = await fetch(`/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ name: item.name, entryId: item.entryId, itemId: item.id }),
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to add item');
+  return res.json();
+}
+
+/**
+ * Delete an item from a shared list via the serverless API.
+ */
+export async function removeSharedListItem(ownerId, entryId) {
+  const token = await getAuthToken();
+  const res = await fetch(
+    `/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}&entryId=${encodeURIComponent(entryId)}`,
+    { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to delete item');
+}
+
+/**
  * Patch checked state on a shared list item via the serverless API.
  * Bypasses RLS — the API verifies the accepted share before patching.
  */
