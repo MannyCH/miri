@@ -26,11 +26,11 @@ export default async function handler(req, res) {
 
     const socketId = req.headers['x-pusher-socket-id'] || null;
 
-    // Helper: trigger Pusher event (fire-and-forget, don't block response)
-    function triggerEvent(listId, event, data) {
+    // Helper: trigger Pusher event (must await so serverless doesn't kill before send)
+    async function triggerEvent(listId, event, data) {
       try {
         const pusher = getPusher();
-        pusher.trigger(`private-list-${listId}`, event, data, { socket_id: socketId });
+        await pusher.trigger(`private-list-${listId}`, event, data, { socket_id: socketId });
       } catch (e) {
         console.error(`Pusher trigger error (${event}):`, e.message);
       }
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
         ON CONFLICT (list_id, entry_id) DO NOTHING
       `;
 
-      triggerEvent(listId, 'item:added', { entryId, name, checked: false, recipeId, recipeName });
+      await triggerEvent(listId, 'item:added', { entryId, name, checked: false, recipeId, recipeName });
       return res.status(201).json({ ok: true });
     }
 
@@ -83,7 +83,7 @@ export default async function handler(req, res) {
         WHERE list_id = ${listId} AND entry_id = ${entryId}
       `;
 
-      triggerEvent(listId, 'item:updated', { entryId, checked });
+      await triggerEvent(listId, 'item:updated', { entryId, checked });
       return res.status(200).json({ ok: true });
     }
 
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
         WHERE list_id = ${listId} AND entry_id = ${entryId}
       `;
 
-      triggerEvent(listId, 'item:removed', { entryId });
+      await triggerEvent(listId, 'item:removed', { entryId });
       return res.status(200).json({ ok: true });
     }
 
