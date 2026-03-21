@@ -33,6 +33,11 @@ export const ShoppingListView = ({
   summaryEntries = [],
   pantryStaples = [],
   onTogglePantryStaple,
+  // Multi-list props
+  listName = 'Shopping list',
+  memberCount = 1,
+  isListLoading = false,
+  onListNameTap,
   ...props
 }) => {
   const [smartChecked, setSmartChecked] = useState({});
@@ -163,7 +168,14 @@ export const ShoppingListView = ({
     >
       {/* Header */}
       <header className="shopping-list-header">
-        <h1 className="text-h1-bold">Shopping list</h1>
+        <button type="button" className="shopping-list-title-btn" onClick={onListNameTap}>
+          <h1 className="text-h1-bold">{listName}</h1>
+          {memberCount > 1 && (
+            <span className="shopping-list-share-badge text-caption-bold">
+              <UsersIcon /> {memberCount}
+            </span>
+          )}
+        </button>
 
         {/* View Mode Toggle */}
         <div className="shopping-list-view-toggle">
@@ -678,6 +690,15 @@ const SparkleIcon = () => (
     <line x1="3" y1="10" x2="21" y2="10"/>
     <line x1="3" y1="15" x2="21" y2="15"/>
     <line x1="3" y1="20" x2="10" y2="20"/>
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
   </svg>
 );
 

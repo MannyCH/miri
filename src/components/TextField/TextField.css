@@ -30,7 +30,7 @@
 }
 
 .text-field-control {
-  height: 45px;
+  height: var(--control-height);
   display: flex;
   align-items: center;
   border: 1px solid var(--color-stroke-weak);

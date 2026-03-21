@@ -28,6 +28,28 @@
   color: var(--color-text-strong);
 }
 
+.shopping-list-title-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shopping-list-share-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--spacing-8);
+  background: var(--color-fill-brand-weak);
+  color: var(--color-text-brand);
+  border-radius: var(--corner-radius-8);
+  white-space: nowrap;
+}
+
 /* Summary card */
 .shopping-list-summary {
   margin-bottom: var(--spacing-12);
