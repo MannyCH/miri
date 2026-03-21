@@ -106,6 +106,7 @@ export function AppProvider({ children }) {
   const [activeListId, setActiveListId] = useState(null);
   const [shoppingList, setShoppingList] = useState([]);
   const [members, setMembers] = useState([]);
+  const [inviteToken, setInviteToken] = useState(null);
   const [shoppingListViewMode, setShoppingListViewMode] = useState('recipe');
   const [isListLoading, setIsListLoading] = useState(true);
   const nextEntryIdRef = useRef(0);
@@ -190,7 +191,7 @@ export function AppProvider({ children }) {
 
     async function load() {
       try {
-        const [{ items }, { members: m }] = await Promise.all([
+        const [{ items }, { members: m, inviteToken: token }] = await Promise.all([
           listApi.fetchItems(activeListId),
           listApi.fetchMembers(activeListId),
         ]);
@@ -203,6 +204,7 @@ export function AppProvider({ children }) {
           checked: i.checked,
         })));
         setMembers(m);
+        setInviteToken(token);
       } catch (err) {
         console.error('[items] load failed:', err);
       }
@@ -251,7 +253,7 @@ export function AppProvider({ children }) {
 
     channel.bind('member:joined', () => {
       // Refresh members list
-      listApi.fetchMembers(activeListIdRef.current).then(({ members: m }) => setMembers(m)).catch(() => {});
+      listApi.fetchMembers(activeListIdRef.current).then(({ members: m, inviteToken: token }) => { setMembers(m); setInviteToken(token); }).catch(() => {});
     });
 
     channel.bind('member:left', (data) => {
@@ -658,6 +660,7 @@ export function AppProvider({ children }) {
     lists,
     activeListId,
     members,
+    inviteToken,
     isListLoading,
     switchList,
     createNewList,

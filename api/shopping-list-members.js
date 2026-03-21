@@ -26,14 +26,17 @@ export default async function handler(req, res) {
       `;
       if (check.length === 0) return res.status(403).json({ error: 'Not a member' });
 
-      const members = await sql`
-        SELECT slm.user_id, slm.joined_at,
-               na.name AS user_name, na.email AS user_email
-        FROM shopping_list_members slm
-        LEFT JOIN neon_auth."user" na ON na.id::text = slm.user_id
-        WHERE slm.list_id = ${listId}
-        ORDER BY slm.joined_at ASC
-      `;
+      const [members, listInfo] = await Promise.all([
+        sql`
+          SELECT slm.user_id, slm.joined_at,
+                 na.name AS user_name, na.email AS user_email
+          FROM shopping_list_members slm
+          LEFT JOIN neon_auth."user" na ON na.id::text = slm.user_id
+          WHERE slm.list_id = ${listId}
+          ORDER BY slm.joined_at ASC
+        `,
+        sql`SELECT invite_token FROM shopping_lists WHERE id = ${listId}`,
+      ]);
 
       return res.status(200).json({
         members: members.map((m) => ({
@@ -41,6 +44,7 @@ export default async function handler(req, res) {
           name: m.user_name || m.user_email || 'Unknown',
           isSelf: m.user_id === userId,
         })),
+        inviteToken: listInfo[0]?.invite_token || null,
       });
     }
 

@@ -4,7 +4,6 @@ import { useApp } from '../context/AppContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { ActionSheet } from '../components/ActionSheet';
 import { ShareSheet } from '../components/ShareSheet';
-import * as listApi from '../lib/shoppingListApi';
 import './ShoppingListPage.css';
 
 /**
@@ -35,6 +34,7 @@ export function ShoppingListPage() {
     lists,
     activeListId,
     members,
+    inviteToken,
     isListLoading,
     switchList,
     createNewList,
@@ -291,9 +291,9 @@ export function ShoppingListPage() {
         listName={listName}
         members={members}
         onCopyLink={async () => {
+          if (!inviteToken) { showToast('error', 'No invite link available'); return; }
           try {
-            const { token } = await listApi.fetchShareToken(activeListId);
-            const url = `${window.location.origin}/join/${token}`;
+            const url = `${window.location.origin}/join/${inviteToken}`;
             await navigator.clipboard.writeText(url);
             showToast('success', 'Link copied');
           } catch {
@@ -301,9 +301,9 @@ export function ShoppingListPage() {
           }
         }}
         onNativeShare={async () => {
+          if (!inviteToken) return;
           try {
-            const { token } = await listApi.fetchShareToken(activeListId);
-            const url = `${window.location.origin}/join/${token}`;
+            const url = `${window.location.origin}/join/${inviteToken}`;
             await navigator.share({ title: listName, url });
           } catch { /* user cancelled or unsupported */ }
         }}

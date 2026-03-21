@@ -100,12 +100,6 @@ export function removeMember(listId, targetUserId, socketId) {
   });
 }
 
-// ── Share ──
-
-export function fetchShareToken(listId) {
-  return authFetch(`/api/shopping-list-share?listId=${encodeURIComponent(listId)}`);
-}
-
 // ── Join ──
 
 export function fetchJoinInfo(token) {
