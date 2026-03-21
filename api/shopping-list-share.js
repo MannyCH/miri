@@ -34,19 +34,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { inviteeEmail } = req.body ?? {};
-    if (!inviteeEmail) return res.status(400).json({ error: 'inviteeEmail is required' });
-
     const token = crypto.randomUUID().replace(/-/g, '');
 
     try {
       await sql`
-        INSERT INTO shopping_list_shares (owner_id, invitee_email, status, token)
-        VALUES (${ownerId}, ${inviteeEmail}, 'pending', ${token})
-        ON CONFLICT (owner_id, invitee_email) DO UPDATE
-          SET token = EXCLUDED.token, status = 'pending', updated_at = NOW()
+        INSERT INTO shopping_list_shares (owner_id, status, token)
+        VALUES (${ownerId}, 'pending', ${token})
       `;
-      return res.json({ token, inviteeEmail });
+      return res.json({ token });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }

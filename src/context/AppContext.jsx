@@ -284,15 +284,15 @@ export function AppProvider({ children }) {
   }, [createEntryId]);
 
   // ── Share list helper ─────────────────────────────────────────────────────
-  const shareList = useCallback(async (inviteeEmail) => {
+  const shareList = useCallback(async () => {
     const token = await getAuthToken();
     const res = await fetch('/api/shopping-list-share', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ inviteeEmail }),
+      body: JSON.stringify({}),
     });
     if (!res.ok) throw new Error((await res.json()).error ?? 'Share failed');
-    return res.json(); // { token, inviteeEmail }
+    return res.json(); // { token }
   }, []);
 
   const acceptSharedList = useCallback(async (token) => {

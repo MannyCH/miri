@@ -14,14 +14,12 @@ import './ShareListSheet.css';
  *   sharedWith      – array of { invitee_email, status } for owner view
  */
 export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave, sharedWith = [] }) {
-  const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
   const [errorMsg, setErrorMsg] = useState('');
   const [acceptLink, setAcceptLink] = useState('');
 
   useEffect(() => {
     if (!isOpen) {
-      setEmail('');
       setStatus('idle');
       setErrorMsg('');
       setAcceptLink('');
@@ -35,25 +33,27 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handleShare = async () => {
-    if (!email.trim()) return;
+  const handleGetLink = async () => {
     setStatus('loading');
     setErrorMsg('');
     try {
-      const result = await onShare?.(email.trim());
+      const result = await onShare?.();
       if (result?.token) {
         setAcceptLink(`${window.location.origin}/shopping-list/accept?token=${result.token}`);
       }
       setStatus('success');
-      setEmail('');
     } catch (err) {
       setStatus('error');
-      setErrorMsg(err.message ?? 'Could not send invite');
+      setErrorMsg(err.message ?? 'Could not create link');
     }
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(acceptLink).catch(() => {});
+    if (navigator.share) {
+      navigator.share({ url: acceptLink }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(acceptLink).catch(() => {});
+    }
   };
 
   return (
@@ -98,69 +98,37 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
               <>
                 <h2 className="text-h3-bold share-sheet-title">Share List</h2>
                 <p className="text-body-regular share-sheet-description">
-                  Invite someone to view and edit your shopping list together.
+                  Create a link and send it via WhatsApp, iMessage, or any app.
                 </p>
 
-                <div className="share-sheet-input-row">
-                  <input
-                    type="email"
-                    className="text-body-regular share-sheet-input"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleShare()}
-                    aria-label="Invitee email"
-                    disabled={status === 'loading'}
-                  />
+                {status !== 'success' && (
                   <button
                     type="button"
                     className="share-sheet-send-btn text-body-regular"
-                    onClick={handleShare}
-                    disabled={!email.trim() || status === 'loading'}
+                    onClick={handleGetLink}
+                    disabled={status === 'loading'}
                   >
-                    {status === 'loading' ? 'Sending…' : 'Invite'}
+                    {status === 'loading' ? 'Creating…' : 'Create invite link'}
                   </button>
-                </div>
+                )}
 
-                {status === 'success' && (
-                  <div className="share-sheet-feedback share-sheet-feedback--success">
-                    <p className="text-body-small-regular">Invite created! Share this link:</p>
-                    {acceptLink && (
-                      <div className="share-sheet-link-row">
-                        <span className="text-body-small-regular share-sheet-link">{acceptLink}</span>
-                        <button
-                          type="button"
-                          className="share-sheet-copy-btn text-body-small-regular"
-                          onClick={handleCopyLink}
-                        >
-                          Copy
-                        </button>
-                      </div>
-                    )}
+                {status === 'success' && acceptLink && (
+                  <div className="share-sheet-link-row">
+                    <span className="text-body-small-regular share-sheet-link">{acceptLink}</span>
+                    <button
+                      type="button"
+                      className="share-sheet-copy-btn text-body-small-regular"
+                      onClick={handleCopyLink}
+                    >
+                      {navigator.share ? 'Share' : 'Copy'}
+                    </button>
                   </div>
                 )}
+
                 {status === 'error' && (
                   <p className="text-body-small-regular share-sheet-feedback share-sheet-feedback--error">
                     {errorMsg}
                   </p>
-                )}
-
-                {sharedWith.length > 0 && (
-                  <div className="share-sheet-members">
-                    <h3 className="text-tiny-bold share-sheet-members-title">SHARED WITH</h3>
-                    <ul className="share-sheet-members-list">
-                      {sharedWith.map((share) => (
-                        <li key={share.invitee_email} className="share-sheet-member-row">
-                          <span className="text-body-regular share-sheet-member-email">
-                            {share.invitee_email}
-                          </span>
-                          <span className={`text-body-small-regular share-sheet-member-status share-sheet-member-status--${share.status}`}>
-                            {share.status === 'accepted' ? 'Active' : 'Pending'}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 )}
               </>
             )}
