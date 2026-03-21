@@ -201,9 +201,12 @@ export async function fetchSharedListItems(ownerId) {
 
 /**
  * Get current user's JWT token for server-side API calls.
- * Uses getSession().data.session.token — the verifiable JWT from Better Auth.
+ * Uses authClient (dedicated Neon Auth client) to get the verifiable JWT.
+ * Throws if no session is active so callers fail fast instead of sending "Bearer null".
  */
 export async function getAuthToken() {
   const session = await dataClient.auth.getSession();
-  return session.data?.session?.token ?? null;
+  const token = session.data?.session?.token;
+  if (!token) throw new Error('No active session — cannot get auth token');
+  return token;
 }
