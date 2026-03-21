@@ -14,6 +14,7 @@ const AuthPage = lazy(() => import('./pages/AuthPage').then((module) => ({ defau
 const AccountPage = lazy(() => import('./pages/AccountPage').then((module) => ({ default: module.AccountPage })));
 const OnboardingPage = lazy(() => import('./pages/OnboardingPage').then((module) => ({ default: module.OnboardingPage })));
 const RecipeImportPage = lazy(() => import('./pages/RecipeImportPage').then((module) => ({ default: module.RecipeImportPage })));
+const ShoppingListAcceptPage = lazy(() => import('./pages/ShoppingListAcceptPage').then((module) => ({ default: module.ShoppingListAcceptPage })));
 
 /**
  * Miri - Meal Planning App
@@ -89,6 +90,10 @@ function AppContent() {
           <Route
             path="/shopping-list"
             element={isAuthenticated ? <ShoppingListPage /> : <Navigate to="/auth" replace />}
+          />
+          <Route
+            path="/shopping-list/accept"
+            element={isAuthenticated ? <ShoppingListAcceptPage /> : <Navigate to="/auth" replace />}
           />
           <Route
             path="/account"

@@ -136,9 +136,9 @@ export async function fetchShares() {
 
 /**
  * Get current user's JWT token for server-side API calls.
- * Uses getJWTToken() — the correct method for extracting a verifiable JWT.
+ * Uses getSession().data.session.token — the verifiable JWT from Better Auth.
  */
 export async function getAuthToken() {
-  const token = await dataClient.auth.getJWTToken?.();
-  return token ?? null;
+  const session = await dataClient.auth.getSession();
+  return session.data?.session?.token ?? null;
 }

@@ -17,12 +17,14 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
   const [errorMsg, setErrorMsg] = useState('');
+  const [acceptLink, setAcceptLink] = useState('');
 
   useEffect(() => {
     if (!isOpen) {
       setEmail('');
       setStatus('idle');
       setErrorMsg('');
+      setAcceptLink('');
     }
   }, [isOpen]);
 
@@ -38,13 +40,20 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
     setStatus('loading');
     setErrorMsg('');
     try {
-      await onShare?.(email.trim());
+      const result = await onShare?.(email.trim());
+      if (result?.token) {
+        setAcceptLink(`${window.location.origin}/shopping-list/accept?token=${result.token}`);
+      }
       setStatus('success');
       setEmail('');
     } catch (err) {
       setStatus('error');
       setErrorMsg(err.message ?? 'Could not send invite');
     }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(acceptLink).catch(() => {});
   };
 
   return (
@@ -114,9 +123,21 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
                 </div>
 
                 {status === 'success' && (
-                  <p className="text-body-small-regular share-sheet-feedback share-sheet-feedback--success">
-                    Invite sent! Share the link with them to accept.
-                  </p>
+                  <div className="share-sheet-feedback share-sheet-feedback--success">
+                    <p className="text-body-small-regular">Invite created! Share this link:</p>
+                    {acceptLink && (
+                      <div className="share-sheet-link-row">
+                        <span className="text-body-small-regular share-sheet-link">{acceptLink}</span>
+                        <button
+                          type="button"
+                          className="share-sheet-copy-btn text-body-small-regular"
+                          onClick={handleCopyLink}
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
                 {status === 'error' && (
                   <p className="text-body-small-regular share-sheet-feedback share-sheet-feedback--error">
