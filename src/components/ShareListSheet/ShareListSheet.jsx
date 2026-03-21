@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Button } from '../Button/Button';
 import './ShareListSheet.css';
 
 /**
@@ -86,13 +87,13 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
                 <p className="text-body-regular share-sheet-description">
                   You are viewing a shared list. Your changes sync in real time.
                 </p>
-                <button
-                  type="button"
-                  className="share-sheet-leave-btn text-body-regular"
+                <Button
+                  variant="tertiary-delete"
+                  showIcon={false}
                   onClick={() => { onLeave?.(); onClose?.(); }}
                 >
                   Leave shared list
-                </button>
+                </Button>
               </>
             ) : (
               <>
@@ -102,14 +103,14 @@ export function ShareListSheet({ isOpen, onClose, onShare, isSharedList, onLeave
                 </p>
 
                 {status !== 'success' && (
-                  <button
-                    type="button"
-                    className="share-sheet-send-btn text-body-regular"
+                  <Button
+                    variant="primary"
+                    showIcon={false}
                     onClick={handleGetLink}
                     disabled={status === 'loading'}
                   >
                     {status === 'loading' ? 'Creating…' : 'Create invite link'}
-                  </button>
+                  </Button>
                 )}
 
                 {status === 'success' && acceptLink && (

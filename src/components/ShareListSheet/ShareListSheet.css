@@ -39,40 +39,10 @@
   color: var(--color-text-weak);
 }
 
-.share-sheet-send-btn {
-  width: 100%;
-  height: 44px;
-  padding: 0 var(--spacing-16);
-  border: none;
-  border-radius: var(--corner-radius-12);
-  background: var(--color-fill-brand-strong);
-  color: var(--color-text-inverted);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.share-sheet-send-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.share-sheet-send-btn:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-}
-
-.share-sheet-feedback {
-  margin: 0 0 var(--spacing-12);
-}
-
-.share-sheet-feedback--success {
-  color: var(--color-text-success);
-}
-
 .share-sheet-feedback--error {
   color: var(--color-text-error);
+  margin: 0 0 var(--spacing-12);
 }
-
 
 .share-sheet-link-row {
   display: flex;
@@ -107,18 +77,3 @@
   outline-offset: 2px;
 }
 
-.share-sheet-leave-btn {
-  width: 100%;
-  height: 44px;
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-12);
-  background: transparent;
-  color: var(--color-text-error);
-  cursor: pointer;
-  margin-top: var(--spacing-8);
-}
-
-.share-sheet-leave-btn:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-}
