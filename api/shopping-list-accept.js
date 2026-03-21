@@ -37,18 +37,29 @@ export default async function handler(req, res) {
   if (!token) return res.status(400).json({ error: 'token is required' });
 
   try {
-    const rows = await sql`
+    // Try to accept a pending invite
+    const updated = await sql`
       UPDATE shopping_list_shares
       SET invitee_id = ${inviteeId}, status = 'accepted', updated_at = NOW()
       WHERE token = ${token} AND status = 'pending'
       RETURNING owner_id
     `;
 
-    if (!rows.length) {
-      return res.status(404).json({ error: 'Invalid or already used token' });
+    if (updated.length) {
+      return res.json({ ownerId: updated[0].owner_id });
     }
 
-    return res.json({ ownerId: rows[0].owner_id });
+    // Already accepted by this user — still return the owner so the app can switch
+    const existing = await sql`
+      SELECT owner_id FROM shopping_list_shares
+      WHERE token = ${token} AND invitee_id = ${inviteeId} AND status = 'accepted'
+    `;
+
+    if (existing.length) {
+      return res.json({ ownerId: existing[0].owner_id });
+    }
+
+    return res.status(404).json({ error: 'Invalid or already used token' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

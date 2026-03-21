@@ -109,7 +109,7 @@ CREATE POLICY shopping_list_items_own_delete ON shopping_list_items
 CREATE TABLE IF NOT EXISTS shopping_list_shares (
   id            BIGSERIAL   PRIMARY KEY,
   owner_id      TEXT        NOT NULL,
-  invitee_email TEXT        NOT NULL,
+  invitee_email TEXT,
   invitee_id    TEXT,
   status        TEXT        NOT NULL DEFAULT 'pending',
   token         TEXT        NOT NULL UNIQUE,
