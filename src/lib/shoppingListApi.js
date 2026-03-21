@@ -135,6 +135,28 @@ export async function fetchShares() {
 }
 
 /**
+ * Fetch shopping list items for a shared list owner via the serverless API.
+ * Bypasses RLS — the API verifies the accepted share before returning rows.
+ */
+export async function fetchSharedListItems(ownerId) {
+  const token = await getAuthToken();
+  const res = await fetch(`/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to fetch shared list');
+  const { items } = await res.json();
+  return (items ?? []).map(row => ({
+    id: row.item_id ?? row.entry_id,
+    entryId: row.entry_id,
+    name: row.name,
+    recipeId: row.recipe_id ?? null,
+    recipeName: row.recipe_name ?? null,
+    checked: row.checked ?? false,
+    _ownerUserId: row.user_id,
+  }));
+}
+
+/**
  * Get current user's JWT token for server-side API calls.
  * Uses getSession().data.session.token — the verifiable JWT from Better Auth.
  */

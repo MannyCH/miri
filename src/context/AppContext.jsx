@@ -3,6 +3,7 @@ import { generateCalendarDays, formatDayTitle } from '../data/recipes';
 import { fetchUserRecipes } from '../lib/recipesApi';
 import {
   fetchShoppingList,
+  fetchSharedListItems,
   addListItem,
   patchListItem,
   removeListItem,
@@ -228,7 +229,7 @@ export function AppProvider({ children }) {
     }
     const load = async () => {
       try {
-        const items = await fetchShoppingList(sharedListMeta.ownerId);
+        const items = await fetchSharedListItems(sharedListMeta.ownerId);
         setSharedListItems(items.map(item => ({ ...item, entryId: item.entryId ?? item.id })));
       } catch { /* ignore */ }
     };
