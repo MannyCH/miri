@@ -40,9 +40,9 @@ export default async function handler(req, res) {
     // Try to accept a pending invite
     const updated = await sql`
       UPDATE shopping_list_shares
-      SET invitee_id = ${inviteeId}, status = 'accepted', updated_at = NOW()
+      SET invitee_id = ${inviteeId}, status = 'accepted'
       WHERE token = ${token} AND status = 'pending'
-      RETURNING owner_id
+      RETURNING owner_id, list_name
     `;
 
     if (updated.length) {
