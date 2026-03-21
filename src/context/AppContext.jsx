@@ -3,6 +3,10 @@ import { generateCalendarDays, formatDayTitle } from '../data/recipes';
 import { fetchUserRecipes } from '../lib/recipesApi';
 import {
   fetchShoppingList,
+  fetchSharedListItems,
+  addSharedListItem,
+  removeSharedListItem,
+  patchSharedListItem,
   addListItem,
   patchListItem,
   removeListItem,
@@ -126,6 +130,7 @@ export function AppProvider({ children }) {
     try { return JSON.parse(localStorage.getItem(SHARED_LIST_KEY)) ?? null; }
     catch { return null; }
   });
+  const [sharedListItems, setSharedListItems] = useState([]);
 
   // Persist shopping list to localStorage whenever it changes
   useEffect(() => {
@@ -217,6 +222,23 @@ export function AppProvider({ children }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
+  // Fetch shared list items once when sharedListMeta is set (no polling)
+  useEffect(() => {
+    if (!isAuthenticated || !sharedListMeta?.ownerId) {
+      setSharedListItems([]);
+      return;
+    }
+    const load = async () => {
+      try {
+        const items = await fetchSharedListItems(sharedListMeta.ownerId);
+        setSharedListItems(items.map(item => ({ ...item, entryId: item.entryId ?? item.id })));
+      } catch (err) {
+        console.error('[shared-list] fetch failed:', err.message);
+      }
+    };
+    load();
+  }, [isAuthenticated, sharedListMeta?.ownerId]);
+
   const setSharedListMeta = useCallback((meta) => {
     if (meta) {
       localStorage.setItem(SHARED_LIST_KEY, JSON.stringify(meta));
@@ -305,7 +327,48 @@ export function AppProvider({ children }) {
 
   const leaveSharedList = useCallback(() => {
     setSharedListMeta(null);
+    setSharedListItems([]);
   }, [setSharedListMeta]);
+
+  const addItemToSharedList = useCallback(async (name) => {
+    if (!sharedListMeta?.ownerId || !name.trim()) return;
+    const entryId = createEntryId();
+    const newItem = { id: entryId, entryId, name: name.trim(), checked: false, recipeId: null, recipeName: null };
+    setSharedListItems(prev => [...prev, newItem]);
+    try {
+      await addSharedListItem(sharedListMeta.ownerId, newItem);
+    } catch (err) {
+      console.error('[shared-list] add failed:', err.message);
+      setSharedListItems(prev => prev.filter(i => (i.entryId ?? i.id) !== entryId));
+    }
+  }, [sharedListMeta, createEntryId]);
+
+  const removeItemFromSharedList = useCallback(async (entryId) => {
+    if (!sharedListMeta?.ownerId) return;
+    setSharedListItems(prev => prev.filter(i => (i.entryId ?? i.id) !== entryId));
+    try {
+      await removeSharedListItem(sharedListMeta.ownerId, entryId);
+    } catch (err) {
+      console.error('[shared-list] remove failed:', err.message);
+    }
+  }, [sharedListMeta]);
+
+  const toggleSharedItem = useCallback((entryId) => {
+    let newChecked = null;
+    setSharedListItems(prev => prev.map(item => {
+      if ((item.entryId ?? item.id) === entryId) {
+        newChecked = !item.checked;
+        return { ...item, checked: newChecked };
+      }
+      return item;
+    }));
+    if (sharedListMeta?.ownerId && newChecked !== null) {
+      Promise.resolve().then(() =>
+        patchSharedListItem(sharedListMeta.ownerId, entryId, newChecked)
+          .catch(err => console.error('[shared-list] patch failed:', err))
+      );
+    }
+  }, [sharedListMeta]);
   
   // Start with no plan — user taps "Plan my week" to generate
   
@@ -668,6 +731,10 @@ export function AppProvider({ children }) {
 
     // Shared list
     sharedListMeta,
+    sharedListItems,
+    toggleSharedItem,
+    addItemToSharedList,
+    removeItemFromSharedList,
     shareList,
     acceptSharedList,
     leaveSharedList,

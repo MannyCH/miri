@@ -28,6 +28,10 @@ export function ShoppingListPage() {
     smartStatus,
     fetchSmartGroups,
     sharedListMeta,
+    sharedListItems,
+    toggleSharedItem,
+    addItemToSharedList,
+    removeItemFromSharedList,
     shareList,
     leaveSharedList,
   } = useApp();
@@ -210,6 +214,10 @@ export function ShoppingListPage() {
       onSearch={setSearchQuery}
       isSharedList={!!sharedListMeta}
       sharedListMeta={sharedListMeta}
+      sharedListItems={sharedListItems}
+      onToggleSharedItem={toggleSharedItem}
+      onAddSharedItem={addItemToSharedList}
+      onDeleteSharedItem={removeItemFromSharedList}
       onShare={shareList}
       onLeave={leaveSharedList}
     />

@@ -135,6 +135,71 @@ export async function fetchShares() {
 }
 
 /**
+ * Add an item to a shared list via the serverless API.
+ */
+export async function addSharedListItem(ownerId, item) {
+  const token = await getAuthToken();
+  const res = await fetch(`/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ name: item.name, entryId: item.entryId, itemId: item.id }),
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to add item');
+  return res.json();
+}
+
+/**
+ * Delete an item from a shared list via the serverless API.
+ */
+export async function removeSharedListItem(ownerId, entryId) {
+  const token = await getAuthToken();
+  const res = await fetch(
+    `/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}&entryId=${encodeURIComponent(entryId)}`,
+    { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to delete item');
+}
+
+/**
+ * Patch checked state on a shared list item via the serverless API.
+ * Bypasses RLS — the API verifies the accepted share before patching.
+ */
+export async function patchSharedListItem(ownerId, entryId, checked) {
+  const token = await getAuthToken();
+  const res = await fetch(
+    `/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}&entryId=${encodeURIComponent(entryId)}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ checked }),
+    }
+  );
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to patch shared item');
+}
+
+/**
+ * Fetch shopping list items for a shared list owner via the serverless API.
+ * Bypasses RLS — the API verifies the accepted share before returning rows.
+ */
+export async function fetchSharedListItems(ownerId) {
+  const token = await getAuthToken();
+  const res = await fetch(`/api/shopping-list-items?ownerId=${encodeURIComponent(ownerId)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to fetch shared list');
+  const { items } = await res.json();
+  return (items ?? []).map(row => ({
+    id: row.item_id ?? row.entry_id,
+    entryId: row.entry_id,
+    name: row.name,
+    recipeId: row.recipe_id ?? null,
+    recipeName: row.recipe_name ?? null,
+    checked: row.checked ?? false,
+    _ownerUserId: row.user_id,
+  }));
+}
+
+/**
  * Get current user's JWT token for server-side API calls.
  * Uses authClient (dedicated Neon Auth client) to get the verifiable JWT.
  * Throws if no session is active so callers fail fast instead of sending "Bearer null".
