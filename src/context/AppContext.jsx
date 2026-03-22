@@ -472,11 +472,18 @@ export function AppProvider({ children }) {
       setShoppingList(prev => [...prev, ...allIngredients]);
     }
 
-    // Send all items to API
+    // Send all items to API, then re-fetch canonical order
     const sid = getSocketId();
-    allIngredients.forEach((item) => {
-      listApi.addItem(activeListId, item, sid).catch(() => {});
-    });
+    await Promise.all(allIngredients.map((item) =>
+      listApi.addItem(activeListId, item, sid).catch(() => {})
+    ));
+    try {
+      const { items } = await listApi.fetchItems(activeListId);
+      setShoppingList(items.map((i) => ({
+        entryId: i.entry_id, name: i.name, recipeId: i.recipe_id,
+        recipeName: i.recipe_name, checked: i.checked, createdAt: i.created_at,
+      })));
+    } catch { /* optimistic state is good enough */ }
   }, [activeListId, mealPlan, shoppingList, getSocketId, createEntryId]);
   
   // Add ingredients from a specific recipe to shopping list.
@@ -510,11 +517,18 @@ export function AppProvider({ children }) {
     // Optimistic update
     setShoppingList(prev => [...prev, ...newItems]);
 
-    // Send to API
+    // Send to API, then re-fetch canonical order
     const sid = getSocketId();
-    newItems.forEach((item) => {
-      listApi.addItem(activeListId, item, sid).catch(() => {});
-    });
+    await Promise.all(newItems.map((item) =>
+      listApi.addItem(activeListId, item, sid).catch(() => {})
+    ));
+    try {
+      const { items } = await listApi.fetchItems(activeListId);
+      setShoppingList(items.map((i) => ({
+        entryId: i.entry_id, name: i.name, recipeId: i.recipe_id,
+        recipeName: i.recipe_name, checked: i.checked, createdAt: i.created_at,
+      })));
+    } catch { /* optimistic state is good enough */ }
   }, [activeListId, lookupRecipe, getSocketId, createEntryId]);
   
   // Toggle ingredient checked state (optimistic + API)
