@@ -42,13 +42,27 @@ export function PusherProvider({ children }) {
       cluster,
       forceTLS: true,
       channelAuthorization: {
-        endpoint: '/api/pusher-auth',
-        transport: 'ajax',
-        headersProvider: async () => {
-          const { data: sessionData } = await dataClient.auth.getSession();
-          const token = sessionData?.session?.token;
-          if (!token) throw new Error('No auth token for Pusher');
-          return { Authorization: `Bearer ${token}` };
+        customHandler: async ({ channelName, socketId }, callback) => {
+          try {
+            const { data: sessionData } = await dataClient.auth.getSession();
+            const token = sessionData?.session?.token;
+            if (!token) throw new Error('No auth token for Pusher');
+
+            const res = await fetch('/api/pusher-auth', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ socket_id: socketId, channel_name: channelName }),
+            });
+
+            if (!res.ok) throw new Error(`Auth failed: ${res.status}`);
+            const data = await res.json();
+            callback(null, data);
+          } catch (err) {
+            callback(err, null);
+          }
         },
       },
     });
