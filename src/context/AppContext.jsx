@@ -202,6 +202,7 @@ export function AppProvider({ children }) {
           recipeId: i.recipe_id,
           recipeName: i.recipe_name,
           checked: i.checked,
+          createdAt: i.created_at,
         })));
         setMembers(m);
         setInviteToken(token);
@@ -223,13 +224,15 @@ export function AppProvider({ children }) {
     channel.bind('item:added', (data) => {
       setShoppingList((prev) => {
         if (prev.some((i) => i.entryId === data.entryId)) return prev;
-        return [...prev, {
+        const next = [...prev, {
           entryId: data.entryId,
           name: data.name,
           recipeId: data.recipeId,
           recipeName: data.recipeName,
           checked: data.checked,
+          createdAt: data.createdAt,
         }];
+        return next.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
       });
     });
 
@@ -290,6 +293,7 @@ export function AppProvider({ children }) {
           recipeId: i.recipe_id,
           recipeName: i.recipe_name,
           checked: i.checked,
+          createdAt: i.created_at,
         })));
       }).catch(() => {});
     }
@@ -450,6 +454,7 @@ export function AppProvider({ children }) {
               recipeId: meal.id,
               recipeName: meal.title,
               checked: false,
+              createdAt: new Date().toISOString(),
             });
           });
         }
@@ -497,6 +502,7 @@ export function AppProvider({ children }) {
           recipeId: recipe.id,
           recipeName: recipe.title,
           checked: false,
+          createdAt: new Date().toISOString(),
         });
       });
     }

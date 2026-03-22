@@ -59,13 +59,15 @@ export default async function handler(req, res) {
       }
       if (!(await verifyMembership(listId))) return res.status(403).json({ error: 'Not a member' });
 
-      await sql`
+      const inserted = await sql`
         INSERT INTO shopping_list_items (list_id, entry_id, name, recipe_id, recipe_name)
         VALUES (${listId}, ${entryId}, ${name}, ${recipeId}, ${recipeName})
         ON CONFLICT (list_id, entry_id) DO NOTHING
+        RETURNING created_at
       `;
+      const createdAt = inserted[0]?.created_at || new Date().toISOString();
 
-      await triggerEvent(listId, 'item:added', { entryId, name, checked: false, recipeId, recipeName });
+      await triggerEvent(listId, 'item:added', { entryId, name, checked: false, recipeId, recipeName, createdAt });
       return res.status(201).json({ ok: true });
     }
 
