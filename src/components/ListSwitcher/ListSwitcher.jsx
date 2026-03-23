@@ -45,7 +45,7 @@ export function ListSwitcher({ lists = [], activeListId, onSwitch, onCreateNew }
         aria-haspopup={hasMultiple ? 'listbox' : undefined}
         disabled={!hasMultiple}
       >
-        <span className="list-switcher-name text-h1-bold">{displayName}</span>
+        <span className="list-switcher-name text-body-small-bold">{displayName}</span>
         {hasMultiple && (
           <ChevronIcon className={`list-switcher-chevron${open ? ' list-switcher-chevron--open' : ''}`} />
         )}

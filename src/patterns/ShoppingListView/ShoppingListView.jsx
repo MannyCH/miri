@@ -5,6 +5,7 @@ import { Divider } from '../../components/Divider';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
+import { ListSwitcher } from '../../components/ListSwitcher';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './ShoppingListView.css';
 
@@ -38,12 +39,21 @@ export const ShoppingListView = ({
   memberCount = 1,
   isListLoading = false,
   onListNameTap,
+  lists = [],
+  activeListId,
+  onSwitchList,
+  onMenuTap,
   ...props
 }) => {
-  const [smartChecked, setSmartChecked] = useState({});
-
-  const toggleSmartItem = (key) =>
-    setSmartChecked(prev => ({ ...prev, [key]: !prev[key] }));
+  // Build a lookup of checked state from actual shopping list items (by lowercase name)
+  const checkedByName = React.useMemo(() => {
+    const map = {};
+    items.forEach((name, idx) => {
+      const key = name?.toLowerCase();
+      if (key && checkedItems[idx]) map[key] = true;
+    });
+    return map;
+  }, [items, checkedItems]);
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -168,31 +178,55 @@ export const ShoppingListView = ({
     >
       {/* Header */}
       <header className="shopping-list-header">
-        <button type="button" className="shopping-list-title-btn" onClick={onListNameTap}>
-          <h1 className="text-h1-bold">{listName}</h1>
-          {memberCount > 1 && (
-            <span className="shopping-list-share-badge text-caption-bold">
-              <UsersIcon /> {memberCount}
-            </span>
+        <div className="shopping-list-header-left">
+          <div className="shopping-list-title-row">
+            <h1 className="text-h1-bold">{listName}</h1>
+            {memberCount > 1 && (
+              <span className="shopping-list-share-badge text-caption-bold">
+                <UsersIcon /> {memberCount}
+              </span>
+            )}
+          </div>
+          {lists.length > 1 && (
+            <ListSwitcher
+              lists={lists.map((l) => ({
+                ...l,
+                isShared: l.memberCount > 1,
+              }))}
+              activeListId={activeListId}
+              onSwitch={onSwitchList}
+            />
           )}
-        </button>
+        </div>
 
-        {/* View Mode Toggle */}
-        <div className="shopping-list-view-toggle">
-          <button
-            className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('recipe')}
-            aria-label="Group by recipe"
-          >
-            <GridIcon />
-          </button>
-          <button
-            className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('smart')}
-            aria-label="Smart grouped list"
-          >
-            <SparkleIcon />
-          </button>
+        <div className="shopping-list-header-right">
+          {/* View Mode Toggle */}
+          <div className="shopping-list-view-toggle">
+            <button
+              className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
+              onClick={() => onViewModeChange?.('recipe')}
+              aria-label="Group by recipe"
+            >
+              <GridIcon />
+            </button>
+            <button
+              className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
+              onClick={() => onViewModeChange?.('smart')}
+              aria-label="Smart grouped list"
+            >
+              <SparkleIcon />
+            </button>
+          </div>
+          {onMenuTap && (
+            <button
+              type="button"
+              className="shopping-list-menu-btn"
+              onClick={onMenuTap}
+              aria-label="List options"
+            >
+              <MoreIcon />
+            </button>
+          )}
         </div>
       </header>
 
@@ -347,8 +381,10 @@ export const ShoppingListView = ({
             {smartStatus === 'idle' && smartGroups.length > 0 && (
               <SmartListContent
                 smartGroups={smartGroups}
-                smartChecked={smartChecked}
-                toggleSmartItem={toggleSmartItem}
+                checkedByName={checkedByName}
+                onItemCheck={onItemCheck}
+                itemIds={itemIds}
+                items={items}
                 pantryStaples={pantryStaples}
                 onTogglePantryStaple={onTogglePantryStaple}
                 onSmartItemDelete={onSmartItemDelete}
@@ -550,7 +586,18 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
   );
 }
 
-function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
+function SmartListContent({ smartGroups, checkedByName, onItemCheck, itemIds, items, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
+  // Find the matching shopping list item index by name (for toggling via onItemCheck)
+  const findItemId = (smartItemName) => {
+    const needle = smartItemName?.toLowerCase();
+    for (let i = 0; i < items.length; i++) {
+      if (items[i]?.toLowerCase().includes(needle)) return itemIds[i];
+    }
+    return null;
+  };
+
+  const isChecked = (itemName) => !!checkedByName[itemName?.toLowerCase()];
+
   const allCheckedItems = [];
   const pantryItems = [];
 
@@ -559,16 +606,24 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
       const key = `${groupIdx}-${item.name}`;
       const isPantry = pantryStaples.includes(item.name?.toLowerCase());
       if (isPantry) pantryItems.push({ item, key });
-      else if (smartChecked[key]) allCheckedItems.push({ item, key });
+      else if (isChecked(item.name)) allCheckedItems.push({ item, key });
     });
   });
+
+  const handleToggle = (itemName) => {
+    const id = findItemId(itemName);
+    if (id && onItemCheck) {
+      const idx = items.findIndex((n) => n?.toLowerCase().includes(itemName?.toLowerCase()));
+      onItemCheck(idx, !isChecked(itemName), id);
+    }
+  };
 
   return (
     <>
       {smartGroups.map((group, groupIdx) => {
         const visibleItems = group.items
           .map((item) => ({ item, key: `${groupIdx}-${item.name}` }))
-          .filter(({ item, key }) => !pantryStaples.includes(item.name?.toLowerCase()) && !smartChecked[key]);
+          .filter(({ item }) => !pantryStaples.includes(item.name?.toLowerCase()) && !isChecked(item.name));
         if (visibleItems.length === 0) return null;
         return (
           <div key={group.category} className="smart-group">
@@ -581,7 +636,7 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
                 item={item}
                 checked={false}
                 isPantry={false}
-                onToggle={() => toggleSmartItem(key)}
+                onToggle={() => handleToggle(item.name)}
                 onTogglePantryStaple={onTogglePantryStaple}
                 onDelete={() => onSmartItemDelete?.(item.name)}
                 isFirst={idx === 0}
@@ -600,7 +655,7 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
               item={item}
               checked={true}
               isPantry={false}
-              onToggle={() => toggleSmartItem(key)}
+              onToggle={() => handleToggle(item.name)}
               onTogglePantryStaple={onTogglePantryStaple}
               onDelete={() => onSmartItemDelete?.(item.name)}
               isFirst={idx === 0}
@@ -699,6 +754,14 @@ const UsersIcon = () => (
     <circle cx="9" cy="7" r="4"/>
     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const MoreIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="12" cy="5" r="1" fill="currentColor"/>
+    <circle cx="12" cy="12" r="1" fill="currentColor"/>
+    <circle cx="12" cy="19" r="1" fill="currentColor"/>
   </svg>
 );
 

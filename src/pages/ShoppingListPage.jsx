@@ -2,8 +2,10 @@ import React from 'react';
 import { ShoppingListView } from '../patterns/ShoppingListView';
 import { useApp } from '../context/AppContext';
 import { usePreferences } from '../context/PreferencesContext';
+import { AnimatePresence, motion } from 'motion/react';
 import { ActionSheet } from '../components/ActionSheet';
 import { ShareSheet } from '../components/ShareSheet';
+import { Button } from '../components/Button';
 import './ShoppingListPage.css';
 
 /**
@@ -50,9 +52,11 @@ export function ShoppingListPage() {
   const [isShareSheetOpen, setIsShareSheetOpen] = React.useState(false);
   const [isRenaming, setIsRenaming] = React.useState(false);
   const [renameValue, setRenameValue] = React.useState('');
+  const [isCreating, setIsCreating] = React.useState(false);
+  const [createValue, setCreateValue] = React.useState('');
 
   const activeList = lists.find((l) => l.id === activeListId);
-  const listName = activeList?.name || 'Shopping list';
+  const listName = activeList?.name || 'Home';
   const isShared = members.length > 1;
 
   // Pantry staples persisted to localStorage
@@ -192,11 +196,9 @@ export function ShoppingListPage() {
 
   actionSheetItems.push({
     label: 'New list',
-    onAction: async () => {
-      const name = window.prompt('List name');
-      if (name?.trim()) {
-        await createNewList(name.trim());
-      }
+    onAction: () => {
+      setCreateValue('');
+      setIsCreating(true);
     },
   });
 
@@ -219,13 +221,22 @@ export function ShoppingListPage() {
     });
   }
 
-  // ── Rename dialog ──
+  // ── Rename handler ──
   const handleRenameSubmit = async (e) => {
     e.preventDefault();
     if (renameValue.trim() && renameValue.trim() !== listName) {
       await renameActiveList(renameValue.trim());
     }
     setIsRenaming(false);
+  };
+
+  // ── Create handler ──
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    if (createValue.trim()) {
+      await createNewList(createValue.trim());
+    }
+    setIsCreating(false);
   };
 
   return (
@@ -235,6 +246,10 @@ export function ShoppingListPage() {
         memberCount={members.length}
         isListLoading={isListLoading}
         onListNameTap={() => setIsActionSheetOpen(true)}
+        lists={lists}
+        activeListId={activeListId}
+        onSwitchList={switchList}
+        onMenuTap={() => setIsActionSheetOpen(true)}
         viewMode={shoppingListViewMode}
         onViewModeChange={setShoppingListViewMode}
         summaryEntries={summaryEntries}
@@ -310,28 +325,89 @@ export function ShoppingListPage() {
         onRemoveMember={removeListMember}
       />
 
-      {/* Rename overlay */}
-      {isRenaming && (
-        <div className="shopping-list-rename-overlay" onClick={() => setIsRenaming(false)}>
-          <form
-            className="shopping-list-rename-form"
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={handleRenameSubmit}
-          >
-            <input
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
-              className="shopping-list-rename-input text-body-regular"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              placeholder="List name"
+      {/* Rename sheet */}
+      <AnimatePresence>
+        {isRenaming && (
+          <>
+            <motion.div
+              className="sheet-form-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsRenaming(false)}
+              aria-hidden="true"
             />
-            <button type="submit" className="shopping-list-rename-save text-body-base-bold">
-              Save
-            </button>
-          </form>
-        </div>
-      )}
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Rename list"
+              className="sheet-form"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            >
+              <div className="sheet-form-handle" aria-hidden="true" />
+              <h2 className="text-h3-bold sheet-form-title">Rename list</h2>
+              <form onSubmit={handleRenameSubmit} className="sheet-form-body">
+                <input
+                  autoFocus
+                  className="sheet-form-input text-body-regular"
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  placeholder="List name"
+                />
+                <div className="sheet-form-actions">
+                  <Button variant="secondary" onClick={() => setIsRenaming(false)} type="button">Cancel</Button>
+                  <Button variant="primary" type="submit">Save</Button>
+                </div>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Create list sheet */}
+      <AnimatePresence>
+        {isCreating && (
+          <>
+            <motion.div
+              className="sheet-form-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCreating(false)}
+              aria-hidden="true"
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="New list"
+              className="sheet-form"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            >
+              <div className="sheet-form-handle" aria-hidden="true" />
+              <h2 className="text-h3-bold sheet-form-title">New list</h2>
+              <form onSubmit={handleCreateSubmit} className="sheet-form-body">
+                <input
+                  autoFocus
+                  className="sheet-form-input text-body-regular"
+                  value={createValue}
+                  onChange={(e) => setCreateValue(e.target.value)}
+                  placeholder="List name"
+                />
+                <div className="sheet-form-actions">
+                  <Button variant="secondary" onClick={() => setIsCreating(false)} type="button">Cancel</Button>
+                  <Button variant="primary" type="submit">Save</Button>
+                </div>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
