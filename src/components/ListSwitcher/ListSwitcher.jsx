@@ -33,7 +33,7 @@ export function ListSwitcher({ lists = [], activeListId, onSwitch, onCreateNew }
   }, [open]);
 
   const activeList = lists.find((l) => l.id === activeListId);
-  const displayName = activeList?.name || 'Shopping list';
+  const displayName = activeList?.name || 'Home';
 
   return (
     <div className="list-switcher" ref={wrapperRef}>

@@ -178,16 +178,9 @@ export const ShoppingListView = ({
     >
       {/* Header */}
       <header className="shopping-list-header">
-        <div className="shopping-list-header-left">
-          <div className="shopping-list-title-row">
-            <h1 className="text-h1-bold">{listName}</h1>
-            {memberCount > 1 && (
-              <span className="shopping-list-share-badge text-caption-bold">
-                <UsersIcon /> {memberCount}
-              </span>
-            )}
-          </div>
-          {lists.length > 1 && (
+        <h1 className="text-h1-bold">Einkaufsliste</h1>
+        <div className="shopping-list-subtitle-row">
+          <div className="shopping-list-subtitle-left">
             <ListSwitcher
               lists={lists.map((l) => ({
                 ...l,
@@ -196,37 +189,40 @@ export const ShoppingListView = ({
               activeListId={activeListId}
               onSwitch={onSwitchList}
             />
-          )}
-        </div>
-
-        <div className="shopping-list-header-right">
-          {/* View Mode Toggle */}
-          <div className="shopping-list-view-toggle">
-            <button
-              className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
-              onClick={() => onViewModeChange?.('recipe')}
-              aria-label="Group by recipe"
-            >
-              <GridIcon />
-            </button>
-            <button
-              className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
-              onClick={() => onViewModeChange?.('smart')}
-              aria-label="Smart grouped list"
-            >
-              <SparkleIcon />
-            </button>
+            {memberCount > 1 && (
+              <span className="shopping-list-share-badge text-caption-bold">
+                <UsersIcon /> {memberCount}
+              </span>
+            )}
           </div>
-          {onMenuTap && (
-            <button
-              type="button"
-              className="shopping-list-menu-btn"
-              onClick={onMenuTap}
-              aria-label="List options"
-            >
-              <MoreIcon />
-            </button>
-          )}
+          <div className="shopping-list-subtitle-right">
+            <div className="shopping-list-view-toggle">
+              <button
+                className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
+                onClick={() => onViewModeChange?.('recipe')}
+                aria-label="Group by recipe"
+              >
+                <GridIcon />
+              </button>
+              <button
+                className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
+                onClick={() => onViewModeChange?.('smart')}
+                aria-label="Smart grouped list"
+              >
+                <SparkleIcon />
+              </button>
+            </div>
+            {onMenuTap && (
+              <button
+                type="button"
+                className="shopping-list-menu-btn"
+                onClick={onMenuTap}
+                aria-label="List options"
+              >
+                <MoreIcon />
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -587,16 +583,27 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
 }
 
 function SmartListContent({ smartGroups, checkedByName, onItemCheck, itemIds, items, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
-  // Find the matching shopping list item index by name (for toggling via onItemCheck)
+  // Find the matching shopping list item ID by name (bidirectional partial match)
   const findItemId = (smartItemName) => {
     const needle = smartItemName?.toLowerCase();
+    if (!needle) return null;
     for (let i = 0; i < items.length; i++) {
-      if (items[i]?.toLowerCase().includes(needle)) return itemIds[i];
+      const name = items[i]?.toLowerCase();
+      if (name && (name.includes(needle) || needle.includes(name))) return itemIds[i];
     }
     return null;
   };
 
-  const isChecked = (itemName) => !!checkedByName[itemName?.toLowerCase()];
+  // Check if a smart item name matches any checked shopping list item (bidirectional)
+  const isChecked = (itemName) => {
+    const needle = itemName?.toLowerCase();
+    if (!needle) return false;
+    if (checkedByName[needle]) return true;
+    for (const [name, checked] of Object.entries(checkedByName)) {
+      if (checked && (name.includes(needle) || needle.includes(name))) return true;
+    }
+    return false;
+  };
 
   const allCheckedItems = [];
   const pantryItems = [];
@@ -613,7 +620,11 @@ function SmartListContent({ smartGroups, checkedByName, onItemCheck, itemIds, it
   const handleToggle = (itemName) => {
     const id = findItemId(itemName);
     if (id && onItemCheck) {
-      const idx = items.findIndex((n) => n?.toLowerCase().includes(itemName?.toLowerCase()));
+      const needle = itemName?.toLowerCase();
+      const idx = items.findIndex((n) => {
+        const name = n?.toLowerCase();
+        return name && (name.includes(needle) || needle.includes(name));
+      });
       onItemCheck(idx, !isChecked(itemName), id);
     }
   };
