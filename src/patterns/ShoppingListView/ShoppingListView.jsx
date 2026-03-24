@@ -583,16 +583,11 @@ function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, ite
     return set;
   }, [itemIds, checkedItems]);
 
-  // Check if a smart item is checked — uses sourceIds when available, falls back to name match
+  // Smart groups only contain unchecked items (AI merges quantities correctly).
+  // A smart item is "checked" if ALL its sources are now checked in the shopping list.
   const isItemChecked = (item) => {
     if (item.sourceIds?.length > 0) {
       return item.sourceIds.every(id => checkedIdSet.has(id));
-    }
-    // Fallback: exact name match against item IDs
-    const needle = item.name?.toLowerCase();
-    if (!needle) return false;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i]?.toLowerCase() === needle && checkedItems[i]) return true;
     }
     return false;
   };
@@ -601,32 +596,37 @@ function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, ite
   const handleToggle = (item) => {
     const checked = isItemChecked(item);
     if (item.sourceIds?.length > 0) {
-      // Toggle each source item
       item.sourceIds.forEach(id => {
         const idx = itemIds.indexOf(id);
         if (idx !== -1 && onItemCheck) onItemCheck(idx, !checked, id);
       });
-    } else {
-      // Fallback: exact name match
-      const needle = item.name?.toLowerCase();
-      for (let i = 0; i < items.length; i++) {
-        if (items[i]?.toLowerCase() === needle) {
-          onItemCheck?.(i, !checked, itemIds[i]);
-          return;
-        }
-      }
     }
   };
 
-  const allCheckedItems = [];
-  const pantryItems = [];
+  // Unchecked toggle for items in "Eingekauft" — derived from shopping list, not smart groups
+  const handleCheckedToggle = (id) => {
+    const idx = itemIds.indexOf(id);
+    if (idx !== -1 && onItemCheck) onItemCheck(idx, false, id);
+  };
 
+  // Checked items come directly from shopping list (not AI groups) — correct names/quantities
+  const checkedShoppingItems = React.useMemo(() => {
+    const result = [];
+    items.forEach((name, idx) => {
+      if (checkedItems[idx] && !pantryStaples.includes(name?.toLowerCase())) {
+        result.push({ name, id: itemIds[idx] });
+      }
+    });
+    return result;
+  }, [items, checkedItems, itemIds, pantryStaples]);
+
+  // Pantry items from smart groups
+  const pantryItems = [];
   smartGroups.forEach((group, groupIdx) => {
     group.items.forEach((item) => {
-      const key = `${groupIdx}-${item.name}`;
-      const isPantry = pantryStaples.includes(item.name?.toLowerCase());
-      if (isPantry) pantryItems.push({ item, key });
-      else if (isItemChecked(item)) allCheckedItems.push({ item, key });
+      if (pantryStaples.includes(item.name?.toLowerCase())) {
+        pantryItems.push({ item, key: `${groupIdx}-${item.name}` });
+      }
     });
   });
 
@@ -635,7 +635,8 @@ function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, ite
       {smartGroups.map((group, groupIdx) => {
         const visibleItems = group.items
           .map((item) => ({ item, key: `${groupIdx}-${item.name}` }))
-          .filter(({ item }) => !pantryStaples.includes(item.name?.toLowerCase()) && !isItemChecked(item));
+          .filter(({ item }) =>
+            !pantryStaples.includes(item.name?.toLowerCase()) && !isItemChecked(item));
         if (visibleItems.length === 0) return null;
         return (
           <div key={group.category} className="smart-group">
@@ -658,18 +659,18 @@ function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, ite
         );
       })}
 
-      {allCheckedItems.length > 0 && (
+      {checkedShoppingItems.length > 0 && (
         <div className="smart-group">
           <h2 className="smart-group-header text-tiny-bold">{PURCHASED_SECTION_TITLE.toUpperCase()}</h2>
-          {allCheckedItems.map(({ item, key }, idx) => (
+          {checkedShoppingItems.map(({ name, id }, idx) => (
             <SmartListItem
-              key={key}
-              item={item}
+              key={id}
+              item={{ name, quantity: '' }}
               checked={true}
               isPantry={false}
-              onToggle={() => handleToggle(item)}
+              onToggle={() => handleCheckedToggle(id)}
               onTogglePantryStaple={onTogglePantryStaple}
-              onDelete={() => onSmartItemDelete?.(item.name)}
+              onDelete={() => onSmartItemDelete?.(name)}
               isFirst={idx === 0}
             />
           ))}
