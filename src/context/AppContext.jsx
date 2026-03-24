@@ -156,7 +156,7 @@ export function AppProvider({ children }) {
         setActiveListId(match ? match.id : fetched[0].id);
       } else {
         // New user — auto-create "Einkaufsliste"
-        const { list } = await listApi.createList('Einkaufsliste');
+        const { list } = await listApi.createList('Home');
         setLists([list]);
         setActiveListId(list.id);
       }
@@ -306,14 +306,16 @@ export function AppProvider({ children }) {
   const lastSmartKeyRef = useRef(null);
 
   const fetchSmartGroups = useCallback((force = false) => {
-    const uncheckedItems = shoppingList
-      .filter(item => !item.checked)
-      .map(item => item.name);
-    const key = uncheckedItems.join('||');
+    // Key on ALL item names (sorted) so check/uncheck doesn't change the key
+    const allItems = shoppingList.map(item => ({
+      name: item.name,
+      id: item.entryId ?? item.id,
+    }));
+    const key = allItems.map(i => i.name).sort().join('||');
 
     if (!force && key === lastSmartKeyRef.current) return;
 
-    if (uncheckedItems.length === 0) {
+    if (allItems.length === 0) {
       lastSmartKeyRef.current = key;
       setSmartGroups([]);
       setSmartStatus('idle');
@@ -322,14 +324,25 @@ export function AppProvider({ children }) {
 
     lastSmartKeyRef.current = key;
     setSmartStatus('loading');
+    // Send ALL items so AI returns source indices into the full list
     fetch('/api/normalize-shopping-list', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: uncheckedItems }),
+      body: JSON.stringify({ items: allItems.map(i => i.name) }),
     })
       .then(r => r.json())
       .then(data => {
-        setSmartGroups(data.groups ?? []);
+        // Map 1-based source indices to entryIds
+        const groups = (data.groups ?? []).map(group => ({
+          ...group,
+          items: group.items.map(item => ({
+            ...item,
+            sourceIds: (item.sources || [])
+              .map(idx => allItems[idx - 1]?.id)
+              .filter(Boolean),
+          })),
+        }));
+        setSmartGroups(groups);
         setSmartStatus('idle');
       })
       .catch(() => setSmartStatus('error'));
@@ -363,7 +376,7 @@ export function AppProvider({ children }) {
         setActiveListId(remaining[0].id);
       } else {
         // Auto-create fresh list
-        listApi.createList('Einkaufsliste').then(({ list }) => {
+        listApi.createList('Home').then(({ list }) => {
           setLists([list]);
           setActiveListId(list.id);
         });

@@ -45,15 +45,6 @@ export const ShoppingListView = ({
   onMenuTap,
   ...props
 }) => {
-  // Build a lookup of checked state from actual shopping list items (by lowercase name)
-  const checkedByName = React.useMemo(() => {
-    const map = {};
-    items.forEach((name, idx) => {
-      const key = name?.toLowerCase();
-      if (key && checkedItems[idx]) map[key] = true;
-    });
-    return map;
-  }, [items, checkedItems]);
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -377,7 +368,7 @@ export const ShoppingListView = ({
             {smartStatus === 'idle' && smartGroups.length > 0 && (
               <SmartListContent
                 smartGroups={smartGroups}
-                checkedByName={checkedByName}
+                checkedItems={checkedItems}
                 onItemCheck={onItemCheck}
                 itemIds={itemIds}
                 items={items}
@@ -582,27 +573,49 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
   );
 }
 
-function SmartListContent({ smartGroups, checkedByName, onItemCheck, itemIds, items, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
-  // Find the matching shopping list item ID by name (bidirectional partial match)
-  const findItemId = (smartItemName) => {
-    const needle = smartItemName?.toLowerCase();
-    if (!needle) return null;
-    for (let i = 0; i < items.length; i++) {
-      const name = items[i]?.toLowerCase();
-      if (name && (name.includes(needle) || needle.includes(name))) return itemIds[i];
-    }
-    return null;
-  };
+function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, items, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
+  // Build a Set of checked item IDs for fast lookup
+  const checkedIdSet = React.useMemo(() => {
+    const set = new Set();
+    itemIds.forEach((id, idx) => {
+      if (checkedItems[idx]) set.add(id);
+    });
+    return set;
+  }, [itemIds, checkedItems]);
 
-  // Check if a smart item name matches any checked shopping list item (bidirectional)
-  const isChecked = (itemName) => {
-    const needle = itemName?.toLowerCase();
+  // Check if a smart item is checked — uses sourceIds when available, falls back to name match
+  const isItemChecked = (item) => {
+    if (item.sourceIds?.length > 0) {
+      return item.sourceIds.every(id => checkedIdSet.has(id));
+    }
+    // Fallback: exact name match against item IDs
+    const needle = item.name?.toLowerCase();
     if (!needle) return false;
-    if (checkedByName[needle]) return true;
-    for (const [name, checked] of Object.entries(checkedByName)) {
-      if (checked && (name.includes(needle) || needle.includes(name))) return true;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i]?.toLowerCase() === needle && checkedItems[i]) return true;
     }
     return false;
+  };
+
+  // Toggle a smart item — checks/unchecks all source shopping list items
+  const handleToggle = (item) => {
+    const checked = isItemChecked(item);
+    if (item.sourceIds?.length > 0) {
+      // Toggle each source item
+      item.sourceIds.forEach(id => {
+        const idx = itemIds.indexOf(id);
+        if (idx !== -1 && onItemCheck) onItemCheck(idx, !checked, id);
+      });
+    } else {
+      // Fallback: exact name match
+      const needle = item.name?.toLowerCase();
+      for (let i = 0; i < items.length; i++) {
+        if (items[i]?.toLowerCase() === needle) {
+          onItemCheck?.(i, !checked, itemIds[i]);
+          return;
+        }
+      }
+    }
   };
 
   const allCheckedItems = [];
@@ -613,28 +626,16 @@ function SmartListContent({ smartGroups, checkedByName, onItemCheck, itemIds, it
       const key = `${groupIdx}-${item.name}`;
       const isPantry = pantryStaples.includes(item.name?.toLowerCase());
       if (isPantry) pantryItems.push({ item, key });
-      else if (isChecked(item.name)) allCheckedItems.push({ item, key });
+      else if (isItemChecked(item)) allCheckedItems.push({ item, key });
     });
   });
-
-  const handleToggle = (itemName) => {
-    const id = findItemId(itemName);
-    if (id && onItemCheck) {
-      const needle = itemName?.toLowerCase();
-      const idx = items.findIndex((n) => {
-        const name = n?.toLowerCase();
-        return name && (name.includes(needle) || needle.includes(name));
-      });
-      onItemCheck(idx, !isChecked(itemName), id);
-    }
-  };
 
   return (
     <>
       {smartGroups.map((group, groupIdx) => {
         const visibleItems = group.items
           .map((item) => ({ item, key: `${groupIdx}-${item.name}` }))
-          .filter(({ item }) => !pantryStaples.includes(item.name?.toLowerCase()) && !isChecked(item.name));
+          .filter(({ item }) => !pantryStaples.includes(item.name?.toLowerCase()) && !isItemChecked(item));
         if (visibleItems.length === 0) return null;
         return (
           <div key={group.category} className="smart-group">
@@ -647,7 +648,7 @@ function SmartListContent({ smartGroups, checkedByName, onItemCheck, itemIds, it
                 item={item}
                 checked={false}
                 isPantry={false}
-                onToggle={() => handleToggle(item.name)}
+                onToggle={() => handleToggle(item)}
                 onTogglePantryStaple={onTogglePantryStaple}
                 onDelete={() => onSmartItemDelete?.(item.name)}
                 isFirst={idx === 0}
@@ -666,7 +667,7 @@ function SmartListContent({ smartGroups, checkedByName, onItemCheck, itemIds, it
               item={item}
               checked={true}
               isPantry={false}
-              onToggle={() => handleToggle(item.name)}
+              onToggle={() => handleToggle(item)}
               onTogglePantryStaple={onTogglePantryStaple}
               onDelete={() => onSmartItemDelete?.(item.name)}
               isFirst={idx === 0}
