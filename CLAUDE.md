@@ -39,6 +39,10 @@ Components can originate from multiple sources — Figma, Storybook, or direct c
 | Context | `src/context/` | Global state (Auth, App, Preferences) |
 | API | `api/` | Vercel serverless functions |
 
+### Features Map
+
+**Read `FEATURES-MAP.md`** to locate key files for any feature area before scanning the codebase.
+
 ### State Management
 
 Three React Contexts, nested in this order:

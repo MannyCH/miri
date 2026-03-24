@@ -17,6 +17,10 @@ Agent instructions index for the Miri project. Read the relevant rule file befor
 | Deployment, env vars, Vercel | `.claude/rules/deployment.md` |
 | Project overview, architecture | `CLAUDE.md` |
 
+## Features Map
+
+**Read `FEATURES-MAP.md` first** to locate key files for any feature area. This avoids scanning the codebase from scratch.
+
 ## Feature Specs (read before implementing)
 
 | Feature | Spec |
