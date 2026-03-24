@@ -2,8 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-For detailed rules, see `AGENTS.md` which routes to modular rule files in `.claude/rules/`.
-
 ## Commands
 
 ```bash
@@ -66,6 +64,35 @@ Three React Contexts, nested in this order:
 
 All visual values come from CSS variables in `src/design-tokens.css`, `src/typography-tokens.css`, and `src/elevation-tokens.css`. Never hardcode colors, spacing, font sizes, or border radii. See `.claude/rules/tokens.md` for full reference.
 
+## Rules (read the relevant file before working in that area)
+
+| Working on | Read this |
+|------------|-----------|
+| Components or patterns | `.claude/rules/components.md` |
+| Design tokens, CSS, styling | `.claude/rules/tokens.md` |
+| Figma design work | `.claude/rules/figma.md` |
+| Storybook stories, Chromatic | `.claude/rules/storybook.md` |
+| API routes (`api/`) | `.claude/rules/api.md` |
+| Database, schema, migrations | `.claude/rules/database.md` |
+| Feature specs, docs | `.claude/rules/docs.md` |
+| Dev workflow, code quality, commits | `.claude/rules/development.md` |
+| Deployment, env vars, Vercel | `.claude/rules/deployment.md` |
+
+## Feature Specs (read before implementing)
+
+| Feature | Spec |
+|---------|------|
+| Shopping list sharing & multi-list | `docs/shopping-list-flow.json` |
+| Real-time sync (Pusher) | `docs/pusher-integration.json` |
+
+## Design Mappings
+
+| File | Purpose |
+|------|---------|
+| `FIGMA_STORYBOOK_MAPPING.md` | Figma ↔ Storybook component pairings |
+| `design-mapping.json` | Structured mapping data |
+| `database/schema.sql` | Full DB schema |
+
 ## MCP Servers
 
 | Server | Scope | Availability |
@@ -75,7 +102,7 @@ All visual values come from CSS variables in `src/design-tokens.css`, `src/typog
 | **Neon** | user | Always connected |
 | **Context7** | user | Always connected — use proactively for library docs |
 
-## Key Rules (detailed in `.claude/rules/`)
+## Key Rules
 
 1. **Minimal changes** — only what's requested, never add unrequested features
 2. **Design tokens** — never hardcode visual values
