@@ -296,6 +296,7 @@ export function ShoppingListPage() {
       <ActionSheet
         isOpen={isActionSheetOpen}
         onClose={() => setIsActionSheetOpen(false)}
+        title={listName}
         items={actionSheetItems}
       />
 
