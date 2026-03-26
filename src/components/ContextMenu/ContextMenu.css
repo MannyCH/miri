@@ -1,0 +1,87 @@
+/* ContextMenu — Dropdown anchored to a three-dot trigger */
+
+.context-menu-wrapper {
+  position: relative;
+}
+
+.context-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-icon-neutral);
+  border-radius: var(--corner-radius-8);
+  cursor: pointer;
+}
+
+.context-menu-trigger:hover {
+  background: var(--color-fill-hover);
+}
+
+.context-menu-trigger:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.context-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--spacing-4);
+  min-width: 180px;
+  background: var(--color-background-raised);
+  border-radius: var(--corner-radius-8);
+  box-shadow: var(--elevation-overlay);
+  padding: var(--spacing-4) 0;
+  z-index: 10;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-12);
+  width: 100%;
+  padding: var(--spacing-12) var(--spacing-16);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: var(--color-text-strong);
+}
+
+.context-menu-item:hover {
+  background: var(--color-fill-hover);
+}
+
+.context-menu-item:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: -2px;
+}
+
+.context-menu-item:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.context-menu-item--destructive {
+  color: var(--color-text-error);
+}
+
+.context-menu-item-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.context-menu-separator {
+  height: 1px;
+  margin: var(--spacing-4) var(--spacing-16);
+  background: var(--color-stroke-weak);
+}

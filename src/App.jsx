@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { PusherProvider } from './context/PusherContext';
 import { PreferencesProvider, usePreferences } from './context/PreferencesContext';
 import { ToastContainer } from './components/ToastContainer';
 import './index.css';
@@ -14,6 +15,7 @@ const AuthPage = lazy(() => import('./pages/AuthPage').then((module) => ({ defau
 const AccountPage = lazy(() => import('./pages/AccountPage').then((module) => ({ default: module.AccountPage })));
 const OnboardingPage = lazy(() => import('./pages/OnboardingPage').then((module) => ({ default: module.OnboardingPage })));
 const RecipeImportPage = lazy(() => import('./pages/RecipeImportPage').then((module) => ({ default: module.RecipeImportPage })));
+const JoinListPage = lazy(() => import('./pages/JoinListPage').then((module) => ({ default: module.JoinListPage })));
 
 /**
  * Miri - Meal Planning App
@@ -91,6 +93,10 @@ function AppContent() {
             element={isAuthenticated ? <ShoppingListPage /> : <Navigate to="/auth" replace />}
           />
           <Route
+            path="/join/:token"
+            element={isAuthenticated ? <JoinListPage /> : <Navigate to="/auth" replace />}
+          />
+          <Route
             path="/account"
             element={isAuthenticated ? <AccountPage /> : <Navigate to="/auth" replace />}
           />
@@ -104,13 +110,15 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <PreferencesProvider>
-        <AppProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </AppProvider>
-      </PreferencesProvider>
+      <PusherProvider>
+        <PreferencesProvider>
+          <AppProvider>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </AppProvider>
+        </PreferencesProvider>
+      </PusherProvider>
     </AuthProvider>
   );
 }

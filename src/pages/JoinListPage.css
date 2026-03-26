@@ -1,0 +1,72 @@
+.join-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: var(--spacing-24);
+  background: var(--color-bg-base);
+}
+
+.join-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--color-bg-surface);
+  border-radius: var(--corner-radius-16);
+  padding: var(--spacing-32);
+  text-align: center;
+  box-shadow: var(--elevation-medium);
+}
+
+.join-card h2 {
+  margin-bottom: var(--spacing-8);
+}
+
+.join-list-name {
+  color: var(--color-text-strong);
+  margin-bottom: var(--spacing-4);
+}
+
+.join-meta {
+  color: var(--color-text-weak);
+  margin-bottom: var(--spacing-24);
+}
+
+.join-error {
+  color: var(--color-text-error);
+  margin-bottom: var(--spacing-16);
+}
+
+.join-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.join-btn {
+  width: 100%;
+  height: var(--control-height);
+  border-radius: var(--corner-radius-8);
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.join-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.join-btn--primary {
+  background: var(--color-fill-brand);
+  color: var(--color-text-on-brand);
+}
+
+.join-btn--secondary {
+  background: var(--color-fill-brand-weak);
+  color: var(--color-text-brand);
+}
+
+.join-btn--ghost {
+  background: transparent;
+  color: var(--color-text-weak);
+}

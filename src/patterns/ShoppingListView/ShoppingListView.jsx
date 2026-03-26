@@ -5,6 +5,7 @@ import { Divider } from '../../components/Divider';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
+import { ListSwitcher } from '../../components/ListSwitcher';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './ShoppingListView.css';
 
@@ -33,12 +34,17 @@ export const ShoppingListView = ({
   summaryEntries = [],
   pantryStaples = [],
   onTogglePantryStaple,
+  // Multi-list props
+  listName = 'Shopping list',
+  memberCount = 1,
+  isListLoading = false,
+  onListNameTap,
+  lists = [],
+  activeListId,
+  onSwitchList,
+  onMenuTap,
   ...props
 }) => {
-  const [smartChecked, setSmartChecked] = useState({});
-
-  const toggleSmartItem = (key) =>
-    setSmartChecked(prev => ({ ...prev, [key]: !prev[key] }));
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -163,24 +169,51 @@ export const ShoppingListView = ({
     >
       {/* Header */}
       <header className="shopping-list-header">
-        <h1 className="text-h1-bold">Shopping list</h1>
-
-        {/* View Mode Toggle */}
-        <div className="shopping-list-view-toggle">
-          <button
-            className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('recipe')}
-            aria-label="Group by recipe"
-          >
-            <GridIcon />
-          </button>
-          <button
-            className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
-            onClick={() => onViewModeChange?.('smart')}
-            aria-label="Smart grouped list"
-          >
-            <SparkleIcon />
-          </button>
+        <h1 className="text-h1-bold">Einkaufsliste</h1>
+        <div className="shopping-list-subtitle-row">
+          <div className="shopping-list-subtitle-left">
+            <ListSwitcher
+              lists={lists.map((l) => ({
+                ...l,
+                isShared: l.memberCount > 1,
+              }))}
+              activeListId={activeListId}
+              onSwitch={onSwitchList}
+            />
+            {memberCount > 1 && (
+              <span className="shopping-list-share-badge text-caption-bold">
+                <UsersIcon /> {memberCount}
+              </span>
+            )}
+          </div>
+          <div className="shopping-list-subtitle-right">
+            <div className="shopping-list-view-toggle">
+              <button
+                className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
+                onClick={() => onViewModeChange?.('recipe')}
+                aria-label="Group by recipe"
+              >
+                <GridIcon />
+              </button>
+              <button
+                className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
+                onClick={() => onViewModeChange?.('smart')}
+                aria-label="Smart grouped list"
+              >
+                <SparkleIcon />
+              </button>
+            </div>
+            {onMenuTap && (
+              <button
+                type="button"
+                className="shopping-list-menu-btn"
+                onClick={onMenuTap}
+                aria-label="List options"
+              >
+                <MoreIcon />
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -335,8 +368,10 @@ export const ShoppingListView = ({
             {smartStatus === 'idle' && smartGroups.length > 0 && (
               <SmartListContent
                 smartGroups={smartGroups}
-                smartChecked={smartChecked}
-                toggleSmartItem={toggleSmartItem}
+                checkedItems={checkedItems}
+                onItemCheck={onItemCheck}
+                itemIds={itemIds}
+                items={items}
                 pantryStaples={pantryStaples}
                 onTogglePantryStaple={onTogglePantryStaple}
                 onSmartItemDelete={onSmartItemDelete}
@@ -538,16 +573,60 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
   );
 }
 
-function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
-  const allCheckedItems = [];
-  const pantryItems = [];
+function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, items, pantryStaples, onTogglePantryStaple, onSmartItemDelete, onSmartRefresh, PURCHASED_SECTION_TITLE }) {
+  // Build a Set of checked item IDs for fast lookup
+  const checkedIdSet = React.useMemo(() => {
+    const set = new Set();
+    itemIds.forEach((id, idx) => {
+      if (checkedItems[idx]) set.add(id);
+    });
+    return set;
+  }, [itemIds, checkedItems]);
 
+  // Smart groups only contain unchecked items (AI merges quantities correctly).
+  // A smart item is "checked" if ALL its sources are now checked in the shopping list.
+  const isItemChecked = (item) => {
+    if (item.sourceIds?.length > 0) {
+      return item.sourceIds.every(id => checkedIdSet.has(id));
+    }
+    return false;
+  };
+
+  // Toggle a smart item — checks/unchecks all source shopping list items
+  const handleToggle = (item) => {
+    const checked = isItemChecked(item);
+    if (item.sourceIds?.length > 0) {
+      item.sourceIds.forEach(id => {
+        const idx = itemIds.indexOf(id);
+        if (idx !== -1 && onItemCheck) onItemCheck(idx, !checked, id);
+      });
+    }
+  };
+
+  // Unchecked toggle for items in "Eingekauft" — derived from shopping list, not smart groups
+  const handleCheckedToggle = (id) => {
+    const idx = itemIds.indexOf(id);
+    if (idx !== -1 && onItemCheck) onItemCheck(idx, false, id);
+  };
+
+  // Checked items come directly from shopping list (not AI groups) — correct names/quantities
+  const checkedShoppingItems = React.useMemo(() => {
+    const result = [];
+    items.forEach((name, idx) => {
+      if (checkedItems[idx] && !pantryStaples.includes(name?.toLowerCase())) {
+        result.push({ name, id: itemIds[idx] });
+      }
+    });
+    return result;
+  }, [items, checkedItems, itemIds, pantryStaples]);
+
+  // Pantry items from smart groups
+  const pantryItems = [];
   smartGroups.forEach((group, groupIdx) => {
     group.items.forEach((item) => {
-      const key = `${groupIdx}-${item.name}`;
-      const isPantry = pantryStaples.includes(item.name?.toLowerCase());
-      if (isPantry) pantryItems.push({ item, key });
-      else if (smartChecked[key]) allCheckedItems.push({ item, key });
+      if (pantryStaples.includes(item.name?.toLowerCase())) {
+        pantryItems.push({ item, key: `${groupIdx}-${item.name}` });
+      }
     });
   });
 
@@ -556,7 +635,8 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
       {smartGroups.map((group, groupIdx) => {
         const visibleItems = group.items
           .map((item) => ({ item, key: `${groupIdx}-${item.name}` }))
-          .filter(({ item, key }) => !pantryStaples.includes(item.name?.toLowerCase()) && !smartChecked[key]);
+          .filter(({ item }) =>
+            !pantryStaples.includes(item.name?.toLowerCase()) && !isItemChecked(item));
         if (visibleItems.length === 0) return null;
         return (
           <div key={group.category} className="smart-group">
@@ -569,7 +649,7 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
                 item={item}
                 checked={false}
                 isPantry={false}
-                onToggle={() => toggleSmartItem(key)}
+                onToggle={() => handleToggle(item)}
                 onTogglePantryStaple={onTogglePantryStaple}
                 onDelete={() => onSmartItemDelete?.(item.name)}
                 isFirst={idx === 0}
@@ -579,18 +659,18 @@ function SmartListContent({ smartGroups, smartChecked, toggleSmartItem, pantrySt
         );
       })}
 
-      {allCheckedItems.length > 0 && (
+      {checkedShoppingItems.length > 0 && (
         <div className="smart-group">
           <h2 className="smart-group-header text-tiny-bold">{PURCHASED_SECTION_TITLE.toUpperCase()}</h2>
-          {allCheckedItems.map(({ item, key }, idx) => (
+          {checkedShoppingItems.map(({ name, id }, idx) => (
             <SmartListItem
-              key={key}
-              item={item}
+              key={id}
+              item={{ name, quantity: '' }}
               checked={true}
               isPantry={false}
-              onToggle={() => toggleSmartItem(key)}
+              onToggle={() => handleCheckedToggle(id)}
               onTogglePantryStaple={onTogglePantryStaple}
-              onDelete={() => onSmartItemDelete?.(item.name)}
+              onDelete={() => onSmartItemDelete?.(name)}
               isFirst={idx === 0}
             />
           ))}
@@ -678,6 +758,23 @@ const SparkleIcon = () => (
     <line x1="3" y1="10" x2="21" y2="10"/>
     <line x1="3" y1="15" x2="21" y2="15"/>
     <line x1="3" y1="20" x2="10" y2="20"/>
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const MoreIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="12" cy="5" r="1" fill="currentColor"/>
+    <circle cx="12" cy="12" r="1" fill="currentColor"/>
+    <circle cx="12" cy="19" r="1" fill="currentColor"/>
   </svg>
 );
 

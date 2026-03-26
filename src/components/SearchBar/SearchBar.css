@@ -28,9 +28,9 @@
   appearance: none;
   box-shadow: none;
   font-family: var(--font-family-body);
-  font-size: 16px; /* iOS requires >=16px to avoid auto-zoom */
-  font-weight: 400;
-  line-height: 20px;
+  font-size: 16px; /* Must be >=16px to prevent iOS auto-zoom — matches .text-body-regular sizing */
+  font-weight: 400; /* text-body-regular weight */
+  line-height: 24px; /* text-body-regular line-height */
 }
 
 .search-bar-input::placeholder {
