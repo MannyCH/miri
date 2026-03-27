@@ -396,9 +396,7 @@
   right: 0;
   z-index: 20;
   display: flex;
-  align-items: center;
-  gap: var(--spacing-8);
-  padding: var(--spacing-12) var(--spacing-16);
+  flex-direction: column;
   background: var(--color-background-base);
   border-bottom: 1px solid var(--color-stroke-weak);
   animation: search-slide-down 0.2s ease;
@@ -409,8 +407,86 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.shopping-list-search-overlay .search-bar {
+.shopping-list-search-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12) var(--spacing-16);
+}
+
+.shopping-list-search-row .search-bar {
   flex: 1;
+}
+
+/* Suggestions list */
+.shopping-list-suggestions {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-stroke-weak);
+}
+
+.shopping-list-suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-12) var(--spacing-16);
+  background: transparent;
+  border: none;
+  text-align: left;
+  color: var(--color-text-strong);
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-stroke-weak);
+}
+
+.shopping-list-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.shopping-list-suggestion-item:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: -2px;
+}
+
+.shopping-list-suggestion-add {
+  color: var(--color-text-brand);
+}
+
+/* Pending ingredient rows (quantity input) */
+.shopping-list-pending {
+  width: 100%;
+}
+
+.pending-ingredient-row {
+  width: 100%;
+}
+
+.pending-ingredient-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12) var(--spacing-16);
+  min-height: 48px;
+}
+
+.pending-ingredient-quantity {
+  width: 64px;
+  flex-shrink: 0;
+  padding: var(--spacing-4) var(--spacing-8);
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-4);
+  background: var(--color-background-raised);
+  color: var(--color-text-strong);
+  text-align: center;
+  font-family: inherit;
+}
+
+.pending-ingredient-quantity:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 1px;
+}
+
+.pending-ingredient-name {
+  flex: 1;
+  color: var(--color-text-strong);
 }
 
 .shopping-list-search-cancel {

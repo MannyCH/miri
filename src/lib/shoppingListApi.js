@@ -78,6 +78,14 @@ export function toggleItem(listId, entryId, checked, socketId) {
   });
 }
 
+export function updateItemName(listId, entryId, name, socketId) {
+  return authFetch('/api/shopping-list-items', {
+    method: 'PATCH',
+    body: { listId, entryId, name },
+    socketId,
+  });
+}
+
 export function removeItem(listId, entryId, socketId) {
   return authFetch('/api/shopping-list-items', {
     method: 'DELETE',

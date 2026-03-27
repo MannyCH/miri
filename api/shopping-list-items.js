@@ -71,21 +71,35 @@ export default async function handler(req, res) {
       return res.status(201).json({ ok: true });
     }
 
-    // ── PATCH: toggle checked ──
+    // ── PATCH: update checked and/or name ──
     if (req.method === 'PATCH') {
-      const { listId, entryId, checked } = req.body ?? {};
-      if (!listId || !entryId || typeof checked !== 'boolean') {
-        return res.status(400).json({ error: 'listId, entryId, and checked (boolean) required' });
+      const { listId, entryId, checked, name } = req.body ?? {};
+      if (!listId || !entryId) {
+        return res.status(400).json({ error: 'listId and entryId required' });
+      }
+      if (typeof checked !== 'boolean' && !name) {
+        return res.status(400).json({ error: 'checked or name required' });
       }
       if (!(await verifyMembership(listId))) return res.status(403).json({ error: 'Not a member' });
 
-      await sql`
-        UPDATE shopping_list_items
-        SET checked = ${checked}, updated_at = NOW()
-        WHERE list_id = ${listId} AND entry_id = ${entryId}
-      `;
+      if (typeof checked === 'boolean') {
+        await sql`
+          UPDATE shopping_list_items
+          SET checked = ${checked}, updated_at = NOW()
+          WHERE list_id = ${listId} AND entry_id = ${entryId}
+        `;
+        await triggerEvent(listId, 'item:updated', { entryId, checked });
+      }
 
-      await triggerEvent(listId, 'item:updated', { entryId, checked });
+      if (name) {
+        await sql`
+          UPDATE shopping_list_items
+          SET name = ${name}, updated_at = NOW()
+          WHERE list_id = ${listId} AND entry_id = ${entryId}
+        `;
+        await triggerEvent(listId, 'item:updated', { entryId, name });
+      }
+
       return res.status(200).json({ ok: true });
     }
 

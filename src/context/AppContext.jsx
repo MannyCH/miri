@@ -543,6 +543,34 @@ export function AppProvider({ children }) {
     } catch { /* optimistic state is good enough */ }
   }, [activeListId, lookupRecipe, getSocketId, createEntryId]);
   
+  // Add a single ingredient manually (no recipe association)
+  const addSingleIngredient = useCallback((name) => {
+    if (!activeListId || !name.trim()) return null;
+    const entryId = createEntryId();
+    const newItem = {
+      entryId,
+      name: name.trim(),
+      recipeId: null,
+      recipeName: null,
+      checked: false,
+      createdAt: new Date().toISOString(),
+    };
+    setShoppingList(prev => [newItem, ...prev]);
+    const sid = getSocketId();
+    listApi.addItem(activeListId, newItem, sid).catch(() => {});
+    return entryId;
+  }, [activeListId, getSocketId, createEntryId]);
+
+  // Update ingredient name (used to prepend quantity after manual add)
+  const updateIngredientName = useCallback((entryId, newName) => {
+    if (!activeListId || !newName.trim()) return;
+    setShoppingList(prev =>
+      prev.map(i => i.entryId === entryId ? { ...i, name: newName.trim() } : i)
+    );
+    const sid = getSocketId();
+    listApi.updateItemName(activeListId, entryId, newName.trim(), sid).catch(() => {});
+  }, [activeListId, getSocketId]);
+
   // Toggle ingredient checked state (optimistic + API)
   const toggleIngredientCheck = useCallback((ingredientId) => {
     const item = shoppingList.find((i) => i.entryId === ingredientId);
@@ -707,6 +735,8 @@ export function AppProvider({ children }) {
     shoppingListViewMode,
     setShoppingListViewMode,
     addRecipeToShoppingList,
+    addSingleIngredient,
+    updateIngredientName,
     toggleIngredientCheck,
     deleteIngredient,
     deleteRecipeFromShoppingList,

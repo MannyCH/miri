@@ -43,10 +43,14 @@ export const ShoppingListView = ({
   activeListId,
   onSwitchList,
   onMenuTap,
+  onAddIngredient,
+  pendingItems = [],
+  onSetQuantity,
   ...props
 }) => {
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
+  const MAX_SUGGESTIONS = 5;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
@@ -78,6 +82,19 @@ export const ShoppingListView = ({
     setIsSearchOpen(false);
     onSearch?.('');
   };
+
+  const handleAddSuggestion = (name) => {
+    onAddIngredient?.(name);
+    onSearch?.('');
+    searchInputRef.current?.focus();
+  };
+
+  const trimmedQuery = searchQuery.trim();
+  const suggestions = trimmedQuery.length > 0
+    ? INGREDIENT_SUGGESTIONS
+        .filter(s => s.toLowerCase().includes(trimmedQuery.toLowerCase()))
+        .slice(0, MAX_SUGGESTIONS)
+    : [];
 
   const getRecipeGroupKey = (group, index) =>
     group.recipeId ?? group.id ?? group.recipeName ?? `group-${index}`;
@@ -219,6 +236,18 @@ export const ShoppingListView = ({
 
       {/* Content */}
       <div className="shopping-list-content">
+        {pendingItems.length > 0 && (
+          <div className="shopping-list-pending">
+            {pendingItems.map(({ entryId, name }) => (
+              <PendingIngredientRow
+                key={entryId}
+                entryId={entryId}
+                name={name}
+                onSetQuantity={onSetQuantity}
+              />
+            ))}
+          </div>
+        )}
         {summaryEntries.length > 0 && (
           <div className="shopping-list-summary">
             <p className="text-body-small-bold shopping-list-summary-title">For this week</p>
@@ -389,22 +418,49 @@ export const ShoppingListView = ({
       {/* Search overlay — slides in from top, Cancel always visible above keyboard */}
       {isSearchOpen && (
         <div className="shopping-list-search-overlay">
-          <SearchBar
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            inputRef={searchInputRef}
-            placeholder="Ich brauche..."
-            value={searchQuery}
-            onChange={(e) => onSearch?.(e.target.value)}
-            showTrailingIcon={false}
-          />
-          <button
-            type="button"
-            className="shopping-list-search-cancel"
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
+          <div className="shopping-list-search-row">
+            <SearchBar
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              inputRef={searchInputRef}
+              placeholder="Ich brauche..."
+              value={searchQuery}
+              onChange={(e) => onSearch?.(e.target.value)}
+              showTrailingIcon={false}
+            />
+            <button
+              type="button"
+              className="shopping-list-search-cancel"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+          {trimmedQuery.length > 0 && (
+            <div className="shopping-list-suggestions" role="listbox" aria-label="Ingredient suggestions">
+              {suggestions.map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  className="shopping-list-suggestion-item text-body-small-regular"
+                  role="option"
+                  aria-selected="false"
+                  onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(name); }}
+                >
+                  {name}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="shopping-list-suggestion-item shopping-list-suggestion-add text-body-small-regular"
+                role="option"
+                aria-selected="false"
+                onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(trimmedQuery); }}
+              >
+                Add &ldquo;{trimmedQuery}&rdquo;
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -420,6 +476,61 @@ export const ShoppingListView = ({
     </div>
   );
 };
+
+// Common ingredients for search suggestions
+const INGREDIENT_SUGGESTIONS = [
+  'Apples', 'Avocado', 'Bananas', 'Basil', 'Beef', 'Bell pepper',
+  'Black pepper', 'Bread', 'Broccoli', 'Butter', 'Carrots', 'Celery',
+  'Cheese', 'Chicken', 'Chickpeas', 'Chili flakes', 'Chocolate',
+  'Cinnamon', 'Coconut milk', 'Coffee', 'Corn', 'Cream', 'Cucumbers',
+  'Cumin', 'Eggs', 'Fish', 'Flour', 'Garlic', 'Ginger', 'Greek yogurt',
+  'Honey', 'Kale', 'Lemons', 'Lentils', 'Lettuce', 'Limes', 'Milk',
+  'Mushrooms', 'Mustard', 'Oats', 'Olive oil', 'Onions', 'Oranges',
+  'Paprika', 'Parmesan', 'Parsley', 'Pasta', 'Peas', 'Potatoes',
+  'Rice', 'Salmon', 'Salt', 'Shrimp', 'Soy sauce', 'Spinach', 'Sugar',
+  'Sweet potato', 'Tomatoes', 'Tuna', 'Vanilla', 'Vinegar', 'Walnuts',
+  'Yogurt', 'Zucchini',
+];
+
+/**
+ * PendingIngredientRow — shows a newly added ingredient with an editable quantity field.
+ * Quantity is prepended to the name when confirmed.
+ */
+function PendingIngredientRow({ entryId, name, onSetQuantity }) {
+  const [quantity, setQuantity] = React.useState('');
+  const inputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const handleCommit = () => {
+    onSetQuantity?.(entryId, name, quantity);
+  };
+
+  return (
+    <div className="pending-ingredient-row">
+      <Divider />
+      <div className="pending-ingredient-content">
+        <input
+          ref={inputRef}
+          className="pending-ingredient-quantity text-body-small-regular"
+          type="text"
+          value={quantity}
+          placeholder="qty"
+          onChange={(e) => setQuantity(e.target.value)}
+          onBlur={handleCommit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') { e.preventDefault(); inputRef.current?.blur(); }
+          }}
+          aria-label={`Quantity for ${name}`}
+        />
+        <span className="pending-ingredient-name text-body-small-regular">{name}</span>
+      </div>
+      <Divider />
+    </div>
+  );
+}
 
 /**
  * SmartListItem — tap to check/uncheck,

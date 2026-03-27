@@ -28,6 +28,8 @@ export function ShoppingListPage() {
     markRecipeAsPurchased,
     markRecipeAsUnpurchased,
     clearShoppingList,
+    addSingleIngredient,
+    updateIngredientName,
     smartGroups,
     setSmartGroups,
     smartStatus,
@@ -48,6 +50,7 @@ export function ShoppingListPage() {
   } = useApp();
   const { preferences } = usePreferences();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [pendingQuantityIds, setPendingQuantityIds] = React.useState(new Set());
   const [isActionSheetOpen, setIsActionSheetOpen] = React.useState(false);
   const [isShareSheetOpen, setIsShareSheetOpen] = React.useState(false);
   const [isRenaming, setIsRenaming] = React.useState(false);
@@ -63,6 +66,21 @@ export function ShoppingListPage() {
   const [pantryStaples, setPantryStaples] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem('miri-pantry-staples') ?? '[]'); } catch { return []; }
   });
+
+  const handleAddIngredient = React.useCallback((name) => {
+    const entryId = addSingleIngredient(name);
+    if (entryId) setPendingQuantityIds(prev => new Set([...prev, entryId]));
+  }, [addSingleIngredient]);
+
+  const handleSetQuantity = React.useCallback((entryId, ingredientName, quantity) => {
+    const newName = quantity.trim() ? `${quantity.trim()} ${ingredientName}` : ingredientName;
+    updateIngredientName(entryId, newName);
+    setPendingQuantityIds(prev => {
+      const next = new Set(prev);
+      next.delete(entryId);
+      return next;
+    });
+  }, [updateIngredientName]);
 
   const togglePantryStaple = React.useCallback((itemName) => {
     setPantryStaples(prev => {
@@ -126,7 +144,8 @@ export function ShoppingListPage() {
 
   const filteredList = shoppingList
     .map((item, originalIdx) => ({ ...item, originalIdx }))
-    .filter(item => !lowerQuery || item.name.toLowerCase().includes(lowerQuery));
+    .filter(item => !lowerQuery || item.name.toLowerCase().includes(lowerQuery))
+    .filter(item => !pendingQuantityIds.has(item.entryId));
 
   const items = filteredList.map(item => item.name);
   const itemKeys = filteredList.map((item, index) => item.entryId ?? `${item.id}-${index}`);
@@ -290,6 +309,11 @@ export function ShoppingListPage() {
         onClearList={clearShoppingList}
         searchQuery={searchQuery}
         onSearch={setSearchQuery}
+        onAddIngredient={handleAddIngredient}
+        pendingItems={shoppingList
+          .filter(item => pendingQuantityIds.has(item.entryId))
+          .map(item => ({ entryId: item.entryId, name: item.name }))}
+        onSetQuantity={handleSetQuantity}
       />
 
       {/* List action sheet */}
