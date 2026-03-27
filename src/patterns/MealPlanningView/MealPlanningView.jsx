@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { CalendarModule } from '../../components/CalendarModule';
 import { Button } from '../../components/Button';
 import { RecipeListItem } from '../../components/RecipeListItem';
 import { Divider } from '../../components/Divider';
+import { ContextMenu } from '../../components/ContextMenu';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './MealPlanningView.css';
 
@@ -27,23 +28,6 @@ export const MealPlanningView = ({
   onReplaceMeal,
   ...props
 }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handler = (e) => {
-      if (!menuRef.current?.contains(e.target)) setMenuOpen(false);
-    };
-    document.addEventListener('pointerdown', handler);
-    return () => document.removeEventListener('pointerdown', handler);
-  }, [menuOpen]);
-
-  const handleMenuAction = (action) => {
-    setMenuOpen(false);
-    action?.();
-  };
-
   return (
     <div className="meal-planning-view" {...props}>
       {/* Header: Title + three-dot menu + Calendar Module */}
@@ -53,36 +37,12 @@ export const MealPlanningView = ({
             {title}
           </h1>
           {hasPlan && (
-            <div className="meal-planning-menu-wrapper" ref={menuRef}>
-              <button
-                className="icon-button"
-                aria-label="More options"
-                aria-expanded={menuOpen}
-                aria-haspopup="menu"
-                onClick={() => setMenuOpen(prev => !prev)}
-              >
-                <MoreIcon />
-              </button>
-              {menuOpen && (
-                <div className="context-menu" role="menu">
-                  <button
-                    className="context-menu-item text-body-base-regular"
-                    role="menuitem"
-                    onClick={() => handleMenuAction(onReplan)}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? 'Planning…' : 'Replan week'}
-                  </button>
-                  <button
-                    className="context-menu-item context-menu-item-danger text-body-base-regular"
-                    role="menuitem"
-                    onClick={() => handleMenuAction(onClearPlan)}
-                  >
-                    Clear week
-                  </button>
-                </div>
-              )}
-            </div>
+            <ContextMenu
+              items={[
+                { label: isGenerating ? 'Planning…' : 'Replan week', disabled: isGenerating, onAction: onReplan },
+                { label: 'Clear week', destructive: true, onAction: onClearPlan },
+              ]}
+            />
           )}
         </div>
 
@@ -183,14 +143,6 @@ const MealSection = ({ label, meal, onAddToList, onRecipeClick, isReplacing, onR
       />
     )}
   </>
-);
-
-const MoreIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <circle cx="12" cy="5" r="2" />
-    <circle cx="12" cy="12" r="2" />
-    <circle cx="12" cy="19" r="2" />
-  </svg>
 );
 
 const RefreshIcon = () => (

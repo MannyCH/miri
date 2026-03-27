@@ -17,8 +17,8 @@
 .shopping-list-header {
   flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-4);
   padding: var(--spacing-24) var(--spacing-16) var(--spacing-16);
   background: var(--color-background-base);
 }
@@ -26,6 +26,62 @@
 .shopping-list-header h1 {
   margin: 0;
   color: var(--color-text-strong);
+}
+
+/* Subtitle row: list name + badge on left, view toggle + menu on right */
+.shopping-list-subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-8);
+}
+
+.shopping-list-subtitle-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  min-width: 0;
+}
+
+.shopping-list-subtitle-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
+  flex-shrink: 0;
+}
+
+.shopping-list-share-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--spacing-8);
+  background: var(--color-fill-brand-weak);
+  color: var(--color-text-brand);
+  border-radius: var(--corner-radius-8);
+  white-space: nowrap;
+}
+
+.shopping-list-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-8);
+  color: var(--color-icon-neutral);
+  cursor: pointer;
+}
+
+.shopping-list-menu-btn:hover {
+  background: var(--color-background-sunken);
+}
+
+.shopping-list-menu-btn:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
 }
 
 /* Summary card */
@@ -75,8 +131,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   background: transparent;
   border: 1px solid var(--color-stroke-weak);

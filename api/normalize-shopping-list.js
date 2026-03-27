@@ -29,7 +29,8 @@ Rules:
    Vegetables | Fruits | Herbs & Spices | Dairy & Eggs | Meat & Fish | Bakery | Canned & Dry Goods | Frozen | Beverages | Other
 4. Use natural ingredient names. Prefer the language the user seems to use (if mostly German, use German names).
 5. Leave quantity empty string if no quantity was given, except for fresh herbs (e.g. parsley, mint, basil, coriander) — if no quantity is specified, use "1".
-6. Return ONLY valid JSON — no explanation, no markdown.
+6. For each normalized item, include a "sources" array with the 1-based line numbers of the original ingredients that were merged into it. Every input line number must appear in exactly one item's sources.
+7. Return ONLY valid JSON — no explanation, no markdown.
 
 Ingredients:
 ${items.map((item, i) => `${i + 1}. ${item}`).join('\n')}
@@ -41,8 +42,8 @@ Return this exact JSON shape:
       "category": "Vegetables",
       "emoji": "🥦",
       "items": [
-        { "name": "Onions", "quantity": "3" },
-        { "name": "Asparagus", "quantity": "320g" }
+        { "name": "Onions", "quantity": "3", "sources": [1, 5] },
+        { "name": "Asparagus", "quantity": "320g", "sources": [3] }
       ]
     }
   ]

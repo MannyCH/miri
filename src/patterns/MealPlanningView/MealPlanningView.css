@@ -39,49 +39,7 @@
   margin: 0;
 }
 
-/* Three-dot menu wrapper (relative anchor for the dropdown) */
-.meal-planning-menu-wrapper {
-  position: relative;
-}
-
-/* Context menu dropdown */
-.context-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: var(--spacing-4);
-  min-width: 160px;
-  background: var(--color-background-raised);
-  border-radius: var(--corner-radius-8);
-  box-shadow: var(--elevation-overlay);
-  padding: var(--spacing-4) 0;
-  z-index: 10;
-}
-
-.context-menu-item {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: var(--spacing-12) var(--spacing-16);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
-  color: var(--color-text-strong);
-}
-
-.context-menu-item:hover {
-  background: var(--color-fill-hover);
-}
-
-.context-menu-item:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: -2px;
-}
-
-.context-menu-item-danger {
-  color: var(--color-text-error);
-}
+/* Context menu is now provided by the reusable ContextMenu component */
 
 /* Calendar section wrapping the CalendarModule */
 .meal-planning-calendar-section {
