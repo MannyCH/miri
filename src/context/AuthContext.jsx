@@ -1,17 +1,15 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { dataClient, upgradeDataClientAuth } from '../lib/dataClient';
+import { dataClient, setDataJWT, clearDataJWT } from '../lib/dataClient';
 
-// Access dataClient.auth dynamically so that if the client is rebuilt after
-// sign-in (Bearer token upgrade for Safari ITP), all subsequent auth calls
-// automatically use the updated client.
-function getAuthClient() { return dataClient.auth; }
+const authClient = dataClient.auth;
 
 const AuthContext = createContext(null);
 
 // Safari ITP blocks cross-domain cookies from the Neon Auth server, causing
-// getSession() to return null. We persist session data in localStorage so the
-// session survives page reloads. The server is still the source of truth for
-// new sign-ins; this only affects the bootstrap check on reload.
+// getSession() to return null and the Data API to have no JWT for RLS.
+// We persist session data (including the session token) in localStorage so
+// the session survives page reloads. On each load we exchange the stored
+// session token for a fresh JWT via a server-side proxy (/api/auth/jwt).
 const SESSION_STORAGE_KEY = 'miri-session-v1';
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days fallback
@@ -63,12 +61,33 @@ function getErrorMessage(result, fallbackMessage) {
   return result.error.message || fallbackMessage;
 }
 
+/**
+ * Exchange a Better Auth session token for a Neon JWT via our server-side proxy.
+ * The proxy calls the Neon Auth server without browser ITP restrictions and
+ * extracts the JWT from the set-auth-jwt response header.
+ */
+async function fetchJWT(sessionToken) {
+  if (!sessionToken) return null;
+  try {
+    const res = await fetch('/api/auth/jwt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionToken }),
+    });
+    if (!res.ok) return null;
+    const { jwt } = await res.json();
+    return jwt ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }) {
   const [sessionData, setSessionData] = useState(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
 
   const refreshSession = useCallback(async () => {
-    const result = await getAuthClient().getSession();
+    const result = await authClient.getSession();
     const data = result?.data ?? null;
     setSessionData(data);
     if (data) {
@@ -82,7 +101,7 @@ export function AuthProvider({ children }) {
 
     const bootstrap = async () => {
       try {
-        const result = await getAuthClient().getSession();
+        const result = await authClient.getSession();
         if (!isMounted) return;
         const apiData = result?.data ?? null;
         // Prefer the live API session; fall back to localStorage when cookies
@@ -92,9 +111,25 @@ export function AuthProvider({ children }) {
         if (apiData) {
           saveSessionToStorage(apiData);
         }
+
+        // Ensure the Data API has a JWT — even if getSession() worked via
+        // cookies, this is a no-op if the JWT was already set by the adapter.
+        // If cookies were blocked (Safari), we exchange the stored session
+        // token for a JWT via the server-side proxy.
+        const sessionToken = data?.session?.token;
+        if (sessionToken) {
+          const jwt = await fetchJWT(sessionToken);
+          if (jwt && isMounted) setDataJWT(jwt);
+        }
       } catch (_error) {
         if (!isMounted) return;
-        setSessionData(loadSessionFromStorage());
+        const stored = loadSessionFromStorage();
+        setSessionData(stored);
+        const sessionToken = stored?.session?.token;
+        if (sessionToken) {
+          const jwt = await fetchJWT(sessionToken);
+          if (jwt && isMounted) setDataJWT(jwt);
+        }
       } finally {
         if (isMounted) {
           setIsAuthReady(true);
@@ -110,7 +145,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
-    const result = await getAuthClient().signIn.email({
+    const result = await authClient.signIn.email({
       email: normalizeEmail(email),
       password,
     });
@@ -119,12 +154,19 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user) {
+      const sessionToken = result.data.token ?? null;
       const data = {
         user: result.data.user,
-        session: result.data.session ?? { token: result.data.token ?? null },
+        session: result.data.session ?? { token: sessionToken },
       };
       setSessionData(data);
       saveSessionToStorage(data);
+
+      // Get JWT for Data API (bypasses Safari ITP via server-side proxy).
+      if (sessionToken) {
+        const jwt = await fetchJWT(sessionToken);
+        if (jwt) setDataJWT(jwt);
+      }
     } else {
       await refreshSession();
     }
@@ -132,7 +174,7 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const signUp = useCallback(async ({ email, password, name }) => {
-    const result = await getAuthClient().signUp.email({
+    const result = await authClient.signUp.email({
       email: normalizeEmail(email),
       password,
       name,
@@ -142,14 +184,18 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user) {
-      const token = result.data.token ?? null;
+      const sessionToken = result.data.token ?? null;
       const data = {
         user: result.data.user,
-        session: result.data.session ?? { token },
+        session: result.data.session ?? { token: sessionToken },
       };
-      if (token) upgradeDataClientAuth(token);
       setSessionData(data);
       saveSessionToStorage(data);
+
+      if (sessionToken) {
+        const jwt = await fetchJWT(sessionToken);
+        if (jwt) setDataJWT(jwt);
+      }
     } else {
       await refreshSession();
     }
@@ -157,16 +203,16 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const verifyEmail = useCallback(async ({ token, email, code }) => {
-    const hasOtpMethod = Boolean(getAuthClient().emailOtp?.verifyEmail);
+    const hasOtpMethod = Boolean(authClient.emailOtp?.verifyEmail);
     let result;
 
     if (hasOtpMethod && email && code) {
-      result = await getAuthClient().emailOtp.verifyEmail({
+      result = await authClient.emailOtp.verifyEmail({
         email: normalizeEmail(email),
         otp: code,
       });
     } else if (token) {
-      result = await getAuthClient().verifyEmail({
+      result = await authClient.verifyEmail({
         query: {
           token,
         },
@@ -180,12 +226,17 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user) {
+      const sessionToken = result.data.token ?? null;
       const data = {
         user: result.data.user,
-        session: result.data.session ?? { token: result.data.token ?? null },
+        session: result.data.session ?? { token: sessionToken },
       };
       setSessionData(data);
       saveSessionToStorage(data);
+      if (sessionToken) {
+        const jwt = await fetchJWT(sessionToken);
+        if (jwt) setDataJWT(jwt);
+      }
     } else {
       await refreshSession();
     }
@@ -193,16 +244,16 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const sendVerificationCode = useCallback(async ({ email }) => {
-    const hasOtpMethod = Boolean(getAuthClient().emailOtp?.sendVerificationOtp);
+    const hasOtpMethod = Boolean(authClient.emailOtp?.sendVerificationOtp);
     let result;
 
     if (hasOtpMethod) {
-      result = await getAuthClient().emailOtp.sendVerificationOtp({
+      result = await authClient.emailOtp.sendVerificationOtp({
         email: normalizeEmail(email),
         type: 'email-verification',
       });
     } else {
-      result = await getAuthClient().sendVerificationEmail({
+      result = await authClient.sendVerificationEmail({
         email: normalizeEmail(email),
       });
     }
@@ -215,7 +266,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const requestPasswordReset = useCallback(async ({ email, redirectTo }) => {
-    const result = await getAuthClient().requestPasswordReset({
+    const result = await authClient.requestPasswordReset({
       email: normalizeEmail(email),
       ...(redirectTo ? { redirectTo } : {}),
     });
@@ -227,7 +278,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const resetPassword = useCallback(async ({ token, newPassword }) => {
-    const result = await getAuthClient().resetPassword({
+    const result = await authClient.resetPassword({
       token,
       newPassword,
     });
@@ -239,17 +290,18 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    const result = await getAuthClient().signOut();
+    const result = await authClient.signOut();
     const message = getErrorMessage(result, 'Sign-out failed.');
     if (message) {
       throw new Error(message);
     }
     clearSessionFromStorage();
+    clearDataJWT();
     setSessionData(null);
   }, []);
 
   const updateUser = useCallback(async ({ name, email }) => {
-    const result = await getAuthClient().updateUser({ name, email });
+    const result = await authClient.updateUser({ name, email });
     const message = getErrorMessage(result, 'Could not update user details.');
     if (message) throw new Error(message);
     await refreshSession();
@@ -257,14 +309,14 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const changePassword = useCallback(async ({ currentPassword, newPassword }) => {
-    const result = await getAuthClient().changePassword({ currentPassword, newPassword, revokeOtherSessions: false });
+    const result = await authClient.changePassword({ currentPassword, newPassword, revokeOtherSessions: false });
     const message = getErrorMessage(result, 'Could not change password.');
     if (message) throw new Error(message);
     return result?.data ?? null;
   }, []);
 
   const verifyCurrentPassword = useCallback(async ({ password }) => {
-    const result = await getAuthClient().verifyPassword({ password });
+    const result = await authClient.verifyPassword({ password });
     const message = getErrorMessage(result, 'Could not verify current password.');
     if (message) throw new Error(message);
 
@@ -276,7 +328,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const changeEmail = useCallback(async ({ newEmail }) => {
-    const result = await getAuthClient().changeEmail({
+    const result = await authClient.changeEmail({
       newEmail,
       callbackURL: `${window.location.origin}/account`,
     });
@@ -286,10 +338,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   const deleteUser = useCallback(async () => {
-    const result = await getAuthClient().deleteUser();
+    const result = await authClient.deleteUser();
     const message = getErrorMessage(result, 'Could not delete account.');
     if (message) throw new Error(message);
     clearSessionFromStorage();
+    clearDataJWT();
     setSessionData(null);
   }, []);
 

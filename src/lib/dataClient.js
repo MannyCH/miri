@@ -1,60 +1,36 @@
-import { createClient, BetterAuthVanillaAdapter } from '@neondatabase/neon-js';
+import { createClient } from '@neondatabase/neon-js';
 
-// Safari ITP blocks cross-domain session cookies from the Neon Auth server.
-// getSession() returns null → getJWTToken() returns null → RLS sees no user.
-//
-// Fix: pass a custom adapter wrapper that merges the Bearer token into
-// fetchOptions. createClient() hardcodes fetchOptions (only the client-info
-// header) and does NOT merge authConfig.fetchOptions, so we inject the token
-// via the adapter path instead — the adapter builder receives those same
-// fetchOptions and CAN merge them.
+export const dataClient = createClient({
+  auth: {
+    url: import.meta.env.VITE_NEON_AUTH_URL,
+  },
+  dataApi: {
+    url: import.meta.env.VITE_NEON_DATA_API_URL,
+  },
+});
 
-function buildClient(bearerToken) {
-  const authConfig = { url: import.meta.env.VITE_NEON_AUTH_URL };
+// Safari ITP blocks cross-domain cookies so getSession() returns null, which
+// makes the adapter's getJWTToken() return null, which makes the Data API throw
+// AuthRequiredError on every query. Fix: store the JWT ourselves (fetched via a
+// server-side proxy that has no ITP restrictions) and patch the adapter instance
+// so its getJWTToken() returns our stored value. The internal getAccessToken
+// closure in createClient calls adapter.getJWTToken() dynamically, so patching
+// the instance property shadows the prototype method and takes effect immediately.
+let _jwt = null;
 
-  if (bearerToken) {
-    // Wrap the default adapter builder so it merges our Bearer token into
-    // whatever fetchOptions neon-js passes down (which includes the client-info
-    // header). The wrapped builder is called as adapterBuilder(url, fetchOptions)
-    // by createInternalNeonAuth.
-    const baseBuilder = BetterAuthVanillaAdapter();
-    authConfig.adapter = (url, fetchOptions) => baseBuilder(url, {
-      ...fetchOptions,
-      headers: {
-        ...fetchOptions?.headers,
-        Authorization: `Bearer ${bearerToken}`,
-      },
-    });
-  }
+const _patchedGetJWT = async () => _jwt;
 
-  return createClient({
-    auth: authConfig,
-    dataApi: {
-      url: import.meta.env.VITE_NEON_DATA_API_URL,
-    },
-  });
-}
-
-function getStoredBearerToken() {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const raw = localStorage.getItem('miri-session-v1');
-    if (!raw) return null;
-    return JSON.parse(raw)?.session?.token ?? null;
-  } catch {
-    return null;
-  }
-}
-
-// Initialise with stored token so page reloads also get Bearer auth.
-export let dataClient = buildClient(getStoredBearerToken());
+// Patch the adapter instance — must be done after createClient returns.
+dataClient.auth.getJWTToken = _patchedGetJWT;
 
 /**
- * Rebuild the data client with a fresh Bearer token after sign-in.
- * Called from AuthContext once we have the token from the sign-in response.
+ * Store a JWT so the Data API can authenticate requests in Safari.
+ * Call this after sign-in with the JWT received from /api/auth/jwt.
  */
-export function upgradeDataClientAuth(token) {
-  if (token) {
-    dataClient = buildClient(token);
-  }
+export function setDataJWT(jwt) {
+  _jwt = jwt;
+}
+
+export function clearDataJWT() {
+  _jwt = null;
 }
