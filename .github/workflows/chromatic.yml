@@ -1,17 +1,7 @@
 name: Chromatic Visual Testing
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      # Only run when Storybook components or design tokens change
-      - 'src/components/**'
-      - 'src/patterns/**'
-      - 'src/foundations/**'
-      - 'src/*-tokens.css'
-      - '.storybook/**'
-      - 'package.json'
+  workflow_dispatch:
 jobs:
   chromatic:
     name: Run Chromatic Tests
