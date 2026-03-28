@@ -1,12 +1,12 @@
 /**
  * POST /api/auth/jwt
  *
- * Server-side proxy to exchange a Better Auth session token for a JWT.
+ * Server-side proxy to exchange a Better Auth session token for a Neon JWT.
  * Client-side: Safari ITP blocks cross-domain cookies from the Neon Auth
  * server, so getSession() returns null and the Data API has no JWT for RLS.
- * Server-side: no ITP restrictions — we can call the auth server directly
- * with the session token as a Bearer token and receive the JWT from the
- * set-auth-jwt response header.
+ * Server-side: no ITP restrictions — we send the session token as a cookie
+ * (the standard Better Auth auth mechanism) and extract the JWT from the
+ * set-auth-jwt response header that Neon Auth includes on session responses.
  *
  * Body: { sessionToken: string }
  * Response: { jwt: string }
@@ -25,15 +25,17 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Auth base URL not configured' });
     }
 
+    // Better Auth authenticates via a session cookie. The default cookie name
+    // is "better-auth.session_token". Server-side fetch has no ITP, so we can
+    // set this header directly without any cross-domain cookie restrictions.
     const response = await fetch(`${authBaseUrl}/api/auth/get-session`, {
       headers: {
-        Authorization: `Bearer ${sessionToken}`,
-        'Content-Type': 'application/json',
+        Cookie: `better-auth.session_token=${sessionToken}`,
       },
     });
 
     if (!response.ok) {
-      return res.status(401).json({ error: 'Auth server rejected session token' });
+      return res.status(401).json({ error: `Auth server error: ${response.status}` });
     }
 
     const jwt = response.headers.get('set-auth-jwt');
