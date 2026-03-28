@@ -5,6 +5,9 @@
  * Safari ITP blocks cross-domain cookies, so getSession() returns null and
  * the Data API has no JWT for RLS. Server-side has no ITP restrictions.
  *
+ * NEON_AUTH_BASE_URL already includes the path (e.g. .../neondb/auth), so
+ * endpoints are appended directly: ${authBaseUrl}/get-session
+ *
  * Body: { sessionToken: string }
  * Response: { jwt: string }
  */
@@ -24,35 +27,19 @@ export default async function handler(req, res) {
 
     const cookieHeader = `better-auth.session_token=${sessionToken}`;
 
-    // Strategy 1: Call the dedicated /token endpoint (GET) which directly
-    // returns the JWT as { token: <jwt> }. This is simpler than extracting
-    // set-auth-jwt from the get-session response headers.
-    const tokenResponse = await fetch(`${authBaseUrl}/api/auth/token`, {
+    // Call /get-session with the session token as a cookie.
+    // The Neon Auth server returns the JWT in the set-auth-jwt response header.
+    const response = await fetch(`${authBaseUrl}/get-session`, {
       headers: {
         Cookie: cookieHeader,
       },
     });
 
-    if (tokenResponse.ok) {
-      const tokenData = await tokenResponse.json();
-      const jwt = tokenData?.token ?? null;
-      if (jwt) {
-        return res.status(200).json({ jwt });
-      }
+    if (!response.ok) {
+      return res.status(401).json({ error: `Auth server error: ${response.status}` });
     }
 
-    // Strategy 2: Fall back to /get-session and read set-auth-jwt header.
-    const sessionResponse = await fetch(`${authBaseUrl}/api/auth/get-session`, {
-      headers: {
-        Cookie: cookieHeader,
-      },
-    });
-
-    if (!sessionResponse.ok) {
-      return res.status(401).json({ error: `Auth server error: ${sessionResponse.status}` });
-    }
-
-    const jwt = sessionResponse.headers.get('set-auth-jwt');
+    const jwt = response.headers.get('set-auth-jwt');
     if (jwt) {
       return res.status(200).json({ jwt });
     }

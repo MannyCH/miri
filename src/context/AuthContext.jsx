@@ -8,10 +8,17 @@ const AuthContext = createContext(null);
 // Safari ITP blocks cross-domain cookies from the Neon Auth server, causing
 // getSession() to return null and the Data API to have no JWT for RLS.
 //
-// Fix: persist both session data and the JWT in localStorage.
-// After sign-in, the SDK's onSuccess hook overwrites session.token with the
-// JWT from the set-auth-jwt response header — so result.data.session.token
-// IS the JWT. We save it and restore it on reload with setDataJWT().
+// Fix:
+// 1. After sign-in/signUp, call the server-side proxy (/api/auth/jwt) with
+//    result.data.token (raw session ID). The proxy calls /get-session on the
+//    Neon Auth server — no ITP restriction server-side — and extracts the JWT
+//    from the set-auth-jwt response header.
+// 2. Save the JWT in localStorage (miri-jwt-v1) and restore it on page reload
+//    via setDataJWT() so data queries can authenticate immediately.
+//
+// NOTE: result.data.session.token after sign-in is the RAW session token, not
+// a JWT. The SDK only replaces it with a JWT during getSession() responses
+// (onSuccess hook). That's why we need the proxy for the initial JWT.
 const SESSION_STORAGE_KEY = 'miri-session-v1';
 const JWT_STORAGE_KEY = 'miri-jwt-v1';
 
@@ -112,12 +119,27 @@ function getErrorMessage(result, fallbackMessage) {
 }
 
 /**
- * Extract JWT from auth result data.
- * The SDK's onSuccess hook overwrites session.token with the JWT from the
- * set-auth-jwt response header, so result.data.session.token IS the JWT.
+ * Exchange a raw Better Auth session token for a Neon JWT via our server-side
+ * proxy. The proxy calls the Neon Auth server without ITP restrictions and
+ * reads the JWT from the set-auth-jwt response header.
+ *
+ * Pass result.data.token (the raw session ID), NOT session.token which the
+ * SDK overwrites with a JWT during getSession() responses.
  */
-function extractJWT(resultData) {
-  return resultData?.session?.token ?? null;
+async function fetchJWT(rawSessionToken) {
+  if (!rawSessionToken) return null;
+  try {
+    const res = await fetch('/api/auth/jwt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionToken: rawSessionToken }),
+    });
+    if (!res.ok) return null;
+    const { jwt } = await res.json();
+    return jwt ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export function AuthProvider({ children }) {
@@ -130,7 +152,8 @@ export function AuthProvider({ children }) {
     setSessionData(data);
     if (data) {
       saveSessionToStorage(data);
-      const jwt = extractJWT(data);
+      // When getSession() works, session.token IS the JWT (SDK onSuccess hook).
+      const jwt = data.session?.token ?? null;
       if (jwt) {
         setDataJWT(jwt);
         saveJWTToStorage(jwt);
@@ -156,20 +179,27 @@ export function AuthProvider({ children }) {
 
         // Restore JWT before setting session so data queries have a token
         // the moment isAuthenticated becomes true.
-        // Priority: fresh JWT from API → cached JWT from localStorage.
-        const freshJWT = apiData ? extractJWT(apiData) : null;
-        const jwt = freshJWT ?? loadJWTFromStorage();
-        if (jwt && isMounted) {
-          setDataJWT(jwt);
-          if (freshJWT) saveJWTToStorage(freshJWT);
+        if (apiData) {
+          // When getSession() works, session.token IS the JWT.
+          const jwt = apiData.session?.token ?? null;
+          if (jwt && isMounted) {
+            setDataJWT(jwt);
+            saveJWTToStorage(jwt);
+          }
+        } else {
+          // getSession() failed (Safari ITP) — use cached JWT from localStorage.
+          const cachedJWT = loadJWTFromStorage();
+          if (cachedJWT && isMounted) {
+            setDataJWT(cachedJWT);
+          }
         }
 
         if (isMounted) setSessionData(data);
       } catch (_error) {
         if (!isMounted) return;
         const stored = loadSessionFromStorage();
-        const jwt = loadJWTFromStorage();
-        if (jwt && isMounted) setDataJWT(jwt);
+        const cachedJWT = loadJWTFromStorage();
+        if (cachedJWT && isMounted) setDataJWT(cachedJWT);
         if (isMounted) setSessionData(stored);
       } finally {
         if (isMounted) {
@@ -199,12 +229,16 @@ export function AuthProvider({ children }) {
         user: result.data.user,
         session: result.data.session ?? { token: null },
       };
-      // result.data.session.token is the JWT (SDK's onSuccess overwrites it).
-      // Set it before setSessionData so data queries have a token immediately.
-      const jwt = extractJWT(result.data);
-      if (jwt) {
-        setDataJWT(jwt);
-        saveJWTToStorage(jwt);
+      // Use the proxy to get the JWT. result.data.token is the raw session ID;
+      // result.data.session.token at sign-in time is also the raw session token
+      // (not a JWT — the SDK only replaces it during getSession() responses).
+      const rawToken = result.data.token ?? result.data.session?.token ?? null;
+      if (rawToken) {
+        const jwt = await fetchJWT(rawToken);
+        if (jwt) {
+          setDataJWT(jwt);
+          saveJWTToStorage(jwt);
+        }
       }
       setSessionData(data);
       saveSessionToStorage(data);
@@ -229,10 +263,13 @@ export function AuthProvider({ children }) {
         user: result.data.user,
         session: result.data.session ?? { token: null },
       };
-      const jwt = extractJWT(result.data);
-      if (jwt) {
-        setDataJWT(jwt);
-        saveJWTToStorage(jwt);
+      const rawToken = result.data.token ?? result.data.session?.token ?? null;
+      if (rawToken) {
+        const jwt = await fetchJWT(rawToken);
+        if (jwt) {
+          setDataJWT(jwt);
+          saveJWTToStorage(jwt);
+        }
       }
       setSessionData(data);
       saveSessionToStorage(data);
@@ -270,10 +307,13 @@ export function AuthProvider({ children }) {
         user: result.data.user,
         session: result.data.session ?? { token: null },
       };
-      const jwt = extractJWT(result.data);
-      if (jwt) {
-        setDataJWT(jwt);
-        saveJWTToStorage(jwt);
+      const rawToken = result.data.token ?? result.data.session?.token ?? null;
+      if (rawToken) {
+        const jwt = await fetchJWT(rawToken);
+        if (jwt) {
+          setDataJWT(jwt);
+          saveJWTToStorage(jwt);
+        }
       }
       setSessionData(data);
       saveSessionToStorage(data);
