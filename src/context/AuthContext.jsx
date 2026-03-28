@@ -107,29 +107,28 @@ export function AuthProvider({ children }) {
         // Prefer the live API session; fall back to localStorage when cookies
         // are blocked (Safari ITP).
         const data = apiData ?? loadSessionFromStorage();
-        setSessionData(data);
         if (apiData) {
           saveSessionToStorage(apiData);
         }
 
-        // Ensure the Data API has a JWT — even if getSession() worked via
-        // cookies, this is a no-op if the JWT was already set by the adapter.
-        // If cookies were blocked (Safari), we exchange the stored session
-        // token for a JWT via the server-side proxy.
+        // Fetch JWT before setting session so data queries have a token
+        // the moment isAuthenticated becomes true.
         const sessionToken = data?.session?.token;
         if (sessionToken) {
           const jwt = await fetchJWT(sessionToken);
           if (jwt && isMounted) setDataJWT(jwt);
         }
+
+        if (isMounted) setSessionData(data);
       } catch (_error) {
         if (!isMounted) return;
         const stored = loadSessionFromStorage();
-        setSessionData(stored);
         const sessionToken = stored?.session?.token;
         if (sessionToken) {
           const jwt = await fetchJWT(sessionToken);
           if (jwt && isMounted) setDataJWT(jwt);
         }
+        if (isMounted) setSessionData(stored);
       } finally {
         if (isMounted) {
           setIsAuthReady(true);
@@ -159,14 +158,14 @@ export function AuthProvider({ children }) {
         user: result.data.user,
         session: result.data.session ?? { token: sessionToken },
       };
-      setSessionData(data);
-      saveSessionToStorage(data);
-
-      // Get JWT for Data API (bypasses Safari ITP via server-side proxy).
+      // Fetch JWT before setting session so data queries have a token
+      // the moment isAuthenticated becomes true.
       if (sessionToken) {
         const jwt = await fetchJWT(sessionToken);
         if (jwt) setDataJWT(jwt);
       }
+      setSessionData(data);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
@@ -189,13 +188,12 @@ export function AuthProvider({ children }) {
         user: result.data.user,
         session: result.data.session ?? { token: sessionToken },
       };
-      setSessionData(data);
-      saveSessionToStorage(data);
-
       if (sessionToken) {
         const jwt = await fetchJWT(sessionToken);
         if (jwt) setDataJWT(jwt);
       }
+      setSessionData(data);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
