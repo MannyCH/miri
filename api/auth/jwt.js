@@ -28,11 +28,19 @@ export default async function handler(req, res) {
     // Neon Auth uses __Secure-neon-auth.session_token, not better-auth.session_token
     const cookieHeader = `__Secure-neon-auth.session_token=${sessionToken}`;
 
+    // The Neon SDK always sends X-Neon-Client-Info on every request. The server
+    // uses this to decide whether to include the set-auth-jwt response header.
+    const clientInfo = JSON.stringify({
+      sdk: { name: '@neondatabase/neon-js', version: '0.1.0-beta.22' },
+      runtime: { name: 'node', version: process.version },
+    });
+
     // Call /get-session with the session token as a cookie.
     // The Neon Auth server returns the JWT in the set-auth-jwt response header.
     const response = await fetch(`${authBaseUrl}/get-session`, {
       headers: {
         Cookie: cookieHeader,
+        'X-Neon-Client-Info': clientInfo,
       },
     });
 
