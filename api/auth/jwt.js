@@ -25,7 +25,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Auth base URL not configured' });
     }
 
-    const cookieHeader = `better-auth.session_token=${sessionToken}`;
+    // Neon Auth uses __Secure-neon-auth.session_token, not better-auth.session_token
+    const cookieHeader = `__Secure-neon-auth.session_token=${sessionToken}`;
 
     // Call /get-session with the session token as a cookie.
     // The Neon Auth server returns the JWT in the set-auth-jwt response header.
