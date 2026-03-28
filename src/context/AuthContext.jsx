@@ -8,6 +8,46 @@ const authClient = dataClient.auth;
 
 const AuthContext = createContext(null);
 
+// Safari ITP blocks cross-domain cookies from the Neon Auth server, causing
+// getSession() to return null. We persist session data in localStorage so the
+// session survives page reloads. The server is still the source of truth for
+// new sign-ins; this only affects the bootstrap check on reload.
+const SESSION_STORAGE_KEY = 'miri-session-v1';
+
+function saveSessionToStorage(data) {
+  if (!data?.user || !data?.session) return;
+  try {
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data));
+  } catch (_e) {
+    // localStorage unavailable (e.g. private browsing with restrictions)
+  }
+}
+
+function loadSessionFromStorage() {
+  try {
+    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data?.user || !data?.session) return null;
+    const expiresAt = data.session?.expiresAt;
+    if (expiresAt && new Date(expiresAt) < new Date()) {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      return null;
+    }
+    return data;
+  } catch (_e) {
+    return null;
+  }
+}
+
+function clearSessionFromStorage() {
+  try {
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+  } catch (_e) {
+    // ignore
+  }
+}
+
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
@@ -23,8 +63,12 @@ export function AuthProvider({ children }) {
 
   const refreshSession = useCallback(async () => {
     const result = await authClient.getSession();
-    setSessionData(result?.data ?? null);
-    return result?.data ?? null;
+    const data = result?.data ?? null;
+    setSessionData(data);
+    if (data) {
+      saveSessionToStorage(data);
+    }
+    return data;
   }, []);
 
   useEffect(() => {
@@ -34,10 +78,17 @@ export function AuthProvider({ children }) {
       try {
         const result = await authClient.getSession();
         if (!isMounted) return;
-        setSessionData(result?.data ?? null);
+        const apiData = result?.data ?? null;
+        // Prefer the live API session; fall back to localStorage when cookies
+        // are blocked (Safari ITP).
+        const data = apiData ?? loadSessionFromStorage();
+        setSessionData(data);
+        if (apiData) {
+          saveSessionToStorage(apiData);
+        }
       } catch (_error) {
         if (!isMounted) return;
-        setSessionData(null);
+        setSessionData(loadSessionFromStorage());
       } finally {
         if (isMounted) {
           setIsAuthReady(true);
@@ -62,7 +113,9 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user && result?.data?.session) {
-      setSessionData({ user: result.data.user, session: result.data.session });
+      const data = { user: result.data.user, session: result.data.session };
+      setSessionData(data);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
@@ -80,7 +133,9 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user && result?.data?.session) {
-      setSessionData({ user: result.data.user, session: result.data.session });
+      const data = { user: result.data.user, session: result.data.session };
+      setSessionData(data);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
@@ -111,7 +166,9 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user && result?.data?.session) {
-      setSessionData({ user: result.data.user, session: result.data.session });
+      const data = { user: result.data.user, session: result.data.session };
+      setSessionData(data);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
@@ -170,6 +227,7 @@ export function AuthProvider({ children }) {
     if (message) {
       throw new Error(message);
     }
+    clearSessionFromStorage();
     setSessionData(null);
   }, []);
 
@@ -214,6 +272,7 @@ export function AuthProvider({ children }) {
     const result = await authClient.deleteUser();
     const message = getErrorMessage(result, 'Could not delete account.');
     if (message) throw new Error(message);
+    clearSessionFromStorage();
     setSessionData(null);
   }, []);
 
