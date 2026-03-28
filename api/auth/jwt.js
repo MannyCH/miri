@@ -35,8 +35,14 @@ export default async function handler(req, res) {
       },
     });
 
+    const responseHeaders = {};
+    response.headers.forEach((value, key) => { responseHeaders[key] = value; });
+
     if (!response.ok) {
-      return res.status(401).json({ error: `Auth server error: ${response.status}` });
+      return res.status(401).json({
+        error: `Auth server error: ${response.status}`,
+        debug: { status: response.status, headers: Object.keys(responseHeaders) },
+      });
     }
 
     const jwt = response.headers.get('set-auth-jwt');
@@ -44,7 +50,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ jwt });
     }
 
-    return res.status(401).json({ error: 'No JWT in auth server response' });
+    const body = await response.json().catch(() => null);
+    return res.status(401).json({
+      error: 'No JWT in auth server response',
+      debug: {
+        status: response.status,
+        headers: Object.keys(responseHeaders),
+        hasSetAuthJwt: responseHeaders['set-auth-jwt'] !== undefined,
+        bodyKeys: body ? Object.keys(body) : null,
+        sessionTokenPresent: !!(body?.data?.session?.token ?? body?.session?.token),
+      },
+    });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch JWT from auth server' });
   }

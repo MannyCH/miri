@@ -229,12 +229,14 @@ export function AuthProvider({ children }) {
         user: result.data.user,
         session: result.data.session ?? { token: null },
       };
-      // Use the proxy to get the JWT. result.data.token is the raw session ID;
-      // result.data.session.token at sign-in time is also the raw session token
-      // (not a JWT — the SDK only replaces it during getSession() responses).
       const rawToken = result.data.token ?? result.data.session?.token ?? null;
+      // DEBUG: log sign-in response structure to diagnose Safari ITP issue
+      console.log('[auth:signIn] result.data.token:', result.data.token);
+      console.log('[auth:signIn] result.data.session:', JSON.stringify(result.data.session));
+      console.log('[auth:signIn] rawToken:', rawToken);
       if (rawToken) {
         const jwt = await fetchJWT(rawToken);
+        console.log('[auth:signIn] proxy jwt:', jwt ? jwt.substring(0, 20) + '...' : null);
         if (jwt) {
           setDataJWT(jwt);
           saveJWTToStorage(jwt);
