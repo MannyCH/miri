@@ -1,20 +1,34 @@
-import { createClient } from '@neondatabase/neon-js';
+import { createClient, BetterAuthVanillaAdapter } from '@neondatabase/neon-js';
 
 // Safari ITP blocks cross-domain session cookies from the Neon Auth server.
-// When a Bearer token is available (after sign-in), we rebuild the client with
-// it baked into fetchOptions so that ALL auth requests — including the
-// getSession() call inside getJWTToken() — include the Authorization header.
-// Without this, getJWTToken() returns null and the Neon Data API rejects all
-// queries (RLS sees no authenticated user).
+// getSession() returns null → getJWTToken() returns null → RLS sees no user.
+//
+// Fix: pass a custom adapter wrapper that merges the Bearer token into
+// fetchOptions. createClient() hardcodes fetchOptions (only the client-info
+// header) and does NOT merge authConfig.fetchOptions, so we inject the token
+// via the adapter path instead — the adapter builder receives those same
+// fetchOptions and CAN merge them.
 
 function buildClient(bearerToken) {
+  const authConfig = { url: import.meta.env.VITE_NEON_AUTH_URL };
+
+  if (bearerToken) {
+    // Wrap the default adapter builder so it merges our Bearer token into
+    // whatever fetchOptions neon-js passes down (which includes the client-info
+    // header). The wrapped builder is called as adapterBuilder(url, fetchOptions)
+    // by createInternalNeonAuth.
+    const baseBuilder = BetterAuthVanillaAdapter();
+    authConfig.adapter = (url, fetchOptions) => baseBuilder(url, {
+      ...fetchOptions,
+      headers: {
+        ...fetchOptions?.headers,
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    });
+  }
+
   return createClient({
-    auth: {
-      url: import.meta.env.VITE_NEON_AUTH_URL,
-      ...(bearerToken ? {
-        fetchOptions: { headers: { Authorization: `Bearer ${bearerToken}` } },
-      } : {}),
-    },
+    auth: authConfig,
     dataApi: {
       url: import.meta.env.VITE_NEON_DATA_API_URL,
     },
