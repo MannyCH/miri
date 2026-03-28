@@ -1,10 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { dataClient } from '../lib/dataClient';
+import { dataClient, upgradeDataClientAuth } from '../lib/dataClient';
 
-// Use dataClient.auth as the single auth client so it shares the same session
-// as all Data API requests. Having a separate authClient causes two different
-// user IDs to be issued by the different adapters, breaking RLS.
-const authClient = dataClient.auth;
+// Access dataClient.auth dynamically so that if the client is rebuilt after
+// sign-in (Bearer token upgrade for Safari ITP), all subsequent auth calls
+// automatically use the updated client.
+function getAuthClient() { return dataClient.auth; }
 
 const AuthContext = createContext(null);
 
@@ -68,7 +68,7 @@ export function AuthProvider({ children }) {
   const [isAuthReady, setIsAuthReady] = useState(false);
 
   const refreshSession = useCallback(async () => {
-    const result = await authClient.getSession();
+    const result = await getAuthClient().getSession();
     const data = result?.data ?? null;
     setSessionData(data);
     if (data) {
@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
 
     const bootstrap = async () => {
       try {
-        const result = await authClient.getSession();
+        const result = await getAuthClient().getSession();
         if (!isMounted) return;
         const apiData = result?.data ?? null;
         // Prefer the live API session; fall back to localStorage when cookies
@@ -110,7 +110,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
-    const result = await authClient.signIn.email({
+    const result = await getAuthClient().signIn.email({
       email: normalizeEmail(email),
       password,
     });
@@ -132,7 +132,7 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const signUp = useCallback(async ({ email, password, name }) => {
-    const result = await authClient.signUp.email({
+    const result = await getAuthClient().signUp.email({
       email: normalizeEmail(email),
       password,
       name,
@@ -142,10 +142,12 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user) {
+      const token = result.data.token ?? null;
       const data = {
         user: result.data.user,
-        session: result.data.session ?? { token: result.data.token ?? null },
+        session: result.data.session ?? { token },
       };
+      if (token) upgradeDataClientAuth(token);
       setSessionData(data);
       saveSessionToStorage(data);
     } else {
@@ -155,16 +157,16 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const verifyEmail = useCallback(async ({ token, email, code }) => {
-    const hasOtpMethod = Boolean(authClient.emailOtp?.verifyEmail);
+    const hasOtpMethod = Boolean(getAuthClient().emailOtp?.verifyEmail);
     let result;
 
     if (hasOtpMethod && email && code) {
-      result = await authClient.emailOtp.verifyEmail({
+      result = await getAuthClient().emailOtp.verifyEmail({
         email: normalizeEmail(email),
         otp: code,
       });
     } else if (token) {
-      result = await authClient.verifyEmail({
+      result = await getAuthClient().verifyEmail({
         query: {
           token,
         },
@@ -191,16 +193,16 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const sendVerificationCode = useCallback(async ({ email }) => {
-    const hasOtpMethod = Boolean(authClient.emailOtp?.sendVerificationOtp);
+    const hasOtpMethod = Boolean(getAuthClient().emailOtp?.sendVerificationOtp);
     let result;
 
     if (hasOtpMethod) {
-      result = await authClient.emailOtp.sendVerificationOtp({
+      result = await getAuthClient().emailOtp.sendVerificationOtp({
         email: normalizeEmail(email),
         type: 'email-verification',
       });
     } else {
-      result = await authClient.sendVerificationEmail({
+      result = await getAuthClient().sendVerificationEmail({
         email: normalizeEmail(email),
       });
     }
@@ -213,7 +215,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const requestPasswordReset = useCallback(async ({ email, redirectTo }) => {
-    const result = await authClient.requestPasswordReset({
+    const result = await getAuthClient().requestPasswordReset({
       email: normalizeEmail(email),
       ...(redirectTo ? { redirectTo } : {}),
     });
@@ -225,7 +227,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const resetPassword = useCallback(async ({ token, newPassword }) => {
-    const result = await authClient.resetPassword({
+    const result = await getAuthClient().resetPassword({
       token,
       newPassword,
     });
@@ -237,7 +239,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    const result = await authClient.signOut();
+    const result = await getAuthClient().signOut();
     const message = getErrorMessage(result, 'Sign-out failed.');
     if (message) {
       throw new Error(message);
@@ -247,7 +249,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const updateUser = useCallback(async ({ name, email }) => {
-    const result = await authClient.updateUser({ name, email });
+    const result = await getAuthClient().updateUser({ name, email });
     const message = getErrorMessage(result, 'Could not update user details.');
     if (message) throw new Error(message);
     await refreshSession();
@@ -255,14 +257,14 @@ export function AuthProvider({ children }) {
   }, [refreshSession]);
 
   const changePassword = useCallback(async ({ currentPassword, newPassword }) => {
-    const result = await authClient.changePassword({ currentPassword, newPassword, revokeOtherSessions: false });
+    const result = await getAuthClient().changePassword({ currentPassword, newPassword, revokeOtherSessions: false });
     const message = getErrorMessage(result, 'Could not change password.');
     if (message) throw new Error(message);
     return result?.data ?? null;
   }, []);
 
   const verifyCurrentPassword = useCallback(async ({ password }) => {
-    const result = await authClient.verifyPassword({ password });
+    const result = await getAuthClient().verifyPassword({ password });
     const message = getErrorMessage(result, 'Could not verify current password.');
     if (message) throw new Error(message);
 
@@ -274,7 +276,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const changeEmail = useCallback(async ({ newEmail }) => {
-    const result = await authClient.changeEmail({
+    const result = await getAuthClient().changeEmail({
       newEmail,
       callbackURL: `${window.location.origin}/account`,
     });
@@ -284,7 +286,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const deleteUser = useCallback(async () => {
-    const result = await authClient.deleteUser();
+    const result = await getAuthClient().deleteUser();
     const message = getErrorMessage(result, 'Could not delete account.');
     if (message) throw new Error(message);
     clearSessionFromStorage();
