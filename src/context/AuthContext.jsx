@@ -120,11 +120,8 @@ function getErrorMessage(result, fallbackMessage) {
 
 /**
  * Exchange a raw Better Auth session token for a Neon JWT via our server-side
- * proxy. The proxy calls the Neon Auth server without ITP restrictions and
- * reads the JWT from the set-auth-jwt response header.
- *
- * Pass result.data.token (the raw session ID), NOT session.token which the
- * SDK overwrites with a JWT during getSession() responses.
+ * proxy (Mode A). The proxy tries Bearer → /token, then falls back to unsigned
+ * cookie → /get-session.
  */
 async function fetchJWT(rawSessionToken) {
   if (!rawSessionToken) return null;
@@ -137,6 +134,28 @@ async function fetchJWT(rawSessionToken) {
     if (!res.ok) return null;
     const { jwt } = await res.json();
     return jwt ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Mode B: sign-in proxy. Sends credentials to our server, which proxies to
+ * Neon Auth, captures the signed Set-Cookie (inaccessible to browser JS due
+ * to it being a forbidden response header), calls /get-session with the signed
+ * cookie, and returns the JWT. Used as a fallback when fetchJWT returns null
+ * (e.g. Safari ITP prevents the session cookie being stored).
+ */
+async function fetchJWTViaSignInProxy(email, password) {
+  try {
+    const res = await fetch('/api/auth/jwt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.jwt ?? null;
   } catch {
     return null;
   }
@@ -216,8 +235,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
+    const normalizedEmail = normalizeEmail(email);
     const result = await authClient.signIn.email({
-      email: normalizeEmail(email),
+      email: normalizedEmail,
       password,
     });
     const message = getErrorMessage(result, 'Sign-in failed.');
@@ -230,17 +250,20 @@ export function AuthProvider({ children }) {
         session: result.data.session ?? { token: null },
       };
       const rawToken = result.data.token ?? result.data.session?.token ?? null;
-      // DEBUG: log sign-in response structure to diagnose Safari ITP issue
-      console.log('[auth:signIn] result.data.token:', result.data.token);
-      console.log('[auth:signIn] result.data.session:', JSON.stringify(result.data.session));
-      console.log('[auth:signIn] rawToken:', rawToken);
-      if (rawToken) {
-        const jwt = await fetchJWT(rawToken);
-        console.log('[auth:signIn] proxy jwt:', jwt ? jwt.substring(0, 20) + '...' : null);
-        if (jwt) {
-          setDataJWT(jwt);
-          saveJWTToStorage(jwt);
-        }
+
+      // Attempt Mode A: exchange raw session token for JWT via proxy
+      let jwt = rawToken ? await fetchJWT(rawToken) : null;
+
+      // Fallback Mode B: sign-in proxy captures the signed Set-Cookie
+      // server-side (browser JS can't access Set-Cookie due to forbidden
+      // header rules, so with Safari ITP the cookie is lost).
+      if (!jwt) {
+        jwt = await fetchJWTViaSignInProxy(normalizedEmail, password);
+      }
+
+      if (jwt) {
+        setDataJWT(jwt);
+        saveJWTToStorage(jwt);
       }
       setSessionData(data);
       saveSessionToStorage(data);
