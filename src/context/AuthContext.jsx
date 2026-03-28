@@ -10,14 +10,23 @@ const AuthContext = createContext(null);
 // We persist session data (including the session token) in localStorage so
 // the session survives page reloads. On each load we exchange the stored
 // session token for a fresh JWT via a server-side proxy (/api/auth/jwt).
+//
+// IMPORTANT: After sign-in the SDK's onSuccess hook overwrites session.token
+// with the JWT from the set-auth-jwt response header. We must save the raw
+// session ID (result.data.token) separately — rawSessionToken — so the
+// proxy can authenticate server-side with the correct cookie value.
 const SESSION_STORAGE_KEY = 'miri-session-v1';
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days fallback
 
-function saveSessionToStorage(data) {
+function saveSessionToStorage(data, rawSessionToken) {
   if (!data?.user) return;
   try {
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+      ...data,
+      rawSessionToken: rawSessionToken ?? null,
+      savedAt: Date.now(),
+    }));
   } catch (_e) {
     // localStorage unavailable (e.g. private browsing with restrictions)
   }
@@ -38,7 +47,11 @@ function loadSessionFromStorage() {
       localStorage.removeItem(SESSION_STORAGE_KEY);
       return null;
     }
-    return { user: stored.user, session: stored.session ?? { token: null } };
+    return {
+      user: stored.user,
+      session: stored.session ?? { token: null },
+      rawSessionToken: stored.rawSessionToken ?? null,
+    };
   } catch (_e) {
     return null;
   }
@@ -112,10 +125,12 @@ export function AuthProvider({ children }) {
         }
 
         // Fetch JWT before setting session so data queries have a token
-        // the moment isAuthenticated becomes true.
-        const sessionToken = data?.session?.token;
-        if (sessionToken) {
-          const jwt = await fetchJWT(sessionToken);
+        // the moment isAuthenticated becomes true. Use rawSessionToken (the
+        // raw session ID) not session.token which may be a JWT after onSuccess.
+        const stored = !apiData ? loadSessionFromStorage() : null;
+        const rawToken = stored?.rawSessionToken ?? data?.session?.token;
+        if (rawToken) {
+          const jwt = await fetchJWT(rawToken);
           if (jwt && isMounted) setDataJWT(jwt);
         }
 
@@ -123,9 +138,9 @@ export function AuthProvider({ children }) {
       } catch (_error) {
         if (!isMounted) return;
         const stored = loadSessionFromStorage();
-        const sessionToken = stored?.session?.token;
-        if (sessionToken) {
-          const jwt = await fetchJWT(sessionToken);
+        const rawToken = stored?.rawSessionToken ?? stored?.session?.token;
+        if (rawToken) {
+          const jwt = await fetchJWT(rawToken);
           if (jwt && isMounted) setDataJWT(jwt);
         }
         if (isMounted) setSessionData(stored);
@@ -165,7 +180,7 @@ export function AuthProvider({ children }) {
         if (jwt) setDataJWT(jwt);
       }
       setSessionData(data);
-      saveSessionToStorage(data);
+      saveSessionToStorage(data, sessionToken);
     } else {
       await refreshSession();
     }
@@ -193,7 +208,7 @@ export function AuthProvider({ children }) {
         if (jwt) setDataJWT(jwt);
       }
       setSessionData(data);
-      saveSessionToStorage(data);
+      saveSessionToStorage(data, sessionToken);
     } else {
       await refreshSession();
     }
@@ -230,7 +245,7 @@ export function AuthProvider({ children }) {
         session: result.data.session ?? { token: sessionToken },
       };
       setSessionData(data);
-      saveSessionToStorage(data);
+      saveSessionToStorage(data, sessionToken);
       if (sessionToken) {
         const jwt = await fetchJWT(sessionToken);
         if (jwt) setDataJWT(jwt);
