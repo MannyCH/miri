@@ -14,10 +14,12 @@ const AuthContext = createContext(null);
 // new sign-ins; this only affects the bootstrap check on reload.
 const SESSION_STORAGE_KEY = 'miri-session-v1';
 
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days fallback
+
 function saveSessionToStorage(data) {
-  if (!data?.user || !data?.session) return;
+  if (!data?.user) return;
   try {
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
   } catch (_e) {
     // localStorage unavailable (e.g. private browsing with restrictions)
   }
@@ -27,14 +29,18 @@ function loadSessionFromStorage() {
   try {
     const raw = localStorage.getItem(SESSION_STORAGE_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (!data?.user || !data?.session) return null;
-    const expiresAt = data.session?.expiresAt;
+    const stored = JSON.parse(raw);
+    if (!stored?.user) return null;
+    const expiresAt = stored.session?.expiresAt;
     if (expiresAt && new Date(expiresAt) < new Date()) {
       localStorage.removeItem(SESSION_STORAGE_KEY);
       return null;
     }
-    return data;
+    if (!expiresAt && stored.savedAt && Date.now() - stored.savedAt > SESSION_TTL_MS) {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      return null;
+    }
+    return { user: stored.user, session: stored.session ?? { token: null } };
   } catch (_e) {
     return null;
   }
@@ -108,14 +114,15 @@ export function AuthProvider({ children }) {
       email: normalizeEmail(email),
       password,
     });
-    // eslint-disable-next-line no-console
-    console.log('[auth] signIn result:', JSON.stringify(result));
     const message = getErrorMessage(result, 'Sign-in failed.');
     if (message) {
       throw new Error(message);
     }
-    if (result?.data?.user && result?.data?.session) {
-      const data = { user: result.data.user, session: result.data.session };
+    if (result?.data?.user) {
+      const data = {
+        user: result.data.user,
+        session: result.data.session ?? { token: result.data.token ?? null },
+      };
       setSessionData(data);
       saveSessionToStorage(data);
     } else {
@@ -134,8 +141,11 @@ export function AuthProvider({ children }) {
     if (message) {
       throw new Error(message);
     }
-    if (result?.data?.user && result?.data?.session) {
-      const data = { user: result.data.user, session: result.data.session };
+    if (result?.data?.user) {
+      const data = {
+        user: result.data.user,
+        session: result.data.session ?? { token: result.data.token ?? null },
+      };
       setSessionData(data);
       saveSessionToStorage(data);
     } else {
@@ -167,8 +177,11 @@ export function AuthProvider({ children }) {
     if (message) {
       throw new Error(message);
     }
-    if (result?.data?.user && result?.data?.session) {
-      const data = { user: result.data.user, session: result.data.session };
+    if (result?.data?.user) {
+      const data = {
+        user: result.data.user,
+        session: result.data.session ?? { token: result.data.token ?? null },
+      };
       setSessionData(data);
       saveSessionToStorage(data);
     } else {
