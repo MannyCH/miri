@@ -61,7 +61,11 @@ export function AuthProvider({ children }) {
     if (message) {
       throw new Error(message);
     }
-    await refreshSession();
+    if (result?.data?.user && result?.data?.session) {
+      setSessionData({ user: result.data.user, session: result.data.session });
+    } else {
+      await refreshSession();
+    }
     return result?.data ?? null;
   }, [refreshSession]);
 
@@ -75,7 +79,11 @@ export function AuthProvider({ children }) {
     if (message) {
       throw new Error(message);
     }
-    await refreshSession();
+    if (result?.data?.user && result?.data?.session) {
+      setSessionData({ user: result.data.user, session: result.data.session });
+    } else {
+      await refreshSession();
+    }
     return result?.data ?? null;
   }, [refreshSession]);
 
@@ -102,7 +110,11 @@ export function AuthProvider({ children }) {
     if (message) {
       throw new Error(message);
     }
-    await refreshSession();
+    if (result?.data?.user && result?.data?.session) {
+      setSessionData({ user: result.data.user, session: result.data.session });
+    } else {
+      await refreshSession();
+    }
     return result?.data ?? null;
   }, [refreshSession]);
 
