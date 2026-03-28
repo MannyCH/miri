@@ -108,6 +108,8 @@ export function AuthProvider({ children }) {
       email: normalizeEmail(email),
       password,
     });
+    // eslint-disable-next-line no-console
+    console.log('[auth] signIn result:', JSON.stringify(result));
     const message = getErrorMessage(result, 'Sign-in failed.');
     if (message) {
       throw new Error(message);
