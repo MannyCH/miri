@@ -7,26 +7,22 @@ const AuthContext = createContext(null);
 
 // Safari ITP blocks cross-domain cookies from the Neon Auth server, causing
 // getSession() to return null and the Data API to have no JWT for RLS.
-// We persist session data (including the session token) in localStorage so
-// the session survives page reloads. On each load we exchange the stored
-// session token for a fresh JWT via a server-side proxy (/api/auth/jwt).
 //
-// IMPORTANT: After sign-in the SDK's onSuccess hook overwrites session.token
-// with the JWT from the set-auth-jwt response header. We must save the raw
-// session ID (result.data.token) separately — rawSessionToken — so the
-// proxy can authenticate server-side with the correct cookie value.
+// Fix: persist both session data and the JWT in localStorage.
+// After sign-in, the SDK's onSuccess hook overwrites session.token with the
+// JWT from the set-auth-jwt response header — so result.data.session.token
+// IS the JWT. We save it and restore it on reload with setDataJWT().
 const SESSION_STORAGE_KEY = 'miri-session-v1';
+const JWT_STORAGE_KEY = 'miri-jwt-v1';
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days fallback
 
-function saveSessionToStorage(data, rawSessionToken) {
+// --- Session storage ---
+
+function saveSessionToStorage(data) {
   if (!data?.user) return;
   try {
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
-      ...data,
-      rawSessionToken: rawSessionToken ?? null,
-      savedAt: Date.now(),
-    }));
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
   } catch (_e) {
     // localStorage unavailable (e.g. private browsing with restrictions)
   }
@@ -47,11 +43,7 @@ function loadSessionFromStorage() {
       localStorage.removeItem(SESSION_STORAGE_KEY);
       return null;
     }
-    return {
-      user: stored.user,
-      session: stored.session ?? { token: null },
-      rawSessionToken: stored.rawSessionToken ?? null,
-    };
+    return { user: stored.user, session: stored.session ?? { token: null } };
   } catch (_e) {
     return null;
   }
@@ -65,6 +57,51 @@ function clearSessionFromStorage() {
   }
 }
 
+// --- JWT storage ---
+
+function jwtExpiresAt(jwt) {
+  try {
+    const payload = JSON.parse(atob(jwt.split('.')[1]));
+    return payload.exp ? payload.exp * 1000 : null;
+  } catch (_e) {
+    return null;
+  }
+}
+
+function saveJWTToStorage(jwt) {
+  if (!jwt) return;
+  try {
+    localStorage.setItem(JWT_STORAGE_KEY, jwt);
+  } catch (_e) {
+    // ignore
+  }
+}
+
+function loadJWTFromStorage() {
+  try {
+    const jwt = localStorage.getItem(JWT_STORAGE_KEY);
+    if (!jwt) return null;
+    const exp = jwtExpiresAt(jwt);
+    if (exp && exp < Date.now()) {
+      localStorage.removeItem(JWT_STORAGE_KEY);
+      return null;
+    }
+    return jwt;
+  } catch (_e) {
+    return null;
+  }
+}
+
+function clearJWTFromStorage() {
+  try {
+    localStorage.removeItem(JWT_STORAGE_KEY);
+  } catch (_e) {
+    // ignore
+  }
+}
+
+// --- Helpers ---
+
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
@@ -75,24 +112,12 @@ function getErrorMessage(result, fallbackMessage) {
 }
 
 /**
- * Exchange a Better Auth session token for a Neon JWT via our server-side proxy.
- * The proxy calls the Neon Auth server without browser ITP restrictions and
- * extracts the JWT from the set-auth-jwt response header.
+ * Extract JWT from auth result data.
+ * The SDK's onSuccess hook overwrites session.token with the JWT from the
+ * set-auth-jwt response header, so result.data.session.token IS the JWT.
  */
-async function fetchJWT(sessionToken) {
-  if (!sessionToken) return null;
-  try {
-    const res = await fetch('/api/auth/jwt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionToken }),
-    });
-    if (!res.ok) return null;
-    const { jwt } = await res.json();
-    return jwt ?? null;
-  } catch {
-    return null;
-  }
+function extractJWT(resultData) {
+  return resultData?.session?.token ?? null;
 }
 
 export function AuthProvider({ children }) {
@@ -105,6 +130,11 @@ export function AuthProvider({ children }) {
     setSessionData(data);
     if (data) {
       saveSessionToStorage(data);
+      const jwt = extractJWT(data);
+      if (jwt) {
+        setDataJWT(jwt);
+        saveJWTToStorage(jwt);
+      }
     }
     return data;
   }, []);
@@ -117,32 +147,29 @@ export function AuthProvider({ children }) {
         const result = await authClient.getSession();
         if (!isMounted) return;
         const apiData = result?.data ?? null;
-        // Prefer the live API session; fall back to localStorage when cookies
+        // Prefer live API session; fall back to localStorage when cookies
         // are blocked (Safari ITP).
         const data = apiData ?? loadSessionFromStorage();
         if (apiData) {
           saveSessionToStorage(apiData);
         }
 
-        // Fetch JWT before setting session so data queries have a token
-        // the moment isAuthenticated becomes true. Use rawSessionToken (the
-        // raw session ID) not session.token which may be a JWT after onSuccess.
-        const stored = !apiData ? loadSessionFromStorage() : null;
-        const rawToken = stored?.rawSessionToken ?? data?.session?.token;
-        if (rawToken) {
-          const jwt = await fetchJWT(rawToken);
-          if (jwt && isMounted) setDataJWT(jwt);
+        // Restore JWT before setting session so data queries have a token
+        // the moment isAuthenticated becomes true.
+        // Priority: fresh JWT from API → cached JWT from localStorage.
+        const freshJWT = apiData ? extractJWT(apiData) : null;
+        const jwt = freshJWT ?? loadJWTFromStorage();
+        if (jwt && isMounted) {
+          setDataJWT(jwt);
+          if (freshJWT) saveJWTToStorage(freshJWT);
         }
 
         if (isMounted) setSessionData(data);
       } catch (_error) {
         if (!isMounted) return;
         const stored = loadSessionFromStorage();
-        const rawToken = stored?.rawSessionToken ?? stored?.session?.token;
-        if (rawToken) {
-          const jwt = await fetchJWT(rawToken);
-          if (jwt && isMounted) setDataJWT(jwt);
-        }
+        const jwt = loadJWTFromStorage();
+        if (jwt && isMounted) setDataJWT(jwt);
         if (isMounted) setSessionData(stored);
       } finally {
         if (isMounted) {
@@ -168,19 +195,19 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user) {
-      const sessionToken = result.data.token ?? null;
       const data = {
         user: result.data.user,
-        session: result.data.session ?? { token: sessionToken },
+        session: result.data.session ?? { token: null },
       };
-      // Fetch JWT before setting session so data queries have a token
-      // the moment isAuthenticated becomes true.
-      if (sessionToken) {
-        const jwt = await fetchJWT(sessionToken);
-        if (jwt) setDataJWT(jwt);
+      // result.data.session.token is the JWT (SDK's onSuccess overwrites it).
+      // Set it before setSessionData so data queries have a token immediately.
+      const jwt = extractJWT(result.data);
+      if (jwt) {
+        setDataJWT(jwt);
+        saveJWTToStorage(jwt);
       }
       setSessionData(data);
-      saveSessionToStorage(data, sessionToken);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
@@ -198,17 +225,17 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user) {
-      const sessionToken = result.data.token ?? null;
       const data = {
         user: result.data.user,
-        session: result.data.session ?? { token: sessionToken },
+        session: result.data.session ?? { token: null },
       };
-      if (sessionToken) {
-        const jwt = await fetchJWT(sessionToken);
-        if (jwt) setDataJWT(jwt);
+      const jwt = extractJWT(result.data);
+      if (jwt) {
+        setDataJWT(jwt);
+        saveJWTToStorage(jwt);
       }
       setSessionData(data);
-      saveSessionToStorage(data, sessionToken);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
@@ -239,17 +266,17 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     if (result?.data?.user) {
-      const sessionToken = result.data.token ?? null;
       const data = {
         user: result.data.user,
-        session: result.data.session ?? { token: sessionToken },
+        session: result.data.session ?? { token: null },
       };
-      setSessionData(data);
-      saveSessionToStorage(data, sessionToken);
-      if (sessionToken) {
-        const jwt = await fetchJWT(sessionToken);
-        if (jwt) setDataJWT(jwt);
+      const jwt = extractJWT(result.data);
+      if (jwt) {
+        setDataJWT(jwt);
+        saveJWTToStorage(jwt);
       }
+      setSessionData(data);
+      saveSessionToStorage(data);
     } else {
       await refreshSession();
     }
@@ -309,6 +336,7 @@ export function AuthProvider({ children }) {
       throw new Error(message);
     }
     clearSessionFromStorage();
+    clearJWTFromStorage();
     clearDataJWT();
     setSessionData(null);
   }, []);
@@ -355,6 +383,7 @@ export function AuthProvider({ children }) {
     const message = getErrorMessage(result, 'Could not delete account.');
     if (message) throw new Error(message);
     clearSessionFromStorage();
+    clearJWTFromStorage();
     clearDataJWT();
     setSessionData(null);
   }, []);
