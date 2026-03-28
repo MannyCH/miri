@@ -34,9 +34,18 @@ export default async function middleware(request) {
   const targetPath = url.pathname.replace(/^\/neon-auth/, '') || '/';
   const targetUrl = `${authBaseUrl}${targetPath}${url.search}`;
 
-  // Forward all request headers except host
-  const forwardHeaders = new Headers(request.headers);
+  // Forward only the headers Neon Auth expects. Forwarding all browser
+  // headers (x-forwarded-host, x-vercel-*, etc.) causes INVALID_HOSTNAME.
+  const forwardHeaders = new Headers();
   forwardHeaders.set('host', new URL(authBaseUrl).host);
+
+  // Pass through auth/session-related headers
+  const passThrough = ['cookie', 'authorization', 'content-type', 'accept',
+    'origin', 'x-neon-client-info', 'x-neon-auth-proxy'];
+  for (const name of passThrough) {
+    const value = request.headers.get(name);
+    if (value) forwardHeaders.set(name, value);
+  }
 
   // Read body once for methods that have one
   const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
