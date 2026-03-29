@@ -364,81 +364,49 @@
   color: var(--color-icon-brand);
 }
 
-/* Floating search FAB — anchored to container */
-.shopping-list-search-fab {
-  position: absolute;
-  bottom: calc(76px + var(--safe-area-inset-bottom) + var(--spacing-16) + var(--keyboard-height, 0px));
-  right: var(--spacing-16);
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  border: 1px solid var(--color-stroke-weak);
-  background: var(--color-background-raised);
-  color: var(--color-icon-brand);
-  cursor: pointer;
-  box-shadow: var(--elevation-overlay);
-  z-index: 10;
-}
-
-.shopping-list-search-fab:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-}
-
-/* Search overlay — slides in from top, above header */
-.shopping-list-search-overlay {
-  position: absolute;
-  top: var(--safe-area-inset-top);
-  left: 0;
-  right: 0;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  background: var(--color-background-base);
-  border-bottom: 1px solid var(--color-stroke-weak);
-  animation: search-slide-down 0.2s ease;
-}
-
-@keyframes search-slide-down {
-  from { opacity: 0; transform: translateY(-100%); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.shopping-list-search-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-8);
-  padding: var(--spacing-12) var(--spacing-16);
-}
-
-.shopping-list-search-row .search-bar {
-  flex: 1;
-}
-
-/* Suggestions list */
-.shopping-list-suggestions {
-  display: flex;
-  flex-direction: column;
+/* Add ingredient bar — always visible above navigation */
+.shopping-list-add-bar {
+  flex-shrink: 0;
+  padding: var(--spacing-8) var(--spacing-16);
   border-top: 1px solid var(--color-stroke-weak);
+  background: var(--color-background-base);
 }
 
+.shopping-list-add-bar .search-bar {
+  width: 100%;
+}
+
+/* Suggestion sheet — partial bottom overlay, scrollable, above add bar */
+.shopping-list-suggestions-sheet {
+  flex-shrink: 0;
+  max-height: 264px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid var(--color-stroke-weak);
+  background: var(--color-background-raised);
+  box-shadow: var(--elevation-overlay);
+}
+
+/* Suggestions list items */
 .shopping-list-suggestion-item {
   display: flex;
   align-items: center;
+  width: 100%;
   padding: var(--spacing-12) var(--spacing-16);
   background: transparent;
   border: none;
+  border-bottom: 1px solid var(--color-stroke-weak);
   text-align: left;
   color: var(--color-text-strong);
   cursor: pointer;
-  border-bottom: 1px solid var(--color-stroke-weak);
 }
 
 .shopping-list-suggestion-item:last-child {
   border-bottom: none;
+}
+
+.shopping-list-suggestion-item:active {
+  background: var(--color-background-sunken);
 }
 
 .shopping-list-suggestion-item:focus-visible {
@@ -489,24 +457,6 @@
   color: var(--color-text-strong);
 }
 
-.shopping-list-search-cancel {
-  flex-shrink: 0;
-  padding: 0 var(--spacing-4);
-  border: none;
-  background: transparent;
-  color: var(--color-text-brand);
-  font-family: var(--font-family-body);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.shopping-list-search-cancel:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-  border-radius: var(--corner-radius-4);
-}
 
 /* Pantry staples section header */
 .smart-group-header--pantry {

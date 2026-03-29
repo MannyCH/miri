@@ -49,7 +49,6 @@ export function ShoppingListPage() {
     showToast,
   } = useApp();
   const { preferences } = usePreferences();
-  const [searchQuery, setSearchQuery] = React.useState('');
   const [pendingQuantityIds, setPendingQuantityIds] = React.useState(new Set());
   const [isActionSheetOpen, setIsActionSheetOpen] = React.useState(false);
   const [isShareSheetOpen, setIsShareSheetOpen] = React.useState(false);
@@ -140,11 +139,8 @@ export function ShoppingListPage() {
     return acc;
   }, []);
 
-  const lowerQuery = searchQuery.toLowerCase();
-
   const filteredList = shoppingList
     .map((item, originalIdx) => ({ ...item, originalIdx }))
-    .filter(item => !lowerQuery || item.name.toLowerCase().includes(lowerQuery))
     .filter(item => !pendingQuantityIds.has(item.entryId));
 
   const items = filteredList.map(item => item.name);
@@ -157,8 +153,7 @@ export function ShoppingListPage() {
   });
 
   const recipeGroups = groupedByRecipe.map(group => {
-    const filteredIngredients = group.ingredients
-      .filter(item => !lowerQuery || item.name.toLowerCase().includes(lowerQuery));
+    const filteredIngredients = group.ingredients;
 
     return {
       recipeName: group.recipeName,
@@ -307,8 +302,6 @@ export function ShoppingListPage() {
         }}
         onRecipeDelete={(recipeId) => deleteRecipeFromShoppingList(recipeId)}
         onClearList={clearShoppingList}
-        searchQuery={searchQuery}
-        onSearch={setSearchQuery}
         onAddIngredient={handleAddIngredient}
         pendingItems={shoppingList
           .filter(item => pendingQuantityIds.has(item.entryId))

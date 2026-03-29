@@ -29,8 +29,6 @@ export const ShoppingListView = ({
   onSmartItemDelete,
   smartGroups = [],
   smartStatus = 'idle',
-  searchQuery = '',
-  onSearch,
   summaryEntries = [],
   pantryStaples = [],
   onTogglePantryStaple,
@@ -51,7 +49,7 @@ export const ShoppingListView = ({
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const MAX_SUGGESTIONS = 5;
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
@@ -70,29 +68,23 @@ export const ShoppingListView = ({
     };
   }, []);
 
-  const handleFabClick = () => {
-    if (isSearchOpen) {
-      searchInputRef.current?.focus();
-    } else {
-      setIsSearchOpen(true);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsSearchOpen(false);
-    onSearch?.('');
-  };
-
   const handleAddSuggestion = (name) => {
     onAddIngredient?.(name);
-    onSearch?.('');
+    setSearchQuery('');
     searchInputRef.current?.focus();
+  };
+
+  const handleAddBarKeyDown = (e) => {
+    if (e.key === 'Enter' && trimmedQuery.length > 0) {
+      e.preventDefault();
+      handleAddSuggestion(trimmedQuery);
+    }
   };
 
   const trimmedQuery = searchQuery.trim();
   const suggestions = trimmedQuery.length > 0
     ? INGREDIENT_SUGGESTIONS
-        .filter(s => s.toLowerCase().includes(trimmedQuery.toLowerCase()))
+        .filter(s => s.toLowerCase().startsWith(trimmedQuery.toLowerCase()))
         .slice(0, MAX_SUGGESTIONS)
     : [];
 
@@ -412,67 +404,49 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Bottom Navigation */}
-      <NavigationBarConnected activeItem="shopping-list" />
-
-      {/* Search overlay — slides in from top, Cancel always visible above keyboard */}
-      {isSearchOpen && (
-        <div className="shopping-list-search-overlay">
-          <div className="shopping-list-search-row">
-            <SearchBar
-              // eslint-disable-next-line jsx-a11y/no-autofocus
-              autoFocus
-              inputRef={searchInputRef}
-              placeholder="Ich brauche..."
-              value={searchQuery}
-              onChange={(e) => onSearch?.(e.target.value)}
-              showTrailingIcon={false}
-            />
+      {/* Suggestion sheet — partial overlay above add bar, visible while typing */}
+      {trimmedQuery.length > 0 && (
+        <div className="shopping-list-suggestions-sheet" role="listbox" aria-label="Ingredient suggestions">
+          <button
+            type="button"
+            className="shopping-list-suggestion-item shopping-list-suggestion-add text-body-regular"
+            role="option"
+            aria-selected="false"
+            onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(trimmedQuery); }}
+          >
+            Add &ldquo;{trimmedQuery}&rdquo;
+          </button>
+          {suggestions.map((name) => (
             <button
+              key={name}
               type="button"
-              className="shopping-list-search-cancel"
-              onClick={handleCancel}
+              className="shopping-list-suggestion-item text-body-regular"
+              role="option"
+              aria-selected="false"
+              onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(name); }}
             >
-              Cancel
+              {name}
             </button>
-          </div>
-          {trimmedQuery.length > 0 && (
-            <div className="shopping-list-suggestions" role="listbox" aria-label="Ingredient suggestions">
-              {suggestions.map((name) => (
-                <button
-                  key={name}
-                  type="button"
-                  className="shopping-list-suggestion-item text-body-small-regular"
-                  role="option"
-                  aria-selected="false"
-                  onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(name); }}
-                >
-                  {name}
-                </button>
-              ))}
-              <button
-                type="button"
-                className="shopping-list-suggestion-item shopping-list-suggestion-add text-body-small-regular"
-                role="option"
-                aria-selected="false"
-                onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(trimmedQuery); }}
-              >
-                Add &ldquo;{trimmedQuery}&rdquo;
-              </button>
-            </div>
-          )}
+          ))}
         </div>
       )}
 
-      {/* Floating search FAB — fixed, floats above keyboard */}
-      <button
-        type="button"
-        className="shopping-list-search-fab"
-        onClick={handleFabClick}
-        aria-label="Search shopping list"
-      >
-        <SearchIcon />
-      </button>
+      {/* Add ingredient bar — always visible above nav */}
+      <div className="shopping-list-add-bar">
+        <SearchBar
+          inputRef={searchInputRef}
+          placeholder="Ich brauche..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleAddBarKeyDown}
+          showTrailingIcon={false}
+          inputMode="text"
+          enterKeyHint="done"
+        />
+      </div>
+
+      {/* Bottom Navigation */}
+      <NavigationBarConnected activeItem="shopping-list" />
     </div>
   );
 };
@@ -500,10 +474,6 @@ function PendingIngredientRow({ entryId, name, onSetQuantity }) {
   const [quantity, setQuantity] = React.useState('');
   const inputRef = React.useRef(null);
 
-  React.useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
   const handleCommit = () => {
     onSetQuantity?.(entryId, name, quantity);
   };
@@ -516,6 +486,7 @@ function PendingIngredientRow({ entryId, name, onSetQuantity }) {
           ref={inputRef}
           className="pending-ingredient-quantity text-body-small-regular"
           type="text"
+          inputMode="decimal"
           value={quantity}
           placeholder="qty"
           onChange={(e) => setQuantity(e.target.value)}
@@ -524,6 +495,7 @@ function PendingIngredientRow({ entryId, name, onSetQuantity }) {
             if (e.key === 'Enter') { e.preventDefault(); inputRef.current?.blur(); }
           }}
           aria-label={`Quantity for ${name}`}
+          style={{ fontSize: '16px' }}
         />
         <span className="pending-ingredient-name text-body-small-regular">{name}</span>
       </div>
@@ -856,12 +828,6 @@ const TrashIcon = () => (
   </svg>
 );
 
-const SearchIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="11" cy="11" r="8"/>
-    <path d="m21 21-4.35-4.35"/>
-  </svg>
-);
 
 const SparkleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
