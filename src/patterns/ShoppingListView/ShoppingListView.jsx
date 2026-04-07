@@ -246,7 +246,7 @@ export const ShoppingListView = ({
             <ul className="shopping-list-summary-list">
               {summaryEntries.map(({ recipeName, servings }) => (
                 <li key={recipeName} className="text-body-small-regular shopping-list-summary-item">
-                  <span className="shopping-list-summary-servings">×{servings}</span>
+                  <span className="shopping-list-summary-servings">{servings}×</span>
                   <span>{recipeName}</span>
                 </li>
               ))}
