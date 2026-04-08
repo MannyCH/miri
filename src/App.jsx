@@ -32,7 +32,8 @@ const JoinListPage = lazy(() => import('./pages/JoinListPage').then((module) => 
 function useNeedsOnboarding() {
   const { user } = useAuth();
   const { preferences, isLoading } = usePreferences();
-  if (!user || isLoading) return false;
+  if (!user) return false;
+  if (isLoading) return null; // Still determining — don't make a routing decision yet
   const done = localStorage.getItem(`miri_onboarding_${user.id}`);
   if (done) return false;
   return !preferences.goal && !preferences.eatingStyle;
@@ -47,6 +48,12 @@ function AppContent() {
     return <div>Loading authentication...</div>;
   }
 
+  // While authenticated and preferences are still loading, hold off routing decisions
+  // to avoid sending new users to /planning instead of /onboarding.
+  if (isAuthenticated && needsOnboarding === null) {
+    return null;
+  }
+
   const defaultRoute = isAuthenticated
     ? (needsOnboarding ? '/onboarding' : '/planning')
     : '/auth';
@@ -58,7 +65,7 @@ function AppContent() {
           <Route path="/" element={<Navigate to={defaultRoute} replace />} />
           <Route
             path="/auth"
-            element={isAuthenticated ? <Navigate to={needsOnboarding ? '/onboarding' : '/planning'} replace /> : <AuthPage />}
+            element={isAuthenticated && needsOnboarding !== null ? <Navigate to={needsOnboarding ? '/onboarding' : '/planning'} replace /> : <AuthPage />}
           />
           <Route
             path="/onboarding"
