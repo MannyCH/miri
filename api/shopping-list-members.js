@@ -5,20 +5,60 @@ import { getPusher } from './_lib/pusher.js';
 /**
  * /api/shopping-list-members
  *
- * GET    — Get members of a list  ?listId=xxx
- * DELETE — Remove a member (self = leave, other = remove)
- *          Body: { listId, targetUserId }
+ * GET  ?listId=xxx  — Get members of a list
+ * GET  ?token=xxx   — Get list info by invite token (for join screen)
+ * POST              — Join a list { token, mergeFromListId? }
+ * DELETE            — Remove a member (self = leave, other = remove)
+ *                     Body: { listId, targetUserId }
  */
 export default async function handler(req, res) {
   try {
     const userId = await getUserId(req);
 
-    // ── GET: list members ──
+    // ── GET: list members or list info by invite token ──
     if (req.method === 'GET') {
-      const { listId } = req.query;
-      if (!listId) return res.status(400).json({ error: 'listId required' });
+      const { listId, token } = req.query;
 
-      // Verify membership
+      // Join screen: get list info by invite token
+      if (token) {
+        const lists = await sql`
+          SELECT id, name FROM shopping_lists WHERE invite_token = ${token}
+        `;
+        if (lists.length === 0) {
+          return res.status(404).json({ error: 'List not found or link expired' });
+        }
+        const list = lists[0];
+
+        const existing = await sql`
+          SELECT 1 FROM shopping_list_members
+          WHERE list_id = ${list.id} AND user_id = ${userId}
+          LIMIT 1
+        `;
+        if (existing.length > 0) {
+          return res.status(200).json({ list, alreadyMember: true });
+        }
+
+        const countRows = await sql`
+          SELECT COUNT(*)::int AS count FROM shopping_list_items WHERE list_id = ${list.id}
+        `;
+        const members = await sql`
+          SELECT slm.user_id, up.default_servings
+          FROM shopping_list_members slm
+          LEFT JOIN user_profile up ON up.user_id = slm.user_id
+          WHERE slm.list_id = ${list.id}
+        `;
+
+        return res.status(200).json({
+          list,
+          alreadyMember: false,
+          itemCount: countRows[0].count,
+          memberCount: members.length,
+        });
+      }
+
+      // Members list: get members by listId
+      if (!listId) return res.status(400).json({ error: 'listId or token required' });
+
       const check = await sql`
         SELECT 1 FROM shopping_list_members
         WHERE list_id = ${listId} AND user_id = ${userId}
@@ -48,6 +88,72 @@ export default async function handler(req, res) {
       });
     }
 
+    // ── POST: join list ──
+    if (req.method === 'POST') {
+      const { token, mergeFromListId } = req.body ?? {};
+      if (!token) return res.status(400).json({ error: 'token required' });
+
+      const lists = await sql`
+        SELECT id, name FROM shopping_lists WHERE invite_token = ${token}
+      `;
+      if (lists.length === 0) {
+        return res.status(404).json({ error: 'List not found or link expired' });
+      }
+      const list = lists[0];
+
+      const existing = await sql`
+        SELECT 1 FROM shopping_list_members
+        WHERE list_id = ${list.id} AND user_id = ${userId}
+        LIMIT 1
+      `;
+      if (existing.length > 0) {
+        return res.status(200).json({ listId: list.id, alreadyMember: true });
+      }
+
+      await sql`
+        INSERT INTO shopping_list_members (list_id, user_id)
+        VALUES (${list.id}, ${userId})
+      `;
+
+      if (mergeFromListId) {
+        const memberCheck = await sql`
+          SELECT 1 FROM shopping_list_members
+          WHERE list_id = ${mergeFromListId} AND user_id = ${userId}
+          LIMIT 1
+        `;
+        if (memberCheck.length > 0) {
+          await sql`
+            INSERT INTO shopping_list_items (list_id, entry_id, name, recipe_id, recipe_name, checked)
+            SELECT ${list.id}, entry_id || '-merged', name, recipe_id, recipe_name, false
+            FROM shopping_list_items
+            WHERE list_id = ${mergeFromListId} AND checked = false
+          `;
+
+          const oldMembers = await sql`
+            SELECT COUNT(*)::int AS count FROM shopping_list_members
+            WHERE list_id = ${mergeFromListId}
+          `;
+          if (oldMembers[0].count <= 1) {
+            await sql`DELETE FROM shopping_lists WHERE id = ${mergeFromListId}`;
+          } else {
+            await sql`
+              DELETE FROM shopping_list_members
+              WHERE list_id = ${mergeFromListId} AND user_id = ${userId}
+            `;
+          }
+        }
+      }
+
+      try {
+        const pusher = getPusher();
+        await pusher.trigger(`private-list-${list.id}`, 'member:joined', { userId });
+      } catch (e) {
+        console.error('Pusher trigger error (member:joined):', e.message);
+      }
+
+      return res.status(200).json({ listId: list.id, alreadyMember: false });
+    }
+
     // ── DELETE: remove member (leave or kick) ──
     if (req.method === 'DELETE') {
       const { listId, targetUserId } = req.body ?? {};
@@ -55,7 +161,6 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'listId and targetUserId required' });
       }
 
-      // Verify caller is a member
       const check = await sql`
         SELECT 1 FROM shopping_list_members
         WHERE list_id = ${listId} AND user_id = ${userId}
@@ -63,24 +168,20 @@ export default async function handler(req, res) {
       `;
       if (check.length === 0) return res.status(403).json({ error: 'Not a member' });
 
-      // Remove target member
       await sql`
         DELETE FROM shopping_list_members
         WHERE list_id = ${listId} AND user_id = ${targetUserId}
       `;
 
-      // Check remaining members
       const remaining = await sql`
         SELECT COUNT(*)::int AS count FROM shopping_list_members
         WHERE list_id = ${listId}
       `;
 
       if (remaining[0].count === 0) {
-        // Last person left — delete the list entirely
         await sql`DELETE FROM shopping_lists WHERE id = ${listId}`;
       }
 
-      // Trigger Pusher event
       const socketId = req.headers['x-pusher-socket-id'] || null;
       const isSelf = targetUserId === userId;
       try {

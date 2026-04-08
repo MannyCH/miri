@@ -111,11 +111,11 @@ export function removeMember(listId, targetUserId, socketId) {
 // ── Join ──
 
 export function fetchJoinInfo(token) {
-  return authFetch(`/api/shopping-list-join?token=${encodeURIComponent(token)}`);
+  return authFetch(`/api/shopping-list-members?token=${encodeURIComponent(token)}`);
 }
 
 export function joinList(token, mergeFromListId) {
-  return authFetch('/api/shopping-list-join', {
+  return authFetch('/api/shopping-list-members', {
     method: 'POST',
     body: { token, mergeFromListId },
   });
