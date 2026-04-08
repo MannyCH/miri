@@ -199,9 +199,20 @@ export function AuthProvider({ children }) {
   }, []);
 
   const deleteUser = useCallback(async () => {
-    const result = await authClient.deleteUser();
-    const message = getErrorMessage(result, 'Could not delete account.');
-    if (message) throw new Error(message);
+    // authClient.deleteUser() returns 404 on the Neon Auth hosted instance
+    // because that endpoint is not exposed. Use our own API route instead.
+    const { data: sessionData } = await authClient.getSession();
+    const token = sessionData?.session?.token;
+    if (!token) throw new Error('Not authenticated');
+
+    const res = await fetch('/api/delete-account', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Could not delete account.');
+    }
     setSessionData(null);
   }, []);
 
