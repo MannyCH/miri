@@ -263,7 +263,6 @@ export function AuthPage() {
           || name.trim()
           || verifyEmailAddress.split('@')[0]
           || 'there';
-        showToast('Success', `Welcome to Miri, ${welcomeName}. Account successfully created.`);
         clearPendingSignUpName(normalizedVerifyEmail);
         await new Promise((resolve) => setTimeout(resolve, 1100));
         setVerifyInfoMessage('');
@@ -711,7 +710,7 @@ export function AuthPage() {
       </form>
       <button
         type="button"
-        className="auth-inline-link text-body-small-bold-underlined"
+        className="auth-inline-link auth-back-to-login text-body-small-bold-underlined"
         onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
       >
         Back to login
