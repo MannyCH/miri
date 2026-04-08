@@ -70,15 +70,13 @@
 }
 
 .auth-verify-actions {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-16);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-12);
 }
 
 .auth-verify-actions .button.button-primary {
-  width: auto;
-  min-width: 124px;
+  width: 100%;
 }
 
 .auth-password-requirements {
