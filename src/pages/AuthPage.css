@@ -195,14 +195,15 @@
 }
 
 .auth-code-group {
-  width: 304px;
+  width: 100%;
   display: flex;
   gap: var(--spacing-8);
   margin: 0;
 }
 
 .auth-code-input {
-  width: 44px;
+  flex: 1;
+  min-width: 0;
   height: 52px;
   border: 1px solid var(--color-stroke-weak);
   border-radius: var(--corner-radius-8);
