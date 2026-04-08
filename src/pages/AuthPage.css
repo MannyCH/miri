@@ -202,8 +202,10 @@
 }
 
 .auth-code-input {
-  flex: 1;
+  flex: 1 1 0;
+  width: 0;
   min-width: 0;
+  box-sizing: border-box;
   height: 52px;
   border: 1px solid var(--color-stroke-weak);
   border-radius: var(--corner-radius-8);
