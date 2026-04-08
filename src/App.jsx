@@ -41,7 +41,7 @@ function useNeedsOnboarding() {
 
 function AppContent() {
   const { toasts, dismissToast } = useApp();
-  const { isAuthenticated, isAuthReady } = useAuth();
+  const { isAuthenticated, isAuthReady, user } = useAuth();
   const needsOnboarding = useNeedsOnboarding();
 
   if (!isAuthReady) {
@@ -54,7 +54,13 @@ function AppContent() {
     return null;
   }
 
-  const defaultRoute = isAuthenticated
+  // Don't redirect away from /auth until the user's email is verified.
+  // signUp() creates a session immediately (before OTP entry), so isAuthenticated
+  // becomes true while the user still needs to enter their verification code.
+  const isEmailVerified = Boolean(user?.emailVerified);
+  const canRedirectFromAuth = isAuthenticated && isEmailVerified;
+
+  const defaultRoute = canRedirectFromAuth
     ? (needsOnboarding ? '/onboarding' : '/planning')
     : '/auth';
 
@@ -65,7 +71,7 @@ function AppContent() {
           <Route path="/" element={<Navigate to={defaultRoute} replace />} />
           <Route
             path="/auth"
-            element={isAuthenticated && needsOnboarding !== null ? <Navigate to={needsOnboarding ? '/onboarding' : '/planning'} replace /> : <AuthPage />}
+            element={canRedirectFromAuth && needsOnboarding !== null ? <Navigate to={needsOnboarding ? '/onboarding' : '/planning'} replace /> : <AuthPage />}
           />
           <Route
             path="/onboarding"
