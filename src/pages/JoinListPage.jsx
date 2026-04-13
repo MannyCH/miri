@@ -132,7 +132,7 @@ export function JoinListPage() {
                 Keep separate
               </Button>
             )}
-            <Button variant="text" disabled={joining} onClick={handleCancel}>
+            <Button variant="tertiary" disabled={joining} onClick={handleCancel}>
               Cancel
             </Button>
           </div>
