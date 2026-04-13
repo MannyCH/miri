@@ -6,6 +6,7 @@ import { SelectField } from '../SelectField/SelectField';
 export default {
   title: 'Components/SettingsSection',
   component: SettingsSection,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

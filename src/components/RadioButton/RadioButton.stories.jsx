@@ -4,6 +4,7 @@ import { RadioButton } from './RadioButton';
 export default {
   title: 'Components/RadioButton',
   component: RadioButton,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     docs: {

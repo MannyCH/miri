@@ -4,6 +4,7 @@ import { ListSwitcher } from './ListSwitcher';
 export default {
   title: 'Components/ListSwitcher',
   component: ListSwitcher,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

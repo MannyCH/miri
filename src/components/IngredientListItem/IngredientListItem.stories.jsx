@@ -4,6 +4,7 @@ import { IngredientListItem } from './IngredientListItem';
 export default {
   title: 'Components/IngredientListItem',
   component: IngredientListItem,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {

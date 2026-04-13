@@ -4,6 +4,7 @@ import { NavigationBar } from './NavigationBar';
 export default {
   title: 'Components/NavigationBar',
   component: NavigationBar,
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
     docs: {

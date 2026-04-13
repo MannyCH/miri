@@ -4,6 +4,7 @@ import { Stepper } from './Stepper';
 export default {
   title: 'Components/Stepper',
   component: Stepper,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

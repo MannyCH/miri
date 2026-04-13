@@ -5,6 +5,7 @@ import { generateCalendarDays, formatDayTitle } from '../../data/recipes';
 export default {
   title: 'Components/CalendarModule',
   component: CalendarModule,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {

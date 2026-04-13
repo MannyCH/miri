@@ -13,6 +13,7 @@ import { TextField } from './TextField';
 export default {
   title: 'Components/TextField',
   component: TextField,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

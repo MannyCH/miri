@@ -4,6 +4,7 @@ import { SearchBar } from './SearchBar';
 export default {
   title: 'Components/SearchBar',
   component: SearchBar,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {

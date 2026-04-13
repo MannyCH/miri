@@ -4,6 +4,7 @@ import { RecipeListItem } from './RecipeListItem';
 export default {
   title: 'Components/RecipeListItem',
   component: RecipeListItem,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {

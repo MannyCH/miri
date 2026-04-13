@@ -4,6 +4,7 @@ import { UnitField } from './UnitField';
 export default {
   title: 'Components/UnitField',
   component: UnitField,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

@@ -4,6 +4,7 @@ import { SelectField } from './SelectField';
 export default {
   title: 'Components/SelectField',
   component: SelectField,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

@@ -4,6 +4,7 @@ import { ShareSheet } from './ShareSheet';
 export default {
   title: 'Components/ShareSheet',
   component: ShareSheet,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

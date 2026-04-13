@@ -5,6 +5,7 @@ import { RecipesView } from './RecipesView';
 export default {
   title: 'Patterns/RecipesView',
   component: RecipesView,
+  tags: ['autodocs'],
   decorators: [
     (Story) => (
       <MemoryRouter initialEntries={['/recipes']}>

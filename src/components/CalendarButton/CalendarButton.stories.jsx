@@ -4,6 +4,7 @@ import { CalendarButton } from './CalendarButton';
 export default {
   title: 'Components/CalendarButton',
   component: CalendarButton,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     docs: {

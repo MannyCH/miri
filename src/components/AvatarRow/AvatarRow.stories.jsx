@@ -4,6 +4,7 @@ import { AvatarRow } from './AvatarRow';
 export default {
   title: 'Components/AvatarRow',
   component: AvatarRow,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

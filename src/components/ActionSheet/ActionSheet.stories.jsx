@@ -4,6 +4,7 @@ import { ActionSheet } from './ActionSheet';
 export default {
   title: 'Components/ActionSheet',
   component: ActionSheet,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

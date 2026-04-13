@@ -4,6 +4,7 @@ import { BatchImportSection } from './BatchImportSection';
 export default {
   title: 'Components/BatchImportSection',
   component: BatchImportSection,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

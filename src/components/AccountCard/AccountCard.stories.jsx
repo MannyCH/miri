@@ -4,6 +4,7 @@ import { AccountCard } from './AccountCard';
 export default {
   title: 'Components/AccountCard',
   component: AccountCard,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

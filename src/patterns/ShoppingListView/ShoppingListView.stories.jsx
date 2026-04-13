@@ -5,6 +5,7 @@ import { ShoppingListView } from './ShoppingListView';
 export default {
   title: 'Patterns/ShoppingListView',
   component: ShoppingListView,
+  tags: ['autodocs'],
   decorators: [
     (Story) => (
       <MemoryRouter initialEntries={['/shopping-list']}>

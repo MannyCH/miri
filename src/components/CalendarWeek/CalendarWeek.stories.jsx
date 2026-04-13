@@ -4,6 +4,7 @@ import { CalendarWeek } from './CalendarWeek';
 export default {
   title: 'Components/CalendarWeek',
   component: CalendarWeek,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {

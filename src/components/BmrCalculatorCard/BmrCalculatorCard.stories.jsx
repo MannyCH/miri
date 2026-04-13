@@ -4,6 +4,7 @@ import { BmrCalculatorCard } from './BmrCalculatorCard';
 export default {
   title: 'Components/BmrCalculatorCard',
   component: BmrCalculatorCard,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

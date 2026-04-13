@@ -4,6 +4,7 @@ import { NavItem } from './NavItem';
 export default {
   title: 'Components/NavItem',
   component: NavItem,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     docs: {
