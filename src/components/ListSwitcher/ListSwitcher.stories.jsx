@@ -8,8 +8,21 @@ export default {
     docs: {
       description: {
         component: `
-Tappable list name pill that opens a dropdown for switching between shopping lists.
-Only shows chevron and dropdown when user has 2+ lists.
+Tappable list name pill in the shopping list header. Shows the active list name, and when the user has 2+ lists, opens a dropdown to switch between them or create a new one.
+
+## When to use
+- In the shopping list screen header to display and switch the active list
+- Only in contexts where the user manages multiple shopping lists
+
+## When NOT to use
+- As a generic tab switcher or segmented control — reach for a tab component
+- When there is only one list and switching is never needed — the component already handles this by disabling the pill, but do not add it where multi-list is architecturally not supported
+- For switching between non-list contexts (views, screens) — use navigation components
+
+## Pairs well with
+- \`AvatarRow\` displayed alongside the pill to show shared list members
+- \`ActionSheet\` or \`ContextMenu\` for additional list management actions (rename, delete)
+- \`ShareSheet\` for inviting members to the active list
 
 ## Behavior (from shopping-list-flow.json)
 - **1 list**: Plain text title, no chevron, no dropdown
@@ -49,6 +62,13 @@ export const SingleList = {
     lists: singleList,
     activeListId: 'list-1',
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Only one list exists — the pill shows the list name as plain text with no chevron and no dropdown. The button is disabled.',
+      },
+    },
+  },
 };
 
 export const MultipleLists = {
@@ -59,6 +79,13 @@ export const MultipleLists = {
     onSwitch: (id) => console.log('switch to', id),
     onCreateNew: () => console.log('create new'),
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Three lists — the pill is tappable, shows a chevron, and the dropdown lists all options. Shared lists display a member count icon.',
+      },
+    },
+  },
 };
 
 export const SecondActive = {
@@ -68,5 +95,12 @@ export const SecondActive = {
     activeListId: 'list-2',
     onSwitch: (id) => console.log('switch to', id),
     onCreateNew: () => console.log('create new'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'A non-first list is active — the active list name appears in the pill, and a checkmark appears next to it in the dropdown.',
+      },
+    },
   },
 };

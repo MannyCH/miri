@@ -8,7 +8,19 @@ export default {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Calendar date button with weekday label and day number. Three states: No background (past/inactive), Default (available), and Pressed (selected/today). Matches Figma Calendar Button component set.',
+        component: `Individual day cell in the calendar — shows a weekday abbreviation and day number stacked vertically. Three visual states reflect whether the day is in the past, available to select, or currently selected.
+
+## When to use
+- As the building block inside \`CalendarWeek\` or \`CalendarModule\` — do not use standalone
+- When you need a tap target that represents a single calendar day with clear selected/unselected feedback
+
+## When NOT to use
+- Don't use outside of a calendar row/module context — it carries no label or surrounding context on its own
+- Don't use for non-date selection (e.g. choosing a category) — use \`ChoiceTile\` instead
+
+## Pairs well with
+- \`CalendarWeek\` — wraps a row of 7 CalendarButtons
+- \`CalendarModule\` — adds a title and horizontal scroll behaviour to a sequence of CalendarButtons`,
       },
     },
   },
@@ -16,15 +28,15 @@ export default {
     state: {
       control: 'select',
       options: ['no-background', 'default', 'pressed'],
-      description: 'Visual state of the button',
+      description: 'Visual state of the button. `no-background` — past or inactive day, reduced emphasis. `default` — future/available day, normal emphasis. `pressed` — currently selected day, highlighted fill.',
     },
     day: {
       control: 'number',
-      description: 'Day number to display',
+      description: 'Day number to display (1–31).',
     },
     weekday: {
       control: 'text',
-      description: 'Weekday abbreviation (Mo, Tu, We, etc.)',
+      description: 'Two-letter weekday abbreviation shown above the day number (Mo, Tu, We, Th, Fr, Sa, Su).',
     },
   },
 };
@@ -35,6 +47,13 @@ export const NoBackground = {
     day: 22,
     weekday: 'Mo',
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Past or inactive day — reduced visual weight signals the date is not selectable or has already passed.',
+      },
+    },
+  },
 };
 
 export const Default = {
@@ -43,6 +62,13 @@ export const Default = {
     day: 23,
     weekday: 'Tu',
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Future/available day — normal emphasis, ready to be selected.',
+      },
+    },
+  },
 };
 
 export const Pressed = {
@@ -50,6 +76,13 @@ export const Pressed = {
     state: 'pressed',
     day: 25,
     weekday: 'Th',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Currently selected day — highlighted fill to confirm the active selection.',
+      },
+    },
   },
 };
 

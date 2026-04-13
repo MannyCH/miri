@@ -8,7 +8,34 @@ export default {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Container component for recipe list items. Shows a list of recipes with thumbnails and titles.',
+        component: `Container that renders a vertical list of \`RecipeListItem\` rows from an array of recipe objects. Handles divider placement, empty state, and click routing automatically.
+
+## When to use
+- On the /recipes page to display the user's saved recipe collection
+- Whenever you need to render a scrollable list of recipes with consistent thumbnail + title rows
+- Prefer this over mapping \`RecipeListItem\` yourself — it manages dividers and keys
+
+## When NOT to use
+- Do not use for horizontal recipe carousels or grid layouts — those need a different container
+- Do not use if the rows need additional interactive elements (e.g. swipe-to-delete) not supported by this component; manage RecipeListItems directly in that case
+
+## Pairs well with
+- A search or filter bar above the list
+- \`RecipeListItem\` — rendered internally; no need to import separately
+- An "Import recipe" button or FAB below or above the list`,
+      },
+    },
+  },
+};
+
+export const Empty = {
+  args: {
+    recipes: [],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Empty state — shown when the user has no saved recipes yet. The component renders a prompt to import the first recipe.',
       },
     },
   },
@@ -38,5 +65,12 @@ export const Default = {
         thumbnail: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=200&h=200&fit=crop',
       },
     ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Five recipes with real thumbnails — representative of the populated state on the /recipes page.',
+      },
+    },
   },
 };

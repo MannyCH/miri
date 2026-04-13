@@ -13,8 +13,24 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          'Full account page pattern. Composed of AccountCard, SettingsSection, Stepper, SelectField, and UnitField components. Shows user info and editable settings.',
+        component: `
+Full-screen account page where users view their profile and adjust meal planning preferences. Represents the \`/account\` route.
+
+## When to use
+Use for the \`/account\` route only. This is the destination when the user taps the account tab in the NavigationBar.
+
+## Composed of
+- **AccountCard** — displays user name, email, and account actions (logout, change password, delete account)
+- **SettingsSection** — groups related preference controls with a section title
+- **Stepper** — numeric control for serving size (how many people to cook for)
+- **SelectField** — dropdown selectors for eating style, goal, and cooking frequency
+- **UnitField** — numeric input with unit label for metabolic basal rate (kcal)
+- **BmrCalculatorCard** — optional inline calculator to derive BMR from biometrics
+- **NavigationBar** — bottom tab bar with "account" tab active
+
+## Key props
+This pattern has no external props — it is a self-contained template that manages its own local state. All preference changes are local to the story; in the app they are persisted via PreferencesContext to Neon Postgres.
+        `,
       },
     },
     layout: 'fullscreen',
@@ -116,10 +132,24 @@ function AccountViewTemplate() {
 }
 
 export const Default = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Blank state — all preference dropdowns unset, serving size at the default of 2. Represents a newly registered user who has not yet configured their settings.',
+      },
+    },
+  },
   render: () => <AccountViewTemplate />,
 };
 
 export const WithValues = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Populated state — all preferences filled in (4 servings, plant-forward diet, lose-weight goal, cooks a few times a week, BMR set to 1600 kcal). Represents a returning user who completed onboarding.',
+      },
+    },
+  },
   render: () => {
     const [servings, setServings] = useState(4);
     const [eatingStyle, setEatingStyle] = useState('plant-forward');

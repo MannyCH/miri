@@ -7,7 +7,24 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'Dropdown select field with label. Used in account settings for nutrition and goal preferences.',
+        component: `
+Labelled dropdown select field. Wraps a native \`<select>\` element with a styled chevron indicator.
+
+## When to use
+- Choosing one value from a short, known set of options (eating style, health goal, dietary preference)
+- Settings screens where a full-page picker would be overkill
+- When options are pre-defined and do not require freeform input
+
+## When NOT to use
+- For freeform text input — use \`TextField\`
+- For numeric values with a unit (weight, height, BMR) — use \`UnitField\`
+- For incrementing/decrementing a number — use \`Stepper\`
+- When the option list is very long or needs search — consider a dedicated picker pattern
+
+## Pairs well with
+- \`SettingsSection\` as the grouping container
+- \`Stepper\` for adjacent settings rows (e.g. serving size next to eating style)
+        `.trim(),
       },
     },
   },
@@ -49,6 +66,13 @@ export const Default = {
       placeholder="Select"
     />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Unselected state — placeholder is shown. This is the initial state when a user opens account settings for the first time.',
+      },
+    },
+  },
 };
 
 export const WithSelection = {
@@ -60,6 +84,13 @@ export const WithSelection = {
       onChange={() => {}}
     />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'A value is already selected — the chosen option label replaces the placeholder.',
+      },
+    },
+  },
 };
 
 export const GoalSelect = {
@@ -70,4 +101,11 @@ export const GoalSelect = {
       placeholder="Select"
     />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Same component used for the health goal preference — only the label and options change.',
+      },
+    },
+  },
 };

@@ -11,6 +11,17 @@ export default {
 Bottom sheet with a list of tappable action items. Slides up from the bottom with spring animation.
 Used for share actions, list management, and any context where a full-screen bottom sheet is more appropriate than a dropdown.
 
+## When to use
+- Presenting a set of actions on mobile where large touch targets are important
+- When the action set has 3+ items and a dropdown would feel cramped
+- Destructive or irreversible actions that benefit from the intentional friction of a bottom sheet
+- When an action sheet is the native mobile pattern expected by the user (share, manage list)
+
+## When NOT to use
+- For a short, 1–2 item menu anchored to a specific button — use \`ContextMenu\` instead
+- On desktop/wide screens — a popover or modal is more appropriate
+- For content that is not a list of actions (forms, descriptions) — use a modal dialog
+
 ## Features
 - Slides up with spring animation (same physics as ImportMethodSheet)
 - Closes on backdrop tap or Escape
@@ -48,6 +59,13 @@ export const Default = {
       { label: 'Create new list', onAction: () => console.log('create') },
     ],
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Standard list management actions — three text-only items with no icons or destructive styling.',
+      },
+    },
+  },
 };
 
 export const WithDestructive = {
@@ -62,6 +80,13 @@ export const WithDestructive = {
       '---',
       { label: 'Leave list', destructive: true, onAction: () => console.log('leave') },
     ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Destructive action ("Leave list") separated from safe actions by a divider. Use a separator + destructive item whenever an action cannot be undone.',
+      },
+    },
   },
 };
 
@@ -100,6 +125,13 @@ export const WithIcons = {
       },
     ],
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Share actions with icons — the icon appears in a branded background circle to the left of the label. Use icons when the action type benefits from visual reinforcement.',
+      },
+    },
+  },
 };
 
 export const Closed = {
@@ -107,5 +139,12 @@ export const Closed = {
     isOpen: false,
     title: 'Hidden',
     items: [{ label: 'Item', onAction: () => {} }],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'isOpen=false — the sheet is fully hidden. Used to verify that AnimatePresence correctly removes the sheet from the DOM when closed.',
+      },
+    },
   },
 };

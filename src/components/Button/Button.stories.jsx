@@ -12,6 +12,23 @@ export default {
 Button component with 4 variants and 5 interaction states, matching the Figma Design Library exactly.
 Built with Base UI for full accessibility (keyboard navigation, focus management, ARIA).
 
+## When to use
+- Main screen-level call to action → \`primary\`
+- Second option alongside a destructive or dominant primary (e.g. "Delete" + "Cancel") → \`secondary\`
+- Dismiss, cancel, or low-commitment inline action → \`tertiary\`
+- Low-emphasis destructive action (leave group, unlink, remove) → \`tertiary-delete\`
+
+## When NOT to use
+- Don't use \`tertiary-delete\` for Cancel — use \`tertiary\` (cancel is not destructive)
+- Don't use multiple \`primary\` buttons in one view — there should be one dominant CTA per screen
+- Don't use \`primary\` for actions inside a list row or card — prefer \`secondary\` or \`tertiary\` there
+- Don't use a button when a plain link (anchor tag) is semantically correct (navigation to a new URL)
+
+## Pairs well with
+- \`ConfirmDialog\` — dialog action rows use \`secondary\` for confirm and \`tertiary-delete\` for cancel/destructive
+- \`AccountCard\`, \`BmrCalculatorCard\` — internal actions use \`secondary\`
+- Form footers — primary CTA + optional secondary "Back" or "Cancel"
+
 ## Variants
 | Variant | Use case |
 |---|---|
@@ -53,7 +70,7 @@ Built with Base UI for full accessibility (keyboard navigation, focus management
     variant: {
       control: 'select',
       options: ['primary', 'secondary', 'tertiary', 'tertiary-delete'],
-      description: 'Visual variant matching Figma Property 1',
+      description: 'Visual variant matching Figma Property 1. `primary` — dominant CTA, filled brand colour. `secondary` — outlined, equal-weight alternative action. `tertiary` — low-emphasis inline action (underlined, no border). `tertiary-delete` — same weight as tertiary but signals irreversible/destructive intent via error colour.',
       table: {
         type: { summary: 'string' },
         defaultValue: { summary: 'primary' },

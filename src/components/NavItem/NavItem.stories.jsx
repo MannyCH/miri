@@ -8,7 +8,19 @@ export default {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Navigation item component with icon and text. 2 states: Default and Pressed.',
+        component: `A single bottom-navigation tab composed of an icon and a text label. Built on Base UI Button for full keyboard and screen-reader support.
+
+## When to use
+- As a building block inside \`NavigationBar\` — use \`NavigationBar\` for the full app chrome rather than wiring up NavItems individually
+- When a custom navigation bar layout is needed that cannot be expressed through \`NavigationBar\` props
+
+## When NOT to use
+- Do not use for in-page tab switching (use a Tabs component instead)
+- Do not use for actions — NavItem signals "go to a section", not "do something"
+- Do not use standalone outside a navigation bar context; the visual treatment assumes peer items
+
+## Pairs well with
+- \`NavigationBar\` — the standard container that renders four NavItems and manages the active state`,
       },
     },
   },
@@ -16,7 +28,7 @@ export default {
     state: {
       control: 'select',
       options: ['default', 'pressed'],
-      description: 'Navigation item state',
+      description: '`default` — the tab is not the current section; icon and label render at reduced emphasis. `pressed` — the tab is the active section; label switches to bold weight to reinforce selection.',
     },
     showIcon: {
       control: 'boolean',
@@ -47,6 +59,13 @@ export const Default = {
     showIcon: true,
     icon: <ListIcon />,
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'The inactive state — used for all tabs that are not the current route. Icon and label appear at standard (not bold) weight.',
+      },
+    },
+  },
 };
 
 export const Pressed = {
@@ -55,6 +74,13 @@ export const Pressed = {
     children: 'Recipes',
     showIcon: true,
     icon: <ListIcon />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'The active/selected state — used for the tab matching the current route. The label becomes bold to reinforce which section the user is in.',
+      },
+    },
   },
 };
 
@@ -68,3 +94,11 @@ export const BothStates = () => (
     </NavItem>
   </div>
 );
+
+BothStates.parameters = {
+  docs: {
+    description: {
+      story: 'Side-by-side comparison of the default and pressed states — useful for verifying the visual distinction between an inactive and active tab.',
+    },
+  },
+};

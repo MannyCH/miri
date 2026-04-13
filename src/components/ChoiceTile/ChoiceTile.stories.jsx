@@ -8,7 +8,22 @@ export default {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Large tap-target tile for single-choice selection. Used in onboarding flows.',
+        component: `Large tap-target tile for mutually exclusive single-choice selection. Renders a full-width button that toggles between unselected and selected states.
+
+## When to use
+- Onboarding question screens where the user picks one option from a short list (e.g. "What's your goal?")
+- Any single-select group where options need a large, accessible touch target — especially on mobile
+- When choices are simple text labels without icons or extra metadata
+
+## When NOT to use
+- Don't use for multi-select — there is no multi-select affordance; use checkboxes instead
+- Don't use when options have rich content (icons, descriptions, prices) — a custom card tile is more appropriate
+- Don't use inline within body text or alongside other form controls — it expects to be the sole input in a step/screen
+- Don't use for Yes/No binary choices that fit neatly in a dialog — use \`ConfirmDialog\` instead
+
+## Pairs well with
+- A \`ChoiceTile\` group (map over options array) stacked vertically with \`gap: var(--spacing-8)\`
+- A \`Button variant="primary"\` Continue button below the group to advance the onboarding step`,
       },
     },
   },
@@ -21,6 +36,13 @@ export const Default = {
       <ChoiceTile label="Lose weight" value="lose-weight" selected={false} onClick={() => {}} />
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Unselected state — neutral background, awaiting user tap.',
+      },
+    },
+  },
 };
 
 export const Selected = {
@@ -29,9 +51,23 @@ export const Selected = {
       <ChoiceTile label="Lose weight" value="lose-weight" selected onClick={() => {}} />
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Selected state — highlighted to confirm the active choice.',
+      },
+    },
+  },
 };
 
 export const ChoiceGroup = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Typical onboarding usage — a vertical stack of tiles where only one can be active at a time. Click any tile to move the selection.',
+      },
+    },
+  },
   render: () => {
     const [selected, setSelected] = useState('maintain');
     const options = [

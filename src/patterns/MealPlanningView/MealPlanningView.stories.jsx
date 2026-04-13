@@ -18,6 +18,30 @@ export default {
     docs: {
       description: {
         component: `
+Full-screen meal planning view with a swipeable weekly calendar and per-day meal cards. Represents the \`/planning\` route — the app's home screen.
+
+## When to use
+Use for the \`/planning\` route only. This is the first screen authenticated users see after login.
+
+## When NOT to use
+Do not use this pattern to display shopping list actions or recipe details — those belong to ShoppingListView and RecipeDetailView respectively.
+
+## Composed of
+- **CalendarModule** — horizontal swipeable week strip; drives which day's meals are shown
+- **ContextMenu** — three-dot overflow menu (Replan week / Clear week); appears only when a plan exists
+- **RecipeListItem** — one card per meal slot (breakfast, lunch, dinner)
+- **Divider** — separates meal sections
+- **Button** — primary CTA ("Plan my week" in empty state; "Add week to list" / "Added to list ✓" in plan state)
+- **NavigationBarConnected** — bottom tab bar with "planning" tab active
+
+## Key props
+- \`hasPlan\` — toggles between empty state (Plan my week button) and plan state (meals + bottom action bar)
+- \`hasMealsForDay\` — controls whether meal cards or "No meals planned for this day" placeholder renders
+- \`hasAddedToList\` — switches the bottom CTA to a disabled "Added to list ✓" state
+- \`isGenerating\` — disables interactive controls and shows "Planning…" during AI plan generation
+- \`days\` / \`selectedFullDate\` / \`onDayClick\` — calendar state; drive which day is highlighted and what meals are shown
+- \`meals\` — object with \`breakfast\`, \`lunch\`, \`dinner\` keys (each has \`id\`, \`title\`, \`thumbnail\`)
+
 Meal Planning pattern with swipeable Calendar Module and stateful layout.
 
 Empty state shows centered "Plan my week" button. After planning, a three-dot context menu provides "Replan week" and "Clear week" actions, while the bottom bar shows "Add week to list".
@@ -68,6 +92,13 @@ const sampleMeals = {
  * Empty state — no plan yet, centered "Plan my week" button
  */
 export const NoPlan = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'No plan exists — shows a centred "Plan my week" primary button. This is the initial state for a new user or after clearing the plan.',
+      },
+    },
+  },
   args: {
     calendarTitle: formatDayTitle(todayFullDate),
     days: calendarDays,
@@ -83,6 +114,13 @@ export const NoPlan = {
  * Plan exists — meals shown, bottom "Add week to list" button, three-dot menu visible
  */
 export const WithPlan = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Plan generated — all three meal slots populated for the selected day, three-dot context menu visible in the header, "Add week to list" CTA at the bottom.',
+      },
+    },
+  },
   args: {
     calendarTitle: formatDayTitle(todayFullDate),
     days: calendarDays,
@@ -101,6 +139,13 @@ export const WithPlan = {
  * After adding to list — disabled "Added to list" button
  */
 export const AddedToList = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Ingredients already sent to the shopping list — bottom CTA switches to a disabled secondary "Added to list ✓" button, preventing double-adding.',
+      },
+    },
+  },
   args: {
     calendarTitle: formatDayTitle(todayFullDate),
     days: calendarDays,
@@ -118,6 +163,13 @@ export const AddedToList = {
  * Interactive demo — full lifecycle: plan -> view meals -> add to list
  */
 export const Interactive = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Fully interactive demo — click "Plan my week" to generate meals, navigate the calendar between days, use the three-dot menu to replan or clear, and tap "Add week to list" to confirm. Exercises the full planning lifecycle in a single story.',
+      },
+    },
+  },
   render: () => {
     const [selected, setSelected] = React.useState(todayFullDate);
     const [hasPlan, setHasPlan] = React.useState(false);

@@ -9,7 +9,19 @@ export default {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Calendar module pattern with dynamic date title and a horizontally swipeable calendar. Matches Figma Calendar Module pattern with fill, padding, and corner radius.',
+        component: `Full calendar navigation module — a dynamic title that updates to "Today", "Tomorrow", or the weekday name, combined with a horizontally scrollable strip of \`CalendarButton\` cells. Automatically pages to keep the selected day visible.
+
+## When to use
+- As the primary date-picker at the top of the Meal Planning view — one per screen
+- When the user needs to navigate across a multi-week range of days and see meal context per day
+
+## When NOT to use
+- Don't use when only a single week is needed — \`CalendarWeek\` is lighter and has no scroll logic
+- Don't use for date input in a form (e.g. pick a date for a reminder) — a date picker or text input is more appropriate
+
+## Pairs well with
+- Meal plan content panels rendered below the module that update when the selected day changes
+- \`CalendarButton\` (rendered internally — not composed manually)`,
       },
     },
   },
@@ -23,6 +35,13 @@ export const Default = {
     title: formatDayTitle(todayFullDate),
     days: calendarDays,
     selectedDay: todayFullDate,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Static snapshot with today selected. Title reads "Today". The calendar auto-scrolls to the correct page when selectedDay changes.',
+      },
+    },
   },
 };
 
@@ -46,4 +65,12 @@ export const Interactive = () => {
       </p>
     </div>
   );
+};
+
+Interactive.parameters = {
+  docs: {
+    description: {
+      story: 'Click any day to see the title update and the calendar page to the correct week. Demonstrates the auto-scroll pagination behaviour when selecting a day at the end of a week.',
+    },
+  },
 };

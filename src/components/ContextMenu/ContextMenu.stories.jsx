@@ -8,8 +8,21 @@ export default {
     docs: {
       description: {
         component: `
-Dropdown menu anchored to a three-dot (kebab) trigger button.
-Extracted from MealPlanningView for reuse across the app.
+Dropdown menu anchored to a three-dot (kebab) trigger button. Extracted from MealPlanningView for reuse across the app.
+
+## When to use
+- Exposing 2–5 secondary actions on a list item or card (rename, share, delete)
+- When the actions are contextual to a specific item and should not take up permanent UI space
+- Compact layouts where a full action button row would be too wide
+
+## When NOT to use
+- When there are more than ~5 actions, or touch targets need to be large — use \`ActionSheet\`
+- For a primary CTA — use a \`Button\` directly
+- When the actions apply to the whole screen, not a specific item — use an \`ActionSheet\` or toolbar
+
+## Pairs well with
+- List rows (meal plan cards, recipe list items, shopping list entries)
+- \`ActionSheet\` for the same item when a larger surface is needed on mobile
 
 ## Features
 - Closes on outside click or Escape
@@ -42,6 +55,13 @@ export const Default = {
       { label: 'Create new list', onAction: () => console.log('create') },
     ],
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Three-item menu without any destructive actions — the typical list management menu (rename, share, create).',
+      },
+    },
+  },
 };
 
 export const WithDestructive = {
@@ -54,6 +74,13 @@ export const WithDestructive = {
       '---',
       { label: 'Leave list', destructive: true, onAction: () => console.log('leave') },
     ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Destructive action visually separated from safe actions by a divider. The destructive item is styled in error red to signal an irreversible operation.',
+      },
+    },
   },
 };
 
@@ -104,6 +131,13 @@ export const WithIcons = {
       },
     ],
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Each item has an icon — useful when actions benefit from a visual cue. Icons are optional per item and can be mixed with non-icon items.',
+      },
+    },
+  },
 };
 
 export const MealPlanMenu = {
@@ -113,5 +147,12 @@ export const MealPlanMenu = {
       { label: 'Replan week', onAction: () => console.log('replan') },
       { label: 'Clear week', destructive: true, onAction: () => console.log('clear') },
     ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'The original use case — two items on a meal plan card. "Clear week" is destructive (removes all meals) so it is styled in red.',
+      },
+    },
   },
 };

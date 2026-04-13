@@ -17,7 +17,26 @@ export default {
     docs: {
       description: {
         component: `
-Recipe browsing screen with search functionality. Composition of SearchBar, RecipeList, and NavigationBar components.
+Full-screen recipe browsing view for the \`/recipes\` route. Displays the user's recipe collection with category filter chips and an overlay search bar triggered by a floating action button.
+
+## When to use
+Use for the \`/recipes\` route. Rendered when the user taps the Recipes tab in the NavigationBar. Tapping a recipe card navigates to RecipeDetailView (\`/recipes/:id\`).
+
+## When NOT to use
+Do not use for showing a single recipe — use RecipeDetailView for that. Do not use for importing or editing a recipe — use RecipeImportView.
+
+## Composed of
+- **RecipeList** — scrollable list of recipe cards
+- **SearchBar** — appears as an overlay slide-in when the FAB is tapped; includes filter chips when \`availableFilters\` is provided
+- **NavigationBarConnected** — bottom tab bar with "recipes" tab active
+- **Import button** (optional) — Plus icon in the header that triggers a file import flow; only rendered when \`onImportRequest\` is provided
+
+## Key props
+- \`recipes\` — array of recipe objects to display (each with \`title\` and optional \`thumbnail\`)
+- \`searchQuery\` / \`onSearchChange\` — controlled search input state
+- \`onRecipeClick\` — callback when a recipe card is tapped; typically navigates to \`/recipes/:id\`
+- \`onImportRequest\` — when provided, shows a Plus icon button in the header to trigger the import flow
+- \`availableFilters\` / \`activeFilters\` / \`onFilterToggle\` — category filter chip system shown in the search overlay and as active-filter pills below the header
 
 ## Elevation token usage
 - Floating search FAB uses \`--elevation-overlay\`.
@@ -47,6 +66,13 @@ const sampleRecipes = [
 ];
 
 export const Default = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Standard recipe list with four sample recipes. No import button. Represents a returning user browsing their saved recipes.',
+      },
+    },
+  },
   args: {
     recipes: sampleRecipes,
     searchQuery: '',
@@ -54,9 +80,16 @@ export const Default = {
 };
 
 /**
- * With import button — shows the ↓ icon in the header that triggers TXT file import
+ * With import button — shows the Plus icon in the header that triggers TXT file import
  */
 export const WithImportButton = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Import button visible in the header — shown when \`onImportRequest\` is provided. Tapping the Plus icon opens the RecipeImportView flow.',
+      },
+    },
+  },
   args: {
     recipes: sampleRecipes,
     searchQuery: '',
