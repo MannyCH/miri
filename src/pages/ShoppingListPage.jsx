@@ -257,7 +257,7 @@ export function ShoppingListPage() {
     <>
       <ShoppingListView
         listName={listName}
-        memberCount={members.length}
+        members={members}
         isListLoading={isListLoading}
         onListNameTap={() => setIsActionSheetOpen(true)}
         lists={lists}

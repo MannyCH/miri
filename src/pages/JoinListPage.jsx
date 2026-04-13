@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { Button } from '../components/Button';
 import * as listApi from '../lib/shoppingListApi';
 import './JoinListPage.css';
 
@@ -12,7 +13,7 @@ import './JoinListPage.css';
 export function JoinListPage() {
   const { token } = useParams();
   const navigate = useNavigate();
-  const { lists, loadLists, showToast, switchList } = useApp();
+  const { lists, loadLists, showToast, switchList, shoppingList, activeListId } = useApp();
 
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -71,9 +72,9 @@ export function JoinListPage() {
         <div className="join-card">
           <h2 className="text-h3-bold">Invalid Invite</h2>
           <p className="text-body-regular join-error">{error}</p>
-          <button className="join-btn join-btn--secondary" onClick={() => navigate('/shopping-list', { replace: true })}>
+          <Button variant="secondary" onClick={() => navigate('/shopping-list', { replace: true })}>
             Go to Shopping List
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -85,19 +86,26 @@ export function JoinListPage() {
         <div className="join-card">
           <h2 className="text-h3-bold">Already a Member</h2>
           <p className="text-body-regular">You're already on "{info.listName}".</p>
-          <button
-            className="join-btn join-btn--primary"
+          <Button
+            variant="primary"
             onClick={() => {
               switchList(info.listId);
               navigate('/shopping-list', { replace: true });
             }}
           >
             Open List
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
+
+  // Solo list with items → offer merge choice; empty solo list → just join directly
+  // item_count isn't on the lists API, so we check the loaded shoppingList if the
+  // solo list is the currently active list (the common case when opening a join link).
+  const soloList = lists.find((l) => l.member_count === 1);
+  const soloIsActive = soloList?.id === activeListId;
+  const soloHasItems = soloList && soloIsActive && shoppingList.length > 0;
 
   return (
     <div className="join-page">
@@ -109,29 +117,32 @@ export function JoinListPage() {
         </p>
 
         <div className="join-actions">
-          <button
-            className="join-btn join-btn--primary"
-            disabled={joining}
-            onClick={() => handleJoin(false)}
-          >
-            {joining ? 'Joining…' : 'Join List'}
-          </button>
-          {lists.some((l) => l.member_count === 1) && (
-            <button
-              className="join-btn join-btn--secondary"
+          {soloHasItems ? (
+            <>
+              <Button
+                variant="primary"
+                disabled={joining}
+                onClick={() => handleJoin(true)}
+              >
+                {joining ? 'Joining…' : 'Merge & join'}
+              </Button>
+              <Button
+                variant="text"
+                disabled={joining}
+                onClick={() => handleJoin(false)}
+              >
+                Keep mine separate
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="primary"
               disabled={joining}
-              onClick={() => handleJoin(true)}
+              onClick={() => handleJoin(false)}
             >
-              Join & Merge My Items
-            </button>
+              {joining ? 'Joining…' : 'Join List'}
+            </Button>
           )}
-          <button
-            className="join-btn join-btn--ghost"
-            disabled={joining}
-            onClick={() => navigate('/shopping-list', { replace: true })}
-          >
-            Cancel
-          </button>
         </div>
       </div>
     </div>

@@ -41,32 +41,3 @@
   flex-direction: column;
   gap: var(--spacing-12);
 }
-
-.join-btn {
-  width: 100%;
-  height: var(--control-height);
-  border-radius: var(--corner-radius-8);
-  border: none;
-  cursor: pointer;
-  font: inherit;
-}
-
-.join-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.join-btn--primary {
-  background: var(--color-fill-brand);
-  color: var(--color-text-on-brand);
-}
-
-.join-btn--secondary {
-  background: var(--color-fill-brand-weak);
-  color: var(--color-text-brand);
-}
-
-.join-btn--ghost {
-  background: transparent;
-  color: var(--color-text-weak);
-}
