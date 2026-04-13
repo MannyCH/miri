@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { useApp } from '../context/AppContext';
 import { Button } from '../components/Button';
+import { ShoppingListPage } from './ShoppingListPage';
 import * as listApi from '../lib/shoppingListApi';
 import './JoinListPage.css';
 
 /**
- * /join/:token — Accept-or-decline screen when a user opens a share link.
- * Shows the list name, item count, and lets the user join (optionally merging
- * their current solo list into the shared one).
+ * /join/:token — Join dialog shown as an overlay on top of ShoppingListPage.
+ * Shows the inviter name, list name, and item count. Lets the user merge their
+ * current list, keep it separate, or cancel.
  */
 export function JoinListPage() {
   const { token } = useParams();
@@ -23,32 +25,20 @@ export function JoinListPage() {
   useEffect(() => {
     let cancelled = false;
     listApi.fetchJoinInfo(token)
-      .then((data) => {
-        if (cancelled) return;
-        setInfo(data);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      .then((data) => { if (!cancelled) setInfo(data); })
+      .catch((err) => { if (!cancelled) setError(err.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [token]);
 
   const handleJoin = async (merge) => {
     setJoining(true);
     try {
-      // If merging, use current solo list (first non-shared list with 1 member)
-      const soloList = merge
-        ? lists.find((l) => l.member_count === 1)
-        : null;
-
+      const soloList = merge ? lists.find((l) => l.member_count === 1) : null;
       const { listId } = await listApi.joinList(token, soloList?.id || null);
       await loadLists();
       switchList(listId);
-      showToast('success', `Joined "${info.listName}"`);
+      showToast('success', `Joined "${info.list.name}"`);
       navigate('/shopping-list', { replace: true });
     } catch (err) {
       showToast('error', err.message || 'Could not join list');
@@ -56,95 +46,124 @@ export function JoinListPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="join-page">
-        <div className="join-card">
-          <p className="text-body-regular">Loading invite…</p>
-        </div>
-      </div>
-    );
-  }
+  const handleCancel = () => navigate('/shopping-list', { replace: true });
 
-  if (error) {
-    return (
-      <div className="join-page">
-        <div className="join-card">
-          <h2 className="text-h3-bold">Invalid Invite</h2>
-          <p className="text-body-regular join-error">{error}</p>
-          <Button variant="secondary" onClick={() => navigate('/shopping-list', { replace: true })}>
-            Go to Shopping List
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (info.alreadyMember) {
-    return (
-      <div className="join-page">
-        <div className="join-card">
-          <h2 className="text-h3-bold">Already a Member</h2>
-          <p className="text-body-regular">You're already on "{info.listName}".</p>
-          <Button
-            variant="primary"
-            onClick={() => {
-              switchList(info.listId);
-              navigate('/shopping-list', { replace: true });
-            }}
-          >
-            Open List
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Solo list with items → offer merge choice; empty solo list → just join directly
-  // item_count isn't on the lists API, so we check the loaded shoppingList if the
-  // solo list is the currently active list (the common case when opening a join link).
+  // Solo list with items → offer merge choice; empty solo list → just join
   const soloList = lists.find((l) => l.member_count === 1);
   const soloIsActive = soloList?.id === activeListId;
   const soloHasItems = soloList && soloIsActive && shoppingList.length > 0;
 
-  return (
-    <div className="join-page">
-      <div className="join-card">
-        <h2 className="text-h3-bold">Join Shopping List</h2>
-        <p className="text-body-regular join-list-name">"{info.listName}"</p>
-        <p className="text-caption-regular join-meta">
-          {info.itemCount} item{info.itemCount !== 1 ? 's' : ''}
-        </p>
+  const renderDialog = () => {
+    if (loading) {
+      return (
+        <div className="join-dialog">
+          <p className="text-body-regular join-dialog-loading">Loading invite…</p>
+        </div>
+      );
+    }
 
-        <div className="join-actions">
-          {soloHasItems ? (
-            <>
-              <Button
-                variant="primary"
-                disabled={joining}
-                onClick={() => handleJoin(true)}
-              >
-                {joining ? 'Joining…' : 'Merge & join'}
-              </Button>
-              <Button
-                variant="text"
-                disabled={joining}
-                onClick={() => handleJoin(false)}
-              >
-                Keep mine separate
-              </Button>
-            </>
-          ) : (
+    if (error) {
+      return (
+        <div className="join-dialog">
+          <h3 className="text-h3-bold join-dialog-title">Invalid Invite</h3>
+          <p className="text-body-regular join-dialog-message join-dialog-error">{error}</p>
+          <div className="join-dialog-actions">
+            <Button variant="secondary" onClick={handleCancel}>
+              Go to Shopping List
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    if (info?.alreadyMember) {
+      return (
+        <div className="join-dialog">
+          <h3 className="text-h3-bold join-dialog-title">Already a Member</h3>
+          <p className="text-body-regular join-dialog-message">
+            You're already on "{info.list.name}".
+          </p>
+          <div className="join-dialog-actions">
+            <Button
+              variant="primary"
+              onClick={() => {
+                switchList(info.list.id);
+                navigate('/shopping-list', { replace: true });
+              }}
+            >
+              Open List
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    if (info) {
+      const sharerLabel = info.inviterName || 'Someone';
+      const itemLabel = info.itemCount === 1 ? '1 ingredient' : `${info.itemCount} ingredients`;
+
+      return (
+        <div className="join-dialog">
+          <div className="join-dialog-header">
+            <h3 className="text-h3-bold join-dialog-title">
+              {sharerLabel} is sharing a list with you
+            </h3>
+          </div>
+          <p className="text-body-regular join-dialog-message">
+            <strong className="text-body-bold">{info.list.name}</strong> contains {itemLabel}.
+            {soloHasItems
+              ? ' Would you like to merge with your current list or keep it separate?'
+              : ' Would you like to join?'}
+          </p>
+          <div className="join-dialog-actions">
             <Button
               variant="primary"
               disabled={joining}
-              onClick={() => handleJoin(false)}
+              onClick={() => handleJoin(soloHasItems)}
             >
-              {joining ? 'Joining…' : 'Join List'}
+              {joining ? 'Joining…' : soloHasItems ? 'Merge & join' : 'Join list'}
             </Button>
-          )}
+            {soloHasItems && (
+              <Button
+                variant="secondary"
+                disabled={joining}
+                onClick={() => handleJoin(false)}
+              >
+                Keep separate
+              </Button>
+            )}
+            <Button variant="text" disabled={joining} onClick={handleCancel}>
+              Cancel
+            </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <>
+      <ShoppingListPage />
+      <motion.div
+        className="join-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={joining ? undefined : handleCancel}
+      >
+        <motion.div
+          className="join-dialog-wrapper"
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {renderDialog()}
+        </motion.div>
+      </motion.div>
+    </>
   );
 }

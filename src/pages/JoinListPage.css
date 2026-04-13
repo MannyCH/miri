@@ -1,43 +1,56 @@
-.join-page {
+.join-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100dvh;
-  padding: var(--spacing-24);
-  background: var(--color-bg-base);
+  z-index: 10000;
+  padding: var(--spacing-16);
 }
 
-.join-card {
+.join-dialog-wrapper {
   width: 100%;
-  max-width: 360px;
-  background: var(--color-bg-surface);
+  max-width: 358px;
+}
+
+.join-dialog {
+  background: var(--color-background-raised);
   border-radius: var(--corner-radius-16);
-  padding: var(--spacing-32);
-  text-align: center;
-  box-shadow: var(--elevation-medium);
+  padding: var(--spacing-24);
+  box-shadow: var(--elevation-overlay);
 }
 
-.join-card h2 {
-  margin-bottom: var(--spacing-8);
+.join-dialog-header {
+  margin-bottom: var(--spacing-12);
 }
 
-.join-list-name {
+.join-dialog-title {
+  margin: 0;
   color: var(--color-text-strong);
-  margin-bottom: var(--spacing-4);
 }
 
-.join-meta {
+.join-dialog-message {
+  margin: 0 0 var(--spacing-24) 0;
   color: var(--color-text-weak);
-  margin-bottom: var(--spacing-24);
 }
 
-.join-error {
+.join-dialog-error {
   color: var(--color-text-error);
-  margin-bottom: var(--spacing-16);
 }
 
-.join-actions {
+.join-dialog-loading {
+  color: var(--color-text-weak);
+  margin: 0;
+  text-align: center;
+}
+
+.join-dialog-actions {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-12);
+}
+
+.join-dialog-actions .button {
+  width: 100%;
 }
