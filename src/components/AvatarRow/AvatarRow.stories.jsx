@@ -8,7 +8,7 @@ export default {
     docs: {
       description: {
         component: `
-Horizontal row of member avatars for shared shopping lists. Shows initials when no avatar URL is provided. Overflow beyond `maxVisible` collapses into a "+N" indicator.
+Horizontal row of member avatars for shared shopping lists. Shows initials when no avatar URL is provided. Overflow beyond \`maxVisible\` collapses into a "+N" indicator.
 
 ## When to use
 - In the shopping list header to show who has access to a shared list
