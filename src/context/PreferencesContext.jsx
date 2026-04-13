@@ -83,6 +83,18 @@ export function PreferencesProvider({ children }) {
   );
 }
 
+/**
+ * Returns { preferences, updatePreferences, isLoading }.
+ *
+ * Preferences are loaded on first authentication and auto-saved with a 1 s debounce.
+ * `updatePreferences` accepts a partial object and merges it into current state.
+ *
+ * @consumers src/App.jsx (mounts PreferencesProvider), src/pages/AccountPage.jsx,
+ *   src/pages/MealPlanningPage.jsx, src/pages/OnboardingPage.jsx,
+ *   src/pages/RecipeDetailPage.jsx, src/pages/RecipeImportPage.jsx,
+ *   src/pages/ShoppingListPage.jsx
+ * @throws {Error} if called outside PreferencesProvider
+ */
 export function usePreferences() {
   const context = useContext(PreferencesContext);
   if (!context) throw new Error('usePreferences must be used within PreferencesProvider');

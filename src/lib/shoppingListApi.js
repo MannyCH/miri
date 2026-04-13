@@ -12,8 +12,26 @@ async function getAuthToken() {
 }
 
 /**
- * Authenticated fetch helper.
- * Automatically attaches Bearer token and optional Pusher socket ID.
+ * Authenticated fetch helper — single gateway for all shopping list API calls.
+ *
+ * Fetches a Neon Auth Bearer token via `getAuthToken()`, attaches it to every
+ * request, and optionally includes a Pusher socket ID header so the server can
+ * suppress echo events back to the originating client.
+ *
+ * Every exported function in this file calls `authFetch`. If this function
+ * breaks (token missing, network error, non-OK response), all 14 shopping list
+ * operations fail: fetchLists, createList, renameList, deleteList, fetchItems,
+ * addItem, toggleItem, updateItemName, removeItem, fetchMembers, removeMember,
+ * fetchJoinInfo, joinList.
+ *
+ * @param {string} url - API endpoint path (e.g. '/api/shopping-lists')
+ * @param {object} [options]
+ * @param {'GET'|'POST'|'PATCH'|'DELETE'} [options.method='GET']
+ * @param {object} [options.body] - Request body, JSON-serialised automatically
+ * @param {string} [options.socketId] - Pusher socket ID; sets X-Pusher-Socket-Id header
+ * @returns {Promise<any>} Parsed JSON response body
+ * @throws {Error} 'Not authenticated' if no active session exists
+ * @throws {Error} Server error message or 'HTTP {status}' on non-OK responses
  */
 async function authFetch(url, { method = 'GET', body, socketId } = {}) {
   const token = await getAuthToken();

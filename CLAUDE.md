@@ -41,6 +41,14 @@ Components can originate from multiple sources — Figma, Storybook, or direct c
 
 **Read `FEATURES-MAP.md`** to locate key files for any feature area before scanning the codebase.
 
+### Knowledge Graph
+
+`graphify-out/graph.json` + `graphify-out/GRAPH_REPORT.md` contain a structural knowledge graph of the codebase.
+
+- **Before working on any function, component, context, or API:** run `/graphify query "<name>"` to find related files and understand dependencies.
+- **`FEATURES-MAP.md`** is a rough feature-level index — use it for a quick starting point. The graph is more precise for locating specific code and checking blast radius.
+- Keep the graph fresh after significant changes: `/graphify --update`
+
 ### State Management
 
 Three React Contexts, nested in this order:

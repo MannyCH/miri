@@ -114,6 +114,12 @@ export function PusherProvider({ children }) {
   return <PusherContext.Provider value={value}>{children}</PusherContext.Provider>;
 }
 
+/**
+ * Returns { subscribe, unsubscribe, getSocketId, connectionState }.
+ *
+ * @consumers src/App.jsx (mounts PusherProvider), src/context/AppContext.jsx (subscribes to list channels)
+ * @throws {Error} if called outside PusherProvider
+ */
 export function usePusher() {
   const context = useContext(PusherContext);
   if (!context) {
