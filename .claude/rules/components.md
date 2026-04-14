@@ -28,11 +28,12 @@ Regardless of source or workflow, these always apply:
 
 ## Preflight — Check for Existing Components
 
-Before creating ANY new component or element:
+Before writing ANY component usage (new or existing):
 1. If Storybook is running, check `curl -s http://localhost:6006/index.json` for existing components
 2. If an existing component covers the use case — even partially — reuse it. Don't recreate.
 3. Any `<button>` written by hand → stop and check if `Button` component exists first
 4. Any inline color, spacing, or radius value → stop and look up the token
+5. **For any component with string-typed props (variant, size, type, etc.) — check its Storybook stories to confirm valid values and their intended use before writing JSX.** Never guess or invent prop values.
 
 ## Storybook HTTP API
 
