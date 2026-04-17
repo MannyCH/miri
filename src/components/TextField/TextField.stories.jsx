@@ -13,11 +13,27 @@ import { TextField } from './TextField';
 export default {
   title: 'Components/TextField',
   component: TextField,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
         component: `
 **The standard text input component.** Handles label, variant state, font class, and — for \`type="password"\` — an eye toggle, all automatically.
+
+## When to use
+- Any freeform text entry: name, email, password, search query
+- Auth screens (login, signup, verify)
+- Any place the user types a string value with a label above it
+
+## When NOT to use
+- For numeric inputs that pair with a physical unit (kg, cm, kcal) — use \`UnitField\`
+- For choosing from a list of options — use \`SelectField\`
+- For incrementing/decrementing a small integer — use \`Stepper\`
+- Never compose a raw \`<input>\` + separate label by hand — always use this component
+
+## Pairs well with
+- \`Button\` as the submit/CTA below the field
+- \`SelectField\` and \`UnitField\` in multi-field settings forms
 
 | Need | Use |
 |------|-----|
@@ -50,12 +66,26 @@ function Controlled({ type, label, placeholder, disabled, readOnly, defaultValue
 
 export const Default = {
   render: () => <Controlled label="Your name" placeholder="Enter your name" />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Empty state — placeholder is shown. This is the initial state when a form field has not yet been touched.',
+      },
+    },
+  },
 };
 
 export const Filled = {
   render: () => (
     <TextField label="Your name" value="Manuel" onChange={() => {}} />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Filled state — a value is present. The field styling changes automatically when value is non-empty.',
+      },
+    },
+  },
 };
 
 export const Email = {
@@ -67,6 +97,13 @@ export const Email = {
       autoComplete="email"
     />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Email input with autocomplete hint — keyboard shows "@" on mobile. Used on auth screens.',
+      },
+    },
+  },
 };
 
 export const Password = {
@@ -96,6 +133,13 @@ export const WithError = {
       onChange={() => {}}
     />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Error state — an error message appears below the label with a warning icon. The field border switches to the error color automatically.',
+      },
+    },
+  },
 };
 
 export const Disabled = {
@@ -127,4 +171,11 @@ export const ReadOnly = {
       onChange={() => {}}
     />
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Read-only state — value is visible and selectable but cannot be changed. Use for displaying account data that cannot be edited inline (e.g. the verified email address).',
+      },
+    },
+  },
 };

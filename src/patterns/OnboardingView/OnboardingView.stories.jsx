@@ -11,9 +11,24 @@ export default {
     docs: {
       description: {
         component: `
-Onboarding flow shown to new users after sign-up.
-Three steps: goal → eating style → servings.
-One question per screen, large tap-target tiles, progress dots.
+Full-screen onboarding flow presented to new users immediately after account creation, before they reach the main app.
+
+## When to use
+Render this pattern after a successful sign-up when the user has no stored preferences. Each step is its own screen — navigate between them with the Continue / Skip for now actions.
+
+## When NOT to use
+Do not use for in-app preference editing. Returning users who want to change their preferences should use the AccountView SettingsSection instead.
+
+## Composed of
+- **ChoiceTile** — large tap-target selection tiles (steps 1 and 2)
+- **Stepper** — numeric increment/decrement control for serving size (step 3)
+- **Button** — primary "Continue" / "Done" CTA (disabled until a choice is made) and tertiary "Skip for now"
+- **ProgressDots** — inline \`progressbar\` showing current step out of 3 (pattern-scoped, not a shared component)
+
+## Key props
+Each step story is self-contained with local state. In the app, collected values are written to PreferencesContext and persisted to Neon Postgres on completion.
+- Steps 1 and 2: single-select — Continue is disabled until a ChoiceTile is selected
+- Step 3: Stepper defaults to 2 servings; Continue is always enabled (pre-filled value)
         `,
       },
     },
@@ -49,6 +64,13 @@ function ProgressDots({ step }) {
 }
 
 export const StepGoal = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Step 1 of 3 — "What\'s your goal?" Presents four ChoiceTile options (Lose weight, Maintain, Gain muscle, Eat healthier). Continue is disabled until one is selected.',
+      },
+    },
+  },
   render: () => {
     const [selected, setSelected] = useState('');
     return (
@@ -74,6 +96,13 @@ export const StepGoal = {
 };
 
 export const StepEatingStyle = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Step 2 of 3 — "How do you like to eat?" Presents five eating style options (No preference, Mediterranean, Plant-forward, High protein, Intermittent fasting). Continue is disabled until one is selected.',
+      },
+    },
+  },
   render: () => {
     const [selected, setSelected] = useState('');
     return (
@@ -99,6 +128,13 @@ export const StepEatingStyle = {
 };
 
 export const StepServings = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Step 3 of 3 — "How many people are you cooking for?" Stepper defaults to 2. The subtitle explains that recipe quantities will be scaled automatically. Done is always enabled.',
+      },
+    },
+  },
   render: () => {
     const [servings, setServings] = useState(2);
     return (

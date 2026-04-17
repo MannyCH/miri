@@ -27,6 +27,29 @@
   --spacing-256: 256px;
 
   /* ============================================
+     SPACING INTENT ALIASES
+     Use these instead of raw scale values.
+     ============================================ */
+
+  /* Inset — padding inside a container */
+  --spacing-inset-xs: var(--spacing-4);   /* tight inset: badges, chips, tags */
+  --spacing-inset-sm: var(--spacing-8);   /* compact inset: icon buttons, small cells */
+  --spacing-inset-md: var(--spacing-16);  /* standard inset: cards, inputs, list items */
+  --spacing-inset-lg: var(--spacing-24);  /* loose inset: page sections, modals */
+  --spacing-inset-xl: var(--spacing-32);  /* spacious inset: hero areas, empty states */
+
+  /* Gap — space between sibling elements in a row or column */
+  --spacing-gap-xs: var(--spacing-4);     /* icon + label, inline pairs */
+  --spacing-gap-sm: var(--spacing-8);     /* tight groups: button clusters, form rows */
+  --spacing-gap-md: var(--spacing-16);    /* standard groups: card grids, list gaps */
+  --spacing-gap-lg: var(--spacing-24);    /* loose groups: section content */
+
+  /* Stack — vertical rhythm between stacked blocks */
+  --spacing-stack-sm: var(--spacing-12);  /* tight stacking: label + input, title + subtitle */
+  --spacing-stack-md: var(--spacing-24);  /* standard stacking: form fields, content blocks */
+  --spacing-stack-lg: var(--spacing-48);  /* section-level stacking */
+
+  /* ============================================
      CONTROL SIZE TOKENS
      ============================================ */
 
@@ -36,7 +59,7 @@
      CORNER RADIUS TOKENS
      Collection: Spacing
      ============================================ */
-  
+
   --corner-radius-0: 0px;
   --corner-radius-4: 4px;
   --corner-radius-8: 8px;
@@ -44,6 +67,18 @@
   --corner-radius-16: 16px;
   --corner-radius-24: 24px;
   --corner-radius-32: 32px;
+
+  /* ============================================
+     CORNER RADIUS INTENT ALIASES
+     Use these instead of raw scale values.
+     ============================================ */
+
+  --corner-radius-badge: var(--corner-radius-4);    /* badges, tags, chips */
+  --corner-radius-input: var(--corner-radius-8);    /* text inputs, selects */
+  --corner-radius-button: var(--corner-radius-12);  /* buttons, interactive controls */
+  --corner-radius-card: var(--corner-radius-16);    /* cards, sheets, list containers */
+  --corner-radius-modal: var(--corner-radius-24);   /* modals, dialogs, bottom sheets */
+  --corner-radius-pill: var(--corner-radius-32);    /* pill shapes, full-round elements */
 
   /* ============================================
      PRIMITIVE COLORS

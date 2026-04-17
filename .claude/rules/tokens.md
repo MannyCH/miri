@@ -18,21 +18,81 @@ All visual values come from CSS variables. **Never hardcode colors, spacing, fon
 
 ## Usage
 
-**Colors:** `var(--color-text-strong)`, `var(--color-background-base)`, `var(--color-stroke-weak)`, `var(--color-icon-brand)`, etc.
+### Colors
 
-**Spacing:** `var(--spacing-4)`, `var(--spacing-8)`, `var(--spacing-16)`, etc.
+Use semantic tokens — never primitives, never hardcoded hex.
 
-**Typography:** CSS classes `.text-h1-bold`, `.text-body-regular`, `.text-annotation-bold` — never set font properties directly in CSS.
+```css
+color: var(--color-text-strong)         /* primary text */
+color: var(--color-text-weak)           /* secondary/muted text */
+color: var(--color-text-error)          /* error state — also used for "danger" */
+background: var(--color-fill-brand-weak)
+border-color: var(--color-stroke-error-strong)
+```
 
-**Border radius:** `var(--corner-radius-4)`, `var(--corner-radius-8)`, `var(--corner-radius-12)`, etc.
+**Note:** "danger" and "destructive" map to the `error` token family — `--color-text-error`, `--color-fill-error-strong`, `--color-stroke-error-strong`, etc. There is no separate "danger" token.
+
+### Spacing
+
+Prefer **intent aliases** over raw scale values. Only use raw scale (`--spacing-N`) when no alias fits.
+
+| Intent | Token | Use when |
+|--------|-------|----------|
+| Inset XS | `--spacing-inset-xs` | Badges, chips, tags |
+| Inset SM | `--spacing-inset-sm` | Icon buttons, small cells |
+| Inset MD | `--spacing-inset-md` | Cards, inputs, list items |
+| Inset LG | `--spacing-inset-lg` | Page sections, modals |
+| Inset XL | `--spacing-inset-xl` | Hero areas, empty states |
+| Gap XS | `--spacing-gap-xs` | Icon + label, inline pairs |
+| Gap SM | `--spacing-gap-sm` | Button clusters, form rows |
+| Gap MD | `--spacing-gap-md` | Card grids, list gaps |
+| Gap LG | `--spacing-gap-lg` | Loose section content |
+| Stack SM | `--spacing-stack-sm` | Label + input, title + subtitle |
+| Stack MD | `--spacing-stack-md` | Form fields, content blocks |
+| Stack LG | `--spacing-stack-lg` | Section-level stacking |
+
+### Border Radius
+
+Prefer **intent aliases** over raw scale values.
+
+| Intent | Token | Use when |
+|--------|-------|----------|
+| Badge | `--corner-radius-badge` | Badges, tags, chips |
+| Input | `--corner-radius-input` | Text inputs, selects |
+| Button | `--corner-radius-button` | Buttons, interactive controls |
+| Card | `--corner-radius-card` | Cards, sheets, list containers |
+| Modal | `--corner-radius-modal` | Modals, dialogs, bottom sheets |
+| Pill | `--corner-radius-pill` | Full-round / pill shapes |
+
+### Typography
+
+CSS classes only — never set font properties directly.
+
+```css
+class="text-h1-bold"          /* page titles */
+class="text-h3-bold"          /* section headers */
+class="text-body-regular"     /* body copy */
+class="text-body-small-bold"  /* labels, captions */
+class="text-annotation-regular" /* helper text, metadata */
+class="text-tiny-regular"     /* timestamps, micro labels */
+```
+
+### Elevation
+
+```css
+box-shadow: var(--elevation-raised)   /* cards, buttons */
+box-shadow: var(--elevation-overlay)  /* modals, dropdowns */
+box-shadow: var(--elevation-sunken)   /* pressed/inset states */
+```
 
 ## Mandatory Checks
 
 ```
-color: var(--color-text-strong)       ✅  not  color: #260B00          ❌
-padding: var(--spacing-16)            ✅  not  padding: 16px           ❌
-border-radius: var(--corner-radius-12) ✅  not  border-radius: 12px    ❌
-class="text-h1-bold"                  ✅  not  font-size: 24px         ❌
+color: var(--color-text-strong)         ✅  not  color: #260B00          ❌
+padding: var(--spacing-inset-md)        ✅  not  padding: 16px           ❌
+gap: var(--spacing-gap-sm)              ✅  not  gap: 8px                ❌
+border-radius: var(--corner-radius-card) ✅  not  border-radius: 12px   ❌
+class="text-h1-bold"                    ✅  not  font-size: 24px         ❌
 ```
 
 ## CSS Value Traceability

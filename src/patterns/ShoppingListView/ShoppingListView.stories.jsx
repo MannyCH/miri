@@ -5,6 +5,7 @@ import { ShoppingListView } from './ShoppingListView';
 export default {
   title: 'Patterns/ShoppingListView',
   component: ShoppingListView,
+  tags: ['autodocs'],
   decorators: [
     (Story) => (
       <MemoryRouter initialEntries={['/shopping-list']}>
@@ -17,7 +18,30 @@ export default {
     docs: {
       description: {
         component: `
-Shopping list screen with three view modes: simple list, grouped by recipe, or smart AI-organised view. The smart view deduplicates and merges ingredients (e.g. "1 onion + 2 Zwiebeln → 3 Onions"), assigns supermarket categories, and lets you check items off locally while shopping. Composition of IngredientList, SearchBar, Button, and NavigationBar components.
+Full-screen shopping list view for the \`/shopping-list\` route. Supports three view modes (list, recipe-grouped, smart AI-organised) and real-time multi-user collaboration via AvatarRow.
+
+## When to use
+Use for the \`/shopping-list\` route. Navigated to from MealPlanningView ("Add week to list") or directly via the NavigationBar.
+
+## When NOT to use
+Do not embed this inside other views or use it for recipe browsing. Each view mode is controlled by the \`viewMode\` prop — do not try to merge them into one render.
+
+## Composed of
+- **IngredientList** — renders the checklist of items (used in both list and recipe-grouped modes)
+- **ListSwitcher** — toggle control that switches between list / recipe / smart view modes
+- **AvatarRow** — shows collaborators on shared lists (multi-list feature)
+- **SearchBar** — search overlay triggered by the floating action button
+- **Button** — "Add item" CTA and smart-refresh action
+- **Divider** — separates recipe groups and sections
+- **NavigationBarConnected** — bottom tab bar with "shopping-list" tab active
+
+## Key props
+- \`viewMode\` — \`'list'\` | \`'recipe'\` | \`'smart'\`; controls which layout renders
+- \`items\` / \`checkedItems\` / \`onItemCheck\` / \`onItemDelete\` — list mode: flat array of ingredient strings with local check state
+- \`recipeGroups\` — recipe mode: array of \`{ recipeName, ingredients, checkedItems, onIngredientCheck, onIngredientDelete, onDelete }\`
+- \`smartGroups\` / \`smartStatus\` — smart mode: AI-organised groups by supermarket category; \`smartStatus\` can be \`'idle'\` | \`'loading'\`
+- \`members\` / \`listName\` / \`lists\` / \`activeListId\` — multi-list collaboration props
+- \`onAddIngredient\` — opens the add-item input
 
 ## Elevation token usage
 - Floating search FAB uses \`--elevation-overlay\`.
@@ -68,6 +92,13 @@ const sampleRecipeGroups = [
 ];
 
 export const ListView = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Simple list mode — flat checklist of ingredient strings. The default view when a user opens the shopping list.',
+      },
+    },
+  },
   args: {
     viewMode: 'list',
     items: sampleListItems,
@@ -76,6 +107,13 @@ export const ListView = {
 };
 
 export const RecipeView = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Recipe-grouped mode — ingredients are organised under the recipe they belong to. Useful when shopping for multiple planned meals and the user wants to keep track by dish.',
+      },
+    },
+  },
   args: {
     viewMode: 'recipe',
     recipeGroups: sampleRecipeGroups,
@@ -121,6 +159,13 @@ const sampleSmartGroups = [
  * Smart AI-organised view — deduplicated and grouped by supermarket category
  */
 export const SmartView = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Smart view idle state — AI has already organised ingredients into supermarket sections (Vegetables, Fruits, Meat & Fish, Dairy & Eggs) with emoji category headers. Items are deduplicated and quantities merged across recipes.',
+      },
+    },
+  },
   args: {
     viewMode: 'smart',
     smartGroups: sampleSmartGroups,
@@ -132,6 +177,13 @@ export const SmartView = {
  * Smart view loading state — while the API call is in progress
  */
 export const SmartViewLoading = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Smart view while the AI organisation request is in flight — shows a loading skeleton or spinner before groups are available. \`smartStatus: \'loading\'\` with an empty groups array.',
+      },
+    },
+  },
   args: {
     viewMode: 'smart',
     smartGroups: [],

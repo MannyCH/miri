@@ -4,30 +4,48 @@ import { IngredientListItem } from './IngredientListItem';
 export default {
   title: 'Components/IngredientListItem',
   component: IngredientListItem,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Interactive ingredient list item. Tap to toggle strikethrough, swipe left to delete. No visible checkbox - just clean text interaction.',
+        component: `A single interactive ingredient row. Tap (or Space/Enter) to toggle a strikethrough "checked" state; swipe left (or press Delete/Backspace) to remove. When \`onPantryToggle\` is provided, swiping right marks the item as a pantry staple.
+
+## When to use
+- Inside a shopping list or recipe ingredient list where the user needs to check off or remove individual items
+- Use \`IngredientList\` when you have a plain array of strings — it manages dividers, keys, and callbacks for you
+- Use this component directly only when you need custom key management or row-level overrides
+
+## When NOT to use
+- Do not use for non-ingredient rows — reach for a generic list-item pattern that better conveys the content type
+- Do not use if interaction (check/delete) is not needed — a plain text list is simpler
+
+## Pairs well with
+- \`Divider\` — rendered internally via \`showUpperDivider\` / \`showBelowDivider\` props; do not add extra dividers outside
+- \`IngredientList\` — the preferred wrapper when rendering a full list from an array`,
       },
     },
   },
   argTypes: {
     checked: {
       control: 'boolean',
-      description: 'Whether the item is checked off',
+      description: 'Whether the item is checked off. When true, the text is struck through to indicate the ingredient has been collected or used.',
     },
     showUpperDivider: {
       control: 'boolean',
-      description: 'Show divider above',
+      description: 'Render a Divider above this row. Set to true only for the first item in a group to avoid double dividers between consecutive items.',
     },
     showBelowDivider: {
       control: 'boolean',
-      description: 'Show divider below',
+      description: 'Render a Divider below this row. Set to true on the last item in a group to close the list visually.',
     },
     children: {
       control: 'text',
-      description: 'Ingredient text',
+      description: 'The ingredient text displayed in the row (e.g. "500g Spaghetti"). Passed as children, not a prop.',
+    },
+    isPantryStaple: {
+      control: 'boolean',
+      description: 'When true, the swipe-right pantry zone shows a "remove from pantry" icon instead of "add to pantry". Has no visual effect unless onPantryToggle is also provided.',
     },
   },
 };
@@ -39,6 +57,13 @@ export const Unchecked = {
     showUpperDivider: true,
     showBelowDivider: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Default state — the item has not yet been collected. Text appears at full opacity without strikethrough.',
+      },
+    },
+  },
 };
 
 export const Checked = {
@@ -48,6 +73,13 @@ export const Checked = {
     showUpperDivider: true,
     showBelowDivider: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Checked/collected state — the text is struck through and dimmed to signal the ingredient is done.',
+      },
+    },
+  },
 };
 
 export const WithoutDividers = {
@@ -56,6 +88,13 @@ export const WithoutDividers = {
     checked: false,
     showUpperDivider: false,
     showBelowDivider: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Use when the surrounding context already provides its own dividers or when the item is embedded in a layout that handles spacing differently.',
+      },
+    },
   },
 };
 
@@ -94,6 +133,14 @@ export const List = () => {
       </IngredientListItem>
     </div>
   );
+};
+
+List.parameters = {
+  docs: {
+    description: {
+      story: 'Three items composed into a list with correct divider placement: upper divider on the first item only, lower divider on the last item only, none between.',
+    },
+  },
 };
 
 export const TapToToggle = () => {
@@ -141,6 +188,14 @@ export const TapToToggle = () => {
       </IngredientListItem>
     </div>
   );
+};
+
+TapToToggle.parameters = {
+  docs: {
+    description: {
+      story: 'Demonstrates the tap/click interaction: touch or click anywhere on a row to toggle the checked state and strikethrough. No delete handler is wired here so swiping left has no effect.',
+    },
+  },
 };
 
 export const SwipeToDelete = () => {
@@ -208,6 +263,14 @@ export const SwipeToDelete = () => {
   );
 };
 
+SwipeToDelete.parameters = {
+  docs: {
+    description: {
+      story: 'Demonstrates the full delete flow: swipe left past the threshold to reveal the trash zone, then release to animate removal. Also works with the Delete/Backspace keyboard shortcut. Uses real local state so items actually disappear.',
+    },
+  },
+};
+
 export const KeyboardNavigation = () => {
   const [items, setItems] = React.useState([
     { id: 1, text: '500g Spaghetti', checked: false },
@@ -251,4 +314,12 @@ export const KeyboardNavigation = () => {
       ))}
     </div>
   );
+};
+
+KeyboardNavigation.parameters = {
+  docs: {
+    description: {
+      story: 'Tab through the items using a keyboard, press Space or Enter to toggle checked state, and press Delete or Backspace to remove an item — verifying full keyboard accessibility without touch interaction.',
+    },
+  },
 };

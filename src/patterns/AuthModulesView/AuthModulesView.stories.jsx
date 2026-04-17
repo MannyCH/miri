@@ -12,13 +12,22 @@ export default {
     docs: {
       description: {
         component: `
-Auth module structures documented from the finalized Figma auth components.
+Auth screen modules — the centered card layouts that make up the \`/auth\` route. Each story represents one step of the authentication flow.
 
-Includes:
-- Sign in module
-- Sign up module
-- Verify email module
-- Reset password module
+## When to use
+Use these modules for the \`/auth\` route. They are rendered inside the full-screen auth page and centred on screen. Do not embed them inside other views.
+
+## When NOT to use
+Do not use these modules for in-app settings flows (e.g. changing password from the Account view). These modules are entry-point screens for unauthenticated users only.
+
+## Composed of
+- **TextField** — email, password, and new-password inputs
+- **Button** — primary CTA (Log in, Create Account, Continue, Send reset mail, Update Password)
+- **OTP code inputs** — six individual character inputs for the verify-email step (pattern-scoped, not a shared component)
+- **ProgressDots / password requirement list** — inline status feedback (pattern-scoped)
+
+## Key props
+Each module is a self-contained render story with no external props. In the live app they are wired to Neon Auth via the \`AuthContext\` and react to async states (loading, error, success) by updating button icon/label using \`motion/react\` animations.
         `,
       },
     },
@@ -33,6 +42,13 @@ const Card = ({ children, centered = false, moduleClassName = '' }) => (
 );
 
 export const SignInModule = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Default login state — email and password fields filled, ready to submit. Represents a returning user landing on /auth.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-sign-in">
       <h1 className="auth-modules-title text-h2-bold">Log in to Miri</h1>
@@ -62,6 +78,13 @@ export const SignInModule = {
 };
 
 export const SignUpModule = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'New account creation form — first name, email, password fields with inline password-strength requirements. Represents a first-time user signing up.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-sign-up">
       <h1 className="auth-modules-title text-h2-bold">Create your account</h1>
@@ -115,6 +138,13 @@ export const SignUpModule = {
 };
 
 export const VerifyEmailModule = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'OTP entry state — six empty code input boxes, awaiting the verification code sent to the user\'s email. Shown immediately after sign-up or when email verification is required.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-verify">
       <h1 className="auth-modules-title text-h2-bold">Check your email</h1>
@@ -142,6 +172,13 @@ export const VerifyEmailModule = {
 };
 
 export const VerifyEmailSuccess = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'OTP verified — all six boxes filled, Continue button shows a checkmark animation and "Verified" label. Represents a successful code entry before redirect.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-verify">
       <h1 className="auth-modules-title text-h2-bold">Check your email</h1>
@@ -178,6 +215,13 @@ export const VerifyEmailSuccess = {
 };
 
 export const VerifyEmailError = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Invalid OTP — six boxes filled with a wrong code, Continue button shows a warning icon and "Wrong code" label. Represents the error state after a failed verification attempt.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-verify">
       <h1 className="auth-modules-title text-h2-bold">Check your email</h1>
@@ -210,6 +254,13 @@ export const VerifyEmailError = {
 };
 
 export const ForgotPasswordModule = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Forgot password default state — email pre-filled, "Send reset mail" CTA ready. Reached via the "Forgot password" link on the login module.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-forgot">
       <h1 className="auth-modules-title text-h2-bold">Forgot password</h1>
@@ -230,6 +281,13 @@ export const ForgotPasswordModule = {
 };
 
 export const ForgotPasswordSuccess = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Reset email sent — button transitions to "Sent" with a checkmark animation. Represents the state after the user successfully requests a password reset link.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-forgot">
       <h1 className="auth-modules-title text-h2-bold">Forgot password</h1>
@@ -256,6 +314,13 @@ export const ForgotPasswordSuccess = {
 };
 
 export const ResetPasswordModule = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'New password entry — two password fields (new + retype) for completing a password reset. Reached via the reset link emailed to the user.',
+      },
+    },
+  },
   render: () => (
     <Card moduleClassName="auth-modules-reset">
       <h1 className="auth-modules-title text-h2-bold">Reset password</h1>

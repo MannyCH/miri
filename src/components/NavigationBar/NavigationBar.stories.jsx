@@ -4,11 +4,25 @@ import { NavigationBar } from './NavigationBar';
 export default {
   title: 'Components/NavigationBar',
   component: NavigationBar,
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Bottom navigation bar with 4 items. Exactly as designed in Figma.',
+        component: `The app's persistent bottom navigation bar with four fixed tabs: Recipes, Planning, Shopping list, and Account.
+
+## When to use
+- Place this once at the bottom of every authenticated app screen — it is the primary wayfinding chrome for Miri
+- Use the \`activeItem\` prop to highlight the tab that matches the current route; wire \`onItemClick\` to your router
+
+## When NOT to use
+- Do not render this on the \`/auth\` route or any unauthenticated screen
+- Do not use for contextual navigation within a single page — reach for Tabs or a secondary nav pattern instead
+- Do not render multiple NavigationBars — there is always exactly one
+
+## Pairs well with
+- \`NavItem\` — rendered internally; no need to import or manage NavItems separately
+- React Router \`useLocation\` — derive \`activeItem\` from the current pathname`,
       },
     },
   },
@@ -16,7 +30,7 @@ export default {
     activeItem: {
       control: 'select',
       options: ['recipes', 'planning', 'shopping-list', 'account'],
-      description: 'Currently active navigation item',
+      description: 'The tab that is currently selected. Pass the route key that matches the current page: `recipes` → /recipes, `planning` → /planning, `shopping-list` → /shopping-list, `account` → /account.',
     },
   },
 };
@@ -25,11 +39,25 @@ export const RecipesActive = {
   args: {
     activeItem: 'recipes',
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Recipes tab active — shown when the user is on /recipes or /recipes/:id.',
+      },
+    },
+  },
 };
 
 export const PlanningActive = {
   args: {
     activeItem: 'planning',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Planning tab active — shown when the user is on /planning.',
+      },
+    },
   },
 };
 
@@ -37,11 +65,25 @@ export const ShoppingListActive = {
   args: {
     activeItem: 'shopping-list',
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shopping list tab active — the default landing tab shown when the user is on /shopping-list.',
+      },
+    },
+  },
 };
 
 export const AccountActive = {
   args: {
     activeItem: 'account',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Account tab active — shown when the user is on /account.',
+      },
+    },
   },
 };
 
@@ -68,4 +110,12 @@ export const Interactive = () => {
       />
     </div>
   );
+};
+
+Interactive.parameters = {
+  docs: {
+    description: {
+      story: 'Click any tab to switch the active state and see the page heading update — simulating how NavigationBar and the router interact in the real app.',
+    },
+  },
 };

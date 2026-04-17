@@ -4,11 +4,25 @@ import { IngredientList } from './IngredientList';
 export default {
   title: 'Components/IngredientList',
   component: IngredientList,
+  tags: ['autodocs'],
   parameters: {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Container component for interactive ingredient list items. Tap to toggle strikethrough, swipe left to delete.',
+        component: `Container component that renders a vertical list of \`IngredientListItem\` rows from a plain array of ingredient strings.
+
+## When to use
+- Whenever you need to display a full list of ingredients from a recipe or shopping list and want consistent tap-to-check and swipe-to-delete behaviour across all rows
+- Prefer this over mapping \`IngredientListItem\` yourself — it handles key management, divider placement, and index-based callbacks automatically
+
+## When NOT to use
+- Do not use if you need custom row layouts (e.g. quantity/unit split into separate columns) — map \`IngredientListItem\` directly instead
+- Do not use for non-ingredient lists — reach for a more generic list pattern
+
+## Pairs well with
+- \`IngredientListItem\` — rendered internally, no need to import separately
+- A section heading or recipe title above the list
+- \`Divider\` — automatically managed; do not add extra dividers around this component`,
       },
     },
   },
@@ -23,6 +37,13 @@ export const Default = {
       '500ml Sojamilch',
     ],
     checkedItems: {},
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Static render with four ingredients and no items checked. Use Controls to toggle checked state or swap ingredient text.',
+      },
+    },
   },
 };
 
@@ -95,4 +116,12 @@ export const Interactive = () => {
       )}
     </div>
   );
+};
+
+Interactive.parameters = {
+  docs: {
+    description: {
+      story: 'Fully interactive demo: tap items to check them off, swipe left (or use touch/trackpad) to delete. Demonstrates real-world usage with local state — all list mutations handled through the IngredientList callbacks.',
+    },
+  },
 };

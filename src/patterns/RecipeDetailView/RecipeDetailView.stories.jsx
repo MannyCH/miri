@@ -16,7 +16,26 @@ export default {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Recipe detail view matching Figma "Recipes - Detailed" pattern. Title → image → interactive servings counter → non-interactive ingredient list → Badge-numbered directions → full-width "Add to list" button.',
+        component: `
+Full-screen recipe detail view for the \`/recipes/:id\` route. Shows a complete recipe with title, hero image, scalable ingredient list, and step-by-step directions.
+
+## When to use
+Use for the \`/recipes/:id\` route. Rendered when the user taps a recipe card in RecipesView or a meal card in MealPlanningView.
+
+## When NOT to use
+Do not use for editing or importing recipes — use RecipeImportView for that. Do not embed this pattern inside another view; it is always full-screen.
+
+## Composed of
+- **Stepper** — interactive serving size control; adjusts ingredient quantities proportionally when \`recipe.servings\` is provided
+- **Badge** — numbered step indicators in the Directions section
+- **Button** — full-width "Add to list" CTA at the bottom; switches to "Added" (disabled) state via \`isAdded\`
+- **NavigationBarConnected** — bottom tab bar with "recipes" tab active
+
+## Key props
+- \`recipe\` — object with \`title\`, \`image\` (nullable), \`servings\` (base count for scaling), \`ingredients\` (string array or \`{ quantity, name }\` objects), \`directions\` (string array)
+- \`onAddToList\` — callback fired when the user taps "Add to list"; omitting this prop hides the button entirely
+- \`isAdded\` — when true, the CTA becomes "Added ✓" and is disabled, preventing double-adds
+        `,
       },
     },
   },
@@ -48,6 +67,13 @@ const sampleRecipe = {
  * Default view with image, ingredients, directions, and add-to-list button
  */
 export const Default = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Full recipe with hero image, scalable ingredients (base 2 servings), and four direction steps. Represents the typical in-app recipe detail state.',
+      },
+    },
+  },
   args: {
     recipe: sampleRecipe,
     onAddToList: () => console.log('Added to list'),
@@ -58,6 +84,13 @@ export const Default = {
  * Without image — fallback when no recipe image is available
  */
 export const WithoutImage = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'No hero image — the image slot renders a placeholder SVG icon. Occurs when a recipe was imported without an image or the image failed to load.',
+      },
+    },
+  },
   args: {
     recipe: {
       ...sampleRecipe,
@@ -71,6 +104,13 @@ export const WithoutImage = {
  * Short recipe with fewer ingredients and steps
  */
 export const ShortRecipe = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Minimal recipe — 4 ingredients and 2 direction steps without a base servings count, so the Stepper does not scale quantities. Tests layout with less content.',
+      },
+    },
+  },
   args: {
     recipe: {
       title: 'Quick Avocado Toast',

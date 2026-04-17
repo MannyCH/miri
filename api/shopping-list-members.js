@@ -38,21 +38,27 @@ export default async function handler(req, res) {
           return res.status(200).json({ list, alreadyMember: true });
         }
 
-        const countRows = await sql`
-          SELECT COUNT(*)::int AS count FROM shopping_list_items WHERE list_id = ${list.id}
-        `;
-        const members = await sql`
-          SELECT slm.user_id, up.default_servings
-          FROM shopping_list_members slm
-          LEFT JOIN user_profile up ON up.user_id = slm.user_id
-          WHERE slm.list_id = ${list.id}
-        `;
+        const [countRows, members, inviterRows] = await Promise.all([
+          sql`SELECT COUNT(*)::int AS count FROM shopping_list_items WHERE list_id = ${list.id}`,
+          sql`SELECT user_id FROM shopping_list_members WHERE list_id = ${list.id}`,
+          sql`
+            SELECT na.name, na.email
+            FROM shopping_list_members slm
+            LEFT JOIN neon_auth."user" na ON na.id::text = slm.user_id
+            WHERE slm.list_id = ${list.id}
+            ORDER BY slm.joined_at ASC
+            LIMIT 1
+          `,
+        ]);
+        const inviter = inviterRows[0];
+        const inviterName = inviter?.name || inviter?.email || null;
 
         return res.status(200).json({
           list,
           alreadyMember: false,
           itemCount: countRows[0].count,
           memberCount: members.length,
+          inviterName,
         });
       }
 

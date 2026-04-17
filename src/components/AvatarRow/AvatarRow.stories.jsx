@@ -4,12 +4,22 @@ import { AvatarRow } from './AvatarRow';
 export default {
   title: 'Components/AvatarRow',
   component: AvatarRow,
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
         component: `
-Horizontal row of member avatars for shared shopping lists.
-Shows initials when no avatar URL is provided. Overflow shows "+N".
+Horizontal row of member avatars for shared shopping lists. Shows initials when no avatar URL is provided. Overflow beyond \`maxVisible\` collapses into a "+N" indicator.
+
+## When to use
+- In the shopping list header to show who has access to a shared list
+- Anywhere a compact representation of a group of 2+ people is needed
+- When a "+" invite button should appear inline with the member avatars
+
+## When NOT to use
+- When there is only one member — the component renders nothing for single-member lists by design
+- As a standalone user avatar (single person) — use a plain avatar element instead
+- When the full member list needs to be visible — use \`ShareSheet\` which shows all members with names
 
 ## Display rules (from shopping-list-flow.json)
 - Only shown when list has 2+ members
@@ -45,6 +55,13 @@ export const TwoMembers = {
     members: mockMembers.slice(0, 2),
     onInvite: () => console.log('invite'),
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Minimum visible state — two avatars shown side by side. The component becomes visible at exactly 2 members.',
+      },
+    },
+  },
 };
 
 export const ThreeMembers = {
@@ -52,6 +69,13 @@ export const ThreeMembers = {
   args: {
     members: mockMembers.slice(0, 3),
     onInvite: () => console.log('invite'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Three members fills the default maxVisible limit — all avatars shown, no overflow indicator.',
+      },
+    },
   },
 };
 
@@ -62,12 +86,26 @@ export const Overflow = {
     maxVisible: 3,
     onInvite: () => console.log('invite'),
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Five members with maxVisible=3 — the first 3 avatars are shown and "+2" indicates the remaining members.',
+      },
+    },
+  },
 };
 
 export const NoInvite = {
   name: 'Without Invite Button',
   args: {
     members: mockMembers.slice(0, 3),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'No onInvite handler — the "+" invite button is omitted. Use when the current user does not have permission to invite others.',
+      },
+    },
   },
 };
 
@@ -76,5 +114,12 @@ export const SingleMember = {
   args: {
     members: mockMembers.slice(0, 1),
     onInvite: () => console.log('invite'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Single member — the component renders nothing. This is intentional: a solo list has no need for a member row.',
+      },
+    },
   },
 };
