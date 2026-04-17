@@ -1,0 +1,136 @@
+name: Self-Healing Design System
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'src/components/**'
+      - 'src/patterns/**'
+      - 'src/pages/**'
+
+jobs:
+  detect-changes:
+    name: Detect changed file categories
+    runs-on: ubuntu-latest
+    outputs:
+      components_changed: ${{ steps.check.outputs.components_changed }}
+      pages_changed: ${{ steps.check.outputs.pages_changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed categories
+        id: check
+        run: |
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.event.pull_request.head.sha }}
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD")
+
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -qE '^src/components/|\.stories\.jsx$'; then
+            echo "components_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "components_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED" | grep -qE '^src/(pages|patterns)/'; then
+            echo "pages_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "pages_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  design-system-propagation:
+    name: Design system propagation check
+    needs: detect-changes
+    if: needs.detect-changes.outputs.components_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the design-system-propagation agent for PR #${{ github.event.pull_request.number }} in the MannyCH/miri repo.
+
+            The PR changed files in src/components/ or .stories.jsx files.
+
+            Changed files in this PR:
+            $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+
+            Your tasks:
+            1. For each changed component, read its .stories.jsx to understand valid props and variants.
+            2. Scan ALL files in src/pages/ and src/patterns/ that import those components.
+            3. Check for: invalid prop values, removed props still being passed, hardcoded CSS values (hex colors, px spacing, px radius) instead of var(--...) tokens.
+            4. Flag any new component (no prior git history) that likely has no Figma counterpart — mark it as "requires local Figma parity check".
+            5. Post your findings as a PR comment on PR #${{ github.event.pull_request.number }} in MannyCH/miri.
+
+            Format your comment exactly as described in .claude/agents/design-system-propagation.md.
+            Report only — do not modify any files.
+
+  consumer-drift:
+    name: Consumer drift check
+    needs: detect-changes
+    if: needs.detect-changes.outputs.pages_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the consumer-drift agent for PR #${{ github.event.pull_request.number }} in the MannyCH/miri repo.
+
+            The PR changed files in src/pages/ or src/patterns/.
+
+            Changed files in this PR:
+            $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+
+            Your tasks:
+            1. Read each changed page/pattern file.
+            2. For every design system component used (Button, TextField, SearchBar, Divider, Toast, AvatarRow, Badge, etc.), read its .stories.jsx in src/components/ to find valid props.
+            3. Check for: invalid/invented prop values, hardcoded hex colors or px values that should be design tokens, raw HTML elements that have a component equivalent.
+            4. Post your findings as a PR comment on PR #${{ github.event.pull_request.number }} in MannyCH/miri.
+
+            Format your comment exactly as described in .claude/agents/consumer-drift.md.
+            Report only — do not modify any files.
