@@ -373,7 +373,7 @@ export const ShoppingListView = ({
             {smartStatus === 'error' && (
               <div className="shopping-list-smart-error">
                 <p className="text-body-regular">Could not organise list.</p>
-                <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>
+                <button type="button" className="shopping-list-smart-retry text-body-regular" onClick={onSmartRefresh}>
                   Try again
                 </button>
               </div>
@@ -775,7 +775,7 @@ function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, ite
       )}
 
       <div className="shopping-list-smart-refresh">
-        <button type="button" className="shopping-list-smart-retry" onClick={onSmartRefresh}>Refresh</button>
+        <button type="button" className="shopping-list-smart-retry text-body-regular" onClick={onSmartRefresh}>Refresh</button>
       </div>
     </>
   );
