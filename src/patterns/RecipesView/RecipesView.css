@@ -67,7 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: var(--corner-radius-pill);
   border: 1px solid var(--color-stroke-weak);
   background: var(--color-background-raised);
   color: var(--color-icon-brand);
@@ -127,7 +127,7 @@
   gap: var(--spacing-4);
   padding: var(--spacing-4) var(--spacing-12);
   border: 1px solid var(--color-stroke-weak);
-  border-radius: 999px;
+  border-radius: var(--corner-radius-pill);
   background: var(--color-background-sunken);
   color: var(--color-text-strong);
   cursor: pointer;
