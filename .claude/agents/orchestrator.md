@@ -18,7 +18,8 @@ You are the design system orchestrator for the Miri project. You run after the c
 **Default to fixing directly.** Only create a Notion card when you genuinely cannot fix it.
 
 ### Always fix directly:
-- Token swap with an exact match in `src/design-tokens.css` — e.g. `48px` → `var(--spacing-48)`, `border-radius: 8px` → `var(--corner-radius-8)`, `color: #333` → `var(--color-text-strong)`
+- Token swap with an exact match in `src/design-tokens.css` — e.g. `padding: 16px` → `var(--spacing-16)`, `border-radius: 8px` → `var(--corner-radius-8)`, `color: #333` → `var(--color-text-strong)`
+- **Never** treat `width`, `height`, `min/max-width`, `min/max-height`, `top`, `left`, `right`, `bottom` as token drift — these are layout values and are intentional
 - Dead/orphaned CSS rules — just delete them
 - Invalid prop value with a clearly correct alternative in the component's stories
 
