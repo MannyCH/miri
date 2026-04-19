@@ -204,7 +204,7 @@ export const RecipeImportView = ({
         <button type="button" className="recipe-import-nav-btn" onClick={onCancel}>
           Cancel
         </button>
-        <span className="recipe-import-header-title">Import Recipe</span>
+        <span className="recipe-import-header-title text-body-bold">Import Recipe</span>
         <button
           type="button"
           className="recipe-import-nav-btn recipe-import-save-btn"
@@ -243,7 +243,7 @@ export const RecipeImportView = ({
           ) : (
             <div className="recipe-import-image-placeholder">
               <CameraIcon />
-              <span className="recipe-import-image-label">Add photo</span>
+              <span className="recipe-import-image-label text-body-small-regular">Add photo</span>
             </div>
           )}
         </div>
@@ -274,7 +274,7 @@ export const RecipeImportView = ({
                   value={ingredient.quantity}
                   onChange={(e) => updateIngredientQuantity(i, e.target.value)}
                   placeholder="Qty"
-                  className="recipe-import-field recipe-import-ingredient-quantity"
+                  className="recipe-import-field recipe-import-ingredient-quantity text-body-regular"
                   aria-label={`Quantity for ingredient ${i + 1}`}
                 />
                 <input
@@ -282,7 +282,7 @@ export const RecipeImportView = ({
                   value={ingredient.name}
                   onChange={(e) => updateIngredientName(i, e.target.value)}
                   placeholder="Ingredient name"
-                  className="recipe-import-field recipe-import-ingredient-name"
+                  className="recipe-import-field recipe-import-ingredient-name text-body-regular"
                   aria-label={`Ingredient ${i + 1} name`}
                 />
                 <button
@@ -316,7 +316,7 @@ export const RecipeImportView = ({
                     updateDirection(i, e.target.value);
                   }}
                   placeholder="Describe this step…"
-                  className="recipe-import-field recipe-import-textarea"
+                  className="recipe-import-field recipe-import-textarea text-body-regular"
                   rows={1}
                   aria-label={`Direction step ${i + 1}`}
                 />
@@ -373,7 +373,7 @@ export const RecipeImportView = ({
               onKeyDown={handleCategoryKeyDown}
               onBlur={() => addCategory(categoryInput)}
               placeholder={categories.length === 0 ? 'e.g. healthy, vegetarian' : 'Add category…'}
-              className="recipe-import-categories-input"
+              className="recipe-import-categories-input text-body-regular"
               aria-label="Add category"
             />
           </div>
