@@ -40,22 +40,6 @@
   gap: var(--spacing-16);
 }
 
-.sheet-form-input {
-  width: 100%;
-  height: var(--control-height);
-  padding: 0 var(--spacing-12);
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-8);
-  background: var(--color-background-base);
-  color: var(--color-text-strong);
-  font: inherit;
-  box-sizing: border-box;
-}
-
-.sheet-form-input:focus {
-  outline: none;
-  border-color: var(--color-stroke-brand);
-}
 
 .sheet-form-actions {
   display: flex;

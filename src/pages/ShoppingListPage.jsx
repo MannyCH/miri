@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ActionSheet } from '../components/ActionSheet';
 import { ShareSheet } from '../components/ShareSheet';
 import { Button } from '../components/Button';
+import { TextField } from '../components/TextField/TextField';
 import './ShoppingListPage.css';
 
 /**
@@ -368,16 +369,15 @@ export function ShoppingListPage() {
               <div className="sheet-form-handle" aria-hidden="true" />
               <h2 className="text-h3-bold sheet-form-title">Rename list</h2>
               <form onSubmit={handleRenameSubmit} className="sheet-form-body">
-                <input
-                  autoFocus
-                  className="sheet-form-input text-body-regular"
+                <TextField
+                  label="List name"
                   value={renameValue}
-                  onChange={(e) => setRenameValue(e.target.value)}
+                  onChange={setRenameValue}
                   placeholder="List name"
                 />
                 <div className="sheet-form-actions">
                   <Button variant="secondary" onClick={() => setIsRenaming(false)} type="button">Cancel</Button>
-                  <Button variant="primary" type="submit" style={{ fontSize: '14px', padding: '8px 16px', borderRadius: '6px' }}>Save</Button>
+                  <Button variant="primary" type="submit">Save</Button>
                 </div>
               </form>
             </motion.div>
@@ -410,11 +410,10 @@ export function ShoppingListPage() {
               <div className="sheet-form-handle" aria-hidden="true" />
               <h2 className="text-h3-bold sheet-form-title">New list</h2>
               <form onSubmit={handleCreateSubmit} className="sheet-form-body">
-                <input
-                  autoFocus
-                  className="sheet-form-input text-body-regular"
+                <TextField
+                  label="List name"
                   value={createValue}
-                  onChange={(e) => setCreateValue(e.target.value)}
+                  onChange={setCreateValue}
                   placeholder="List name"
                 />
                 <div className="sheet-form-actions">
