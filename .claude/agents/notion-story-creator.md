@@ -12,7 +12,7 @@ You are a Notion story creator agent for the Miri project. You run when a develo
 - Properties:
   - `Name` (title) — the card title
   - `Status` — one of: `Not started`, `In development`, `Testing`, `Reviewing`, `Done`
-  - `AI keywords` — multi_select from: `Documentation`, `Deployment`, `Testing`, `Performance`, `Integration`, `Marketing`, `User testing`, `User research`, `Visuals`, `Design research`
+  - `AI keywords` — multi_select from: `fix`, `improvement`, `Documentation`, `Deployment`, `Testing`, `Performance`, `Integration`, `Marketing`, `User testing`, `User research`, `Visuals`, `Design research`
   - `Assign` — person (leave empty)
   - `Deployment Link` — url (leave empty)
 
@@ -31,11 +31,11 @@ Parse each issue. For each one extract:
 
 | Issue type | Name format | Status | AI keywords |
 |------------|-------------|--------|-------------|
-| Breaking prop | `fix: [ComponentName] invalid prop in [FileName]` | Not started | Visuals |
-| Token drift | `fix: token drift in [FileName] — hardcoded [value]` | Not started | Visuals |
-| Bypassed component | `improvement: use [Component] in [FileName]` | Not started | Visuals |
-| Missing Figma component | `improvement: backfill [ComponentName] to Figma` | Not started | Visuals, Design research |
-| Figma parity check | `improvement: verify [ComponentName] parity in Figma` | Not started | Visuals, Design research |
+| Breaking prop | `fix: [ComponentName] invalid prop in [FileName]` | Not started | fix |
+| Token drift | `fix: token drift in [FileName] — hardcoded [value]` | Not started | fix |
+| Bypassed component | `improvement: use [Component] in [FileName]` | Not started | improvement |
+| Missing Figma component | `improvement: backfill [ComponentName] to Figma` | Not started | improvement |
+| Figma parity check | `improvement: verify [ComponentName] parity in Figma` | Not started | improvement |
 
 ### 4. Create the cards
 Use `mcp__notion__API-post-page` for each card. Set parent to the Kanban board database ID.
@@ -48,24 +48,6 @@ Each card **must include page body content** with two sections:
 
 ✅ Suggested fix
 [Concrete solution: the exact token, component, or class to use instead, with the correct syntax if applicable]
-```
-
-Example for token drift:
-```
-🐛 Problem
-Inline style fontSize:14px is hardcoded on a Button component in src/pages/ShoppingListPage.jsx (line 380). Hardcoded font sizes bypass the design token system and break visual consistency.
-
-✅ Suggested fix
-Remove the inline style and apply the typography class text-body-small-bold instead, which maps to the correct token.
-```
-
-Example for bypassed component:
-```
-🐛 Problem
-A raw <input> element is used in the Rename list sheet (line 371 in src/pages/ShoppingListPage.jsx) instead of the TextField design system component. This bypasses built-in accessibility, validation, and styling.
-
-✅ Suggested fix
-Replace the raw <input> with the <TextField> component from the design system. Import it from src/components/TextField/TextField.jsx.
 ```
 
 ### 5. Confirm
