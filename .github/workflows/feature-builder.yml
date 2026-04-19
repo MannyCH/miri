@@ -1,0 +1,54 @@
+name: Build Feature from Notion
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  build-feature:
+    name: Scaffold feature from Notion card
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/build-feature')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            You are running the feature-builder agent for PR #${{ github.event.issue.number }} in MannyCH/miri.
+
+            A developer just commented `/build-feature`. Your job is to:
+            1. Query the Notion Kanban board for the next Not started feature card
+            2. Scaffold the feature into the codebase
+            3. Open a draft PR
+            4. Update the Notion card to In development
+            5. Post a summary comment on this PR
+
+            Follow the full instructions in .claude/agents/feature-builder.md
+
+            Notion Kanban board ID: acfac060-1abe-8372-85b8-01cddeb44d85
+            Triggering PR: #${{ github.event.issue.number }}
+            Repo: MannyCH/miri
