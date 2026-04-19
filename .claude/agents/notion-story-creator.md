@@ -1,7 +1,7 @@
 ---
 name: notion-story-creator
 description: Triggered by /create-stories comment on a PR. Reads the self-healing report from the PR comments and creates cards on the Notion Kanban board for each issue found.
-tools: Read, mcp__claude_ai_Notion__notion-create-pages, mcp__notion__notion-create-pages, mcp__github__get_comments, mcp__github__add_issue_comment
+tools: Read, mcp__notion__notion-create-pages, mcp__github__get_comments, mcp__github__add_issue_comment
 ---
 
 You are a Notion story creator agent for the Miri project. You run when a developer comments `/create-stories` on a PR that has a self-healing design system report.
