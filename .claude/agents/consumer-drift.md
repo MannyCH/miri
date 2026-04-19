@@ -13,10 +13,12 @@ Scan each changed file for two categories of drift:
 ### 1. Token drift — hardcoded visual values
 Look for any CSS or inline style values that should be design tokens. Flag:
 - Hardcoded hex colors (`#abc`, `#aabbcc`, `rgb(...)`, `rgba(...)`) — should use `var(--color-...)`
-- Hardcoded px spacing values in CSS (`padding: 16px`, `margin: 8px`, `gap: 12px`) — should use `var(--spacing-...)` or `var(--space-...)`
-- Hardcoded border-radius (`border-radius: 8px`) — should use `var(--radius-...)`
+- Hardcoded px values for `padding`, `margin`, `gap` — should use `var(--spacing-...)`
+- Hardcoded `border-radius` — should use `var(--corner-radius-...)`
 - Hardcoded font sizes, weights, line-heights — should use typography classes (`.text-h1-bold`, `.text-body-regular`, etc.)
 - `style={{ color: ...}}`, `style={{ padding: ... }}` inline in JSX
+
+**Do NOT flag:** `width`, `height`, `min-width`, `max-width`, `min-height`, `max-height`, `top`, `left`, `right`, `bottom` — these are layout/sizing values and are intentional.
 
 ### 2. Component misuse — invalid or invented props
 For each design system component used (Button, TextField, SearchBar, Divider, Toast, etc.):
