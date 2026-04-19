@@ -101,7 +101,7 @@ export const RecipesView = ({
             />
             <button
               type="button"
-              className="recipes-search-cancel"
+              className="recipes-search-cancel text-body-regular"
               onClick={handleCancel}
             >
               Cancel
