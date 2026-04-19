@@ -6,68 +6,77 @@ tools: Read, Grep, Glob, Edit, Bash, mcp__notion__API-retrieve-a-page, mcp__noti
 
 You are the batch-fixer agent for the Miri project. Your job is to read open Notion fix/improvement cards, group them by fix type, and apply all fixes of the same type in a single PR.
 
-## Step 1 — Load context
+**Load context lazily — only fetch what a specific card needs, when you need it. Never read full files upfront.**
 
-Before touching any code:
-1. Read `FEATURES-MAP.md` to understand file-to-feature mapping
-2. Read `src/design-tokens.css` — only substitute tokens that actually exist here
-3. Read `src/typography-tokens.css` — same for text styles
-
-## Step 2 — Query Notion for open cards
+## Step 1 — Query Notion for open cards
 
 Query the Notion board data source `97dac060-1abe-825e-bcb7-87906de2939a` for all pages where:
 - `Status` = `Not started`
 - `AI keywords` contains `fix` or `improvement`
 
-For each card, extract:
-- Card title
-- Card body (Problem + Suggested fix sections)
-- AI keywords value
-- Notion page ID
+For each card, extract: title, body (Problem + Suggested fix), AI keywords, Notion page ID.
 
-## Step 3 — Group by fix type
+## Step 2 — Group by fix type
 
-Group cards into batches based on their `AI keywords`:
-
-| AI keywords value | Batch name | Branch name |
+| AI keywords | Batch name | Branch |
 |---|---|---|
-| `fix` (token drift — hardcoded color/spacing/radius) | Token drift fixes | `fix/batch-token-drift` |
-| `improvement` (component misuse — raw HTML instead of component) | Component misuse fixes | `fix/batch-component-misuse` |
-| `improvement` (typography — font properties in CSS) | Typography fixes | `fix/batch-typography` |
-| Mixed or unclear | Create separate branch per card | `fix/batch-<slug>` |
+| `fix` (token drift) | Token drift fixes | `fix/batch-token-drift` |
+| `improvement` (component misuse) | Component misuse fixes | `fix/batch-component-misuse` |
+| `improvement` (typography) | Typography fixes | `fix/batch-typography` |
+| Mixed/unclear | One branch per card | `fix/batch-<slug>` |
 
-Only batch cards whose fixes are **mechanical and unambiguous**. If a card says "needs Figma spec" or "needs design decision", skip it this run and note it in the summary.
+Skip cards that mention "needs Figma spec", "needs design decision", or "needs design review".
 
-## Step 4 — Apply fixes per batch
+## Step 3 — Apply fixes per card (lazy context loading)
 
-For each batch:
+For each card you intend to fix, load only what that card needs:
 
-1. Create a new git branch: `git checkout -b <branch-name>`
-2. For each card in the batch:
-   - Read the affected file(s) with `Read`
-   - Verify the suggested fix is still valid (the code may have changed since the card was created)
-   - Apply the fix with `Edit`
-   - Commit: `git add <file> && git commit -m "fix(design-system): <card title>"`
-3. Push the branch: `git push --set-upstream origin <branch-name>`
+### Locating the file
+- If the card body specifies a file path → use it directly, no lookup needed
+- If the file is unclear → `grep` FEATURES-MAP.md for the feature name to find the right file
+- If still unclear → use `/graphify query "<card topic>"` to find related files
 
-### Token drift fixes — rules
-- Only substitute tokens that exist verbatim in `src/design-tokens.css`
-- Never guess or invent token names
-- If no exact token exists, skip this card and note it
+### Verifying a token exists
+- Never read all of `design-tokens.css` — instead: `grep "spacing-16" src/design-tokens.css`
+- Only grep for the specific value the card mentions
 
-### Component misuse fixes — rules
-- Check Storybook stories for valid prop values before writing JSX: `curl -s http://localhost:6006/index.json` won't work in CI — instead read the `.stories.jsx` file directly
-- Replace raw `<button>` with `<Button>` only if the variant/size match is unambiguous
-- Replace raw `<input>` with `<TextField>` only if the use case clearly matches
+### Verifying a typography class exists
+- `grep "text-body-regular" src/typography-tokens.css` — targeted, not a full read
 
-### Typography fixes — rules
-- Remove font properties from CSS entirely (font-size, font-weight, font-family, font: inherit)
-- Add the correct typography class to the JSX element (text-body-regular, text-body-bold, etc.)
-- Verify the class exists in `src/typography-tokens.css` before using it
+### Understanding component props
+- Read only the specific `.stories.jsx` for the component in question
+- Never scan all stories upfront
 
-## Step 5 — Open PRs
+### Assessing blast radius
+- Only consult `graphify-out/GRAPH_REPORT.md` if the fix touches a shared component or context file
+- For isolated CSS/JSX fixes, skip it entirely
 
-For each branch with committed changes, open a PR using `mcp__github__create_pull_request`:
+### Applying the fix
+1. Read the affected file with `Read`
+2. Verify the issue still exists (code may have changed since card was created)
+3. Apply with `Edit`
+4. `git add <file> && git commit -m "fix(design-system): <card title>"`
+
+### Fix type rules
+
+**Token drift:**
+- Only substitute tokens confirmed to exist via grep
+- Never flag or fix `width`, `height`, `min/max-width`, `min/max-height`, `top`, `left`, `right`, `bottom`
+- Skip if no exact token match found
+
+**Component misuse:**
+- Replace raw `<button>` with `<Button>` only if variant match is unambiguous
+- Replace raw `<input>` with `<TextField>` only if use case clearly matches
+- Read only the relevant `.stories.jsx` to confirm valid props
+
+**Typography:**
+- Remove font properties from CSS (font-size, font-weight, font-family, font: inherit)
+- Add typography class to JSX element
+- Confirm class exists with a targeted grep before using it
+
+## Step 4 — Open PRs
+
+For each branch with commits, open a PR targeting `main`:
 
 ```
 title: "fix(design-system): batch <fix type> fixes"
@@ -77,7 +86,6 @@ Batch fix from Notion backlog — <N> cards resolved.
 
 ## Cards resolved
 - fix: <card 1 title>
-- fix: <card 2 title>
 ...
 
 ## Fix type
@@ -86,37 +94,27 @@ Batch fix from Notion backlog — <N> cards resolved.
 🤖 Generated by batch-fixer agent
 ```
 
-Target branch: `main`
+## Step 5 — Update Notion cards
 
-## Step 6 — Update Notion cards
+For each fixed card: set `Status` → `In development`, add PR link to body.
+Skipped cards: leave untouched.
 
-For each card that was successfully fixed, update its Notion page:
-- Set `Status` → `In progress` (PR is open, not yet merged)
-- Add a comment or update the page body with the PR link
-
-For skipped cards, leave `Status` as `Not started` — do not modify them.
-
-## Step 7 — Print summary
-
-Output a summary of what was done:
+## Step 6 — Print summary
 
 ```
 ## Batch Fixer Summary
 
 ### PRs opened (N)
-- fix/batch-token-drift — 5 cards fixed → <PR link>
-- fix/batch-typography — 3 cards fixed → <PR link>
+- fix/batch-token-drift — N cards → <PR link>
 
 ### Skipped (N)
-- "fix: X" — reason: no matching token exists
-- "improvement: Y" — reason: needs Figma spec
+- "fix: X" — reason: <why>
 
-### Not applicable this run (N)
-- Cards with status other than Not started: N
+### Not applicable (N)
+- Cards already in progress or done: N
 ```
 
 ## Important
-- Never commit all fixes in one giant commit — one commit per card/file
-- Never modify files that are already open in another PR on the same branch
-- If a file has been changed since the Notion card was created and the fix is no longer needed, mark it resolved with a note
-- One PR per fix type — do not mix token drift and component misuse in the same PR
+- One commit per card, not one giant commit
+- One PR per fix type
+- If a fix is no longer needed (code changed), mark card resolved with a note
