@@ -15,32 +15,22 @@ You are the design system orchestrator for the Miri project. You run after the c
 
 ## Decision rules
 
-### Fix directly in the PR if ALL of these are true:
-- The fix is a single-line or small change (< 5 lines)
-- The correct value is unambiguous (e.g. a clear token equivalent exists, dead CSS can just be deleted)
-- The fix touches only files already changed in this PR
-- No design review or Figma check is needed
+**Default to fixing directly.** Only create a Notion card when you genuinely cannot fix it.
 
-**Examples of direct fixes:**
-- Dead/orphaned CSS rules → delete them
-- `height: 4px` → `var(--spacing-4)` when token clearly exists
-- `color: #333` → `var(--color-text-strong)` when mapping is obvious
-- Hardcoded `border-radius: 8px` → `var(--corner-radius-8)` when token exists
-- Invalid prop value with an obvious correct alternative
+### Always fix directly:
+- Token swap with an exact match in `src/design-tokens.css` — e.g. `48px` → `var(--spacing-48)`, `border-radius: 8px` → `var(--corner-radius-8)`, `color: #333` → `var(--color-text-strong)`
+- Dead/orphaned CSS rules — just delete them
+- Invalid prop value with a clearly correct alternative in the component's stories
 
-### Create a Notion card if ANY of these are true:
-- Fix touches files NOT in this PR
-- Fix requires Figma spec lookup
-- Fix is ambiguous or has multiple valid solutions
-- Fix spans multiple files
-- Issue needs design/product decision
-- Issue is architectural (wrong component pattern, missing component)
+These apply **even if the file was not changed in this PR** — token swaps are mechanical and safe anywhere in the codebase.
 
-**Examples for Notion cards:**
-- Hardcoded value with no clear token equivalent
-- Component missing from Figma
-- Pattern-level misuse affecting multiple pages
-- Token drift in files outside this PR
+### Only create a Notion card if you genuinely cannot act:
+- No matching token exists in `src/design-tokens.css` for the hardcoded value
+- Fix requires a Figma spec to determine the correct value
+- Fix requires restructuring a component (not a one-liner)
+- Fix needs a design/product decision that code alone cannot resolve
+
+**When in doubt: fix it. A wrong token swap is easy to revert. An unnecessary Notion card is noise.**
 
 ## How to fix directly
 
