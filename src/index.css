@@ -66,6 +66,6 @@ body {
 
 /* Basic focus visibility - required for accessibility */
 :focus-visible {
-  outline: 2px solid #0066cc;
+  outline: 2px solid var(--color-stroke-focus);
   outline-offset: 2px;
 }
