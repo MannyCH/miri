@@ -1,0 +1,53 @@
+name: Batch Fix from Notion Backlog
+
+on:
+  workflow_dispatch:
+    inputs:
+      fix_type:
+        description: 'Which fix type to batch (token-drift | component-misuse | typography | all)'
+        required: false
+        default: 'all'
+
+jobs:
+  batch-fix:
+    name: Batch fix Notion backlog cards
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          allowed_tools: "Bash,Read,Edit,Write,Glob,Grep,mcp__notion__API-retrieve-a-page,mcp__notion__API-query-data-source,mcp__notion__API-patch-page,mcp__github__create_pull_request,mcp__github__get_file_contents"
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the batch-fixer agent for the Miri repo (MannyCH/miri).
+
+            Fix type filter: ${{ github.event.inputs.fix_type }}
+
+            If fix_type is "all", process all fix types.
+            If fix_type is a specific value (token-drift, component-misuse, typography), only process that group.
+
+            Notion board data source ID: 97dac060-1abe-825e-bcb7-87906de2939a
+
+            Follow the full instructions in .claude/agents/batch-fixer.md
