@@ -40,7 +40,7 @@ Parse each issue from the report tables. For each issue:
 | Figma parity check needed | `improvement: verify [ComponentName] parity in Figma` | Not started | Visuals, Design research |
 
 ### 4. Create the cards
-Use `mcp__claude_ai_Notion__notion-create-pages` for each card. Set parent to the Kanban board database ID.
+Use `mcp__notion__notion-create-pages` for each card (falls back to `mcp__claude_ai_Notion__notion-create-pages` if unavailable). Set parent to the Kanban board database ID.
 
 ### 5. Confirm
 Post a PR comment listing all created Notion cards with their titles. Format:
