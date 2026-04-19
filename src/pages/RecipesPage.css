@@ -67,8 +67,7 @@
   background: transparent;
   color: var(--color-text-strong);
   cursor: pointer;
-  font-family: var(--font-family-body);
-  font-size: 16px;
+  font: inherit;
 }
 
 .recipes-url-cancel:focus-visible {
@@ -84,8 +83,7 @@
   background: var(--color-fill-brand-strong);
   color: var(--color-fill-white);
   cursor: pointer;
-  font-family: var(--font-family-body);
-  font-size: 16px;
+  font: inherit;
   font-weight: 600;
 }
 
