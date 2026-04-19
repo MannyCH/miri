@@ -67,7 +67,6 @@
   background: transparent;
   color: var(--color-text-strong);
   cursor: pointer;
-  font: inherit;
 }
 
 .recipes-url-cancel:focus-visible {
@@ -83,8 +82,6 @@
   background: var(--color-fill-brand-strong);
   color: var(--color-fill-white);
   cursor: pointer;
-  font: inherit;
-  font-weight: 600;
 }
 
 .recipes-url-import-btn:disabled {

@@ -226,7 +226,7 @@ export function RecipesPage() {
             <div className="recipes-url-actions">
               <button
                 type="button"
-                className="recipes-url-cancel"
+                className="recipes-url-cancel text-body-regular"
                 onClick={() => { setShowUrlInput(false); setUrlValue(''); }}
                 disabled={isImporting}
               >
@@ -234,7 +234,7 @@ export function RecipesPage() {
               </button>
               <button
                 type="button"
-                className="recipes-url-import-btn"
+                className="recipes-url-import-btn text-body-bold"
                 onClick={handleUrlImport}
                 disabled={!urlValue.trim() || isImporting}
               >
