@@ -377,7 +377,7 @@ export function ShoppingListPage() {
                 />
                 <div className="sheet-form-actions">
                   <Button variant="secondary" onClick={() => setIsRenaming(false)} type="button">Cancel</Button>
-                  <Button variant="primary" type="submit">Save</Button>
+                  <Button variant="primary" type="submit" style={{ fontSize: '14px', padding: '8px 16px', borderRadius: '6px' }}>Save</Button>
                 </div>
               </form>
             </motion.div>
