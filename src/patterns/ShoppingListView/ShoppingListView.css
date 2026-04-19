@@ -267,8 +267,7 @@
   border: none;
   background: transparent;
   color: var(--color-text-brand);
-  font-family: var(--font-family-body);
-  font-size: 16px;
+  font: inherit;
   font-weight: 500;
   cursor: pointer;
   padding: var(--spacing-4) 0;
