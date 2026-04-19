@@ -1,0 +1,60 @@
+name: Create Notion Stories from Report
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  create-stories:
+    name: Create Notion cards
+    # Only run on PR comments (not issue comments) containing /create-stories
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/create-stories')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the notion-story-creator agent for PR #${{ github.event.issue.number }} in MannyCH/miri.
+
+            A developer just commented `/create-stories` on this PR. Your job is to:
+            1. Read all comments on PR #${{ github.event.issue.number }} in MannyCH/miri
+            2. Find the most recent self-healing report comment (starts with "## 🔍")
+            3. Create Notion Kanban cards for each issue found
+            4. Post a confirmation comment listing all created cards
+
+            Follow the full instructions in .claude/agents/notion-story-creator.md
+
+            Notion Kanban board ID: acfac060-1abe-8372-85b8-01cddeb44d85
