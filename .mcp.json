@@ -3,6 +3,14 @@
     "storybook-mcp": {
       "type": "http",
       "url": "http://localhost:6006/mcp"
+    },
+    "notion": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${NOTION_API_TOKEN}\", \"Notion-Version\": \"2022-06-28\"}"
+      }
     }
   }
 }
