@@ -146,8 +146,6 @@
 }
 
 .recipes-filter-chip-close {
-  font-size: 16px;
-  line-height: 1;
   opacity: 0.8;
 }
 
@@ -168,9 +166,6 @@
   border: none;
   background: transparent;
   color: var(--color-text-brand);
-  font-family: var(--font-family-body);
-  font-size: 16px;
-  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
 }
