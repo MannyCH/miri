@@ -376,8 +376,8 @@ export function ShoppingListPage() {
                   placeholder="List name"
                 />
                 <div className="sheet-form-actions">
-                  <Button variant="secondary" onClick={() => setIsRenaming(false)} type="button">Cancel</Button>
                   <Button variant="primary" type="submit">Save</Button>
+                  <Button variant="secondary" onClick={() => setIsRenaming(false)} type="button">Cancel</Button>
                 </div>
               </form>
             </motion.div>
@@ -417,8 +417,8 @@ export function ShoppingListPage() {
                   placeholder="List name"
                 />
                 <div className="sheet-form-actions">
-                  <Button variant="secondary" onClick={() => setIsCreating(false)} type="button">Cancel</Button>
                   <Button variant="primary" type="submit">Save</Button>
+                  <Button variant="secondary" onClick={() => setIsCreating(false)} type="button">Cancel</Button>
                 </div>
               </form>
             </motion.div>

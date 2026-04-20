@@ -8,7 +8,7 @@ You are a consumer drift agent for the Miri project. You run when a PR changes f
 
 ## Your job
 
-Scan each changed file for two categories of drift:
+Scan only the **files changed in this PR** — do not scan the whole codebase. For each changed file, check two categories of drift:
 
 ### 1. Token drift — hardcoded visual values
 Look for any CSS or inline style values that should be design tokens. Flag:
