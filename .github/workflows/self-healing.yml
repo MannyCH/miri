@@ -54,9 +54,16 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Stylelint (CSS token drift)
+        id: stylelint
         run: npm run lint:css
+        continue-on-error: true
       - name: ESLint (inline styles + bypassed components)
+        id: eslint
         run: npm run lint:js
+        continue-on-error: true
+      - name: Fail if any linter reported errors
+        if: steps.stylelint.outcome == 'failure' || steps.eslint.outcome == 'failure'
+        run: exit 1
 
   design-system-propagation:
     name: Design system propagation check
