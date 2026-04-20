@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "declaration-property-value-disallowed-list": [
+      {
+        "color": ["/^#/", "/^rgb/", "/^hsl/"],
+        "background-color": ["/^#/", "/^rgb/", "/^hsl/"],
+        "background": ["/^#/", "/^rgb/", "/^hsl/"],
+        "border-color": ["/^#/", "/^rgb/", "/^hsl/"],
+        "fill": ["/^#/", "/^rgb/", "/^hsl/"],
+        "stroke": ["/^#/", "/^rgb/", "/^hsl/"]
+      }
+    ]
+  }
+}
