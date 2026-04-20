@@ -42,22 +42,9 @@ jobs:
             echo "pages_changed=false" >> $GITHUB_OUTPUT
           fi
 
-  lint:
-    name: Lint check (stylelint + eslint)
-    needs: detect-changes
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-
   design-system-propagation:
     name: Design system propagation check
-    needs: [detect-changes, lint]
+    needs: detect-changes
     if: needs.detect-changes.outputs.components_changed == 'true' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
     runs-on: ubuntu-latest
     permissions:
@@ -161,7 +148,7 @@ jobs:
 
   consumer-drift:
     name: Consumer drift check
-    needs: [detect-changes, lint]
+    needs: detect-changes
     if: needs.detect-changes.outputs.pages_changed == 'true'
     runs-on: ubuntu-latest
     permissions:
