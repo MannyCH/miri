@@ -84,6 +84,8 @@ jobs:
             })));
           } catch(e) {}
 
+          const escapeHtml = s => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
           let eslintErrors = [];
           try {
             const data = JSON.parse(fs.readFileSync('eslint-results.json', 'utf8'));
@@ -91,7 +93,7 @@ jobs:
               file: f.filePath.replace(cwd, ''),
               line: m.line,
               rule: (m.ruleId || '').replace('design-system/', ''),
-              message: m.message,
+              message: escapeHtml(m.message),
             })));
           } catch(e) {}
 
@@ -125,9 +127,11 @@ jobs:
 
               if (byRule['no-native-interactive-elements']) {
                 md += '### Bypassed design system components (ESLint)\n';
-                md += '| File | Line | Issue |\n|------|------|-------|\n';
+                md += '| File | Line | Found | Use instead |\n|------|------|-------|------------|\n';
                 byRule['no-native-interactive-elements'].forEach(e => {
-                  md += `| \`${e.file}\` | ${e.line} | ${e.message} |\n`;
+                  const native = (e.message.match(/native &lt;([^&]+)&gt;/) || [])[1] || '';
+                  const replacement = (e.message.match(/&lt;([^&]+)&gt; from src/) || [])[1] || '';
+                  md += `| \`${e.file}\` | ${e.line} | \`&lt;${native}&gt;\` | \`&lt;${replacement}&gt;\` |\n`;
                 });
                 md += '\n';
               }
