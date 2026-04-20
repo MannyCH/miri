@@ -46,6 +46,9 @@ jobs:
     name: Lint check (stylelint + eslint)
     needs: detect-changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,17 +56,108 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+
       - name: Stylelint (CSS token drift)
-        id: stylelint
-        run: npm run lint:css
-        continue-on-error: true
+        run: npx stylelint 'src/**/*.css' --formatter json > stylelint-results.json || true
+
       - name: ESLint (inline styles + bypassed components)
-        id: eslint
-        run: npm run lint:js
-        continue-on-error: true
-      - name: Fail if any linter reported errors
-        if: steps.stylelint.outcome == 'failure' || steps.eslint.outcome == 'failure'
-        run: exit 1
+        run: npx eslint src/ --format json > eslint-results.json || true
+
+      - name: Post lint findings to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+          const cwd = process.cwd() + '/';
+
+          let stylelintErrors = [];
+          try {
+            const data = JSON.parse(fs.readFileSync('stylelint-results.json', 'utf8'));
+            data.forEach(f => f.warnings.forEach(w => stylelintErrors.push({
+              file: f.source.replace(cwd, ''),
+              line: w.line,
+              property: (w.text.match(/property "([^"]+)"/) || [])[1] || '',
+              value: (w.text.match(/value "([^"]+)"/) || [])[1] || w.text,
+            })));
+          } catch(e) {}
+
+          let eslintErrors = [];
+          try {
+            const data = JSON.parse(fs.readFileSync('eslint-results.json', 'utf8'));
+            data.forEach(f => f.messages.forEach(m => eslintErrors.push({
+              file: f.filePath.replace(cwd, ''),
+              line: m.line,
+              rule: (m.ruleId || '').replace('design-system/', ''),
+              message: m.message,
+            })));
+          } catch(e) {}
+
+          if (stylelintErrors.length === 0 && eslintErrors.length === 0) {
+            fs.writeFileSync('lint-comment.md', '## ✅ Lint passed\nNo token drift or component misuse found.');
+          } else {
+            let md = '## 🔍 Lint Report\n\n';
+
+            if (stylelintErrors.length > 0) {
+              md += '### Token drift (stylelint)\n';
+              md += '| File | Line | Property | Hardcoded value |\n';
+              md += '|------|------|----------|----------------|\n';
+              stylelintErrors.forEach(e => {
+                md += `| \`${e.file}\` | ${e.line} | \`${e.property}\` | \`${e.value}\` |\n`;
+              });
+              md += '\n';
+            }
+
+            if (eslintErrors.length > 0) {
+              const byRule = {};
+              eslintErrors.forEach(e => { (byRule[e.rule] = byRule[e.rule] || []).push(e); });
+
+              if (byRule['no-hardcoded-style-values']) {
+                md += '### Hardcoded inline styles (ESLint)\n';
+                md += '| File | Line | Issue |\n|------|------|-------|\n';
+                byRule['no-hardcoded-style-values'].forEach(e => {
+                  md += `| \`${e.file}\` | ${e.line} | ${e.message} |\n`;
+                });
+                md += '\n';
+              }
+
+              if (byRule['no-native-interactive-elements']) {
+                md += '### Bypassed design system components (ESLint)\n';
+                md += '| File | Line | Issue |\n|------|------|-------|\n';
+                byRule['no-native-interactive-elements'].forEach(e => {
+                  md += `| \`${e.file}\` | ${e.line} | ${e.message} |\n`;
+                });
+                md += '\n';
+              }
+
+              const other = eslintErrors.filter(e => !['no-hardcoded-style-values','no-native-interactive-elements'].includes(e.rule));
+              if (other.length > 0) {
+                md += '### Other ESLint errors\n';
+                md += '| File | Line | Rule | Issue |\n|------|------|------|-------|\n';
+                other.forEach(e => { md += `| \`${e.file}\` | ${e.line} | \`${e.rule}\` | ${e.message} |\n`; });
+                md += '\n';
+              }
+            }
+
+            const total = stylelintErrors.length + eslintErrors.length;
+            md += `**${stylelintErrors.length} stylelint · ${eslintErrors.length} ESLint — ${total} error${total !== 1 ? 's' : ''} total**\n`;
+            md += '\n---\n*Fix these before the AI review agents run.*';
+            fs.writeFileSync('lint-comment.md', md);
+          }
+          EOF
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file lint-comment.md
+
+      - name: Fail if linters found errors
+        run: |
+          node -e "
+          const fs = require('fs');
+          let total = 0;
+          try { total += JSON.parse(fs.readFileSync('stylelint-results.json')).reduce((s,f) => s + f.warnings.length, 0); } catch(e) {}
+          try { total += JSON.parse(fs.readFileSync('eslint-results.json')).reduce((s,f) => s + f.messages.length, 0); } catch(e) {}
+          if (total > 0) { console.log(total + ' lint error(s) found'); process.exit(1); }
+          "
 
   design-system-propagation:
     name: Design system propagation check
