@@ -7,7 +7,29 @@
         "background": ["/^#/", "/^rgb/", "/^hsl/"],
         "border-color": ["/^#/", "/^rgb/", "/^hsl/"],
         "fill": ["/^#/", "/^rgb/", "/^hsl/"],
-        "stroke": ["/^#/", "/^rgb/", "/^hsl/"]
+        "stroke": ["/^#/", "/^rgb/", "/^hsl/"],
+
+        "padding": ["/\\d+px/"],
+        "padding-top": ["/\\d+px/"],
+        "padding-right": ["/\\d+px/"],
+        "padding-bottom": ["/\\d+px/"],
+        "padding-left": ["/\\d+px/"],
+
+        "margin": ["/\\d+px/"],
+        "margin-top": ["/\\d+px/"],
+        "margin-right": ["/\\d+px/"],
+        "margin-bottom": ["/\\d+px/"],
+        "margin-left": ["/\\d+px/"],
+
+        "gap": ["/\\d+px/"],
+        "row-gap": ["/\\d+px/"],
+        "column-gap": ["/\\d+px/"],
+
+        "border-radius": ["/\\d+px/"],
+        "border-top-left-radius": ["/\\d+px/"],
+        "border-top-right-radius": ["/\\d+px/"],
+        "border-bottom-left-radius": ["/\\d+px/"],
+        "border-bottom-right-radius": ["/\\d+px/"]
       }
     ]
   }

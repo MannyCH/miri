@@ -53,7 +53,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run lint
+      - name: Stylelint (CSS token drift)
+        run: npm run lint:css
+      - name: ESLint (inline styles + bypassed components)
+        run: npm run lint:js
 
   design-system-propagation:
     name: Design system propagation check
