@@ -45,7 +45,7 @@ jobs:
   design-system-propagation:
     name: Design system propagation check
     needs: detect-changes
-    if: needs.detect-changes.outputs.components_changed == 'true'
+    if: needs.detect-changes.outputs.components_changed == 'true' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -130,8 +130,15 @@ jobs:
           prompt: |
             You are running the orchestrator agent for PR #${{ github.event.pull_request.number }} in MannyCH/miri.
 
+            PR branch: ${{ github.event.pull_request.head.ref }}
+            PR type: ${{ startsWith(github.event.pull_request.head.ref, 'fix/batch-') && 'fix' || 'feature' }}
+
             The consumer-drift and design-system-propagation agents have finished running.
-            Your job is to read their PR comments, decide what to fix directly vs create Notion cards for, and act.
+
+            If PR type is "fix": verify only that the specific changes in this PR are correct. Do not scan for new drift elsewhere.
+            If PR type is "feature": read the agent reports and decide what to fix directly vs create Notion cards for.
+
+            Your job is to read the PR comments from those agents, then act.
 
             PR branch: ${{ github.event.pull_request.head.ref }}
 
