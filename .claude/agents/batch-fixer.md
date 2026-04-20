@@ -33,8 +33,7 @@ For each card you intend to fix, load only what that card needs:
 
 ### Locating the file
 - If the card body specifies a file path → use it directly, no lookup needed
-- If the file is unclear → `grep` FEATURES-MAP.md for the feature name to find the right file
-- If still unclear → use `/graphify query "<card topic>"` to find related files
+- If the file is unclear → run `/graphify query "<card topic>"` to find related files and dependencies
 
 ### Verifying a token exists
 - Never read all of `design-tokens.css` — instead: `grep "spacing-16" src/design-tokens.css`

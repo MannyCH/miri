@@ -22,9 +22,8 @@ Use `mcp__notion__API-retrieve-block-children` to get the full body. Extract the
 
 Always do ALL of these before touching a file:
 
-**a. Feature map + knowledge graph**
-- Read `FEATURES-MAP.md` — locate related features, avoid duplication
-- Read `graphify-out/GRAPH_REPORT.md` — understand dependencies and blast radius for any files you plan to touch
+**a. Knowledge graph**
+- Run `/graphify query "<feature name>"` — locate related files, avoid duplication, understand dependencies and blast radius
 
 **b. Architecture rules**
 - Read `.claude/rules/components.md` if creating or using components
