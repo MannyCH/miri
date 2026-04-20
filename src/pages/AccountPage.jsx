@@ -17,6 +17,14 @@ import { NavigationBarConnected } from '../components/NavigationBar/NavigationBa
 import { RadioButton } from '../components/RadioButton/RadioButton';
 import './AccountPage.css';
 
+// TEST: deliberate drift to trigger linters
+const _TEST_DRIFT = () => (
+  <div>
+    <span style={{ color: '#ff0000', padding: '8px' }}>inline drift</span>
+    <button>raw button</button>
+  </div>
+);
+
 const PASSWORD_HAS_NUMBER_REGEX = /\d/;
 const PASSWORD_HAS_UPPERCASE_REGEX = /[A-Z]/;
 const PASSWORD_HAS_SPECIAL_REGEX = /[^A-Za-z0-9]/;

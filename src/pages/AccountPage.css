@@ -1,3 +1,10 @@
+/* TEST: deliberate drift to trigger linters */
+.account-page-test-drift {
+  color: #ff0000;
+  padding: 16px;
+  border-radius: 8px;
+}
+
 .account-page {
   display: flex;
   flex-direction: column;
