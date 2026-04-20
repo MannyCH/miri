@@ -9,27 +9,27 @@
         "fill": ["/^#/", "/^rgb/", "/^hsl/"],
         "stroke": ["/^#/", "/^rgb/", "/^hsl/"],
 
-        "padding": ["/\\d+px/"],
-        "padding-top": ["/\\d+px/"],
-        "padding-right": ["/\\d+px/"],
-        "padding-bottom": ["/\\d+px/"],
-        "padding-left": ["/\\d+px/"],
+        "padding": ["/([2-9]|[1-9]\\d+)px/"],
+        "padding-top": ["/([2-9]|[1-9]\\d+)px/"],
+        "padding-right": ["/([2-9]|[1-9]\\d+)px/"],
+        "padding-bottom": ["/([2-9]|[1-9]\\d+)px/"],
+        "padding-left": ["/([2-9]|[1-9]\\d+)px/"],
 
-        "margin": ["/\\d+px/"],
-        "margin-top": ["/\\d+px/"],
-        "margin-right": ["/\\d+px/"],
-        "margin-bottom": ["/\\d+px/"],
-        "margin-left": ["/\\d+px/"],
+        "margin": ["/([2-9]|[1-9]\\d+)px/"],
+        "margin-top": ["/([2-9]|[1-9]\\d+)px/"],
+        "margin-right": ["/([2-9]|[1-9]\\d+)px/"],
+        "margin-bottom": ["/([2-9]|[1-9]\\d+)px/"],
+        "margin-left": ["/([2-9]|[1-9]\\d+)px/"],
 
-        "gap": ["/\\d+px/"],
-        "row-gap": ["/\\d+px/"],
-        "column-gap": ["/\\d+px/"],
+        "gap": ["/([2-9]|[1-9]\\d+)px/"],
+        "row-gap": ["/([2-9]|[1-9]\\d+)px/"],
+        "column-gap": ["/([2-9]|[1-9]\\d+)px/"],
 
-        "border-radius": ["/\\d+px/"],
-        "border-top-left-radius": ["/\\d+px/"],
-        "border-top-right-radius": ["/\\d+px/"],
-        "border-bottom-left-radius": ["/\\d+px/"],
-        "border-bottom-right-radius": ["/\\d+px/"]
+        "border-radius": ["/([2-9]|[1-9]\\d+)px/"],
+        "border-top-left-radius": ["/([2-9]|[1-9]\\d+)px/"],
+        "border-top-right-radius": ["/([2-9]|[1-9]\\d+)px/"],
+        "border-bottom-left-radius": ["/([2-9]|[1-9]\\d+)px/"],
+        "border-bottom-right-radius": ["/([2-9]|[1-9]\\d+)px/"]
       }
     ]
   }
