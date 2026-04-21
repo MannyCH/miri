@@ -20,7 +20,7 @@ import './AccountPage.css';
 // TEST: deliberate drift to trigger linters
 const _TEST_DRIFT = () => (
   <div>
-    <span style={{ color: '#ff0000', padding: '8px' }}>inline drift</span>
+    <span style={{ color: '#ff0000', padding: 'var(--spacing-inset-sm)' }}>inline drift</span>
     <button>raw button</button>
   </div>
 );
