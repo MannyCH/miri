@@ -75,7 +75,7 @@ Brief feedback notification that appears at the bottom of the screen. Used to co
 // Default story showing all variants
 export const AllVariants = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '358px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-gap-md)', width: '358px' }}>
       <Toast variant="Success" message="Added to shopping list" />
       <Toast variant="Error" message="Could not delete item" />
       <Toast variant="Warning" message="Low stock warning" />
@@ -171,7 +171,7 @@ export const WithoutCloseButton = {
 // Custom messages
 export const CustomMessages = {
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '358px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-gap-md)', width: '358px' }}>
       <Toast variant="Success" message="Recipe saved successfully!" />
       <Toast variant="Error" message="Unable to connect to server" />
       <Toast variant="Warning" message="Only 2 eggs remaining" />
