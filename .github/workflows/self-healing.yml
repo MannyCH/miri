@@ -145,7 +145,6 @@ jobs:
 
             const total = stylelintErrors.length + eslintErrors.length;
             md += `**${stylelintErrors.length} stylelint · ${eslintErrors.length} ESLint — ${total} error${total !== 1 ? 's' : ''} total**\n`;
-            md += '\n---\n*Fix these before the AI review agents run.*';
             fs.writeFileSync('lint-comment.md', md);
           }
           EOF
@@ -161,57 +160,10 @@ jobs:
           if (total > 0) { console.log(total + ' lint error(s) found'); process.exit(1); }
           "
 
-  design-system-propagation:
-    name: Design system propagation check
+  lint-fixer:
+    name: Fix lint issues
     needs: [detect-changes, lint]
-    if: needs.detect-changes.outputs.components_changed == 'true' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          mcp_config: |
-            {
-              "mcpServers": {
-                "notion": {
-                  "command": "npx",
-                  "args": ["-y", "@notionhq/notion-mcp-server"],
-                  "env": {
-                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
-                  }
-                }
-              }
-            }
-          prompt: |
-            You are running the design-system-propagation agent for PR #${{ github.event.pull_request.number }} in the MannyCH/miri repo.
-
-            The PR changed files in src/components/ or .stories.jsx files.
-
-            Changed files in this PR:
-            $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
-
-            Your tasks:
-            1. For each changed component, read its .stories.jsx to understand valid props and variants.
-            2. Scan ALL files in src/pages/ and src/patterns/ that import those components.
-            3. Check for: invalid prop values, removed props still being passed, hardcoded CSS values (hex colors, px spacing, px radius) instead of var(--...) tokens.
-            4. Flag any new component (no prior git history) that likely has no Figma counterpart — mark it as "requires local Figma parity check".
-            5. Post your findings as a PR comment on PR #${{ github.event.pull_request.number }} in MannyCH/miri.
-
-            Format your comment exactly as described in .claude/agents/design-system-propagation.md.
-            Report only — do not modify any files.
-
-  orchestrate:
-    name: Orchestrate fixes and cards
-    needs: [detect-changes, consumer-drift, design-system-propagation]
-    if: always() && (needs.detect-changes.outputs.pages_changed == 'true' || needs.detect-changes.outputs.components_changed == 'true')
+    if: always() && needs.lint.result == 'failure'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -233,7 +185,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          allowed_tools: "Bash,Read,Edit,Write,Glob,Grep,mcp__notion__API-post-page,mcp__notion__API-post-search,mcp__notion__API-query-data-source,mcp__github__add_issue_comment,mcp__github__get_file_contents"
+          allowed_tools: "Bash,Read,Edit,Glob,Grep,mcp__github__add_issue_comment,mcp__github__get_file_contents,mcp__notion__API-post-page"
           mcp_config: |
             {
               "mcpServers": {
@@ -247,28 +199,20 @@ jobs:
               }
             }
           prompt: |
-            You are running the orchestrator agent for PR #${{ github.event.pull_request.number }} in MannyCH/miri.
-
-            PR branch: ${{ github.event.pull_request.head.ref }}
-            PR type: ${{ startsWith(github.event.pull_request.head.ref, 'fix/batch-') && 'fix' || 'feature' }}
-
-            The consumer-drift and design-system-propagation agents have finished running.
-
-            If PR type is "fix": verify only that the specific changes in this PR are correct. Do not scan for new drift elsewhere.
-            If PR type is "feature": read the agent reports and decide what to fix directly vs create Notion cards for.
-
-            Your job is to read the PR comments from those agents, then act.
+            You are the lint-fixer agent for PR #${{ github.event.pull_request.number }} in MannyCH/miri.
 
             PR branch: ${{ github.event.pull_request.head.ref }}
 
-            Follow the full instructions in .claude/agents/orchestrator.md
+            The lint job just failed. Read the lint report PR comment and fix the issues directly on this branch.
+
+            Follow the full instructions in .claude/agents/lint-fixer.md
 
             Notion Kanban board data source ID: 97dac060-1abe-825e-bcb7-87906de2939a
 
   consumer-drift:
     name: Consumer drift check
     needs: [detect-changes, lint]
-    if: needs.detect-changes.outputs.pages_changed == 'true'
+    if: needs.detect-changes.outputs.pages_changed == 'true' && needs.lint.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -302,11 +246,45 @@ jobs:
             Changed files in this PR:
             $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
 
-            Your tasks:
-            1. Read each changed page/pattern file.
-            2. For every design system component used (Button, TextField, SearchBar, Divider, Toast, AvatarRow, Badge, etc.), read its .stories.jsx in src/components/ to find valid props.
-            3. Check for: invalid/invented prop values, hardcoded hex colors or px values that should be design tokens, raw HTML elements that have a component equivalent.
-            4. Post your findings as a PR comment on PR #${{ github.event.pull_request.number }} in MannyCH/miri.
+            Follow the full instructions in .claude/agents/consumer-drift.md.
+            Report only — do not modify any files.
 
-            Format your comment exactly as described in .claude/agents/consumer-drift.md.
+  design-system-propagation:
+    name: Design system propagation check
+    needs: [detect-changes, lint]
+    if: needs.detect-changes.outputs.components_changed == 'true' && needs.lint.result == 'success' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the design-system-propagation agent for PR #${{ github.event.pull_request.number }} in the MannyCH/miri repo.
+
+            The PR changed files in src/components/ or .stories.jsx files.
+
+            Changed files in this PR:
+            $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+
+            Follow the full instructions in .claude/agents/design-system-propagation.md.
             Report only — do not modify any files.
