@@ -101,7 +101,7 @@ export const Group = {
   render: () => {
     const [selected, setSelected] = useState('female');
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-gap-sm)' }}>
         <RadioButton
           label="Female"
           value="female"
