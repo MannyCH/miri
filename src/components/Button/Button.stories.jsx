@@ -321,6 +321,46 @@ pressed shows \`--color-icon-brand\` + \`--color-fill-brand-weak\` background.
   ),
 };
 
+export const IconButtonToggle = {
+  name: 'Icon Button — Toggle (aria-pressed)',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Toggle group using \`variant="secondary"\` + \`iconOnly\` + \`aria-pressed\`.
+
+Same component as the framed icon button — \`aria-pressed\` drives both the visual state and the screen-reader announcement ("toggle button, pressed / not pressed"). Only one option is active at a time.
+
+Used in ShoppingListView for the recipe-grouped / smart-grouped view switcher.
+        `,
+      },
+    },
+  },
+  render: () => {
+    const [active, setActive] = React.useState('grid');
+    return (
+      <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
+        <Button
+          variant="secondary"
+          iconOnly
+          icon={<HeartIcon />}
+          aria-pressed={active === 'grid'}
+          aria-label="Grid view"
+          onClick={() => setActive('grid')}
+        />
+        <Button
+          variant="secondary"
+          iconOnly
+          icon={<MoreIcon />}
+          aria-pressed={active === 'list'}
+          aria-label="List view"
+          onClick={() => setActive('list')}
+        />
+      </div>
+    );
+  },
+};
+
 export const IconButtonRestore = {
   name: 'Icon Button — Restore (tertiary)',
   parameters: {
