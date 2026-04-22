@@ -17,14 +17,6 @@ import { NavigationBarConnected } from '../components/NavigationBar/NavigationBa
 import { RadioButton } from '../components/RadioButton/RadioButton';
 import './AccountPage.css';
 
-// TEST: deliberate drift to trigger linters
-const _TEST_DRIFT = () => (
-  <div>
-    <span style={{ color: '#ff0000', padding: 'var(--spacing-inset-sm)' }}>inline drift</span>
-    <button>raw button</button>
-  </div>
-);
-
 const PASSWORD_HAS_NUMBER_REGEX = /\d/;
 const PASSWORD_HAS_UPPERCASE_REGEX = /[A-Z]/;
 const PASSWORD_HAS_SPECIAL_REGEX = /[^A-Za-z0-9]/;
@@ -63,16 +55,13 @@ const slideTransition = { type: 'tween', duration: 0.3, ease: [0.4, 0, 0.2, 1] }
 function SubViewBack({ onBack }) {
   return (
     <div className="account-subview-header">
-      <button
-        type="button"
-        className="account-subview-back-btn"
-        onClick={onBack}
+      <Button
+        variant="tertiary"
+        iconOnly
+        icon={<ChevronLeft size={20} />}
         aria-label="Go back"
-      >
-        <span className="account-subview-back-circle">
-          <ChevronLeft size={20} aria-hidden="true" />
-        </span>
-      </button>
+        onClick={onBack}
+      />
     </div>
   );
 }

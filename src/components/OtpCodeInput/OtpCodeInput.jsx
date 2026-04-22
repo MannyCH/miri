@@ -1,15 +1,19 @@
-import React, { useRef } from 'react';
+import React, { useImperativeHandle, useRef } from 'react';
 import './OtpCodeInput.css';
 
-export const OtpCodeInput = ({
+export const OtpCodeInput = React.forwardRef(({
   length = 6,
   value = '',
   onChange,
   disabled = false,
   error = false,
-}) => {
+}, ref) => {
   const inputRefs = useRef([]);
   const digits = Array.from({ length }, (_, i) => value[i] ?? '');
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRefs.current[0]?.focus(),
+  }));
 
   const handleChange = (index, e) => {
     const char = e.target.value.replace(/\D/g, '').slice(-1);
@@ -54,11 +58,12 @@ export const OtpCodeInput = ({
           onKeyDown={e => handleKeyDown(index, e)}
           onPaste={index === 0 ? handlePaste : undefined}
           disabled={disabled}
+          autoComplete={index === 0 ? 'one-time-code' : 'off'}
           aria-label={`Digit ${index + 1} of ${length}`}
         />
       ))}
     </div>
   );
-};
+});
 
 OtpCodeInput.displayName = 'OtpCodeInput';

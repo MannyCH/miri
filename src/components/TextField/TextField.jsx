@@ -2,12 +2,7 @@ import React, { useState } from 'react';
 import { AlertTriangle, Eye, EyeOff } from 'react-feather';
 import './TextField.css';
 
-/**
- * Text input field with label, error state and optional eye toggle for passwords.
- * Variant is derived automatically: 'filled' when value is present, 'empty' otherwise.
- * Pass `error` to switch to the error state with a message.
- */
-export function TextField({
+export const TextField = React.forwardRef(({
   label,
   type = 'text',
   value = '',
@@ -18,11 +13,13 @@ export function TextField({
   readOnly = false,
   error = '',
   autoComplete,
-}) {
+  ...rest
+}, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
   const inputType = isPassword && showPassword ? 'text' : type;
   const variant = error ? 'error' : value ? 'filled' : 'empty';
+  const { 'aria-label': ariaLabel, ...restProps } = rest;
 
   return (
     <div className={`text-field text-field-${variant}`}>
@@ -37,6 +34,7 @@ export function TextField({
       ) : null}
       <div className="text-field-control">
         <input
+          ref={ref}
           className="text-field-input text-body-regular"
           type={inputType}
           value={value}
@@ -46,8 +44,9 @@ export function TextField({
           autoComplete={autoComplete}
           onChange={(e) => onChange && onChange(e.target.value)}
           onBlur={onBlur}
-          aria-label={label}
+          aria-label={ariaLabel ?? label}
           aria-invalid={Boolean(error)}
+          {...restProps}
         />
         {isPassword && !disabled && !readOnly ? (
           <button
@@ -65,6 +64,6 @@ export function TextField({
       </div>
     </div>
   );
-}
+});
 
 TextField.displayName = 'TextField';

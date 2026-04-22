@@ -64,28 +64,6 @@
   gap: var(--spacing-8);
 }
 
-.icon-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: var(--corner-radius-4);
-  color: var(--color-icon-neutral);
-  cursor: pointer;
-}
-
-.icon-button:hover {
-  background: var(--color-background-sunken);
-}
-
-.icon-button:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-}
 
 /* Primary action button area - only shown when plan exists */
 .meal-planning-action {

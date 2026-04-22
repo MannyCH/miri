@@ -19,6 +19,7 @@ Built with Base UI for full accessibility (keyboard navigation, focus management
 - Second option alongside a destructive or dominant primary (e.g. "Delete" + "Cancel") → \`secondary\`
 - Dismiss, cancel, or low-commitment inline action → \`tertiary\`
 - Low-emphasis destructive action (leave group, unlink, remove) → \`tertiary-delete\`
+- Inline cancel next to a search bar or input where underline would look out of place → \`ghost\`
 
 ## When NOT to use
 - Don't use \`tertiary-delete\` for Cancel — use \`tertiary\` (cancel is not destructive)
@@ -71,8 +72,8 @@ Built with Base UI for full accessibility (keyboard navigation, focus management
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'tertiary-delete'],
-      description: 'Visual variant matching Figma Property 1. `primary` — dominant CTA, filled brand colour. `secondary` — outlined, equal-weight alternative action. `tertiary` — low-emphasis inline action (underlined, no border). `tertiary-delete` — same weight as tertiary but signals irreversible/destructive intent via error colour.',
+      options: ['primary', 'secondary', 'tertiary', 'tertiary-delete', 'ghost'],
+      description: 'Visual variant matching Figma Property 1. `primary` — dominant CTA, filled brand colour. `secondary` — outlined, equal-weight alternative action. `tertiary` — low-emphasis inline action (underlined, no border). `tertiary-delete` — same weight as tertiary but signals irreversible/destructive intent via error colour. `ghost` — neutral-bordered cancel/dismiss button.',
       table: {
         type: { summary: 'string' },
         defaultValue: { summary: 'primary' },
@@ -130,6 +131,17 @@ export const Tertiary = {
 
 export const TertiaryDelete = {
   args: { variant: 'tertiary-delete', children: 'Label', showIcon: false },
+};
+
+export const Ghost = {
+  args: { variant: 'ghost', children: 'Cancel', showIcon: false },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Like `tertiary` but without the underline decoration. Use for inline cancel/dismiss actions where an underline would look out of place — e.g. "Cancel" next to a search bar or URL input field.',
+      },
+    },
+  },
 };
 
 export const Disabled = {

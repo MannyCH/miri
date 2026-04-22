@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RecipesView } from '../patterns/RecipesView';
 import { ImportMethodSheet } from '../components/ImportMethodSheet';
+import { Button } from '../components/Button/Button';
+import { TextField } from '../components/TextField/TextField';
 import './RecipesPage.css';
 import { useApp } from '../context/AppContext';
 import { parseRecipeTxt } from '../lib/recipeParser';
@@ -170,21 +172,11 @@ export function RecipesPage() {
 
   return (
     <>
-      {/* Hidden file inputs */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".txt"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
-      <input
-        ref={photoInputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={handlePhotoChange}
-      />
+      {/* Hidden file inputs — native <input type="file"> required; no design system equivalent */}
+      {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
+      <input ref={fileInputRef} type="file" accept=".txt" style={{ display: 'none' }} onChange={handleFileChange} />
+      {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
+      <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoChange} />
 
       <RecipesView
         recipes={filteredRecipes}
@@ -211,35 +203,34 @@ export function RecipesPage() {
           <div className="recipes-url-sheet">
             <div className="recipes-url-sheet-handle" aria-hidden="true" />
             <h2 className="text-h3-bold recipes-url-title">Paste Recipe URL</h2>
-            <input
+            <TextField
               ref={urlInputRef}
               type="url"
               inputMode="url"
               value={urlValue}
-              onChange={(e) => setUrlValue(e.target.value)}
+              onChange={setUrlValue}
               onKeyDown={handleUrlKeyDown}
               placeholder="https://..."
-              className="text-body-regular recipes-url-input"
               aria-label="Recipe URL"
               disabled={isImporting}
             />
             <div className="recipes-url-actions">
-              <button
-                type="button"
-                className="recipes-url-cancel text-body-regular"
+              <Button
+                variant="ghost"
+                style={{ flex: 1 }}
                 onClick={() => { setShowUrlInput(false); setUrlValue(''); }}
                 disabled={isImporting}
               >
                 Cancel
-              </button>
-              <button
-                type="button"
-                className="recipes-url-import-btn text-body-bold"
+              </Button>
+              <Button
+                variant="primary"
+                style={{ flex: 2 }}
                 onClick={handleUrlImport}
                 disabled={!urlValue.trim() || isImporting}
               >
                 {isImporting ? 'Importing…' : 'Import'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

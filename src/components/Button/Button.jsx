@@ -11,14 +11,16 @@ export const Button = ({
   icon,
   showIcon = true,
   iconOnly = false,
+  fullWidth = false,
   children,
   ...props
 }) => {
   const variantClass = `button-${variant.toLowerCase().replace(' - ', '-')}`;
+  const classes = ['button', variantClass, iconOnly && 'button--icon-only', fullWidth && 'button--full-width'].filter(Boolean).join(' ');
 
   return (
     <BaseButton
-      className={`button ${variantClass}${iconOnly ? ' button--icon-only' : ''}`}
+      className={classes}
       {...props}
     >
       {(showIcon || iconOnly) && icon && (

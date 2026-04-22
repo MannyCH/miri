@@ -79,10 +79,6 @@
   width: 100%;
 }
 
-.auth-back-to-login {
-  margin-top: var(--spacing-8);
-}
-
 .auth-password-requirements {
   list-style: none;
   margin: 0;
@@ -121,26 +117,9 @@
   }
 }
 
-.auth-inline-link {
-  border: 0;
-  background: transparent;
-  color: var(--color-text-strong);
-  text-align: left;
-  padding: 0;
-  cursor: pointer;
-}
-
 .auth-field-meta {
   display: flex;
   justify-content: flex-end;
-}
-
-.auth-field-link {
-  border: 0;
-  background: transparent;
-  color: var(--color-text-weak);
-  padding: 0;
-  cursor: pointer;
 }
 
 .auth-footer-copy {
@@ -150,14 +129,6 @@
   align-items: center;
   justify-content: flex-start;
   gap: var(--spacing-8);
-}
-
-.auth-footer-link {
-  border: 0;
-  background: transparent;
-  color: var(--color-text-strong);
-  cursor: pointer;
-  padding: 0;
 }
 
 .auth-error {
@@ -194,26 +165,6 @@
 .auth-verify-form {
   width: 100%;
   align-items: flex-start;
-}
-
-.auth-code-group {
-  width: 100%;
-  display: flex;
-  gap: var(--spacing-8);
-  margin: 0;
-}
-
-.auth-code-input {
-  flex: 1 1 0;
-  width: 0;
-  min-width: 0;
-  box-sizing: border-box;
-  height: 52px;
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-8);
-  text-align: center;
-  color: var(--color-text-strong);
-  background: var(--color-fill-brand-weak);
 }
 
 .auth-page-status {

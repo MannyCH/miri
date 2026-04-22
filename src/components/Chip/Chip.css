@@ -1,0 +1,54 @@
+/* Chip — toggle pill for filter selection and category tags
+ *
+ * Token mapping:
+ *   Padding        → --spacing-inset-xs (vertical, badges/chips) + --spacing-12 (horizontal)
+ *   Gap            → --spacing-gap-xs (icon + label spacing)
+ *   Border radius  → --corner-radius-pill (full-round pill shape)
+ *   Default fill   → --color-background-sunken
+ *   Active fill    → --color-fill-brand-strong
+ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-gap-xs);
+  padding: var(--spacing-inset-xs) var(--spacing-12);
+  border: 1px solid var(--color-stroke-weak);
+  border-radius: var(--corner-radius-pill);
+  background: var(--color-background-sunken);
+  color: var(--color-text-strong);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.chip:hover:not([disabled]):not(:disabled) {
+  background: var(--color-fill-hover);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.chip--active {
+  background: var(--color-fill-brand-strong);
+  border-color: var(--color-fill-brand-strong);
+  color: var(--color-text-inverted);
+}
+
+.chip--active:hover:not([disabled]):not(:disabled) {
+  background: linear-gradient(var(--color-fill-hover), var(--color-fill-hover)),
+              var(--color-fill-brand-strong);
+  border-color: var(--color-fill-brand-strong);
+}
+
+.chip[disabled],
+.chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.chip-close {
+  opacity: 0.8;
+}

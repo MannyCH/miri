@@ -5,6 +5,7 @@ import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Button } from '../components/Button/Button';
+import { OtpCodeInput } from '../components/OtpCodeInput';
 import { TextField } from '../components/TextField/TextField';
 import './AuthPage.css';
 
@@ -89,7 +90,7 @@ export function AuthPage() {
   const suppressSignInBlurValidationRef = useRef(false);
   const resendInFlightRef = useRef(false);
   const resendSuccessTimeoutRef = useRef(null);
-  const codeInputRefs = useRef([]);
+  const firstCodeInputRef = useRef(null);
 
   if (!isAuthReady) {
     return <div className="auth-page-status">Loading authentication...</div>;
@@ -331,7 +332,7 @@ export function AuthPage() {
       }
       await sendVerificationCode({ email: verifyEmailAddress });
       setVerificationCode('');
-      codeInputRefs.current[0]?.focus();
+      firstCodeInputRef.current?.focus();
       setResendCodeActionState('success');
       if (resendSuccessTimeoutRef.current) {
         clearTimeout(resendSuccessTimeoutRef.current);
@@ -521,40 +522,6 @@ export function AuthPage() {
     return null;
   };
 
-  const handleCodeDigitChange = (index, value) => {
-    const digits = value.replace(/\D/g, '');
-    if (!digits) {
-      const nextChars = verificationCode.padEnd(OTP_LENGTH, ' ').split('');
-      nextChars[index] = ' ';
-      setVerificationCode(nextChars.join('').trimEnd());
-      return;
-    }
-    const nextChars = verificationCode.padEnd(OTP_LENGTH, ' ').split('');
-    const codeSlice = digits.slice(0, OTP_LENGTH - index).split('');
-    codeSlice.forEach((digit, offset) => {
-      nextChars[index + offset] = digit;
-    });
-    const nextCode = nextChars.join('').trimEnd();
-    setVerificationCode(nextCode);
-
-    const nextFocusIndex = Math.min(index + codeSlice.length, OTP_LENGTH - 1);
-    if (codeSlice.length > 0) {
-      codeInputRefs.current[nextFocusIndex]?.focus();
-    }
-  };
-
-  const handleCodeKeyDown = (index, event) => {
-    if (event.key === 'Backspace' && !verificationCode[index] && index > 0) {
-      codeInputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleCodePaste = (index, event) => {
-    event.preventDefault();
-    const pastedText = event.clipboardData.getData('text');
-    handleCodeDigitChange(index, pastedText);
-  };
-
   const renderSignInContent = () => (
     <>
       <h1 className="auth-title text-h2-bold">Log in to Miri</h1>
@@ -586,16 +553,15 @@ export function AuthPage() {
         />
 
         <div className="auth-field-meta">
-          <button
-            type="button"
-            className="auth-field-link text-tiny-regular"
+          <Button
+            variant="tertiary"
             onClick={() => resetModeUiState(AUTH_MODES.FORGOT_PASSWORD)}
             onMouseDown={() => {
               suppressSignInBlurValidationRef.current = true;
             }}
           >
             Forgot password?
-          </button>
+          </Button>
         </div>
 
         {resolveSignInFieldError(errorMessage).generic ? (
@@ -611,16 +577,15 @@ export function AuthPage() {
 
       <p className="auth-footer-copy text-body-small-regular">
         Don&apos;t have an account?{' '}
-        <button
-          type="button"
-          className="auth-footer-link text-body-small-bold-underlined"
+        <Button
+          variant="tertiary"
           onClick={() => resetModeUiState(AUTH_MODES.SIGN_UP)}
           onMouseDown={() => {
             suppressSignInBlurValidationRef.current = true;
           }}
         >
           Sign up
-        </button>
+        </Button>
       </p>
     </>
   );
@@ -648,25 +613,13 @@ export function AuthPage() {
       ) : null}
 
       <form className="auth-form auth-verify-form" onSubmit={handleSubmit}>
-        <div className="auth-code-group" role="group" aria-label="Verification code">
-          {Array.from({ length: OTP_LENGTH }).map((_, index) => (
-            <input
-              key={`code-${index}`}
-              ref={(element) => {
-                codeInputRefs.current[index] = element;
-              }}
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={1}
-              className="auth-code-input text-body-regular"
-              value={verificationCode[index] || ''}
-              onChange={(event) => handleCodeDigitChange(index, event.target.value)}
-              onKeyDown={(event) => handleCodeKeyDown(index, event)}
-              onPaste={(event) => handleCodePaste(index, event)}
-            />
-          ))}
-        </div>
+        <OtpCodeInput
+          ref={firstCodeInputRef}
+          length={OTP_LENGTH}
+          value={verificationCode}
+          onChange={setVerificationCode}
+          error={verifyActionState === 'error'}
+        />
 
         {hasTokenParam ? (
           <TextField
@@ -696,25 +649,24 @@ export function AuthPage() {
           ) : (
             <p className="auth-footer-copy text-body-small-regular">
               Code not received?{' '}
-              <button
-                type="button"
-                className="auth-footer-link text-body-small-bold-underlined"
+              <Button
+                variant="tertiary"
                 onClick={handleResendCode}
                 disabled={isResendingCode}
               >
                 Resend code
-              </button>
+              </Button>
             </p>
           )}
         </div>
       </form>
-      <button
-        type="button"
-        className="auth-inline-link auth-back-to-login text-body-small-bold-underlined"
+      <Button
+        variant="tertiary"
+        style={{ marginTop: 'var(--spacing-8)' }}
         onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
       >
         Back to login
-      </button>
+      </Button>
     </section>
   );
 
@@ -787,13 +739,12 @@ export function AuthPage() {
 
       <p className="auth-footer-copy text-body-small-regular">
         Already have an account?{' '}
-        <button
-          type="button"
-          className="auth-footer-link text-body-small-bold-underlined"
+        <Button
+          variant="tertiary"
           onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
         >
           Log in
-        </button>
+        </Button>
       </p>
 
     </>
@@ -828,13 +779,12 @@ export function AuthPage() {
         </div>
       </form>
 
-      <button
-        type="button"
-        className="auth-inline-link text-body-small-bold-underlined"
+      <Button
+        variant="tertiary"
         onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
       >
         Back to login
-      </button>
+      </Button>
     </>
   );
 
@@ -905,13 +855,12 @@ export function AuthPage() {
         </div>
       </form>
 
-      <button
-        type="button"
-        className="auth-inline-link text-body-small-bold-underlined"
+      <Button
+        variant="tertiary"
         onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
       >
         Back to login
-      </button>
+      </Button>
     </>
   );
 

@@ -28,7 +28,7 @@ Do not use for showing a single recipe — use RecipeDetailView for that. Do not
 
 ## Composed of
 - **RecipeList** — scrollable list of recipe cards
-- **SearchBar** — appears as an overlay slide-in when the FAB is tapped; includes filter chips when \`availableFilters\` is provided
+- **SearchBar** — appears as an overlay sliding down from the top when the FAB is tapped; covers the header; includes filter chips when \`availableFilters\` is provided
 - **NavigationBarConnected** — bottom tab bar with "recipes" tab active
 - **Import button** (optional) — Plus icon in the header that triggers a file import flow; only rendered when \`onImportRequest\` is provided
 
@@ -98,19 +98,68 @@ export const WithImportButton = {
   },
 };
 
-export const Interactive = () => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  
-  const filteredRecipes = sampleRecipes.filter(recipe =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+export const Interactive = {
+  name: 'Interactive',
+  parameters: {
+    docs: {
+      description: {
+        story: 'Live demo — tap the floating search FAB to open the search overlay. The Cancel button (ghost variant) and filter chips (Chip component) are fully interactive.',
+      },
+    },
+  },
+  render: () => {
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const filteredRecipes = sampleRecipes.filter(recipe =>
+      recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    return (
+      <RecipesView
+        recipes={filteredRecipes}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onRecipeClick={(recipe) => console.log('Recipe clicked:', recipe)}
+      />
+    );
+  },
+};
 
-  return (
-    <RecipesView
-      recipes={filteredRecipes}
-      searchQuery={searchQuery}
-      onSearch={setSearchQuery}
-      onRecipeClick={(recipe) => console.log('Recipe clicked:', recipe)}
-    />
-  );
+export const SearchFab = {
+  name: 'Search FAB',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**Search floating action button** — 48×48 pill button anchored above the navigation bar. Opens the search overlay on tap.
+
+This is a pattern-scoped element, not a shared Button variant. It uses custom sizing and \`position: absolute\` that the 32×32 \`iconOnly\` Button cannot replicate. Documented here as an approved native element.
+
+CSS class: \`recipes-search-fab\`
+Size: \`var(--spacing-48)\` × \`var(--spacing-48)\`
+Shape: \`--corner-radius-pill\`
+Elevation: \`--elevation-overlay\`
+Icon color: \`--color-icon-brand\`
+Border: \`1px solid --color-stroke-weak\`
+        `,
+      },
+    },
+  },
+  render: () => (
+    <div style={{ position: 'relative', width: '100%', maxWidth: '390px' }}>
+      <button
+        type="button"
+        className="recipes-search-fab"
+        style={{ position: 'absolute', bottom: 'calc(100% + var(--spacing-16))', right: 'var(--spacing-16)' }}
+        aria-label="Search recipes"
+        onClick={() => {}}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      <div style={{ height: '76px', background: 'var(--color-background-base)', borderTop: '1px solid var(--color-stroke-weak)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span className="text-body-small-regular" style={{ color: 'var(--color-text-weak)' }}>Navigation Bar</span>
+      </div>
+    </div>
+  ),
 };
