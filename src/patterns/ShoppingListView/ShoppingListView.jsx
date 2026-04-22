@@ -194,6 +194,7 @@ export const ShoppingListView = ({
           </div>
           <div className="shopping-list-subtitle-right">
             <div className="shopping-list-view-toggle">
+              {/* eslint-disable design-system/no-native-interactive-elements -- icon-only toggle buttons; no icon-button variant exists in design system yet */}
               <button
                 className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
                 onClick={() => onViewModeChange?.('recipe')}
@@ -208,8 +209,10 @@ export const ShoppingListView = ({
               >
                 <SparkleIcon />
               </button>
+              {/* eslint-enable design-system/no-native-interactive-elements */}
             </div>
             {onMenuTap && (
+              // eslint-disable-next-line design-system/no-native-interactive-elements -- icon-only menu button; no icon-button variant exists in design system yet
               <button
                 type="button"
                 className="shopping-list-menu-btn"
@@ -278,6 +281,7 @@ export const ShoppingListView = ({
                 >
                   <div className="recipe-group-header">
                     <h3 className="text-body-base-bold">{group.recipeName}</h3>
+                    {/* eslint-disable-next-line design-system/no-native-interactive-elements -- icon-only delete button; no icon-button variant exists in design system yet */}
                     <button
                       className="icon-button-delete"
                       onClick={() => handleRecipeGroupDelete(group, groupIndex)}
@@ -325,6 +329,7 @@ export const ShoppingListView = ({
                     >
                       <div className="recipe-group-header">
                         <h3 className="text-body-base-bold">{group.recipeName}</h3>
+                        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- icon-only restore button; no icon-button variant exists in design system yet */}
                         <button
                           className="icon-button-restore"
                           onClick={() => group.onRestore?.()}
@@ -373,9 +378,9 @@ export const ShoppingListView = ({
             {smartStatus === 'error' && (
               <div className="shopping-list-smart-error">
                 <p className="text-body-regular">Could not organise list.</p>
-                <button type="button" className="shopping-list-smart-retry text-body-regular" onClick={onSmartRefresh}>
+                <Button variant="tertiary" onClick={onSmartRefresh}>
                   Try again
-                </button>
+                </Button>
               </div>
             )}
             {smartStatus === 'idle' && smartGroups.length === 0 && (
@@ -404,6 +409,7 @@ export const ShoppingListView = ({
       {/* Suggestion sheet — partial overlay above add bar, visible while typing */}
       {trimmedQuery.length > 0 && (
         <div className="shopping-list-suggestions-sheet" role="listbox" aria-label="Ingredient suggestions">
+          {/* eslint-disable design-system/no-native-interactive-elements -- role="option" inside role="listbox" is the correct ARIA pattern; <Button> cannot carry role="option" */}
           <button
             type="button"
             className="shopping-list-suggestion-item shopping-list-suggestion-add text-body-regular"
@@ -425,6 +431,7 @@ export const ShoppingListView = ({
               {name}
             </button>
           ))}
+          {/* eslint-enable design-system/no-native-interactive-elements */}
         </div>
       )}
 
@@ -479,6 +486,7 @@ function PendingIngredientRow({ entryId, name, onSetQuantity }) {
     <div className="pending-ingredient-row">
       <Divider />
       <div className="pending-ingredient-content">
+        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- inline quantity input within pending row; needs label + TextField migration (deferred) */}
         <input
           ref={inputRef}
           className="pending-ingredient-quantity text-body-small-regular"
@@ -603,6 +611,7 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
         style={{ '--left-swipe-progress': leftProgress, '--right-swipe-progress': rightProgress }}
       >
         {/* Pantry zone — sits on the LEFT, revealed by swiping RIGHT */}
+        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- swipe-zone action button; gesture-revealed pattern has no design system equivalent */}
         <button
           type="button"
           className="smart-list-item-pantry-zone"
@@ -614,6 +623,7 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
         </button>
 
         {/* Delete zone — sits on the RIGHT, revealed by swiping LEFT */}
+        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- swipe-zone action button; gesture-revealed pattern has no design system equivalent */}
         <button
           type="button"
           className="smart-list-item-delete-zone"
@@ -775,7 +785,7 @@ function SmartListContent({ smartGroups, checkedItems, onItemCheck, itemIds, ite
       )}
 
       <div className="shopping-list-smart-refresh">
-        <button type="button" className="shopping-list-smart-retry text-body-regular" onClick={onSmartRefresh}>Refresh</button>
+        <Button variant="tertiary" onClick={onSmartRefresh}>Refresh</Button>
       </div>
     </>
   );
