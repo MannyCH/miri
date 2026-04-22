@@ -341,19 +341,14 @@ export const InteractiveRecipeView = () => {
  * the zone buttons (tabIndex controlled by swipe progress).
  */
 export const SwipeGesture = () => {
-  const [pantryStaples, setPantryStaples] = React.useState(new Set());
+  const [pantryStaples, setPantryStaples] = React.useState([]);
   const [groups, setGroups] = React.useState(sampleSmartGroups);
 
   const handlePantryToggle = (itemName) => {
-    setPantryStaples(prev => {
-      const next = new Set(prev);
-      if (next.has(itemName)) {
-        next.delete(itemName);
-      } else {
-        next.add(itemName);
-      }
-      return next;
-    });
+    const lower = itemName?.toLowerCase();
+    setPantryStaples(prev =>
+      prev.includes(lower) ? prev.filter(s => s !== lower) : [...prev, lower]
+    );
   };
 
   const handleItemDelete = (itemName) => {

@@ -43,6 +43,10 @@
   color: var(--color-icon-neutral);
 }
 
+.button--icon-only.button-secondary {
+  border-color: var(--color-stroke-weak);
+}
+
 .button--icon-only.button-tertiary {
   color: var(--color-icon-brand);
 }
@@ -53,6 +57,7 @@
 
 .button--icon-only[aria-pressed="true"] {
   background: var(--color-fill-brand-weak);
+  border-color: var(--color-stroke-selected);
   color: var(--color-icon-brand);
 }
 
