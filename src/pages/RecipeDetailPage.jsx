@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import { usePreferences } from '../context/PreferencesContext';
 import { fetchRecipeById } from '../lib/recipesApi';
 import { convertIngredients, scaleIngredients } from '../lib/unitConverter';
+import { Button } from '../components/Button/Button';
 
 /**
  * Recipe Detail Page
@@ -36,7 +37,7 @@ export function RecipeDetailPage() {
     return (
       <div style={{ padding: 'var(--spacing-32)', textAlign: 'center' }}>
         <h2>Recipe not found</h2>
-        <button onClick={() => navigate('/recipes')}>Back to Recipes</button>
+        <Button variant="secondary" showIcon={false} onClick={() => navigate('/recipes')}>Back to Recipes</Button>
       </div>
     );
   }

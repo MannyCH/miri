@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Plus } from 'react-feather';
 import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
+import { Button } from '../../components/Button/Button';
+import { Chip } from '../../components/Chip';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './RecipesView.css';
 
@@ -49,14 +51,13 @@ export const RecipesView = ({
       <header className="recipes-header">
         <h1 className="text-h1-bold">Recipes</h1>
         {onImportRequest && (
-          <button
-            type="button"
-            className="recipes-import-btn"
-            onClick={onImportRequest}
+          <Button
+            variant="tertiary"
+            iconOnly
+            icon={<Plus size={22} />}
             aria-label="Import recipe"
-          >
-            <Plus size={22} aria-hidden="true" />
-          </button>
+            onClick={onImportRequest}
+          />
         )}
       </header>
 
@@ -65,16 +66,15 @@ export const RecipesView = ({
           {activeFilters.map(value => {
             const filter = availableFilters.find(f => f.value === value);
             return (
-              <button
+              <Chip
                 key={value}
-                type="button"
-                className="recipes-filter-chip recipes-filter-chip--active text-body-small-regular"
+                active
+                showClose
                 onClick={() => onFilterToggle?.(value)}
                 aria-label={`Remove filter: ${filter?.label ?? value}`}
               >
                 {filter?.label ?? value}
-                <span className="recipes-filter-chip-close" aria-hidden="true">×</span>
-              </button>
+              </Chip>
             );
           })}
         </div>
@@ -84,14 +84,11 @@ export const RecipesView = ({
         <RecipeList recipes={recipes} onRecipeClick={onRecipeClick} />
       </div>
 
-      <NavigationBarConnected activeItem="recipes" />
-
-      {/* Search overlay — slides in from top, Cancel always visible above keyboard */}
+      {/* Search overlay — slides down from top, covers the header */}
       {isSearchOpen && (
         <div className="recipes-search-overlay">
           <div className="recipes-search-row">
             <SearchBar
-              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
               inputRef={searchInputRef}
               placeholder="Search recipes..."
@@ -99,29 +96,23 @@ export const RecipesView = ({
               onChange={(e) => onSearchChange?.(e.target.value)}
               showTrailingIcon={false}
             />
-            <button
-              type="button"
-              className="recipes-search-cancel text-body-regular"
-              onClick={handleCancel}
-            >
+            <Button variant="ghost" onClick={handleCancel} style={{ flexShrink: 0 }}>
               Cancel
-            </button>
+            </Button>
           </div>
           {availableFilters.length > 0 && (
             <div className="recipes-filter-chips" role="group" aria-label="Filter recipes">
               {availableFilters.map(filter => {
                 const isActive = activeFilters.includes(filter.value);
                 return (
-                  <button
+                  <Chip
                     key={filter.value}
-                    type="button"
-                    className={`recipes-filter-chip text-body-small-regular${isActive ? ' recipes-filter-chip--active' : ''}`}
+                    active={isActive}
+                    showClose={isActive}
                     onClick={() => onFilterToggle?.(filter.value)}
-                    aria-pressed={isActive}
                   >
                     {filter.label}
-                    {isActive && <span className="recipes-filter-chip-close" aria-hidden="true">×</span>}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
@@ -129,15 +120,20 @@ export const RecipesView = ({
         </div>
       )}
 
-      {/* Floating search trigger — bottom right, above nav bar, always a search icon */}
-      <button
-        type="button"
-        className="recipes-search-fab"
-        onClick={handleFabClick}
-        aria-label="Search recipes"
-      >
-        <SearchIcon />
-      </button>
+      {/* Nav area: FAB is anchored just above the NavigationBar */}
+      <div className="recipes-nav-area">
+        {/* Search FAB — 48×48 pill with elevation; distinct from 32×32 iconOnly Button (see SearchFab story in RecipesView.stories.jsx) */}
+        {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
+        <button
+          type="button"
+          className="recipes-search-fab"
+          onClick={handleFabClick}
+          aria-label="Search recipes"
+        >
+          <SearchIcon />
+        </button>
+        <NavigationBarConnected activeItem="recipes" />
+      </div>
     </div>
   );
 };

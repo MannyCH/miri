@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { AlertTriangle, Check, Circle } from 'react-feather';
 import { Button } from '../../components/Button/Button';
 import { TextField } from '../../components/TextField/TextField';
+import { OtpCodeInput } from '../../components/OtpCodeInput';
 import './AuthModulesView.css';
 
 export default {
@@ -154,11 +155,7 @@ export const VerifyEmailModule = {
       </p>
 
       <form className="auth-modules-form auth-modules-verify-form">
-        <div className="auth-modules-code-group" role="group" aria-label="Verification code">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <input key={index} className="auth-modules-code-input text-body-regular" value="" readOnly />
-          ))}
-        </div>
+        <OtpCodeInput length={6} value="" />
         <div className="auth-modules-verify-actions">
           <Button variant="primary" showIcon={false}>Continue</Button>
           <p className="auth-modules-footer-copy text-body-small-regular">
@@ -190,11 +187,7 @@ export const VerifyEmailSuccess = {
         Account already exists. Please verify your email.
       </p>
       <form className="auth-modules-form auth-modules-verify-form">
-        <div className="auth-modules-code-group" role="group" aria-label="Verification code">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <input key={index} className="auth-modules-code-input text-body-regular" value="4" readOnly />
-          ))}
-        </div>
+        <OtpCodeInput length={6} value="444444" />
         <div className="auth-modules-verify-actions">
           <Button
             variant="primary"
@@ -230,11 +223,7 @@ export const VerifyEmailError = {
         laura@nicelydone.club
       </p>
       <form className="auth-modules-form auth-modules-verify-form">
-        <div className="auth-modules-code-group" role="group" aria-label="Verification code">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <input key={index} className="auth-modules-code-input text-body-regular" value="4" readOnly />
-          ))}
-        </div>
+        <OtpCodeInput length={6} value="444444" error />
         <div className="auth-modules-verify-actions">
           <Button
             variant="primary"

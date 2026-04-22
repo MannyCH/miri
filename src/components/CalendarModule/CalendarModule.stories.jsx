@@ -61,7 +61,7 @@ export const Interactive = () => {
         selectedDay={selected}
         onDayClick={handleDayClick}
       />
-      <p style={{ marginTop: '16px', color: 'var(--color-text-weak)' }}>
+      <p style={{ marginTop: 'var(--spacing-16)', color: 'var(--color-text-weak)' }}>
         Selected: {selected} — Swipe to see more days
       </p>
     </div>

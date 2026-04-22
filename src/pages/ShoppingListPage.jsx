@@ -122,7 +122,6 @@ export function ShoppingListPage() {
     if (shoppingListViewMode === 'smart') {
       fetchSmartGroups();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shoppingListViewMode]);
 
   // Group ingredients by recipe for recipe view mode

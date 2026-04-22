@@ -85,7 +85,7 @@ export const WithValue = {
 
 export const WeightAndHeight = {
   render: () => (
-    <div style={{ display: 'flex', gap: '32px' }}>
+    <div style={{ display: 'flex', gap: 'var(--spacing-32)' }}>
       <UnitFieldWithState label="Weight" unit="kg" />
       <UnitFieldWithState label="Height" unit="cm" />
     </div>

@@ -31,6 +31,36 @@
   opacity: 1;
 }
 
+/* ─── Icon-only ──────────────────────────────────────────────────────────────
+   Square, fixed-size button that shows a single icon with no label.
+   Use with aria-label on the element for accessibility.
+   Pair with any variant: secondary for neutral framed, tertiary-delete for destructive.
+*/
+.button--icon-only {
+  width: var(--spacing-32);
+  height: var(--spacing-32);
+  padding: 0;
+  color: var(--color-icon-neutral);
+}
+
+.button--icon-only.button-secondary {
+  border-color: var(--color-stroke-weak);
+}
+
+.button--icon-only.button-tertiary {
+  color: var(--color-icon-brand);
+}
+
+.button--icon-only.button-tertiary-delete {
+  color: var(--color-icon-error);
+}
+
+.button--icon-only[aria-pressed="true"] {
+  background: var(--color-fill-brand-weak);
+  border-color: var(--color-stroke-selected);
+  color: var(--color-icon-brand);
+}
+
 .button-icon {
   display: flex;
   align-items: center;
@@ -203,6 +233,50 @@
   background: var(--color-fill-hover);
   outline: 2px solid var(--color-stroke-error-strong);
   outline-offset: 2px;
+}
+
+/* ─── Ghost ──────────────────────────────────────────────────────────────────
+   Identical to Tertiary but without the underline decoration.
+   Use for inline cancel/dismiss actions where underline would look out of place
+   (e.g. "Cancel" next to a search bar or URL input).
+   Default  : Transparent, Text/Brand, no border, no underline
+   Hover    : Fill/Hover
+   Pressed  : Fill/Press
+   Focus    : Fill/Hover + Stroke/Focus ring
+*/
+.button-ghost {
+  background: transparent;
+  color: var(--color-text-brand);
+  border: none;
+}
+
+.button-ghost:hover:not([disabled]):not(:disabled) {
+  background: var(--color-fill-hover);
+}
+
+.button-ghost[data-active],
+.button-ghost:active:not([disabled]):not(:disabled) {
+  background: var(--color-fill-press);
+}
+
+.button-ghost:focus-visible,
+.button-ghost[data-focus-visible] {
+  background: var(--color-fill-hover);
+  outline: 2px solid var(--color-stroke-focus);
+  outline-offset: 2px;
+}
+
+.button-ghost[disabled],
+.button-ghost:disabled {
+  background: transparent;
+  color: var(--color-stroke-weak);
+}
+
+/* ─── Full Width ─────────────────────────────────────────────────────────────
+   Makes button fill its parent container width.
+*/
+.button--full-width {
+  width: 100%;
 }
 
 /* ─── Disabled (Figma) ────────────────────────────────────────────────────────

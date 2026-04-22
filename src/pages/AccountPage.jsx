@@ -55,16 +55,13 @@ const slideTransition = { type: 'tween', duration: 0.3, ease: [0.4, 0, 0.2, 1] }
 function SubViewBack({ onBack }) {
   return (
     <div className="account-subview-header">
-      <button
-        type="button"
-        className="account-subview-back-btn"
-        onClick={onBack}
+      <Button
+        variant="tertiary"
+        iconOnly
+        icon={<ChevronLeft size={20} />}
         aria-label="Go back"
-      >
-        <span className="account-subview-back-circle">
-          <ChevronLeft size={20} aria-hidden="true" />
-        </span>
-      </button>
+        onClick={onBack}
+      />
     </div>
   );
 }

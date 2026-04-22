@@ -29,36 +29,6 @@
   color: var(--color-text-strong);
 }
 
-.recipe-import-nav-btn {
-  border: none;
-  background: transparent;
-  color: var(--color-text-brand);
-  font-family: var(--font-family-body);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: var(--spacing-4) 0;
-  min-width: 64px;
-}
-
-.recipe-import-nav-btn:first-child {
-  text-align: left;
-}
-
-.recipe-import-nav-btn:last-child {
-  text-align: right;
-}
-
-.recipe-import-nav-btn:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-  border-radius: var(--corner-radius-4);
-}
-
-.recipe-import-save-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
 
 /* ── Scrollable content ──────────────────────────────────────────────── */
 
@@ -198,10 +168,6 @@
   margin-top: var(--spacing-4);
 }
 
-.recipe-import-direction-item .recipe-import-remove-btn {
-  align-self: center;
-  margin-top: 0;
-}
 
 /* ── Input / Textarea ────────────────────────────────────────────────── */
 
@@ -234,46 +200,6 @@
 
 /* ── Buttons ─────────────────────────────────────────────────────────── */
 
-.recipe-import-remove-btn {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--color-text-weak);
-  cursor: pointer;
-  border-radius: var(--corner-radius-4);
-  padding: 0;
-}
-
-.recipe-import-remove-btn:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-}
-
-.recipe-import-add-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-4);
-  border: none;
-  background: transparent;
-  color: var(--color-text-brand);
-  font-family: var(--font-family-body);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: var(--spacing-4) 0;
-  align-self: flex-start;
-}
-
-.recipe-import-add-btn:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
-  border-radius: var(--corner-radius-4);
-}
 
 /* ── Ingredient rows ─────────────────────────────────────────────────── */
 

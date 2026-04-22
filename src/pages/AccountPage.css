@@ -1,3 +1,10 @@
+/* TEST: deliberate drift to trigger linters */
+.account-page-test-drift {
+  color: #ff0000;
+  padding: 16px;
+  border-radius: 8px;
+}
+
 .account-page {
   display: flex;
   flex-direction: column;
@@ -64,26 +71,6 @@
   align-items: center;
 }
 
-.account-subview-back-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.account-subview-back-circle {
-  width: var(--spacing-32);
-  height: var(--spacing-32);
-  border-radius: 50%;
-  background: var(--color-fill-brand-weak);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-icon-brand);
-}
 
 .account-subview-body {
   display: flex;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { RotateCcw } from 'react-feather';
 import { Button } from './Button';
 
 export default {
@@ -18,6 +19,7 @@ Built with Base UI for full accessibility (keyboard navigation, focus management
 - Second option alongside a destructive or dominant primary (e.g. "Delete" + "Cancel") → \`secondary\`
 - Dismiss, cancel, or low-commitment inline action → \`tertiary\`
 - Low-emphasis destructive action (leave group, unlink, remove) → \`tertiary-delete\`
+- Inline cancel next to a search bar or input where underline would look out of place → \`ghost\`
 
 ## When NOT to use
 - Don't use \`tertiary-delete\` for Cancel — use \`tertiary\` (cancel is not destructive)
@@ -70,8 +72,8 @@ Built with Base UI for full accessibility (keyboard navigation, focus management
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'tertiary-delete'],
-      description: 'Visual variant matching Figma Property 1. `primary` — dominant CTA, filled brand colour. `secondary` — outlined, equal-weight alternative action. `tertiary` — low-emphasis inline action (underlined, no border). `tertiary-delete` — same weight as tertiary but signals irreversible/destructive intent via error colour.',
+      options: ['primary', 'secondary', 'tertiary', 'tertiary-delete', 'ghost'],
+      description: 'Visual variant matching Figma Property 1. `primary` — dominant CTA, filled brand colour. `secondary` — outlined, equal-weight alternative action. `tertiary` — low-emphasis inline action (underlined, no border). `tertiary-delete` — same weight as tertiary but signals irreversible/destructive intent via error colour. `ghost` — neutral-bordered cancel/dismiss button.',
       table: {
         type: { summary: 'string' },
         defaultValue: { summary: 'primary' },
@@ -100,6 +102,19 @@ const HeartIcon = () => (
   </svg>
 );
 
+const TrashIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+  </svg>
+);
+
+const MoreIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+  </svg>
+);
+
+
 // ─── Single variant stories ───────────────────────────────────────────────────
 
 export const Primary = {
@@ -116,6 +131,17 @@ export const Tertiary = {
 
 export const TertiaryDelete = {
   args: { variant: 'tertiary-delete', children: 'Label', showIcon: false },
+};
+
+export const Ghost = {
+  args: { variant: 'ghost', children: 'Cancel', showIcon: false },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Like `tertiary` but without the underline decoration. Use for inline cancel/dismiss actions where an underline would look out of place — e.g. "Cancel" next to a search bar or URL input field.',
+      },
+    },
+  },
 };
 
 export const Disabled = {
@@ -269,4 +295,134 @@ Includes Disabled state with weak token mapping and full opacity.
       </div>
     );
   },
+};
+
+// ─── Icon-only variants ───────────────────────────────────────────────────────
+
+const labelStyle = { color: 'var(--color-text-weak)', textAlign: 'center' };
+
+export const IconButtonFramed = {
+  name: 'Icon Button — Framed (secondary)',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**\`variant="secondary"\` + \`iconOnly\`** — neutral-bordered icon button for actions like menus and view toggles.
+
+Default icon color is \`--color-icon-neutral\` (muted). Use \`aria-pressed\` to show selected state:
+pressed shows \`--color-icon-brand\` + \`--color-fill-brand-weak\` background.
+        `,
+      },
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-16)', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" />
+        <span className="text-body-small-regular" style={labelStyle}>Default</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-pressed={true} aria-label="More options (active)" />
+        <span className="text-body-small-regular" style={labelStyle}>aria-pressed (toggle active)</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" disabled />
+        <span className="text-body-small-regular" style={labelStyle}>Disabled</span>
+      </div>
+    </div>
+  ),
+};
+
+export const IconButtonToggle = {
+  name: 'Icon Button — Toggle (aria-pressed)',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Toggle group using \`variant="secondary"\` + \`iconOnly\` + \`aria-pressed\`.
+
+Same component as the framed icon button — \`aria-pressed\` drives both the visual state and the screen-reader announcement ("toggle button, pressed / not pressed"). Only one option is active at a time.
+
+Used in ShoppingListView for the recipe-grouped / smart-grouped view switcher.
+        `,
+      },
+    },
+  },
+  render: () => {
+    const [active, setActive] = React.useState('grid');
+    return (
+      <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
+        <Button
+          variant="secondary"
+          iconOnly
+          icon={<HeartIcon />}
+          aria-pressed={active === 'grid'}
+          aria-label="Grid view"
+          onClick={() => setActive('grid')}
+        />
+        <Button
+          variant="secondary"
+          iconOnly
+          icon={<MoreIcon />}
+          aria-pressed={active === 'list'}
+          aria-label="List view"
+          onClick={() => setActive('list')}
+        />
+      </div>
+    );
+  },
+};
+
+export const IconButtonRestore = {
+  name: 'Icon Button — Restore (tertiary)',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**\`variant="tertiary"\` + \`iconOnly\`** — borderless icon button for low-emphasis actions like restore or undo.
+
+Icon color is \`--color-icon-brand\`. No border.
+        `,
+      },
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-16)', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary" iconOnly icon={<RotateCcw size={20} />} aria-label="Restore" />
+        <span className="text-body-small-regular" style={labelStyle}>Default</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary" iconOnly icon={<RotateCcw size={20} />} aria-label="Restore" disabled />
+        <span className="text-body-small-regular" style={labelStyle}>Disabled</span>
+      </div>
+    </div>
+  ),
+};
+
+export const IconButtonDelete = {
+  name: 'Icon Button — Delete (tertiary-delete)',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**\`variant="tertiary-delete"\` + \`iconOnly\`** — borderless destructive icon button for delete actions.
+
+Icon color is \`--color-icon-error\`. No border.
+        `,
+      },
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-16)', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" />
+        <span className="text-body-small-regular" style={labelStyle}>Default</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" disabled />
+        <span className="text-body-small-regular" style={labelStyle}>Disabled</span>
+      </div>
+    </div>
+  ),
 };

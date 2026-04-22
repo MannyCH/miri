@@ -1,4 +1,5 @@
 import React from 'react';
+import { RotateCcw, ShoppingCart } from 'react-feather';
 import { CalendarModule } from '../../components/CalendarModule';
 import { Button } from '../../components/Button';
 import { RecipeListItem } from '../../components/RecipeListItem';
@@ -119,17 +120,21 @@ const MealSection = ({ label, meal, onAddToList, onRecipeClick, isReplacing, onR
         {label}
       </h3>
       <div className="meal-actions">
-        <button
-          className="icon-button"
+        <Button
+          variant="secondary"
+          iconOnly
+          icon={isReplacing ? <SpinnerIcon /> : <RotateCcw size={20} />}
           aria-label={`Refresh ${label.toLowerCase()}`}
           onClick={onReplace}
           disabled={isReplacing}
-        >
-          {isReplacing ? <SpinnerIcon /> : <RefreshIcon />}
-        </button>
-        <button className="icon-button" aria-label={`Add ${label.toLowerCase()} to list`} onClick={onAddToList}>
-          <ShoppingCartIcon />
-        </button>
+        />
+        <Button
+          variant="secondary"
+          iconOnly
+          icon={<ShoppingCart size={20} />}
+          aria-label={`Add ${label.toLowerCase()} to list`}
+          onClick={onAddToList}
+        />
       </div>
     </div>
     <Divider />
@@ -145,21 +150,6 @@ const MealSection = ({ label, meal, onAddToList, onRecipeClick, isReplacing, onR
   </>
 );
 
-const RefreshIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <polyline points="23 4 23 10 17 10"/>
-    <polyline points="1 20 1 14 7 14"/>
-    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-  </svg>
-);
-
-const ShoppingCartIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="9" cy="21" r="1"/>
-    <circle cx="20" cy="21" r="1"/>
-    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-  </svg>
-);
 
 const SpinnerIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>

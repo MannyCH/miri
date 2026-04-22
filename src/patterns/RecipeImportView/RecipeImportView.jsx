@@ -1,5 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { X, Plus } from 'react-feather';
 import { Badge } from '../../components/Badge';
+import { Button } from '../../components/Button/Button';
 import { Stepper } from '../../components/Stepper/Stepper';
 import './RecipeImportView.css';
 
@@ -201,18 +203,18 @@ export const RecipeImportView = ({
     >
       {/* ── Fixed header ─────────────────────────────────────────────── */}
       <header className="recipe-import-header">
-        <button type="button" className="recipe-import-nav-btn" onClick={onCancel}>
+        <Button variant="ghost" onClick={onCancel} style={{ minWidth: 64, justifyContent: 'flex-start' }}>
           Cancel
-        </button>
+        </Button>
         <span className="recipe-import-header-title text-body-bold">Import Recipe</span>
-        <button
-          type="button"
-          className="recipe-import-nav-btn recipe-import-save-btn"
+        <Button
+          variant="ghost"
           onClick={handleSave}
           disabled={!title.trim() || isSaving}
+          style={{ minWidth: 64, justifyContent: 'flex-end' }}
         >
           {isSaving ? 'Saving…' : 'Save'}
-        </button>
+        </Button>
       </header>
 
       {/* ── Scrollable content ───────────────────────────────────────── */}
@@ -231,13 +233,8 @@ export const RecipeImportView = ({
           onClick={() => fileInputRef.current?.click()}
           onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="recipe-import-file-input"
-            onChange={(e) => handleImageFile(e.target.files?.[0])}
-          />
+          {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
+          <input ref={fileInputRef} type="file" accept="image/*" className="recipe-import-file-input" onChange={(e) => handleImageFile(e.target.files?.[0])} />
           {imagePreviewUrl ? (
             <img src={imagePreviewUrl} alt="Recipe preview" className="recipe-import-image-preview" />
           ) : (
@@ -269,36 +266,24 @@ export const RecipeImportView = ({
           <ul className="recipe-import-list">
             {ingredients.map((ingredient, i) => (
               <li key={i} className="recipe-import-ingredient-row">
-                <input
-                  type="text"
-                  value={ingredient.quantity}
-                  onChange={(e) => updateIngredientQuantity(i, e.target.value)}
-                  placeholder="Qty"
-                  className="recipe-import-field recipe-import-ingredient-quantity text-body-regular"
-                  aria-label={`Quantity for ingredient ${i + 1}`}
-                />
-                <input
-                  type="text"
-                  value={ingredient.name}
-                  onChange={(e) => updateIngredientName(i, e.target.value)}
-                  placeholder="Ingredient name"
-                  className="recipe-import-field recipe-import-ingredient-name text-body-regular"
-                  aria-label={`Ingredient ${i + 1} name`}
-                />
-                <button
-                  type="button"
-                  className="recipe-import-remove-btn"
+                {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
+                <input type="text" value={ingredient.quantity} onChange={(e) => updateIngredientQuantity(i, e.target.value)} placeholder="Qty" className="recipe-import-field recipe-import-ingredient-quantity text-body-regular" aria-label={`Quantity for ingredient ${i + 1}`} />
+                {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
+                <input type="text" value={ingredient.name} onChange={(e) => updateIngredientName(i, e.target.value)} placeholder="Ingredient name" className="recipe-import-field recipe-import-ingredient-name text-body-regular" aria-label={`Ingredient ${i + 1} name`} />
+                <Button
+                  variant="tertiary-delete"
+                  iconOnly
+                  icon={<X size={16} />}
                   onClick={() => removeIngredient(i)}
                   aria-label={`Remove ingredient ${i + 1}`}
-                >
-                  <RemoveIcon />
-                </button>
+                  style={{ flexShrink: 0 }}
+                />
               </li>
             ))}
           </ul>
-          <button type="button" className="recipe-import-add-btn" onClick={addIngredient}>
-            <AddIcon /> Add ingredient
-          </button>
+          <Button variant="tertiary" icon={<Plus size={16} />} showIcon onClick={addIngredient}>
+            Add ingredient
+          </Button>
         </div>
 
         {/* Directions */}
@@ -320,20 +305,20 @@ export const RecipeImportView = ({
                   rows={1}
                   aria-label={`Direction step ${i + 1}`}
                 />
-                <button
-                  type="button"
-                  className="recipe-import-remove-btn"
+                <Button
+                  variant="tertiary-delete"
+                  iconOnly
+                  icon={<X size={16} />}
                   onClick={() => removeDirection(i)}
                   aria-label={`Remove step ${i + 1}`}
-                >
-                  <RemoveIcon />
-                </button>
+                  style={{ flexShrink: 0, alignSelf: 'center' }}
+                />
               </li>
             ))}
           </ol>
-          <button type="button" className="recipe-import-add-btn" onClick={addDirection}>
-            <AddIcon /> Add step
-          </button>
+          <Button variant="tertiary" icon={<Plus size={16} />} showIcon onClick={addDirection}>
+            Add step
+          </Button>
         </div>
 
         {/* Servings */}
@@ -345,7 +330,6 @@ export const RecipeImportView = ({
         {/* Categories */}
         <div className="recipe-import-section">
           <h2 className="text-tiny-bold recipe-import-section-title">CATEGORIES</h2>
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
           <div
             className="recipe-import-categories-field"
             onClick={() => categoryInputRef.current?.focus()}
@@ -355,16 +339,13 @@ export const RecipeImportView = ({
             {categories.map((cat, i) => (
               <span key={cat} className="recipe-import-category-chip">
                 <span className="text-body-small-regular recipe-import-category-chip-label">{cat}</span>
-                <button
-                  type="button"
-                  className="recipe-import-category-chip-remove"
-                  onClick={(e) => { e.stopPropagation(); removeCategory(i); }}
-                  aria-label={`Remove category ${cat}`}
-                >
-                  <RemoveIcon />
+                {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
+                <button type="button" className="recipe-import-category-chip-remove" onClick={(e) => { e.stopPropagation(); removeCategory(i); }} aria-label={`Remove category ${cat}`}>
+                  <X size={12} aria-hidden="true" />
                 </button>
               </span>
             ))}
+            {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
             <input
               ref={categoryInputRef}
               type="text"
@@ -391,19 +372,6 @@ const CameraIcon = () => (
   </svg>
 );
 
-const RemoveIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-    <line x1="18" y1="6" x2="6" y2="18"/>
-    <line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-);
-
-const AddIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-    <line x1="12" y1="5" x2="12" y2="19"/>
-    <line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>
-);
 
 
 RecipeImportView.displayName = 'RecipeImportView';

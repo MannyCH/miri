@@ -42,57 +42,128 @@ jobs:
             echo "pages_changed=false" >> $GITHUB_OUTPUT
           fi
 
-  design-system-propagation:
-    name: Design system propagation check
+  lint:
+    name: Lint check (stylelint + eslint)
     needs: detect-changes
-    if: needs.detect-changes.outputs.components_changed == 'true' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
+          node-version: 20
+          cache: npm
+      - run: npm ci
 
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          mcp_config: |
-            {
-              "mcpServers": {
-                "notion": {
-                  "command": "npx",
-                  "args": ["-y", "@notionhq/notion-mcp-server"],
-                  "env": {
-                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
-                  }
-                }
+      - name: Stylelint (CSS token drift)
+        run: npx stylelint 'src/**/*.css' --formatter json > stylelint-results.json || true
+
+      - name: ESLint (inline styles + bypassed components)
+        run: npx eslint src/ --format json > eslint-results.json || true
+
+      - name: Post lint findings to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+          const cwd = process.cwd() + '/';
+
+          let stylelintErrors = [];
+          try {
+            const data = JSON.parse(fs.readFileSync('stylelint-results.json', 'utf8'));
+            data.forEach(f => f.warnings.forEach(w => stylelintErrors.push({
+              file: f.source.replace(cwd, ''),
+              line: w.line,
+              property: (w.text.match(/property "([^"]+)"/) || [])[1] || '',
+              value: (w.text.match(/value "([^"]+)"/) || [])[1] || w.text,
+            })));
+          } catch(e) {}
+
+          let eslintErrors = [];
+          try {
+            const data = JSON.parse(fs.readFileSync('eslint-results.json', 'utf8'));
+            data.forEach(f => f.messages.forEach(m => eslintErrors.push({
+              file: f.filePath.replace(cwd, ''),
+              line: m.line,
+              rule: (m.ruleId || '').replace('design-system/', ''),
+              message: m.message,
+            })));
+          } catch(e) {}
+
+          if (stylelintErrors.length === 0 && eslintErrors.length === 0) {
+            fs.writeFileSync('lint-comment.md', '## ✅ Lint passed\nNo token drift or component misuse found.');
+          } else {
+            let md = '## 🔍 Lint Report\n\n';
+
+            if (stylelintErrors.length > 0) {
+              md += '### Token drift (stylelint)\n';
+              md += '| File | Line | Property | Hardcoded value |\n';
+              md += '|------|------|----------|----------------|\n';
+              stylelintErrors.forEach(e => {
+                md += `| \`${e.file}\` | ${e.line} | \`${e.property}\` | \`${e.value}\` |\n`;
+              });
+              md += '\n';
+            }
+
+            if (eslintErrors.length > 0) {
+              const byRule = {};
+              eslintErrors.forEach(e => { (byRule[e.rule] = byRule[e.rule] || []).push(e); });
+
+              if (byRule['no-hardcoded-style-values']) {
+                md += '### Hardcoded inline styles (ESLint)\n';
+                md += '| File | Line | Issue |\n|------|------|-------|\n';
+                byRule['no-hardcoded-style-values'].forEach(e => {
+                  md += `| \`${e.file}\` | ${e.line} | \`${e.message}\` |\n`;
+                });
+                md += '\n';
+              }
+
+              if (byRule['no-native-interactive-elements']) {
+                md += '### Bypassed design system components (ESLint)\n';
+                md += '| File | Line | Found | Use instead |\n|------|------|-------|------------|\n';
+                byRule['no-native-interactive-elements'].forEach(e => {
+                  const native = (e.message.match(/native <([^>]+)>/) || [])[1] || '';
+                  const replacement = (e.message.match(/<([^>]+)> from src/) || [])[1] || '';
+                  md += `| \`${e.file}\` | ${e.line} | \`<${native}>\` | \`<${replacement}>\` |\n`;
+                });
+                md += '\n';
+              }
+
+              const other = eslintErrors.filter(e => !['no-hardcoded-style-values','no-native-interactive-elements'].includes(e.rule));
+              if (other.length > 0) {
+                md += '### Other ESLint errors\n';
+                md += '| File | Line | Rule | Issue |\n|------|------|------|-------|\n';
+                other.forEach(e => { md += `| \`${e.file}\` | ${e.line} | \`${e.rule}\` | ${e.message} |\n`; });
+                md += '\n';
               }
             }
-          prompt: |
-            You are running the design-system-propagation agent for PR #${{ github.event.pull_request.number }} in the MannyCH/miri repo.
 
-            The PR changed files in src/components/ or .stories.jsx files.
+            const total = stylelintErrors.length + eslintErrors.length;
+            md += `**${stylelintErrors.length} stylelint · ${eslintErrors.length} ESLint — ${total} error${total !== 1 ? 's' : ''} total**\n`;
+            fs.writeFileSync('lint-comment.md', md);
+          }
+          EOF
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file lint-comment.md
 
-            Changed files in this PR:
-            $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+      - name: Fail if linters found errors
+        run: |
+          node -e "
+          const fs = require('fs');
+          let total = 0;
+          try { total += JSON.parse(fs.readFileSync('stylelint-results.json')).reduce((s,f) => s + f.warnings.length, 0); } catch(e) {}
+          try { total += JSON.parse(fs.readFileSync('eslint-results.json')).reduce((s,f) => s + f.messages.length, 0); } catch(e) {}
+          if (total > 0) { console.log(total + ' lint error(s) found'); process.exit(1); }
+          "
 
-            Your tasks:
-            1. For each changed component, read its .stories.jsx to understand valid props and variants.
-            2. Scan ALL files in src/pages/ and src/patterns/ that import those components.
-            3. Check for: invalid prop values, removed props still being passed, hardcoded CSS values (hex colors, px spacing, px radius) instead of var(--...) tokens.
-            4. Flag any new component (no prior git history) that likely has no Figma counterpart — mark it as "requires local Figma parity check".
-            5. Post your findings as a PR comment on PR #${{ github.event.pull_request.number }} in MannyCH/miri.
-
-            Format your comment exactly as described in .claude/agents/design-system-propagation.md.
-            Report only — do not modify any files.
-
-  orchestrate:
-    name: Orchestrate fixes and cards
-    needs: [detect-changes, consumer-drift, design-system-propagation]
-    if: always() && (needs.detect-changes.outputs.pages_changed == 'true' || needs.detect-changes.outputs.components_changed == 'true')
+  lint-fixer:
+    name: Fix lint issues
+    needs: [detect-changes, lint]
+    if: always() && needs.lint.result == 'failure'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -114,7 +185,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          allowed_tools: "Bash,Read,Edit,Write,Glob,Grep,mcp__notion__API-post-page,mcp__notion__API-post-search,mcp__notion__API-query-data-source,mcp__github__add_issue_comment,mcp__github__get_file_contents"
+          allowed_tools: "Bash,Read,Edit,Glob,Grep,mcp__github__add_issue_comment,mcp__github__get_file_contents,mcp__notion__API-post-page"
           mcp_config: |
             {
               "mcpServers": {
@@ -128,28 +199,20 @@ jobs:
               }
             }
           prompt: |
-            You are running the orchestrator agent for PR #${{ github.event.pull_request.number }} in MannyCH/miri.
-
-            PR branch: ${{ github.event.pull_request.head.ref }}
-            PR type: ${{ startsWith(github.event.pull_request.head.ref, 'fix/batch-') && 'fix' || 'feature' }}
-
-            The consumer-drift and design-system-propagation agents have finished running.
-
-            If PR type is "fix": verify only that the specific changes in this PR are correct. Do not scan for new drift elsewhere.
-            If PR type is "feature": read the agent reports and decide what to fix directly vs create Notion cards for.
-
-            Your job is to read the PR comments from those agents, then act.
+            You are the lint-fixer agent for PR #${{ github.event.pull_request.number }} in MannyCH/miri.
 
             PR branch: ${{ github.event.pull_request.head.ref }}
 
-            Follow the full instructions in .claude/agents/orchestrator.md
+            The lint job just failed. Read the lint report PR comment and fix the issues directly on this branch.
+
+            Follow the full instructions in .claude/agents/lint-fixer.md
 
             Notion Kanban board data source ID: 97dac060-1abe-825e-bcb7-87906de2939a
 
   consumer-drift:
     name: Consumer drift check
-    needs: detect-changes
-    if: needs.detect-changes.outputs.pages_changed == 'true'
+    needs: [detect-changes, lint]
+    if: needs.detect-changes.outputs.pages_changed == 'true' && needs.lint.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -183,11 +246,45 @@ jobs:
             Changed files in this PR:
             $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
 
-            Your tasks:
-            1. Read each changed page/pattern file.
-            2. For every design system component used (Button, TextField, SearchBar, Divider, Toast, AvatarRow, Badge, etc.), read its .stories.jsx in src/components/ to find valid props.
-            3. Check for: invalid/invented prop values, hardcoded hex colors or px values that should be design tokens, raw HTML elements that have a component equivalent.
-            4. Post your findings as a PR comment on PR #${{ github.event.pull_request.number }} in MannyCH/miri.
+            Follow the full instructions in .claude/agents/consumer-drift.md.
+            Report only — do not modify any files.
 
-            Format your comment exactly as described in .claude/agents/consumer-drift.md.
+  design-system-propagation:
+    name: Design system propagation check
+    needs: [detect-changes, lint]
+    if: needs.detect-changes.outputs.components_changed == 'true' && needs.lint.result == 'success' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the design-system-propagation agent for PR #${{ github.event.pull_request.number }} in the MannyCH/miri repo.
+
+            The PR changed files in src/components/ or .stories.jsx files.
+
+            Changed files in this PR:
+            $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+
+            Follow the full instructions in .claude/agents/design-system-propagation.md.
             Report only — do not modify any files.

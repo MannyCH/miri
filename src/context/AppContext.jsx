@@ -62,8 +62,6 @@ export function AppProvider({ children }) {
     } catch {
       localStorage.removeItem(MEAL_PLAN_KEY);
     }
-  // Only run once after recipes first load — not on every recipe change
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userRecipes.length > 0]);
 
   const addUserRecipe = useCallback((recipe) => {
