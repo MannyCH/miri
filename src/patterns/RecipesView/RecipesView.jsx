@@ -89,7 +89,6 @@ export const RecipesView = ({
         <div className="recipes-search-overlay">
           <div className="recipes-search-row">
             <SearchBar
-              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
               inputRef={searchInputRef}
               placeholder="Search recipes..."

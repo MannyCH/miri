@@ -330,7 +330,6 @@ export const RecipeImportView = ({
         {/* Categories */}
         <div className="recipe-import-section">
           <h2 className="text-tiny-bold recipe-import-section-title">CATEGORIES</h2>
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
           <div
             className="recipe-import-categories-field"
             onClick={() => categoryInputRef.current?.focus()}
