@@ -607,7 +607,7 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
         style={{ '--left-swipe-progress': leftProgress, '--right-swipe-progress': rightProgress }}
       >
         {/* Pantry zone — sits on the LEFT, revealed by swiping RIGHT */}
-        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- swipe-zone action button; gesture-revealed pattern has no design system equivalent */}
+        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- swipe-zone: position:absolute, full-height, 120px wide; incompatible with Button. Pattern documented in Patterns/ShoppingListView/SwipeGesture story */}
         <button
           type="button"
           className="smart-list-item-pantry-zone"
@@ -619,7 +619,7 @@ function SmartListItem({ item, checked, isPantry, onToggle, onTogglePantryStaple
         </button>
 
         {/* Delete zone — sits on the RIGHT, revealed by swiping LEFT */}
-        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- swipe-zone action button; gesture-revealed pattern has no design system equivalent */}
+        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- swipe-zone: position:absolute, full-height, 120px wide; incompatible with Button. Pattern documented in Patterns/ShoppingListView/SwipeGesture story */}
         <button
           type="button"
           className="smart-list-item-delete-zone"
