@@ -145,6 +145,7 @@ Border: \`1px solid --color-stroke-weak\`
   },
   render: () => (
     <div style={{ position: 'relative', width: '100%', maxWidth: '390px' }}>
+      {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
       <button
         type="button"
         className="recipes-search-fab"
