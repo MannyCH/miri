@@ -194,22 +194,22 @@ export const ShoppingListView = ({
           </div>
           <div className="shopping-list-subtitle-right">
             <div className="shopping-list-view-toggle">
-              {/* eslint-disable design-system/no-native-interactive-elements -- icon-only toggle buttons; no icon-button variant exists in design system yet */}
-              <button
-                className={`view-toggle-button ${viewMode === 'recipe' ? 'active' : ''}`}
+              <Button
+                variant="secondary"
+                iconOnly
+                icon={<GridIcon />}
+                aria-pressed={viewMode === 'recipe'}
                 onClick={() => onViewModeChange?.('recipe')}
                 aria-label="Group by recipe"
-              >
-                <GridIcon />
-              </button>
-              <button
-                className={`view-toggle-button ${viewMode === 'smart' ? 'active' : ''}`}
+              />
+              <Button
+                variant="secondary"
+                iconOnly
+                icon={<SparkleIcon />}
+                aria-pressed={viewMode === 'smart'}
                 onClick={() => onViewModeChange?.('smart')}
                 aria-label="Smart grouped list"
-              >
-                <SparkleIcon />
-              </button>
-              {/* eslint-enable design-system/no-native-interactive-elements */}
+              />
             </div>
             {onMenuTap && (
               <Button

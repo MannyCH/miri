@@ -315,6 +315,28 @@ Use \`tertiary\` for low-emphasis icon buttons (e.g. restore, undo).
   ),
 };
 
+export const IconButtonPressed = {
+  name: 'Icon Button — Pressed (toggle)',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Toggle state via \`aria-pressed\`. When \`aria-pressed={true}\`, the button shows the brand-weak active fill.
+Screen readers announce it as "toggle button, pressed" automatically — no extra label needed.
+
+Use for mutually exclusive view switches or any icon button with an on/off state.
+        `,
+      },
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+      <Button variant="secondary" iconOnly icon={<HeartIcon />} aria-pressed={true} aria-label="Favourites (active)" />
+      <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-pressed={false} aria-label="More options (inactive)" />
+    </div>
+  ),
+};
+
 export const IconButtonDisabled = {
   name: 'Icon Button — Disabled',
   parameters: {
