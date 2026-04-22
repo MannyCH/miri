@@ -40,6 +40,15 @@
   width: var(--spacing-32);
   height: var(--spacing-32);
   padding: 0;
+  color: var(--color-icon-neutral);
+}
+
+.button--icon-only.button-tertiary {
+  color: var(--color-icon-brand);
+}
+
+.button--icon-only.button-tertiary-delete {
+  color: var(--color-icon-error);
 }
 
 .button--icon-only[aria-pressed="true"] {

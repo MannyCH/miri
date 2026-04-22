@@ -1,4 +1,5 @@
 import React from 'react';
+import { RotateCcw } from 'react-feather';
 import { Button } from './Button';
 
 export default {
@@ -112,11 +113,6 @@ const MoreIcon = () => (
   </svg>
 );
 
-const RestoreIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.2"/>
-  </svg>
-);
 
 // ─── Single variant stories ───────────────────────────────────────────────────
 
@@ -289,68 +285,92 @@ Includes Disabled state with weak token mapping and full opacity.
   },
 };
 
-// ─── Icon-only variant ────────────────────────────────────────────────────────
+// ─── Icon-only variants ───────────────────────────────────────────────────────
 
-export const IconButton = {
-  name: 'Icon Button',
+const labelStyle = { color: 'var(--color-text-weak)', textAlign: 'center' };
+
+export const IconButtonFramed = {
+  name: 'Icon Button — Framed (secondary)',
   parameters: {
     docs: {
       description: {
         story: `
-Icon-only button using \`iconOnly={true}\`. Always provide \`aria-label\` — there is no visible text.
+**\`variant="secondary"\` + \`iconOnly\`** — neutral-bordered icon button for actions like menus and view toggles.
 
-Use \`secondary\` for neutral framed icon buttons (e.g. menu, view toggles).
-Use \`tertiary-delete\` for destructive icon buttons (e.g. delete a row).
-Use \`tertiary\` for low-emphasis icon buttons (e.g. restore, undo).
+Default icon color is \`--color-icon-neutral\` (muted). Use \`aria-pressed\` to show selected state:
+pressed shows \`--color-icon-brand\` + \`--color-fill-brand-weak\` background.
         `,
       },
     },
   },
   render: () => (
-    <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center', flexWrap: 'wrap' }}>
-      <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" />
-      <Button variant="tertiary" iconOnly icon={<RestoreIcon />} aria-label="Restore" />
-      <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-16)', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" />
+        <span className="text-body-small-regular" style={labelStyle}>Default</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-pressed={true} aria-label="More options (active)" />
+        <span className="text-body-small-regular" style={labelStyle}>aria-pressed (toggle active)</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" disabled />
+        <span className="text-body-small-regular" style={labelStyle}>Disabled</span>
+      </div>
     </div>
   ),
 };
 
-export const IconButtonPressed = {
-  name: 'Icon Button — Pressed (toggle)',
+export const IconButtonRestore = {
+  name: 'Icon Button — Restore (tertiary)',
   parameters: {
     docs: {
       description: {
         story: `
-Toggle state via \`aria-pressed\`. When \`aria-pressed={true}\`, the button shows the brand-weak active fill.
-Screen readers announce it as "toggle button, pressed" automatically — no extra label needed.
+**\`variant="tertiary"\` + \`iconOnly\`** — borderless icon button for low-emphasis actions like restore or undo.
 
-Use for mutually exclusive view switches or any icon button with an on/off state.
+Icon color is \`--color-icon-brand\`. No border.
         `,
       },
     },
   },
   render: () => (
-    <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
-      <Button variant="secondary" iconOnly icon={<HeartIcon />} aria-pressed={true} aria-label="Favourites (active)" />
-      <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-pressed={false} aria-label="More options (inactive)" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-16)', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary" iconOnly icon={<RotateCcw size={20} />} aria-label="Restore" />
+        <span className="text-body-small-regular" style={labelStyle}>Default</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary" iconOnly icon={<RotateCcw size={20} />} aria-label="Restore" disabled />
+        <span className="text-body-small-regular" style={labelStyle}>Disabled</span>
+      </div>
     </div>
   ),
 };
 
-export const IconButtonDisabled = {
-  name: 'Icon Button — Disabled',
+export const IconButtonDelete = {
+  name: 'Icon Button — Delete (tertiary-delete)',
   parameters: {
     docs: {
       description: {
-        story: 'Disabled state applies to all icon-only variants.',
+        story: `
+**\`variant="tertiary-delete"\` + \`iconOnly\`** — borderless destructive icon button for delete actions.
+
+Icon color is \`--color-icon-error\`. No border.
+        `,
       },
     },
   },
   render: () => (
-    <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center', flexWrap: 'wrap' }}>
-      <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" disabled />
-      <Button variant="tertiary" iconOnly icon={<RestoreIcon />} aria-label="Restore" disabled />
-      <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" disabled />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-16)', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" />
+        <span className="text-body-small-regular" style={labelStyle}>Default</span>
+      </div>
+      <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center' }}>
+        <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" disabled />
+        <span className="text-body-small-regular" style={labelStyle}>Disabled</span>
+      </div>
     </div>
   ),
 };
