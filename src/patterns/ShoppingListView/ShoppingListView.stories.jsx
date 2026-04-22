@@ -325,3 +325,68 @@ export const InteractiveRecipeView = () => {
     />
   );
 };
+
+/**
+ * Swipe-gesture pattern — swipe RIGHT to toggle pantry staple, swipe LEFT to delete.
+ * Each SmartListItem is an independent swipe target.
+ *
+ * Swipe mechanics:
+ * - Touch/pointer drag reveals a coloured action zone behind the row.
+ * - Dragging past the threshold (≥ 60px) auto-commits the action on release.
+ * - Dragging below the threshold snaps the row back to rest.
+ * - Zone buttons are keyboard-accessible via tabIndex (only focusable when zone is open).
+ *
+ * Use this pattern when destructive or toggling actions should be available per-item
+ * without cluttering the row with visible buttons. Always provide keyboard access via
+ * the zone buttons (tabIndex controlled by swipe progress).
+ */
+export const SwipeGesture = () => {
+  const [pantryStaples, setPantryStaples] = React.useState(new Set());
+  const [groups, setGroups] = React.useState(sampleSmartGroups);
+
+  const handlePantryToggle = (itemName) => {
+    setPantryStaples(prev => {
+      const next = new Set(prev);
+      if (next.has(itemName)) {
+        next.delete(itemName);
+      } else {
+        next.add(itemName);
+      }
+      return next;
+    });
+  };
+
+  const handleItemDelete = (itemName) => {
+    setGroups(prev => prev
+      .map(g => ({ ...g, items: g.items.filter(i => i.name !== itemName) }))
+      .filter(g => g.items.length > 0)
+    );
+  };
+
+  return (
+    <ShoppingListView
+      viewMode="smart"
+      smartGroups={groups}
+      smartStatus="idle"
+      checkedItems={{}}
+      pantryStaples={pantryStaples}
+      onTogglePantryStaple={handlePantryToggle}
+      onSmartItemDelete={handleItemDelete}
+      onSmartRefresh={() => setGroups(sampleSmartGroups)}
+    />
+  );
+};
+
+SwipeGesture.parameters = {
+  docs: {
+    description: {
+      story: `
+Swipe-gesture interaction on smart list items. **Swipe right** to mark/unmark a pantry staple (green zone). **Swipe left** to delete the item (red zone).
+
+Each swipe zone is also keyboard-accessible: the zone button receives \`tabIndex={0}\` once the swipe is open, so keyboard users can tab into the action.
+
+This is a distinct UI pattern from the \`Button\` component — the zone elements have no visible label and are only revealed by gesture or equivalent keyboard interaction. It is documented here rather than as a \`Button\` variant because it has its own gesture state machine (\`swipeX\`, \`isSwiping\`, threshold logic).
+      `,
+    },
+  },
+};

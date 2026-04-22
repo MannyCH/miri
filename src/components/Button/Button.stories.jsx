@@ -100,6 +100,24 @@ const HeartIcon = () => (
   </svg>
 );
 
+const TrashIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+  </svg>
+);
+
+const MoreIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+  </svg>
+);
+
+const RestoreIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.2"/>
+  </svg>
+);
+
 // ─── Single variant stories ───────────────────────────────────────────────────
 
 export const Primary = {
@@ -269,4 +287,48 @@ Includes Disabled state with weak token mapping and full opacity.
       </div>
     );
   },
+};
+
+// ─── Icon-only variant ────────────────────────────────────────────────────────
+
+export const IconButton = {
+  name: 'Icon Button',
+  parameters: {
+    docs: {
+      description: {
+        story: `
+Icon-only button using \`iconOnly={true}\`. Always provide \`aria-label\` — there is no visible text.
+
+Use \`secondary\` for neutral framed icon buttons (e.g. menu, view toggles).
+Use \`tertiary-delete\` for destructive icon buttons (e.g. delete a row).
+Use \`tertiary\` for low-emphasis icon buttons (e.g. restore, undo).
+        `,
+      },
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center', flexWrap: 'wrap' }}>
+      <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" />
+      <Button variant="tertiary" iconOnly icon={<RestoreIcon />} aria-label="Restore" />
+      <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" />
+    </div>
+  ),
+};
+
+export const IconButtonDisabled = {
+  name: 'Icon Button — Disabled',
+  parameters: {
+    docs: {
+      description: {
+        story: 'Disabled state applies to all icon-only variants.',
+      },
+    },
+  },
+  render: () => (
+    <div style={{ display: 'flex', gap: 'var(--spacing-8)', alignItems: 'center', flexWrap: 'wrap' }}>
+      <Button variant="secondary" iconOnly icon={<MoreIcon />} aria-label="More options" disabled />
+      <Button variant="tertiary" iconOnly icon={<RestoreIcon />} aria-label="Restore" disabled />
+      <Button variant="tertiary-delete" iconOnly icon={<TrashIcon />} aria-label="Delete" disabled />
+    </div>
+  ),
 };

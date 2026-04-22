@@ -6,26 +6,27 @@ import './Button.css';
  * Button component based on Miri design system
  * Built with Base UI for accessibility and composability
  */
-export const Button = ({ 
+export const Button = ({
   variant = 'primary',
   icon,
   showIcon = true,
+  iconOnly = false,
   children,
-  ...props 
+  ...props
 }) => {
   const variantClass = `button-${variant.toLowerCase().replace(' - ', '-')}`;
-  
+
   return (
-    <BaseButton 
-      className={`button ${variantClass}`}
+    <BaseButton
+      className={`button ${variantClass}${iconOnly ? ' button--icon-only' : ''}`}
       {...props}
     >
-      {showIcon && icon && (
+      {(showIcon || iconOnly) && icon && (
         <span className="button-icon" aria-hidden="true">
           {icon}
         </span>
       )}
-      <span className="button-text text-body-small-bold">{children}</span>
+      {!iconOnly && <span className="button-text text-body-small-bold">{children}</span>}
     </BaseButton>
   );
 };

@@ -31,6 +31,17 @@
   opacity: 1;
 }
 
+/* ─── Icon-only ──────────────────────────────────────────────────────────────
+   Square, fixed-size button that shows a single icon with no label.
+   Use with aria-label on the element for accessibility.
+   Pair with any variant: secondary for neutral framed, tertiary-delete for destructive.
+*/
+.button--icon-only {
+  width: var(--spacing-32);
+  height: var(--spacing-32);
+  padding: 0;
+}
+
 .button-icon {
   display: flex;
   align-items: center;

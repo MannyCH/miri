@@ -212,15 +212,13 @@ export const ShoppingListView = ({
               {/* eslint-enable design-system/no-native-interactive-elements */}
             </div>
             {onMenuTap && (
-              // eslint-disable-next-line design-system/no-native-interactive-elements -- icon-only menu button; no icon-button variant exists in design system yet
-              <button
-                type="button"
-                className="shopping-list-menu-btn"
+              <Button
+                variant="secondary"
+                iconOnly
+                icon={<MoreIcon />}
                 onClick={onMenuTap}
                 aria-label="List options"
-              >
-                <MoreIcon />
-              </button>
+              />
             )}
           </div>
         </div>
@@ -281,14 +279,13 @@ export const ShoppingListView = ({
                 >
                   <div className="recipe-group-header">
                     <h3 className="text-body-base-bold">{group.recipeName}</h3>
-                    {/* eslint-disable-next-line design-system/no-native-interactive-elements -- icon-only delete button; no icon-button variant exists in design system yet */}
-                    <button
-                      className="icon-button-delete"
+                    <Button
+                      variant="tertiary-delete"
+                      iconOnly
+                      icon={<TrashIcon />}
                       onClick={() => handleRecipeGroupDelete(group, groupIndex)}
                       aria-label={`Delete ${group.recipeName}`}
-                    >
-                      <TrashIcon />
-                    </button>
+                    />
                   </div>
                   <IngredientList
                     ingredients={group.ingredients}
@@ -329,14 +326,13 @@ export const ShoppingListView = ({
                     >
                       <div className="recipe-group-header">
                         <h3 className="text-body-base-bold">{group.recipeName}</h3>
-                        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- icon-only restore button; no icon-button variant exists in design system yet */}
-                        <button
-                          className="icon-button-restore"
+                        <Button
+                          variant="tertiary"
+                          iconOnly
+                          icon={<RotateCcw size={20} />}
                           onClick={() => group.onRestore?.()}
                           aria-label={`Restore ${group.recipeName}`}
-                        >
-                          <RotateCcw size={20} />
-                        </button>
+                        />
                       </div>
                       <IngredientList
                         ingredients={group.ingredients}
