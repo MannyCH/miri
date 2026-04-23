@@ -44,28 +44,12 @@
   flex-shrink: 0;
 }
 
-/* Floating search button — anchored just above the navigation bar */
+/* Position the SearchFab just above the NavigationBar */
 .recipes-search-fab {
   position: absolute;
   bottom: calc(100% + var(--spacing-16));
   right: var(--spacing-16);
-  width: var(--spacing-48);
-  height: var(--spacing-48);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--corner-radius-pill);
-  border: 1px solid var(--color-stroke-weak);
-  background: var(--color-background-raised);
-  color: var(--color-icon-brand);
-  cursor: pointer;
-  box-shadow: var(--elevation-overlay);
   z-index: 10;
-}
-
-.recipes-search-fab:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 2px;
 }
 
 /* Search overlay — slides down from top, covers the header */

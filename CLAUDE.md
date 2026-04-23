@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Skills
+
+- **design-agents** (`.claude/skills/design-agents/SKILL.md`) — run consumer-drift and propagation checks on the current PR. Trigger: `/design-agents`
+When the user types `/design-agents`, invoke the Skill tool with `skill: "design-agents"` before doing anything else.
+
 ## Commands
 
 ```bash

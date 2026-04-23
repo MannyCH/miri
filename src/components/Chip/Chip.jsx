@@ -8,10 +8,11 @@ export const Chip = ({
   showClose = false,
   onClick,
   disabled = false,
+  className,
   ...props
 }) => (
   <BaseButton
-    className={`chip text-body-small-regular${active ? ' chip--active' : ''}`}
+    className={['chip text-body-small-regular', active && 'chip--active', className].filter(Boolean).join(' ')}
     aria-pressed={active}
     onClick={onClick}
     disabled={disabled}
