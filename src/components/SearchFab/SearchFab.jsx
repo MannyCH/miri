@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@base-ui-components/react/button';
+import { Button } from '@base-ui/react/button';
 import './SearchFab.css';
 
 export const SearchFab = ({ onClick, className, style, 'aria-label': ariaLabel = 'Search', ...props }) => (

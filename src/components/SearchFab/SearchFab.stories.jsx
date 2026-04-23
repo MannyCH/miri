@@ -1,9 +1,6 @@
 import React from 'react';
-import { fn } from 'storybook/test';
-import { Meta, StoryObj } from '@storybook/react-vite';
 import { SearchFab } from './SearchFab';
 
-/** @type {Meta<typeof SearchFab>} */
 export default {
   title: 'Components/SearchFab',
   component: SearchFab,
@@ -37,10 +34,9 @@ Used in **RecipesView** anchored just above the NavigationBar. Positioning (abso
   },
 };
 
-/** @type {StoryObj<typeof SearchFab>} */
 export const Default = {
   args: {
-    onClick: fn(),
+    onClick: () => {},
     'aria-label': 'Search recipes',
   },
 };
@@ -58,7 +54,7 @@ export const AboveNavBar = {
     <div style={{ position: 'relative', width: '390px', height: '120px' }}>
       <SearchFab
         aria-label="Search recipes"
-        onClick={fn()}
+        onClick={() => {}}
         style={{ position: 'absolute', bottom: 'calc(76px + var(--spacing-16))', right: 'var(--spacing-16)' }}
       />
       <div style={{
