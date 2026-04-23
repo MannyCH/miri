@@ -1,0 +1,137 @@
+name: Design System Agents (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to analyse'
+        required: true
+        type: number
+
+jobs:
+  detect-changes:
+    name: Detect changed file categories
+    runs-on: ubuntu-latest
+    outputs:
+      components_changed: ${{ steps.check.outputs.components_changed }}
+      pages_changed: ${{ steps.check.outputs.pages_changed }}
+      base_sha: ${{ steps.pr.outputs.base_sha }}
+      head_sha: ${{ steps.pr.outputs.head_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch PR metadata
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE_SHA=$(gh pr view ${{ inputs.pr_number }} --repo ${{ github.repository }} --json baseRefOid -q .baseRefOid)
+          HEAD_SHA=$(gh pr view ${{ inputs.pr_number }} --repo ${{ github.repository }} --json headRefOid -q .headRefOid)
+          HEAD_REF=$(gh pr view ${{ inputs.pr_number }} --repo ${{ github.repository }} --json headRefName -q .headRefName)
+          echo "base_sha=$BASE_SHA" >> $GITHUB_OUTPUT
+          echo "head_sha=$HEAD_SHA" >> $GITHUB_OUTPUT
+          echo "head_ref=$HEAD_REF" >> $GITHUB_OUTPUT
+          git fetch origin "$HEAD_REF"
+
+      - name: Detect changed categories
+        id: check
+        run: |
+          CHANGED=$(git diff --name-only ${{ steps.pr.outputs.base_sha }} ${{ steps.pr.outputs.head_sha }})
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -qE '^src/components/|\.stories\.jsx$'; then
+            echo "components_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "components_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED" | grep -qE '^src/(pages|patterns)/'; then
+            echo "pages_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "pages_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  consumer-drift:
+    name: Consumer drift check
+    needs: detect-changes
+    if: needs.detect-changes.outputs.pages_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: "--model claude-haiku-4-5"
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the consumer-drift agent for PR #${{ inputs.pr_number }} in the MannyCH/miri repo.
+
+            The PR changed files in src/pages/ or src/patterns/.
+
+            Changed files in this PR:
+            $(git diff --name-only ${{ needs.detect-changes.outputs.base_sha }} ${{ needs.detect-changes.outputs.head_sha }})
+
+            Follow the full instructions in .claude/agents/consumer-drift.md.
+            Report only — do not modify any files.
+
+  design-system-propagation:
+    name: Design system propagation check
+    needs: [detect-changes, consumer-drift]
+    if: always() && needs.detect-changes.outputs.components_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: "--model claude-haiku-4-5"
+          mcp_config: |
+            {
+              "mcpServers": {
+                "notion": {
+                  "command": "npx",
+                  "args": ["-y", "@notionhq/notion-mcp-server"],
+                  "env": {
+                    "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ${{ secrets.NOTION_API_TOKEN }}\", \"Notion-Version\": \"2022-06-28\"}"
+                  }
+                }
+              }
+            }
+          prompt: |
+            You are running the design-system-propagation agent for PR #${{ inputs.pr_number }} in the MannyCH/miri repo.
+
+            The PR changed files in src/components/ or .stories.jsx files.
+
+            Changed files in this PR:
+            $(git diff --name-only ${{ needs.detect-changes.outputs.base_sha }} ${{ needs.detect-changes.outputs.head_sha }})
+
+            Follow the full instructions in .claude/agents/design-system-propagation.md.
+            Report only — do not modify any files.
