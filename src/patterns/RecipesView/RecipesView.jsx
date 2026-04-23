@@ -4,6 +4,7 @@ import { RecipeList } from '../../components/RecipeList';
 import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button/Button';
 import { Chip } from '../../components/Chip';
+import { SearchFab } from '../../components/SearchFab/SearchFab';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './RecipesView.css';
 
@@ -122,28 +123,12 @@ export const RecipesView = ({
 
       {/* Nav area: FAB is anchored just above the NavigationBar */}
       <div className="recipes-nav-area">
-        {/* Search FAB — 48×48 pill with elevation; distinct from 32×32 iconOnly Button (see SearchFab story in RecipesView.stories.jsx) */}
-        {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
-        <button
-          type="button"
-          className="recipes-search-fab"
-          onClick={handleFabClick}
-          aria-label="Search recipes"
-        >
-          <SearchIcon />
-        </button>
+        <SearchFab onClick={handleFabClick} aria-label="Search recipes" className="recipes-search-fab" />
         <NavigationBarConnected activeItem="recipes" />
       </div>
     </div>
   );
 };
-
-const SearchIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="11" cy="11" r="8"/>
-    <path d="m21 21-4.35-4.35"/>
-  </svg>
-);
 
 
 RecipesView.displayName = 'RecipesView';

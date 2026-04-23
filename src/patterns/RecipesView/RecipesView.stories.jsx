@@ -1,6 +1,7 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { RecipesView } from './RecipesView';
+import { SearchFab as SearchFabButton } from '../../components/SearchFab/SearchFab';
 
 export default {
   title: 'Patterns/RecipesView',
@@ -145,19 +146,11 @@ Border: \`1px solid --color-stroke-weak\`
   },
   render: () => (
     <div style={{ position: 'relative', width: '100%', maxWidth: '390px' }}>
-      {/* eslint-disable-next-line design-system/no-native-interactive-elements */}
-      <button
-        type="button"
-        className="recipes-search-fab"
-        style={{ position: 'absolute', bottom: 'calc(100% + var(--spacing-16))', right: 'var(--spacing-16)' }}
+      <SearchFabButton
         aria-label="Search recipes"
         onClick={() => {}}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
-        </svg>
-      </button>
+        style={{ position: 'absolute', bottom: 'calc(100% + var(--spacing-16))', right: 'var(--spacing-16)' }}
+      />
       <div style={{ height: '76px', background: 'var(--color-background-base)', borderTop: '1px solid var(--color-stroke-weak)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span className="text-body-small-regular" style={{ color: 'var(--color-text-weak)' }}>Navigation Bar</span>
       </div>
