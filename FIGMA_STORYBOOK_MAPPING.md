@@ -17,7 +17,8 @@ This file documents a license-free mapping strategy between Figma and Storybook.
 | `Components/CalendarModule` | `Calendar Module` (`FRAME`) | High | Direct name match |
 | `Components/CalendarWeek` | `Calendar week` (`COMPONENT`, `164:707`) | High | Direct name match |
 | `Components/ConfirmDialog` | `Dialog` (`COMPONENT`, `232:2337`) | High | Canonical source confirmed |
-| `Components/ActionSheet` | `ActionSheet` (`COMPONENT_SET`, `570:2945`) | High | Created 2026-04-23 — Default + With Destructive variants, all values token-bound |
+| `Components/ActionSheet` | `ActionSheet` (`COMPONENT_SET`, `570:2945`) | High | Created 2026-04-23 — Default + With Destructive + With Chevron variants, all values token-bound |
+| `Components/ImportMethodSheet` | `ActionSheet` / `State=With Chevron` (`COMPONENT`, `570:3070`) | High | Merged into ActionSheet as a variant — same bottom-sheet structure with trailing chevrons per row |
 | `Components/Chip` | `Chip` (`COMPONENT_SET`, `570:2878`) | High | Created 2026-04-23 — Default + Active variants, all values token-bound |
 | `Components/ContextMenu` | `Context menu` (`COMPONENT_SET`, `232:2631`) | High | 3 variants: Default, Hover, Focus — on Context Menu page |
 | `Components/Divider` | `Divider` (`COMPONENT`, `54:531`) | High | Standalone component found |
@@ -62,7 +63,7 @@ These Storybook components have no Figma counterpart and must be built:
 | `Components/BmrCalculatorCard` | Medium | ✅ Already in Figma — node `319:4936` on Account page |
 | `Components/Chip` | High | ✅ Created 2026-04-23 — node `570:2878` on Chip page |
 | `Components/ChoiceTile` | Medium | ✅ Created 2026-04-23 — node `570:2966` on ChoiceTile page |
-| `Components/ImportMethodSheet` | Low | Sheet for import method selection — deferred |
+| `Components/ImportMethodSheet` | Low | ✅ Merged into ActionSheet as `State=With Chevron` variant — node `570:3070` |
 | `Components/ListSwitcher` | Medium | ✅ Created 2026-04-23 — node `570:3048` on ListSwitcher page |
 | `Components/OtpCodeInput` | Medium | ✅ Created 2026-04-23 — node `570:3029` on OtpCodeInput page |
 | `Components/Overview` | Medium | ✅ Docs-only MDX page — no Figma component needed |
@@ -95,7 +96,7 @@ These Storybook components have no Figma counterpart and must be built:
 - `Components/ConfirmDialog`
 - `Components/ContextMenu`
 - `Components/Divider`
-- `Components/ImportMethodSheet` ❌ no Figma
+- `Components/ImportMethodSheet` ✅ `570:3070` (ActionSheet / State=With Chevron)
 - `Components/IngredientList`
 - `Components/IngredientListItem`
 - `Components/ListSwitcher` ✅ `570:3048`
