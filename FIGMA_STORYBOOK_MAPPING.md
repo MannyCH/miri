@@ -24,6 +24,7 @@ This file documents a license-free mapping strategy between Figma and Storybook.
 | `Components/RecipeList` | `Recipe List` (`COMPONENT`, `157:2548`) | High | Direct name match |
 | `Components/RecipeListItem` | `Recipe List Item` (`COMPONENT`, `157:2502`) | High | Direct name match |
 | `Components/SearchBar` | `Search bar` (`COMPONENT`, `156:970`) | High | Direct name match |
+| `Components/SearchFab` | `SearchFab` (`COMPONENT`, `568:2067`) | High | Created in Figma to match code component — page: SearchFab, all values bound to variables |
 | `Components/Toast` | `Toast` (component set) | High | Name matches directly |
 | `Components/Badge` | `Badge` (`INSTANCE`, `149:1085`) | High | Canonical source confirmed by provided Figma node |
 | `Patterns/Auth Modules` | `Auth Components` (`SECTION`, `273:1638`) | High | Contains Sign In/Sign Up/Verify/Reset modules |
@@ -50,6 +51,7 @@ This file documents a license-free mapping strategy between Figma and Storybook.
 - `Components/RecipeList`
 - `Components/RecipeListItem`
 - `Components/SearchBar`
+- `Components/SearchFab`
 - `Components/Toast`
 
 ### Patterns
@@ -65,6 +67,8 @@ This file documents a license-free mapping strategy between Figma and Storybook.
 - View patterns map to frame-level artifacts in `PATTERNS` rather than component sets, which is expected but should be treated as pattern mapping (not primitive component mapping).
 
 ## Canonical Figma References (User Confirmed)
+
+- SearchFab: node `568:2067` (page: SearchFab, created 2026-04-23)
 
 - Badge: node `149:1085`
 - Dialog: node `232:2337`
