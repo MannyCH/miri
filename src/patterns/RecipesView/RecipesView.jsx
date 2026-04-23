@@ -62,7 +62,7 @@ export const RecipesView = ({
       </header>
 
       {activeFilters.length > 0 && !isSearchOpen && (
-        <div className="recipes-active-filters">
+        <div className="recipes-active-filters" role="group" aria-label="Active filters">
           {activeFilters.map(value => {
             const filter = availableFilters.find(f => f.value === value);
             return (
