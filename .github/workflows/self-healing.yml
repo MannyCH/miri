@@ -252,8 +252,8 @@ jobs:
 
   design-system-propagation:
     name: Design system propagation check
-    needs: [detect-changes, lint]
-    if: needs.detect-changes.outputs.components_changed == 'true' && needs.lint.result == 'success' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
+    needs: [detect-changes, lint, consumer-drift]
+    if: always() && needs.detect-changes.outputs.components_changed == 'true' && needs.lint.result == 'success' && !startsWith(github.event.pull_request.head.ref, 'fix/batch-')
     runs-on: ubuntu-latest
     permissions:
       contents: read
