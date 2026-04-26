@@ -55,7 +55,7 @@ export function ShareSheet({
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
           >
             <div className="share-sheet-handle" aria-hidden="true" />
-            <h2 className="text-h3-bold share-sheet-title">
+            <h2 className="text-h4-bold share-sheet-title">
               Share &ldquo;{listName}&rdquo;
             </h2>
             <p className="text-body-small-regular share-sheet-description">

@@ -32,12 +32,11 @@
 }
 
 .avatar-row-initials {
-  font-size: 10px;
   line-height: 1;
 }
 
 .avatar-row-overflow {
-  background: var(--color-fill-neutral-weak);
+  background: var(--color-fill-weak);
   color: var(--color-text-weak);
 }
 
