@@ -44,7 +44,7 @@ export function ActionSheet({ isOpen, onClose, title, items = [] }) {
           >
             <div className="action-sheet-handle" aria-hidden="true" />
             {title && (
-              <h2 className="text-h3-bold action-sheet-title">{title}</h2>
+              <h2 className="text-h4-bold action-sheet-title">{title}</h2>
             )}
             <ul className="action-sheet-items" role="list">
               {items.map((item, index) => {
