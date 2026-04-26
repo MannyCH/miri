@@ -20,7 +20,7 @@
 .confirm-dialog {
   background: var(--color-background-raised);
   border-radius: var(--corner-radius-16);
-  padding: var(--spacing-24);
+  padding: var(--spacing-16);
   max-width: 358px;
   width: 100%;
   box-shadow: var(--elevation-overlay);

@@ -7,14 +7,14 @@
  *   Text/Error        → --color-text-error          (delete action)
  *   Icon/Brand        → --color-icon-brand          (chevrons)
  *   corner-radius-16  → 16px
- *   padding: 16px, gap: 16px
+ *   padding: 32px, gap: 16px
  */
 
 .account-card {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-16);
-  padding: var(--spacing-16);
+  padding: var(--spacing-32);
   border-radius: var(--corner-radius-16);
   border: 1px solid var(--color-stroke-weak);
   background: var(--color-background-raised);
