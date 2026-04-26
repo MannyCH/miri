@@ -44,7 +44,7 @@ export function ImportMethodSheet({ isOpen, onClose, onSelectUrl, onSelectPhoto,
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
           >
             <div className="import-sheet-handle" aria-hidden="true" />
-            <h2 className="text-h3-bold import-sheet-title">Import Recipe</h2>
+            <h2 className="text-h4-bold import-sheet-title">Import Recipe</h2>
             <ul className="import-sheet-options" role="list">
               <li>
                 <button type="button" className="import-sheet-option" onClick={onSelectUrl}>
