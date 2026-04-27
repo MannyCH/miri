@@ -48,7 +48,7 @@ export default async function middleware(request) {
   }
 
   // Read body once for methods that have one
-  const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
+  const hasBody = request.method !== 'GET' && request.method !== 'HEAD' && request.body != null;
 
   let upstream;
   try {
