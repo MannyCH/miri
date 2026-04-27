@@ -172,6 +172,7 @@
 
 .auth-verify-back {
   align-self: flex-start;
+  margin-left: calc(-1 * var(--spacing-12));
 }
 
 .auth-page-status {

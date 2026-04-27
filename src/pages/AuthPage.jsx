@@ -265,10 +265,8 @@ export function AuthPage() {
       }
 
       if (mode === AUTH_MODES.VERIFY_EMAIL) {
-        const hasCodeInput = Boolean(verifyEmailAddress && verificationCode);
-        const hasTokenInput = Boolean(verifyToken);
-        if (!hasCodeInput && !hasTokenInput) {
-          throw new Error('Enter email + verification code, or paste a verification token.');
+        if (!verificationCode) {
+          throw new Error('Please enter the verification code.');
         }
 
         const verifyResult = await verifyEmail({
@@ -296,6 +294,7 @@ export function AuthPage() {
       const authErrorMessage = error.message || 'Authentication failed.';
       if (mode === AUTH_MODES.VERIFY_EMAIL) {
         setVerifyActionState('error');
+        setTimeout(() => setVerifyActionState('default'), 3000);
       }
       if (mode === AUTH_MODES.RESET_PASSWORD) {
         setResetActionState('error');
@@ -663,7 +662,6 @@ export function AuthPage() {
       <div className="auth-verify-back">
         <Button
           variant="tertiary"
-          style={{ marginTop: 'var(--spacing-8)' }}
           onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
         >
           Back to login
