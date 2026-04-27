@@ -4,6 +4,7 @@ import { Button } from '../components/Button/Button';
 import { ChoiceTile } from '../components/ChoiceTile/ChoiceTile';
 import { Stepper } from '../components/Stepper/Stepper';
 import { usePreferences } from '../context/PreferencesContext';
+import { useApp } from '../context/AppContext';
 import '../patterns/OnboardingView/OnboardingView.css';
 
 const GOAL_OPTIONS = [
@@ -46,6 +47,7 @@ function ProgressDots({ step }) {
 export function OnboardingPage() {
   const navigate = useNavigate();
   const { updatePreferences, flushPreferences } = usePreferences();
+  const { showToast } = useApp();
 
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState('');
@@ -54,7 +56,13 @@ export function OnboardingPage() {
 
   async function finishOnboarding(extraUpdates = {}) {
     updatePreferences({ ...extraUpdates, onboardedAt: new Date().toISOString() });
-    await flushPreferences();
+    try {
+      await flushPreferences();
+    } catch (err) {
+      console.error('[onboarding] could not save preferences:', err);
+      showToast?.('error', `Could not save your preferences: ${err.message || 'unknown error'}`);
+      return;
+    }
     navigate('/planning', { replace: true });
   }
 

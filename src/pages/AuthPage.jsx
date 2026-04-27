@@ -631,14 +631,6 @@ export function AuthPage() {
           error={verifyActionState === 'error'}
         />
 
-        {hasTokenParam ? (
-          <TextField
-            label="Verification token"
-            value={verifyToken}
-            onChange={setVerifyToken}
-          />
-        ) : null}
-
         {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
 
         <div className="auth-button-row auth-verify-actions">

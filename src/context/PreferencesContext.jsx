@@ -90,7 +90,8 @@ export function PreferencesProvider({ children }) {
   }, []);
 
   // Flush any pending debounced save immediately. Used by onboarding to
-  // ensure onboarded_at is persisted before navigating away.
+  // ensure onboarded_at is persisted before navigating away. Throws on
+  // failure so callers can surface the error to the user.
   const flushPreferences = useCallback(async () => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -99,11 +100,7 @@ export function PreferencesProvider({ children }) {
     const payload = pendingPayloadRef.current;
     if (!payload) return;
     pendingPayloadRef.current = null;
-    try {
-      await savePreferences(payload);
-    } catch (err) {
-      console.error('[preferences] flush failed:', err);
-    }
+    await savePreferences(payload);
   }, []);
 
   return (
