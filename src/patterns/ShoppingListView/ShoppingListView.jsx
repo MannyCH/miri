@@ -43,8 +43,6 @@ export const ShoppingListView = ({
   onSwitchList,
   onMenuTap,
   onAddIngredient,
-  pendingItems = [],
-  onSetQuantity,
   ...props
 }) => {
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
@@ -226,18 +224,6 @@ export const ShoppingListView = ({
 
       {/* Content */}
       <div className="shopping-list-content">
-        {pendingItems.length > 0 && (
-          <div className="shopping-list-pending">
-            {pendingItems.map(({ entryId, name }) => (
-              <PendingIngredientRow
-                key={entryId}
-                entryId={entryId}
-                name={name}
-                onSetQuantity={onSetQuantity}
-              />
-            ))}
-          </div>
-        )}
         {summaryEntries.length > 0 && (
           <div className="shopping-list-summary">
             <p className="text-body-small-bold shopping-list-summary-title">For this week</p>
@@ -465,44 +451,6 @@ const INGREDIENT_SUGGESTIONS = [
   'Sweet potato', 'Tomatoes', 'Tuna', 'Vanilla', 'Vinegar', 'Walnuts',
   'Yogurt', 'Zucchini',
 ];
-
-/**
- * PendingIngredientRow — shows a newly added ingredient with an editable quantity field.
- * Quantity is prepended to the name when confirmed.
- */
-function PendingIngredientRow({ entryId, name, onSetQuantity }) {
-  const [quantity, setQuantity] = React.useState('');
-  const inputRef = React.useRef(null);
-
-  const handleCommit = () => {
-    onSetQuantity?.(entryId, name, quantity);
-  };
-
-  return (
-    <div className="pending-ingredient-row">
-      <Divider />
-      <div className="pending-ingredient-content">
-        {/* eslint-disable-next-line design-system/no-native-interactive-elements -- inline quantity input within pending row; needs label + TextField migration (deferred) */}
-        <input
-          ref={inputRef}
-          className="pending-ingredient-quantity text-body-small-regular"
-          type="text"
-          inputMode="decimal"
-          value={quantity}
-          placeholder="qty"
-          onChange={(e) => setQuantity(e.target.value)}
-          onBlur={handleCommit}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') { e.preventDefault(); inputRef.current?.blur(); }
-          }}
-          aria-label={`Quantity for ${name}`}
-        />
-        <span className="pending-ingredient-name text-body-small-regular">{name}</span>
-      </div>
-      <Divider />
-    </div>
-  );
-}
 
 /**
  * SmartListItem — tap to check/uncheck,
