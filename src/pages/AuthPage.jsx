@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { AlertTriangle, Check, CheckCircle, Circle, Loader, X } from 'react-feather';
-import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Button } from '../components/Button/Button';
@@ -30,6 +30,7 @@ function normalizeEmailAddress(email) {
 export function AuthPage() {
   const [params] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { showToast } = useApp();
   const { isAuthenticated, isAuthReady, signIn, signUp, requestPasswordReset, resetPassword, verifyEmail, sendVerificationCode } = useAuth();
   const hasTokenParam = Boolean(params.get('token'));
@@ -96,8 +97,11 @@ export function AuthPage() {
     return <div className="auth-page-status">Loading authentication...</div>;
   }
 
-  if (isAuthenticated) {
-    return <Navigate to="/planning" replace />;
+  // Stay on /auth while the user is mid-OTP — even if Neon Auth has already
+  // marked emailVerified=true (which happens on re-signup with a previously
+  // verified email). Without this, the route guard below would skip OTP entirely.
+  if (isAuthenticated && mode !== AUTH_MODES.VERIFY_EMAIL) {
+    return <Navigate to="/" replace />;
   }
 
   const clearFeedback = () => {
@@ -193,6 +197,9 @@ export function AuthPage() {
         setMode(AUTH_MODES.VERIFY_EMAIL);
         setPassword('');
         setSignUpPasswordRulesTouched(false);
+        // Push URL state so the route guard in App.jsx skips its redirect
+        // when the user lands here as already-authenticated (re-signup case).
+        navigate('/auth?mode=verify-email', { replace: true });
         return;
       }
 
@@ -268,6 +275,9 @@ export function AuthPage() {
         await new Promise((resolve) => setTimeout(resolve, 1100));
         setVerifyInfoMessage('');
         setMode(AUTH_MODES.SIGN_IN);
+        // Drop the verify-email URL marker so App.jsx routing kicks in and
+        // sends the user to /onboarding (or /planning) automatically.
+        navigate('/', { replace: true });
         return;
       }
     } catch (error) {

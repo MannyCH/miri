@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PusherProvider } from './context/PusherContext';
@@ -47,6 +47,11 @@ function AppContent() {
   const { toasts, dismissToast } = useApp();
   const { isAuthenticated, isAuthReady, user } = useAuth();
   const needsOnboarding = useNeedsOnboarding();
+  const location = useLocation();
+  // While AuthPage is mid-OTP, don't auto-redirect away from /auth — Neon Auth
+  // can mark emailVerified=true immediately on re-signup, which would otherwise
+  // skip the OTP step entirely.
+  const isInVerifyEmailFlow = new URLSearchParams(location.search).get('mode') === 'verify-email';
 
   if (!isAuthReady) {
     return <div>Loading authentication...</div>;
@@ -75,7 +80,7 @@ function AppContent() {
           <Route path="/" element={<Navigate to={defaultRoute} replace />} />
           <Route
             path="/auth"
-            element={canRedirectFromAuth && needsOnboarding !== null ? <Navigate to={needsOnboarding ? '/onboarding' : '/planning'} replace /> : <AuthPage />}
+            element={canRedirectFromAuth && !isInVerifyEmailFlow && needsOnboarding !== null ? <Navigate to={needsOnboarding ? '/onboarding' : '/planning'} replace /> : <AuthPage />}
           />
           <Route
             path="/onboarding"
