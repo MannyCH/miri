@@ -47,17 +47,18 @@ export default async function middleware(request) {
     if (value) forwardHeaders.set(name, value);
   }
 
-  // Read body once for methods that have one
-  const hasBody = request.method !== 'GET' && request.method !== 'HEAD' && request.body != null;
+  // Read the body as text upfront — auth payloads are small JSON, no streaming needed.
+  // Avoids 'expected non-null body source' crashes from passing ReadableStream to fetch.
+  const bodyText = request.method !== 'GET' && request.method !== 'HEAD'
+    ? await request.text().catch(() => null)
+    : null;
 
   let upstream;
   try {
     upstream = await fetch(targetUrl, {
       method: request.method,
       headers: forwardHeaders,
-      body: hasBody ? request.body : undefined,
-      // @ts-ignore — duplex is required for streaming request bodies
-      duplex: hasBody ? 'half' : undefined,
+      body: bodyText || undefined,
     });
   } catch (err) {
     console.error('[neon-auth-proxy] fetch failed:', err);
