@@ -766,6 +766,12 @@ export function AuthPage() {
 
         {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}
 
+        {forgotActionState === 'success' ? (
+          <p className="auth-success-message text-body-small-regular">
+            If an account exists for that email, we&apos;ve sent a reset link.
+          </p>
+        ) : null}
+
         <div className="auth-button-row">
           <Button
             variant="primary"
