@@ -285,11 +285,6 @@ export function AuthPage() {
           || verifyEmailAddress.split('@')[0]
           || 'there';
         clearPendingSignUpName(normalizedVerifyEmail);
-        await new Promise((resolve) => setTimeout(resolve, 1100));
-        setVerifyInfoMessage('');
-        setMode(AUTH_MODES.SIGN_IN);
-        // Drop the verify-email URL marker so App.jsx routing kicks in and
-        // sends the user to /onboarding (or /planning) automatically.
         navigate('/', { replace: true });
         return;
       }

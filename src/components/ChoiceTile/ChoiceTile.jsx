@@ -8,6 +8,7 @@ export function ChoiceTile({ label, value, selected = false, onClick }) {
       className={`choice-tile${selected ? ' choice-tile-selected' : ''}`}
       onClick={() => onClick(value)}
       aria-pressed={selected}
+
     >
       <span className="choice-tile-label text-body-regular">{label}</span>
     </BaseButton>

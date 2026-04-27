@@ -14,9 +14,11 @@
   text-align: center;
 }
 
-.choice-tile:hover:not([disabled]) {
-  background: var(--color-fill-brand-weak);
-  border-color: var(--color-stroke-brand-strong);
+@media (hover: hover) {
+  .choice-tile:hover:not([disabled]) {
+    background: var(--color-fill-brand-weak);
+    border-color: var(--color-stroke-brand-strong);
+  }
 }
 
 .choice-tile:focus-visible {
