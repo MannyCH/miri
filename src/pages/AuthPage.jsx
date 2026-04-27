@@ -290,7 +290,7 @@ export function AuthPage() {
       if (mode === AUTH_MODES.SIGN_IN && /email not verified/i.test(authErrorMessage)) {
         setMode(AUTH_MODES.VERIFY_EMAIL);
         setVerifyEmailAddress(email);
-        setVerifyInfoMessage('');
+        setVerifyInfoMessage('Verification still left. Please check your email for the code.');
         setErrorMessage('');
       } else if (mode === AUTH_MODES.SIGN_UP && /user already exists/i.test(authErrorMessage)) {
         const normalizedEmail = normalizeEmailAddress(email);
@@ -304,7 +304,7 @@ export function AuthPage() {
           // Keep UX focused on verify step even if resend fails transiently.
         }
         setVerifyEmailAddress(normalizedEmail);
-        setVerifyInfoMessage('Enter the verification code we sent to confirm your email.');
+        setVerifyInfoMessage('Account already exists. Please verify your email to continue.');
         setMode(AUTH_MODES.VERIFY_EMAIL);
         setErrorMessage('');
       } else {
