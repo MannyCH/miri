@@ -1,5 +1,6 @@
 .auth-modules-card {
-  width: 420px;
+  width: 100%;
+  max-width: 420px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

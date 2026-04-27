@@ -140,9 +140,10 @@ export const SignUpModule = {
 
 export const VerifyEmailModule = {
   parameters: {
+    layout: 'padded',
     docs: {
       description: {
-        story: 'OTP entry state — six empty code input boxes, awaiting the verification code sent to the user\'s email. Shown immediately after sign-up or when email verification is required.',
+        story: 'OTP entry state — six empty code input boxes, awaiting the verification code sent to the user\'s email. Resize the canvas to test OTP responsiveness.',
       },
     },
   },
@@ -170,6 +171,7 @@ export const VerifyEmailModule = {
 
 export const VerifyEmailSuccess = {
   parameters: {
+    layout: 'padded',
     docs: {
       description: {
         story: 'OTP verified — all six boxes filled, Continue button shows a checkmark animation and "Verified" label. Represents a successful code entry before redirect.',
@@ -209,6 +211,7 @@ export const VerifyEmailSuccess = {
 
 export const VerifyEmailError = {
   parameters: {
+    layout: 'padded',
     docs: {
       description: {
         story: 'Invalid OTP — six boxes filled with a wrong code, Continue button shows a warning icon and "Wrong code" label. Represents the error state after a failed verification attempt.',
