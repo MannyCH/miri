@@ -620,16 +620,6 @@ export function AuthPage() {
         <p className="auth-verify-info text-body-small-regular">{verifyInfoMessage}</p>
       ) : null}
 
-      {!verifyEmailAddress ? (
-        <TextField
-          label="Email"
-          type="email"
-          value={verifyEmailAddress}
-          onChange={setVerifyEmailAddress}
-          autoComplete="email"
-        />
-      ) : null}
-
       <form className="auth-form auth-verify-form" onSubmit={handleSubmit}>
         <OtpCodeInput
           ref={firstCodeInputRef}

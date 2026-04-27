@@ -45,22 +45,23 @@ export const OtpCodeInput = React.forwardRef(({
       aria-label="Verification code"
     >
       {digits.map((digit, index) => (
-        <input
-          key={index}
-          ref={el => { inputRefs.current[index] = el; }}
-          className="otp-code-input__digit text-body-regular"
-          type="text"
-          inputMode="numeric"
-          pattern="\d"
-          maxLength={1}
-          value={digit}
-          onChange={e => handleChange(index, e)}
-          onKeyDown={e => handleKeyDown(index, e)}
-          onPaste={index === 0 ? handlePaste : undefined}
-          disabled={disabled}
-          autoComplete={index === 0 ? 'one-time-code' : 'off'}
-          aria-label={`Digit ${index + 1} of ${length}`}
-        />
+        <div key={index} className="otp-code-input__cell">
+          <input
+            ref={el => { inputRefs.current[index] = el; }}
+            className="otp-code-input__digit text-body-regular"
+            type="text"
+            inputMode="numeric"
+            pattern="\d"
+            maxLength={1}
+            value={digit}
+            onChange={e => handleChange(index, e)}
+            onKeyDown={e => handleKeyDown(index, e)}
+            onPaste={index === 0 ? handlePaste : undefined}
+            disabled={disabled}
+            autoComplete={index === 0 ? 'one-time-code' : 'off'}
+            aria-label={`Digit ${index + 1} of ${length}`}
+          />
+        </div>
       ))}
     </div>
   );
