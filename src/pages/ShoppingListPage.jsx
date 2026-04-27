@@ -30,7 +30,6 @@ export function ShoppingListPage() {
     markRecipeAsUnpurchased,
     clearShoppingList,
     addSingleIngredient,
-    updateIngredientName,
     smartGroups,
     setSmartGroups,
     smartStatus,
@@ -50,7 +49,6 @@ export function ShoppingListPage() {
     showToast,
   } = useApp();
   const { preferences } = usePreferences();
-  const [pendingQuantityIds, setPendingQuantityIds] = React.useState(new Set());
   const [isActionSheetOpen, setIsActionSheetOpen] = React.useState(false);
   const [isShareSheetOpen, setIsShareSheetOpen] = React.useState(false);
   const [isRenaming, setIsRenaming] = React.useState(false);
@@ -68,19 +66,8 @@ export function ShoppingListPage() {
   });
 
   const handleAddIngredient = React.useCallback((name) => {
-    const entryId = addSingleIngredient(name);
-    if (entryId) setPendingQuantityIds(prev => new Set([...prev, entryId]));
+    addSingleIngredient(name);
   }, [addSingleIngredient]);
-
-  const handleSetQuantity = React.useCallback((entryId, ingredientName, quantity) => {
-    const newName = quantity.trim() ? `${quantity.trim()} ${ingredientName}` : ingredientName;
-    updateIngredientName(entryId, newName);
-    setPendingQuantityIds(prev => {
-      const next = new Set(prev);
-      next.delete(entryId);
-      return next;
-    });
-  }, [updateIngredientName]);
 
   const togglePantryStaple = React.useCallback((itemName) => {
     setPantryStaples(prev => {
@@ -139,9 +126,7 @@ export function ShoppingListPage() {
     return acc;
   }, []);
 
-  const filteredList = shoppingList
-    .map((item, originalIdx) => ({ ...item, originalIdx }))
-    .filter(item => !pendingQuantityIds.has(item.entryId));
+  const filteredList = shoppingList.map((item, originalIdx) => ({ ...item, originalIdx }));
 
   const items = filteredList.map(item => item.name);
   const itemKeys = filteredList.map((item, index) => item.entryId ?? `${item.id}-${index}`);
@@ -303,10 +288,6 @@ export function ShoppingListPage() {
         onRecipeDelete={(recipeId) => deleteRecipeFromShoppingList(recipeId)}
         onClearList={clearShoppingList}
         onAddIngredient={handleAddIngredient}
-        pendingItems={shoppingList
-          .filter(item => pendingQuantityIds.has(item.entryId))
-          .map(item => ({ entryId: item.entryId, name: item.name }))}
-        onSetQuantity={handleSetQuantity}
       />
 
       {/* List action sheet */}

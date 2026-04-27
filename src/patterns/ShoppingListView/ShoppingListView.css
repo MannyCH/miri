@@ -404,45 +404,6 @@
   color: var(--color-text-brand);
 }
 
-/* Pending ingredient rows (quantity input) */
-.shopping-list-pending {
-  width: 100%;
-}
-
-.pending-ingredient-row {
-  width: 100%;
-}
-
-.pending-ingredient-content {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-8);
-  padding: var(--spacing-12) var(--spacing-16);
-  min-height: var(--spacing-48);
-}
-
-.pending-ingredient-quantity {
-  width: var(--spacing-64);
-  flex-shrink: 0;
-  padding: var(--spacing-4) var(--spacing-8);
-  border: 1px solid var(--color-stroke-weak);
-  border-radius: var(--corner-radius-4);
-  background: var(--color-background-raised);
-  color: var(--color-text-strong);
-  text-align: center;
-  font-family: inherit;
-}
-
-.pending-ingredient-quantity:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: 1px;
-}
-
-.pending-ingredient-name {
-  flex: 1;
-  color: var(--color-text-strong);
-}
-
 
 /* Pantry staples section header */
 .smart-group-header--pantry {
