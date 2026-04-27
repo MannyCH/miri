@@ -46,10 +46,16 @@ export function PreferencesProvider({ children }) {
   const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(false);
   const saveTimeoutRef = useRef(null);
+  const pendingPayloadRef = useRef(null);
+  // Mirror of the latest preferences so updatePreferences can compute the
+  // next state synchronously, without relying on the setState updater
+  // callback (which runs async and would race flushPreferences).
+  const stateRef = useRef(DEFAULT_PREFERENCES);
 
   // Fetch as soon as the user is authenticated — not when Account page opens
   useEffect(() => {
     if (!isAuthenticated) {
+      stateRef.current = DEFAULT_PREFERENCES;
       setPreferences(DEFAULT_PREFERENCES);
       return;
     }
@@ -58,30 +64,29 @@ export function PreferencesProvider({ children }) {
     fetchPreferences()
       .then((row) => {
         const state = rowToState(row);
-        if (state) setPreferences(state);
+        if (state) {
+          stateRef.current = state;
+          setPreferences(state);
+        }
       })
       .catch((err) => console.error('[preferences] load failed:', err))
       .finally(() => setIsLoading(false));
   }, [isAuthenticated]);
 
-  const pendingPayloadRef = useRef(null);
-
   const updatePreferences = useCallback((updates) => {
-    setPreferences((prev) => {
-      const next = { ...prev, ...updates };
-      pendingPayloadRef.current = stateToPayload(next);
+    const next = { ...stateRef.current, ...updates };
+    stateRef.current = next;
+    pendingPayloadRef.current = stateToPayload(next);
+    setPreferences(next);
 
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = setTimeout(() => {
-        const payload = pendingPayloadRef.current;
-        pendingPayloadRef.current = null;
-        savePreferences(payload).catch((err) =>
-          console.error('[preferences] save failed:', err)
-        );
-      }, SAVE_DEBOUNCE_MS);
-
-      return next;
-    });
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      const payload = pendingPayloadRef.current;
+      pendingPayloadRef.current = null;
+      savePreferences(payload).catch((err) =>
+        console.error('[preferences] save failed:', err)
+      );
+    }, SAVE_DEBOUNCE_MS);
   }, []);
 
   // Flush any pending debounced save immediately. Used by onboarding to
