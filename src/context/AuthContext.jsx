@@ -57,9 +57,13 @@ export function AuthProvider({ children }) {
       email: normalizeEmail(email),
       password,
     });
-    const message = getErrorMessage(result, 'Sign-in failed.');
-    if (message) {
-      throw new Error(message);
+    if (result?.error) {
+      const is4xx = result.error.status >= 400 && result.error.status < 500;
+      const fallback = is4xx ? 'Invalid email or password.' : 'Something went wrong. Please try again.';
+      throw new Error(result.error.message || fallback);
+    }
+    if (!result?.data) {
+      throw new Error('Something went wrong. Please try again.');
     }
     await refreshSession();
     return result?.data ?? null;
