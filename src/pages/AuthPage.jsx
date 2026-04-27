@@ -196,6 +196,7 @@ export function AuthPage() {
         navigate('/auth?mode=verify-email', { replace: true });
         setMode(AUTH_MODES.VERIFY_EMAIL);
         setVerifyEmailAddress(trimmedEmail);
+        setTimeout(() => firstCodeInputRef.current?.focus(), 100);
 
         try {
           await signUp({ name: signUpName, email: trimmedEmail, password });
@@ -307,8 +308,11 @@ export function AuthPage() {
       if (mode === AUTH_MODES.SIGN_IN && /email not verified/i.test(authErrorMessage)) {
         setMode(AUTH_MODES.VERIFY_EMAIL);
         setVerifyEmailAddress(email);
-        setVerifyInfoMessage('Verification still left. Please check your email for the code.');
+        setVerifyInfoMessage('');
         setErrorMessage('');
+        // Auto-send a fresh code so user doesn't have to click Resend.
+        sendVerificationCode({ email: normalizeEmailAddress(email) }).catch(() => {});
+        setTimeout(() => firstCodeInputRef.current?.focus(), 100);
       } else if (mode === AUTH_MODES.SIGN_UP && /user already exists/i.test(authErrorMessage)) {
         const normalizedEmail = normalizeEmailAddress(email);
         const rememberedName = pendingSignUpNamesByEmail[normalizedEmail];
