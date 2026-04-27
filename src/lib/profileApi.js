@@ -27,6 +27,7 @@ export async function fetchPreferences() {
 export async function savePreferences({ servings, eatingStyle, goal, bmrKcal, cookingFrequency, unitSystem, onboardedAt }) {
   const { data: sessionData } = await dataClient.auth.getSession();
   const userId = sessionData?.user?.id;
+  console.log('[savePreferences] userId:', userId, 'session:', sessionData);
   if (!userId) throw new Error('Not authenticated');
 
   const payload = {
@@ -41,13 +42,16 @@ export async function savePreferences({ servings, eatingStyle, goal, bmrKcal, co
   };
   if (onboardedAt !== undefined) payload.onboarded_at = onboardedAt;
 
-  // Try updating the existing row first; if there is no row yet, insert one.
+  console.log('[savePreferences] payload:', payload);
+
   const { data: updated, error: updateError } = await dataClient
     .from(TABLE)
     .update(payload)
     .eq('user_id', userId)
     .select()
     .single();
+
+  console.log('[savePreferences] update result:', updated, 'error:', updateError);
 
   if (!updateError) return updated;
   if (updateError.code !== NO_ROWS_CODE) throw new Error(updateError.message);
@@ -57,6 +61,8 @@ export async function savePreferences({ servings, eatingStyle, goal, bmrKcal, co
     .insert(payload)
     .select()
     .single();
+
+  console.log('[savePreferences] insert result:', inserted, 'error:', insertError);
 
   if (insertError) throw new Error(insertError.message);
   return inserted;
