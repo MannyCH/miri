@@ -32,7 +32,7 @@ export function AuthPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useApp();
-  const { isAuthenticated, isAuthReady, signIn, signUp, requestPasswordReset, resetPassword, verifyEmail, sendVerificationCode } = useAuth();
+  const { isAuthenticated, isAuthReady, user, signIn, signUp, requestPasswordReset, resetPassword, verifyEmail, sendVerificationCode } = useAuth();
   const hasTokenParam = Boolean(params.get('token'));
 
   const initialMode = useMemo(() => {
@@ -195,7 +195,7 @@ export function AuthPage() {
         // the route guard redirects away from /auth before we can show OTP.
         navigate('/auth?mode=verify-email', { replace: true });
         setMode(AUTH_MODES.VERIFY_EMAIL);
-        setVerifyEmailAddress(email);
+        setVerifyEmailAddress(trimmedEmail);
 
         try {
           await signUp({ name: signUpName, email: trimmedEmail, password });
@@ -613,7 +613,7 @@ export function AuthPage() {
       <p className="auth-verify-subtitle text-body-small-regular">
         Enter the login code sent to:
         <br />
-        {verifyEmailAddress || email || 'your email'}
+        {verifyEmailAddress || email || user?.email || 'your email'}
       </p>
       {verifyInfoMessage ? (
         <p className="auth-verify-info text-body-small-regular">{verifyInfoMessage}</p>

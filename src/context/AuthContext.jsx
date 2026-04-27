@@ -87,24 +87,21 @@ export function AuthProvider({ children }) {
     const hasOtpMethod = Boolean(authClient.emailOtp?.verifyEmail);
     let result;
 
-    if (hasOtpMethod && email && code) {
+    if (hasOtpMethod && code) {
       result = await authClient.emailOtp.verifyEmail({
-        email: normalizeEmail(email),
+        email: normalizeEmail(email || ''),
         otp: code,
       });
     } else if (token) {
       result = await authClient.verifyEmail({
-        query: {
-          token,
-        },
+        query: { token },
       });
     } else {
-      throw new Error('Missing verification token or code.');
+      throw new Error('Please enter the verification code.');
     }
 
-    const message = getErrorMessage(result, 'Email verification failed.');
-    if (message) {
-      throw new Error(message);
+    if (result?.error) {
+      throw new Error('Code is incorrect. Please try again.');
     }
     await refreshSession();
     return result?.data ?? null;
