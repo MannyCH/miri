@@ -190,16 +190,29 @@ export function AuthPage() {
           setSignUpPasswordRulesTouched(true);
           return;
         }
-        await signUp({ name: signUpName, email: trimmedEmail, password });
+        // Push URL + mode synchronously BEFORE the async signup. Otherwise
+        // signup completes, isAuthenticated/emailVerified flip to true, and
+        // the route guard redirects away from /auth before we can show OTP.
+        navigate('/auth?mode=verify-email', { replace: true });
+        setMode(AUTH_MODES.VERIFY_EMAIL);
+        setVerifyEmailAddress(email);
+
+        try {
+          await signUp({ name: signUpName, email: trimmedEmail, password });
+        } catch (err) {
+          // For 'user already exists', the outer catch routes to verify-email
+          // intentionally — keep the URL/mode. For any other failure, roll back.
+          if (!/user already exists/i.test(err?.message || '')) {
+            navigate('/auth', { replace: true });
+            setMode(AUTH_MODES.SIGN_UP);
+          }
+          throw err;
+        }
+
         rememberPendingSignUpName(trimmedEmail, signUpName);
         setName(signUpName);
-        setVerifyEmailAddress(email);
-        setMode(AUTH_MODES.VERIFY_EMAIL);
         setPassword('');
         setSignUpPasswordRulesTouched(false);
-        // Push URL state so the route guard in App.jsx skips its redirect
-        // when the user lands here as already-authenticated (re-signup case).
-        navigate('/auth?mode=verify-email', { replace: true });
         return;
       }
 
