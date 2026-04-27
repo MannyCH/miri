@@ -34,3 +34,5 @@ build-storybook.log
 debug-storybook.log
 .vercel
 .env*.local
+.venv/
+scripts/
