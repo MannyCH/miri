@@ -14,7 +14,7 @@
   text-align: center;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .choice-tile:hover:not([disabled]) {
     background: var(--color-fill-brand-weak);
     border-color: var(--color-stroke-brand-strong);
