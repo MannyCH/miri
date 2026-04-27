@@ -47,16 +47,29 @@ export default async function middleware(request) {
     if (value) forwardHeaders.set(name, value);
   }
 
-  // Read body once for methods that have one
-  const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
+  // Read the body as text upfront — auth payloads are small JSON.
+  // Streaming via duplex:'half' crashes the Edge runtime with
+  // 'expected non-null body source' on certain requests.
+  const bodyText = request.method !== 'GET' && request.method !== 'HEAD'
+    ? await request.text().catch(() => null)
+    : null;
 
-  const upstream = await fetch(targetUrl, {
-    method: request.method,
-    headers: forwardHeaders,
-    body: hasBody ? request.body : undefined,
-    // @ts-ignore — duplex is required for streaming request bodies
-    duplex: hasBody ? 'half' : undefined,
-  });
+  let upstream;
+  try {
+    upstream = await fetch(targetUrl, {
+      method: request.method,
+      headers: forwardHeaders,
+      body: bodyText || undefined,
+    });
+  } catch (err) {
+    console.error('[neon-auth-proxy] fetch failed:', err);
+    return new Response(JSON.stringify({ error: 'Auth proxy fetch failed' }), {
+      status: 502,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  console.log('[neon-auth-proxy]', request.method, targetPath, '→', upstream.status);
 
   // Copy response headers, rewriting Set-Cookie domain
   const responseHeaders = new Headers(upstream.headers);
