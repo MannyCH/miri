@@ -496,7 +496,6 @@ function PendingIngredientRow({ entryId, name, onSetQuantity }) {
             if (e.key === 'Enter') { e.preventDefault(); inputRef.current?.blur(); }
           }}
           aria-label={`Quantity for ${name}`}
-          className="text-body-regular"
         />
         <span className="pending-ingredient-name text-body-small-regular">{name}</span>
       </div>
