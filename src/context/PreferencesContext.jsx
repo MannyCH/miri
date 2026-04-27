@@ -45,18 +45,19 @@ export function PreferencesProvider({ children }) {
   const { isAuthenticated } = useAuth();
   const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(false);
+  // isReady becomes true only after the first fetch completes for the current
+  // session. useNeedsOnboarding waits on this so it never makes a routing
+  // decision based on stale default preferences.
+  const [isReady, setIsReady] = useState(false);
   const saveTimeoutRef = useRef(null);
   const pendingPayloadRef = useRef(null);
-  // Mirror of the latest preferences so updatePreferences can compute the
-  // next state synchronously, without relying on the setState updater
-  // callback (which runs async and would race flushPreferences).
   const stateRef = useRef(DEFAULT_PREFERENCES);
 
-  // Fetch as soon as the user is authenticated — not when Account page opens
   useEffect(() => {
     if (!isAuthenticated) {
       stateRef.current = DEFAULT_PREFERENCES;
       setPreferences(DEFAULT_PREFERENCES);
+      setIsReady(false);
       return;
     }
 
@@ -70,7 +71,10 @@ export function PreferencesProvider({ children }) {
         }
       })
       .catch((err) => console.error('[preferences] load failed:', err))
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setIsLoading(false);
+        setIsReady(true);
+      });
   }, [isAuthenticated]);
 
   const updatePreferences = useCallback((updates) => {
@@ -104,7 +108,7 @@ export function PreferencesProvider({ children }) {
   }, []);
 
   return (
-    <PreferencesContext.Provider value={{ preferences, updatePreferences, flushPreferences, isLoading }}>
+    <PreferencesContext.Provider value={{ preferences, updatePreferences, flushPreferences, isLoading, isReady }}>
       {children}
     </PreferencesContext.Provider>
   );

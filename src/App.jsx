@@ -31,9 +31,12 @@ const JoinListPage = lazy(() => import('./pages/JoinListPage').then((module) => 
  */
 function useNeedsOnboarding() {
   const { user } = useAuth();
-  const { preferences, isLoading } = usePreferences();
+  const { preferences, isReady } = usePreferences();
   if (!user) return false;
-  if (isLoading) return null; // Still determining — don't make a routing decision yet
+  // Wait until the preferences fetch completes. Without this, there is a
+  // render where isAuthenticated=true but the useEffect hasn't fired yet,
+  // so preferences are still defaults → needsOnboarding incorrectly = true.
+  if (!isReady) return null;
   if (preferences.onboardedAt) return false;
   // Backfill: existing users who completed onboarding before we tracked it
   // in the DB may still have goal/eatingStyle set from that flow.
