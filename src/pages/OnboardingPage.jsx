@@ -45,23 +45,24 @@ function ProgressDots({ step }) {
 
 export function OnboardingPage() {
   const navigate = useNavigate();
-  const { updatePreferences } = usePreferences();
+  const { updatePreferences, flushPreferences } = usePreferences();
 
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState('');
   const [eatingStyle, setEatingStyle] = useState('');
   const [servings, setServings] = useState(2);
 
-  function markOnboardingDone(extraUpdates = {}) {
+  async function finishOnboarding(extraUpdates = {}) {
     updatePreferences({ ...extraUpdates, onboardedAt: new Date().toISOString() });
+    await flushPreferences();
+    navigate('/planning', { replace: true });
   }
 
   function handleSkip() {
     if (step < TOTAL_STEPS) {
       setStep((s) => s + 1);
     } else {
-      markOnboardingDone();
-      navigate('/planning', { replace: true });
+      finishOnboarding();
     }
   }
 
@@ -73,8 +74,7 @@ export function OnboardingPage() {
       if (eatingStyle) updatePreferences({ eatingStyle });
       setStep(3);
     } else {
-      markOnboardingDone({ servings });
-      navigate('/planning', { replace: true });
+      finishOnboarding({ servings });
     }
   }
 

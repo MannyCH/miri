@@ -64,13 +64,18 @@ export function PreferencesProvider({ children }) {
       .finally(() => setIsLoading(false));
   }, [isAuthenticated]);
 
+  const pendingPayloadRef = useRef(null);
+
   const updatePreferences = useCallback((updates) => {
     setPreferences((prev) => {
       const next = { ...prev, ...updates };
+      pendingPayloadRef.current = stateToPayload(next);
 
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(() => {
-        savePreferences(stateToPayload(next)).catch((err) =>
+        const payload = pendingPayloadRef.current;
+        pendingPayloadRef.current = null;
+        savePreferences(payload).catch((err) =>
           console.error('[preferences] save failed:', err)
         );
       }, SAVE_DEBOUNCE_MS);
@@ -79,8 +84,25 @@ export function PreferencesProvider({ children }) {
     });
   }, []);
 
+  // Flush any pending debounced save immediately. Used by onboarding to
+  // ensure onboarded_at is persisted before navigating away.
+  const flushPreferences = useCallback(async () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+    const payload = pendingPayloadRef.current;
+    if (!payload) return;
+    pendingPayloadRef.current = null;
+    try {
+      await savePreferences(payload);
+    } catch (err) {
+      console.error('[preferences] flush failed:', err);
+    }
+  }, []);
+
   return (
-    <PreferencesContext.Provider value={{ preferences, updatePreferences, isLoading }}>
+    <PreferencesContext.Provider value={{ preferences, updatePreferences, flushPreferences, isLoading }}>
       {children}
     </PreferencesContext.Provider>
   );
