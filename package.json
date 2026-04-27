@@ -31,7 +31,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "@base-ui/react": "^1.1.0",
-    "@neondatabase/auth": "^0.1.0-beta.21",
+    "@neondatabase/auth": "^0.2.0-beta.1",
     "@neondatabase/neon-js": "^0.2.0-beta.1",
     "@neondatabase/serverless": "^1.0.2",
     "@vercel/blob": "^2.3.1",
