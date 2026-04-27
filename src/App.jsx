@@ -34,9 +34,13 @@ function useNeedsOnboarding() {
   const { preferences, isLoading } = usePreferences();
   if (!user) return false;
   if (isLoading) return null; // Still determining — don't make a routing decision yet
-  const done = localStorage.getItem(`miri_onboarding_${user.id}`);
-  if (done) return false;
-  return !preferences.goal && !preferences.eatingStyle;
+  if (preferences.onboardedAt) return false;
+  // Backfill: existing users who completed onboarding before we tracked it
+  // in the DB may still have goal/eatingStyle set from that flow.
+  if (preferences.goal || preferences.eatingStyle) return false;
+  // Legacy localStorage fallback for users who only have the device marker.
+  const legacyDone = localStorage.getItem(`miri_onboarding_${user.id}`);
+  return !legacyDone;
 }
 
 function AppContent() {

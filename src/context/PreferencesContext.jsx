@@ -11,6 +11,7 @@ const DEFAULT_PREFERENCES = {
   bmr: '',
   cookingFrequency: 'daily',
   unitSystem: 'metric',
+  onboardedAt: null,
 };
 
 const SAVE_DEBOUNCE_MS = 1000;
@@ -24,6 +25,7 @@ function rowToState(row) {
     bmr: row.bmr_kcal != null ? String(row.bmr_kcal) : '',
     cookingFrequency: row.cooking_frequency ?? 'daily',
     unitSystem: row.unit_system ?? 'metric',
+    onboardedAt: row.onboarded_at ?? null,
   };
 }
 
@@ -35,6 +37,7 @@ function stateToPayload(state) {
     bmrKcal: state.bmr ? parseInt(state.bmr, 10) : null,
     cookingFrequency: state.cookingFrequency || 'daily',
     unitSystem: state.unitSystem || 'metric',
+    onboardedAt: state.onboardedAt ?? null,
   };
 }
 

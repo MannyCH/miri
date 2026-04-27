@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS user_preferences (
   eating_style TEXT,
   goal         TEXT,
   bmr_kcal     INTEGER,
+  onboarded_at TIMESTAMPTZ,
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

@@ -4,7 +4,6 @@ import { Button } from '../components/Button/Button';
 import { ChoiceTile } from '../components/ChoiceTile/ChoiceTile';
 import { Stepper } from '../components/Stepper/Stepper';
 import { usePreferences } from '../context/PreferencesContext';
-import { useAuth } from '../context/AuthContext';
 import '../patterns/OnboardingView/OnboardingView.css';
 
 const GOAL_OPTIONS = [
@@ -47,17 +46,14 @@ function ProgressDots({ step }) {
 export function OnboardingPage() {
   const navigate = useNavigate();
   const { updatePreferences } = usePreferences();
-  const { user } = useAuth();
 
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState('');
   const [eatingStyle, setEatingStyle] = useState('');
   const [servings, setServings] = useState(2);
 
-  function markOnboardingDone() {
-    if (user?.id) {
-      localStorage.setItem(`miri_onboarding_${user.id}`, '1');
-    }
+  function markOnboardingDone(extraUpdates = {}) {
+    updatePreferences({ ...extraUpdates, onboardedAt: new Date().toISOString() });
   }
 
   function handleSkip() {
@@ -77,8 +73,7 @@ export function OnboardingPage() {
       if (eatingStyle) updatePreferences({ eatingStyle });
       setStep(3);
     } else {
-      updatePreferences({ servings });
-      markOnboardingDone();
+      markOnboardingDone({ servings });
       navigate('/planning', { replace: true });
     }
   }
