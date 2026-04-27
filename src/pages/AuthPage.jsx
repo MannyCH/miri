@@ -660,13 +660,15 @@ export function AuthPage() {
           )}
         </div>
       </form>
-      <Button
-        variant="tertiary"
-        style={{ marginTop: 'var(--spacing-8)' }}
-        onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
-      >
-        Back to login
-      </Button>
+      <div className="auth-verify-back">
+        <Button
+          variant="tertiary"
+          style={{ marginTop: 'var(--spacing-8)' }}
+          onClick={() => resetModeUiState(AUTH_MODES.SIGN_IN)}
+        >
+          Back to login
+        </Button>
+      </div>
     </section>
   );
 

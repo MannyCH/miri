@@ -1,10 +1,14 @@
 .otp-code-input {
   display: flex;
   gap: var(--spacing-8);
+  width: 100%;
+  max-width: 100%;
 }
 
 .otp-code-input__digit {
-  width: 44px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 44px;
   height: 52px;
   box-sizing: border-box;
   border: 1px solid var(--color-stroke-weak);

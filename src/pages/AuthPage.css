@@ -167,6 +167,10 @@
   align-items: flex-start;
 }
 
+.auth-verify-back {
+  align-self: flex-start;
+}
+
 .auth-page-status {
   min-height: 100%;
   display: grid;
