@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { motion } from 'motion/react';
 import { AlertTriangle, Check, CheckCircle, Circle, Loader, X } from 'react-feather';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -194,9 +195,13 @@ export function AuthPage() {
         // signup completes, isAuthenticated/emailVerified flip to true, and
         // the route guard redirects away from /auth before we can show OTP.
         navigate('/auth?mode=verify-email', { replace: true });
-        setMode(AUTH_MODES.VERIFY_EMAIL);
-        setVerifyEmailAddress(trimmedEmail);
-        setTimeout(() => firstCodeInputRef.current?.focus(), 100);
+        // flushSync renders the OTP screen synchronously while still inside
+        // the user gesture so the mobile keyboard opens on the first digit.
+        flushSync(() => {
+          setMode(AUTH_MODES.VERIFY_EMAIL);
+          setVerifyEmailAddress(trimmedEmail);
+        });
+        firstCodeInputRef.current?.focus();
 
         try {
           await signUp({ name: signUpName, email: trimmedEmail, password });
@@ -630,6 +635,7 @@ export function AuthPage() {
           value={verificationCode}
           onChange={setVerificationCode}
           error={verifyActionState === 'error'}
+          autoFocus
         />
 
         {errorMessage ? <p className="auth-error">{errorMessage}</p> : null}

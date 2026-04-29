@@ -7,6 +7,7 @@ export const OtpCodeInput = React.forwardRef(({
   onChange,
   disabled = false,
   error = false,
+  autoFocus = false,
 }, ref) => {
   const inputRefs = useRef([]);
   const digits = Array.from({ length }, (_, i) => value[i] ?? '');
@@ -59,6 +60,7 @@ export const OtpCodeInput = React.forwardRef(({
             onPaste={index === 0 ? handlePaste : undefined}
             disabled={disabled}
             autoComplete={index === 0 ? 'one-time-code' : 'off'}
+            autoFocus={autoFocus && index === 0}
             aria-label={`Digit ${index + 1} of ${length}`}
           />
         </div>
