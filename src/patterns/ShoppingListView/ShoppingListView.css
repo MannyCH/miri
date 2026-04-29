@@ -362,46 +362,10 @@
   width: 100%;
 }
 
-/* Suggestion sheet — partial bottom overlay, scrollable, above add bar */
-.shopping-list-suggestions-sheet {
+/* Suggestion list container — sits in flex column above the add bar */
+.shopping-list-suggestions-container {
   flex-shrink: 0;
-  max-height: 264px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  border-top: 1px solid var(--color-stroke-weak);
-  background: var(--color-background-raised);
-  box-shadow: var(--elevation-overlay);
-}
-
-/* Suggestions list items */
-.shopping-list-suggestion-item {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: var(--spacing-12) var(--spacing-16);
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--color-stroke-weak);
-  text-align: left;
-  color: var(--color-text-strong);
-  cursor: pointer;
-}
-
-.shopping-list-suggestion-item:last-child {
-  border-bottom: none;
-}
-
-.shopping-list-suggestion-item:active {
-  background: var(--color-background-sunken);
-}
-
-.shopping-list-suggestion-item:focus-visible {
-  outline: 2px solid var(--color-stroke-focus);
-  outline-offset: -2px;
-}
-
-.shopping-list-suggestion-add {
-  color: var(--color-text-brand);
+  padding: 0 var(--spacing-inset-md) var(--spacing-gap-sm);
 }
 
 

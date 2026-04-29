@@ -193,8 +193,9 @@ export const SmartViewLoading = {
 
 export const InteractiveListView = () => {
   const [items, setItems] = React.useState(sampleListItems);
+  const [itemKeys, setItemKeys] = React.useState(sampleListItems.map((_, i) => `key-${i}`));
+  const [itemIds, setItemIds] = React.useState(sampleListItems.map((_, i) => `id-${i}`));
   const [checkedItems, setCheckedItems] = React.useState({});
-  const [searchQuery, setSearchQuery] = React.useState('');
 
   const handleItemCheck = (index, checked) => {
     setCheckedItems(prev => ({ ...prev, [index]: checked }));
@@ -202,24 +203,30 @@ export const InteractiveListView = () => {
 
   const handleItemDelete = (index) => {
     setItems(prev => prev.filter((_, i) => i !== index));
-    
-    // Adjust checked items indices
+    setItemKeys(prev => prev.filter((_, i) => i !== index));
+    setItemIds(prev => prev.filter((_, i) => i !== index));
     setCheckedItems(prev => {
       const newChecked = {};
       Object.entries(prev).forEach(([key, value]) => {
         const idx = parseInt(key);
-        if (idx < index) {
-          newChecked[idx] = value;
-        } else if (idx > index) {
-          newChecked[idx - 1] = value;
-        }
+        if (idx < index) newChecked[idx] = value;
+        else if (idx > index) newChecked[idx - 1] = value;
       });
       return newChecked;
     });
   };
 
+  const handleAddIngredient = (name) => {
+    const id = `id-${Date.now()}`;
+    setItems(prev => [...prev, name]);
+    setItemKeys(prev => [...prev, `key-${id}`]);
+    setItemIds(prev => [...prev, id]);
+  };
+
   const handleClearList = () => {
     setItems([]);
+    setItemKeys([]);
+    setItemIds([]);
     setCheckedItems({});
   };
 
@@ -227,14 +234,23 @@ export const InteractiveListView = () => {
     <ShoppingListView
       viewMode="list"
       items={items}
+      itemKeys={itemKeys}
+      itemIds={itemIds}
       checkedItems={checkedItems}
       onItemCheck={handleItemCheck}
       onItemDelete={handleItemDelete}
       onClearList={handleClearList}
-      searchQuery={searchQuery}
-      onSearch={setSearchQuery}
+      onAddIngredient={handleAddIngredient}
     />
   );
+};
+
+InteractiveListView.parameters = {
+  docs: {
+    description: {
+      story: 'Fully interactive list view. Type in the search bar at the bottom to see up to 3 ingredient suggestions — tap a suggestion to add it. Press Enter to add exactly what you typed. Check items and swipe (on touch devices) to delete.',
+    },
+  },
 };
 
 export const InteractiveRecipeView = () => {

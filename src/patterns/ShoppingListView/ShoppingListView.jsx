@@ -7,6 +7,7 @@ import { SearchBar } from '../../components/SearchBar';
 import { Button } from '../../components/Button';
 import { ListSwitcher } from '../../components/ListSwitcher';
 import { AvatarRow } from '../../components/AvatarRow';
+import { SuggestionList } from '../../components/SuggestionList';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './ShoppingListView.css';
 
@@ -47,7 +48,7 @@ export const ShoppingListView = ({
 }) => {
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
-  const MAX_SUGGESTIONS = 5;
+  const MAX_SUGGESTIONS = 3;
   const [searchQuery, setSearchQuery] = useState('');
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
@@ -388,32 +389,13 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Suggestion sheet — partial overlay above add bar, visible while typing */}
-      {trimmedQuery.length > 0 && (
-        <div className="shopping-list-suggestions-sheet" role="listbox" aria-label="Ingredient suggestions">
-          {/* eslint-disable design-system/no-native-interactive-elements -- role="option" inside role="listbox" is the correct ARIA pattern; <Button> cannot carry role="option" */}
-          <button
-            type="button"
-            className="shopping-list-suggestion-item shopping-list-suggestion-add text-body-regular"
-            role="option"
-            aria-selected="false"
-            onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(trimmedQuery); }}
-          >
-            Add &ldquo;{trimmedQuery}&rdquo;
-          </button>
-          {suggestions.map((name) => (
-            <button
-              key={name}
-              type="button"
-              className="shopping-list-suggestion-item text-body-regular"
-              role="option"
-              aria-selected="false"
-              onMouseDown={(e) => { e.preventDefault(); handleAddSuggestion(name); }}
-            >
-              {name}
-            </button>
-          ))}
-          {/* eslint-enable design-system/no-native-interactive-elements */}
+      {/* Suggestion list — floating card above add bar, visible while typing */}
+      {suggestions.length > 0 && (
+        <div className="shopping-list-suggestions-container">
+          <SuggestionList
+            suggestions={suggestions}
+            onSelect={handleAddSuggestion}
+          />
         </div>
       )}
 
