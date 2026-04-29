@@ -22,7 +22,23 @@ export default {
 
 ## Pairs well with
 - \`Divider\` — rendered internally via \`showUpperDivider\` / \`showBelowDivider\` props; do not add extra dividers outside
-- \`IngredientList\` — the preferred wrapper when rendering a full list from an array`,
+- \`IngredientList\` — the preferred wrapper when rendering a full list from an array
+
+## Token mapping
+| Element | State | Token |
+|---------|-------|-------|
+| Row background | — | \`--color-background-raised\` |
+| Row background (context area) | — | \`--color-background-sunken\` |
+| Ingredient text | unchecked | \`--color-text-strong\` · \`text-body-small-regular\` |
+| Ingredient text | checked | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Swipe-left reveal (delete) | — | \`--color-fill-error-strong\` |
+| Swipe-right reveal (pantry) | — | \`--color-fill-brand-strong\` |
+| Swipe action icon | — | \`--color-text-inverted\` |
+| Focus ring | focused | \`--color-stroke-focus\` |
+| Row radius | — | \`--corner-radius-8\` |
+| Action icon radius | — | \`--corner-radius-4\` |
+| Row padding | — | \`--spacing-16\` |
+| Row gap | — | \`--spacing-8\`, \`--spacing-12\`, \`--spacing-24\` |`,
       },
     },
   },

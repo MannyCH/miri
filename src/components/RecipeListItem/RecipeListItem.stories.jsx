@@ -21,7 +21,19 @@ export default {
 
 ## Pairs well with
 - \`RecipeList\` — the standard container that maps an array of recipes to RecipeListItems with correct divider placement
-- \`Divider\` — managed via \`showUpperDivider\` and \`showBelowDivider\` props; do not add extra Dividers around this component`,
+- \`Divider\` — managed via \`showUpperDivider\` and \`showBelowDivider\` props; do not add extra Dividers around this component
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Row background | \`--color-background-raised\` |
+| Thumbnail background | \`--color-background-sunken\` |
+| Title text | \`--color-text-strong\` · \`text-h4-regular\` |
+| Placeholder icon | \`--color-icon-weak\` |
+| Focus ring | \`--color-stroke-focus\` |
+| Thumbnail radius | \`--corner-radius-4\` |
+| Row radius | \`--corner-radius-8\` |
+| Row padding | \`--spacing-12\`, \`--spacing-16\` |`,
       },
     },
   },

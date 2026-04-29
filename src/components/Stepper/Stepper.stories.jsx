@@ -25,6 +25,21 @@ Increment/decrement control for selecting a small integer value. Shows the curre
 ## Pairs well with
 - \`SettingsSection\` as the grouping container
 - \`SelectField\` for adjacent preference controls
+
+## Token mapping
+| Element | State | Token |
+|---------|-------|-------|
+| Container background | — | \`--color-fill-brand-weak\` |
+| Container border | — | \`--color-stroke-weak\` |
+| − / + button fill | hover | \`--color-fill-hover\` |
+| − / + button fill | pressed | \`--color-fill-white\` |
+| Value text | active | \`--color-text-strong\` · \`text-body-regular\` |
+| Value text | disabled | \`--color-text-disabled\` |
+| Label | — | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Container height | — | \`--control-height\` |
+| Container radius | — | \`--corner-radius-8\` |
+| Button area width | — | \`--spacing-56\` |
+| Padding | — | \`--spacing-8\`, \`--spacing-16\` |
         `.trim(),
       },
     },

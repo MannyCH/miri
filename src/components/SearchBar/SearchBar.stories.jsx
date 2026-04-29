@@ -25,6 +25,20 @@ Search bar input with an optional trailing icon. Matches the Figma search bar de
 ## Pairs well with
 - A results list or filtered recipe grid rendered below it
 - \`Button\` with a clear/cancel action to dismiss the search
+
+## Token mapping
+| Element | State | Token |
+|---------|-------|-------|
+| Input background | default | \`--color-fill-brand-weak\` |
+| Input border | default | \`--color-stroke-weak\` |
+| Input border | focused | \`--color-stroke-focus\` |
+| Input text | — | \`--color-text-strong\` |
+| Placeholder | — | \`--color-text-weak\` |
+| Search icon | — | \`--color-icon-brand\` |
+| Outer radius | — | \`--corner-radius-16\` |
+| Input radius | — | \`--corner-radius-4\` |
+| Padding | — | \`--spacing-8\`, \`--spacing-16\` |
+| Font | — | \`--font-family-body\` (native input) |
         `.trim(),
       },
     },

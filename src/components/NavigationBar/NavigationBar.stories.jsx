@@ -22,7 +22,18 @@ export default {
 
 ## Pairs well with
 - \`NavItem\` — rendered internally; no need to import or manage NavItems separately
-- React Router \`useLocation\` — derive \`activeItem\` from the current pathname`,
+- React Router \`useLocation\` — derive \`activeItem\` from the current pathname
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Bar background | \`--color-background-raised\` |
+| Page background (behind bar) | \`--color-background-base\` |
+| Top border | \`--color-stroke-weak\` |
+| Title text | \`--color-text-strong\` · \`text-h3-bold\` |
+| Items gap | \`--spacing-4\` |
+| Side padding | \`--spacing-24\` |
+| Safe area | \`--safe-area-inset-bottom\` (iPhone home indicator clearance) |`,
       },
     },
   },

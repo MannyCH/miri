@@ -23,7 +23,14 @@ export default {
 ## Pairs well with
 - A search or filter bar above the list
 - \`RecipeListItem\` — rendered internally; no need to import separately
-- An "Import recipe" button or FAB below or above the list`,
+- An "Import recipe" button or FAB below or above the list
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| List container background | \`--color-background-raised\` |
+| Empty state text | \`--color-text-weak\` · \`text-body-base-regular\` |
+| Container padding | \`--spacing-16\`, \`--spacing-32\` |`,
       },
     },
   },

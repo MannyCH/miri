@@ -21,7 +21,19 @@ export default {
 
 ## Pairs well with
 - \`CalendarWeek\` — wraps a row of 7 CalendarButtons
-- \`CalendarModule\` — adds a title and horizontal scroll behaviour to a sequence of CalendarButtons`,
+- \`CalendarModule\` — adds a title and horizontal scroll behaviour to a sequence of CalendarButtons
+
+## Token mapping
+| Element | State | Token |
+|---------|-------|-------|
+| Button fill | selected | \`--color-fill-selected\` |
+| Day number | selected | \`--color-text-inverted\` · \`text-body-small-regular\` |
+| Day number | default | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Day number | disabled/past | \`--color-text-disabled\` |
+| Weekday label | all | \`--color-grey-slate-light-500\` · \`text-tiny-regular\` |
+| Focus ring | focused | \`--color-stroke-focus\` |
+| Button radius | — | \`--corner-radius-8\` |
+| Cell padding | — | \`--spacing-4\`, \`--spacing-16\` |`,
       },
     },
   },

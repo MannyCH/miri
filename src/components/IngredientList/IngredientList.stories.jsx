@@ -22,7 +22,16 @@ export default {
 ## Pairs well with
 - \`IngredientListItem\` — rendered internally, no need to import separately
 - A section heading or recipe title above the list
-- \`Divider\` — automatically managed; do not add extra dividers around this component`,
+- \`Divider\` — automatically managed; do not add extra dividers around this component
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| List container background | \`--color-background-raised\` |
+| Sunken inset areas | \`--color-background-sunken\` |
+| Empty state text | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Container radius | \`--corner-radius-8\` |
+| Container padding | \`--spacing-16\`, \`--spacing-24\` |`,
       },
     },
   },

@@ -20,7 +20,20 @@ export default {
 
 ## Pairs well with
 - A calorie/kcal goal input field directly above or below — the BMR result flows directly into that field
-- \`AccountCard\` as part of the account page stack`,
+- \`AccountCard\` as part of the account page stack
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Card background | \`--color-background-sunken\` |
+| Card border | \`--color-stroke-weak\` |
+| Body / field labels | \`--color-text-strong\` · \`text-body-small-regular\` |
+| Secondary text | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Expand link | \`--color-text-strong\` · \`text-body-small-bold-underlined\` |
+| Gender label | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Card radius | \`--corner-radius-16\` |
+| Inner padding | \`--spacing-16\` |
+| Field gap | \`--spacing-8\` |`,
       },
     },
   },

@@ -23,7 +23,15 @@ export default {
 
 ## Pairs well with
 - Other RadioButtons sharing the same \`name\` — always render as a group
-- A \`<fieldset>\` + \`<legend>\` to give the group an accessible label (required for WCAG 2.1 AA)`,
+- A \`<fieldset>\` + \`<legend>\` to give the group an accessible label (required for WCAG 2.1 AA)
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Checked icon | \`--color-icon-brand\` |
+| Label text | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Focus ring | \`--color-stroke-focus\` |
+| Icon/label gap | \`--spacing-8\`, \`--spacing-gap-sm\` |`,
       },
     },
   },
