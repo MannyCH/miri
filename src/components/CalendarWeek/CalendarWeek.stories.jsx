@@ -21,7 +21,11 @@ export default {
 
 ## Pairs well with
 - \`CalendarModule\` uses its own scroll logic rather than composing CalendarWeek, but CalendarWeek is the right building block when you need a standalone week row
-- Week-header patterns inside meal cards or summary widgets`,
+- Week-header patterns inside meal cards or summary widgets
+
+## Tokens used
+- Cell gap: \`--spacing-4\`
+- All other tokens: inherited from \`CalendarButton\` — see [CalendarButton](?path=/docs/components-calendarbutton--docs) for the full mapping`,
       },
     },
   },

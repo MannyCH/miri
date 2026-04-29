@@ -33,6 +33,16 @@ Section container with a bold title header and a bottom divider. Groups related 
 |-------|-------------|-------------|
 | \`normal\` | 8px | First section or tightly grouped sections |
 | \`section\` | 32px | Secondary/advanced sections that need visual breathing room |
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Section title | \`--color-text-strong\` · \`text-body-bold\` |
+| Secondary text | \`--color-text-weak\` |
+| Bottom divider | \`--color-stroke-weak\` |
+| Content padding | \`--spacing-16\` |
+| Row gap | \`--spacing-8\` |
+| Section top spacing (\`section\`) | \`--spacing-32\` |
         `.trim(),
       },
     },

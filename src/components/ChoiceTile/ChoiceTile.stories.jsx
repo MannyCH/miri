@@ -23,7 +23,21 @@ export default {
 
 ## Pairs well with
 - A \`ChoiceTile\` group (map over options array) stacked vertically with \`gap: var(--spacing-8)\`
-- A \`Button variant="primary"\` Continue button below the group to advance the onboarding step`,
+- A \`Button variant="primary"\` Continue button below the group to advance the onboarding step
+
+## Token mapping
+| Element | State | Token |
+|---------|-------|-------|
+| Tile background | unselected | \`--color-background-base\` |
+| Tile background | selected | \`--color-fill-brand-weak\` |
+| Tile border | unselected | \`--color-stroke-brand-weak\` |
+| Tile border | selected | \`--color-stroke-brand-strong\` |
+| Label | unselected | \`--color-text-strong\` · \`text-body-regular\` |
+| Label | selected | \`--color-text-brand\` · \`text-body-regular\` |
+| Focus ring | focused | \`--color-stroke-focus\` |
+| Tile radius | — | \`--corner-radius-12\` |
+| Tile padding | — | \`--spacing-16\`, \`--spacing-24\` |
+| Group gap | — | \`--spacing-8\` |`,
       },
     },
   },

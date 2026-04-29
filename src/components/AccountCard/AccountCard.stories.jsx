@@ -20,7 +20,22 @@ export default {
 
 ## Pairs well with
 - Placed at the top of the account page above preference cards (e.g. \`BmrCalculatorCard\`, calorie goal sections)
-- The expandable section maps to \`ConfirmDialog\` for destructive actions like delete account`,
+- The expandable section maps to \`ConfirmDialog\` for destructive actions like delete account
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Card background | \`--color-background-raised\` |
+| Card border | \`--color-stroke-weak\` |
+| Name text | \`--color-text-strong\` · \`text-body-bold\` |
+| Email text | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Action labels | \`--color-text-strong\` · \`text-body-small-bold\` |
+| Destructive action | \`--color-text-error\` |
+| Icon | \`--color-icon-brand\` |
+| Card radius | \`--corner-radius-16\` |
+| Inner padding | \`--spacing-16\` |
+| Row gap | \`--spacing-8\`, \`--spacing-12\` |
+| Section spacing | \`--spacing-32\` |`,
       },
     },
   },

@@ -26,6 +26,18 @@ Number input with a fixed unit label displayed to the right of the input. Design
 - \`SettingsSection\` as the grouping container
 - Multiple \`UnitField\` instances side by side (e.g. weight + height in the same row)
 - \`SelectField\` and \`Stepper\` in the same settings section
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Input background | \`--color-fill-brand-weak\` |
+| Input border | \`--color-stroke-weak\` |
+| Label | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Input value | \`--color-text-strong\` · \`text-body-regular\` |
+| Unit label | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Input height | \`--control-height\` |
+| Input radius | \`--corner-radius-8\` |
+| Padding | \`--spacing-8\`, \`--spacing-16\`, \`--spacing-32\`, \`--spacing-96\` |
         `.trim(),
       },
     },

@@ -25,6 +25,18 @@ Labelled dropdown select field. Wraps a native \`<select>\` element with a style
 ## Pairs well with
 - \`SettingsSection\` as the grouping container
 - \`Stepper\` for adjacent settings rows (e.g. serving size next to eating style)
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Input background | \`--color-fill-brand-weak\` |
+| Input border | \`--color-stroke-weak\` |
+| Label | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Selected value | \`--color-text-strong\` · \`text-body-regular\` |
+| Chevron icon | \`--color-icon-brand\` |
+| Input height | \`--control-height\` |
+| Input radius | \`--corner-radius-8\` |
+| Padding | \`--spacing-8\`, \`--spacing-16\`, \`--spacing-32\` |
         `.trim(),
       },
     },

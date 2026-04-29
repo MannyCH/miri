@@ -20,7 +20,18 @@ export default {
 
 ## Pairs well with
 - Placed inside an account/settings page beneath the \`AccountCard\`
-- Can be preceded by a short explainer paragraph about the expected folder structure (\`.txt\` + matching image filenames)`,
+- Can be preceded by a short explainer paragraph about the expected folder structure (\`.txt\` + matching image filenames)
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Card background | \`--color-background-raised\` |
+| Card border | \`--color-stroke-weak\` |
+| Description text | \`--color-text-strong\` · \`text-body-base-regular\` |
+| Status / secondary text | \`--color-text-weak\` · \`text-body-base-regular\` |
+| Icon | \`--color-icon-brand\` |
+| Progress bar radius | \`--corner-radius-4\` |
+| Row gap | \`--spacing-4\`, \`--spacing-8\`, \`--spacing-12\` |`,
       },
     },
   },

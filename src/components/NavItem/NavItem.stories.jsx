@@ -21,7 +21,18 @@ export default {
 - Do not use standalone outside a navigation bar context; the visual treatment assumes peer items
 
 ## Pairs well with
-- \`NavigationBar\` — the standard container that renders four NavItems and manages the active state`,
+- \`NavigationBar\` — the standard container that renders four NavItems and manages the active state
+
+## Token mapping
+| Element | State | Token |
+|---------|-------|-------|
+| Label | active (pressed) | \`--color-text-strong\` |
+| Label | inactive | \`--color-text-weak\` |
+| Icon | all | \`--color-icon-neutral\` |
+| Focus ring | focused | \`--color-stroke-focus\` |
+| Focus radius | — | \`--corner-radius-4\` |
+| Icon/label gap | — | \`--spacing-4\` |
+| Tap target padding | — | \`--spacing-8\`, \`--spacing-24\` |`,
       },
     },
   },

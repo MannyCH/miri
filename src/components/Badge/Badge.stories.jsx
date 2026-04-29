@@ -22,7 +22,13 @@ export default {
 
 ## Pairs well with
 - Navigation bar icons where an item count needs surfacing
-- List row icons to indicate pending or new items`,
+- List row icons to indicate pending or new items
+
+## Tokens used
+- Background: \`--color-fill-brand-weak\`
+- Border: \`--color-stroke-weak\`
+- Text: \`--color-grey-slate-light-950\` · \`text-tiny-bold\`
+- Shape: \`--corner-radius-pill\``,
       },
     },
   },

@@ -25,6 +25,18 @@ Six single-character digit boxes for OTP / email verification codes.
 - Backspace on an empty box moves focus to the previous box
 - Pasting a full code (e.g. from clipboard) fills all boxes at once
 - \`error\` prop switches borders to \`--color-stroke-error-strong\`
+
+## Token mapping
+| Element | State | Token |
+|---------|-------|-------|
+| Digit box border | default | \`--color-stroke-weak\` |
+| Digit box border | focused | \`--color-stroke-focus\` |
+| Digit box border | error | \`--color-stroke-error-strong\` |
+| Digit box fill | focused | \`--color-fill-brand-weak\` |
+| Digit text | — | \`--color-text-strong\` · \`text-body-regular\` |
+| Helper text | — | \`--color-text-weak\` · \`text-body-small-regular\` |
+| Box radius | — | \`--corner-radius-8\` |
+| Box padding | — | \`--spacing-8\`, \`--spacing-16\` |
         `,
       },
     },

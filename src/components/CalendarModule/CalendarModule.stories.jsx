@@ -22,7 +22,16 @@ export default {
 
 ## Pairs well with
 - Meal plan content panels rendered below the module that update when the selected day changes
-- \`CalendarButton\` (rendered internally — not composed manually)`,
+- \`CalendarButton\` (rendered internally — not composed manually)
+
+## Token mapping
+| Element | Token |
+|---------|-------|
+| Title text | \`--color-text-weak\` · \`text-h4-bold\` |
+| Scroll button fill (hover) | \`--color-fill-hover\` |
+| Container radius | \`--corner-radius-16\` |
+| Outer padding | \`--spacing-16\` |
+| Title / cell gap | \`--spacing-4\`, \`--spacing-12\` |`,
       },
     },
   },
