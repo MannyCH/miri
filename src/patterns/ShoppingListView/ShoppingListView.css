@@ -362,10 +362,34 @@
   width: 100%;
 }
 
-/* Suggestion list container — sits in flex column above the add bar */
-.shopping-list-suggestions-container {
+/* Unified overlay card — matches Figma node 604:2577 "Search Suggestion Overlay" */
+/* Suggestion list sits above, search bar sits below, no gap between them.        */
+.shopping-list-input-overlay {
   flex-shrink: 0;
-  padding: 0 var(--spacing-inset-md) var(--spacing-gap-sm);
+  margin: 0 var(--spacing-inset-md) var(--spacing-gap-sm);
+  background: var(--color-background-sunken);
+  border: 1px solid var(--color-stroke-brand-weak);
+  border-radius: var(--corner-radius-card);
+  box-shadow: var(--elevation-raised);
+}
+
+/* Strip SuggestionList's own card — the overlay provides card styling. */
+.shopping-list-input-overlay .suggestion-list {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* Fixed height = 3 items (56px each) + 2 dividers (1px each), regardless of count */
+.shopping-list-input-overlay .suggestion-list-items {
+  min-height: calc(3 * 56px + 2 * 1px);
+}
+
+/* Search bar row — flush at the bottom of the overlay card */
+.shopping-list-input-overlay-bar {
+  padding: var(--spacing-inset-xs);
+  border-top: 1px solid var(--color-stroke-brand-weak);
 }
 
 

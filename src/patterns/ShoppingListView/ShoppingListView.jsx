@@ -389,29 +389,40 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Suggestion list — floating card above add bar, visible while typing */}
-      {suggestions.length > 0 && (
-        <div className="shopping-list-suggestions-container">
+      {/* Input area — unified overlay card when typing, plain bar when idle */}
+      {suggestions.length > 0 ? (
+        <div className="shopping-list-input-overlay">
           <SuggestionList
             suggestions={suggestions}
             onSelect={handleAddSuggestion}
           />
+          <div className="shopping-list-input-overlay-bar">
+            <SearchBar
+              inputRef={searchInputRef}
+              placeholder="Ich brauche..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleAddBarKeyDown}
+              showTrailingIcon={false}
+              inputMode="text"
+              enterKeyHint="done"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="shopping-list-add-bar">
+          <SearchBar
+            inputRef={searchInputRef}
+            placeholder="Ich brauche..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleAddBarKeyDown}
+            showTrailingIcon={false}
+            inputMode="text"
+            enterKeyHint="done"
+          />
         </div>
       )}
-
-      {/* Add ingredient bar — always visible above nav */}
-      <div className="shopping-list-add-bar">
-        <SearchBar
-          inputRef={searchInputRef}
-          placeholder="Ich brauche..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleAddBarKeyDown}
-          showTrailingIcon={false}
-          inputMode="text"
-          enterKeyHint="done"
-        />
-      </div>
 
       {/* Bottom Navigation */}
       <NavigationBarConnected activeItem="shopping-list" />
