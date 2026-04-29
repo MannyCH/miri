@@ -44,12 +44,13 @@ export const ShoppingListView = ({
   onSwitchList,
   onMenuTap,
   onAddIngredient,
+  initialSearchQuery = '',
   ...props
 }) => {
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const MAX_SUGGESTIONS = 3;
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
