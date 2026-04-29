@@ -42,7 +42,7 @@ Section container with a bold title header and a bottom divider. Groups related 
 | Bottom divider | \`--color-stroke-weak\` |
 | Content padding | \`--spacing-16\` |
 | Row gap | \`--spacing-8\` |
-| Section top spacing (`section`) | \`--spacing-32\` |
+| Section top spacing (\`section\`) | \`--spacing-32\` |
         `.trim(),
       },
     },
