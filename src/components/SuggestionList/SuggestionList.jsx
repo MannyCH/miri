@@ -20,7 +20,6 @@ export const SuggestionList = ({
         {suggestions.map((name, index) => (
           <li key={name} role="presentation">
             {index > 0 && <Divider />}
-            {/* eslint-disable-next-line design-system/no-native-interactive-elements -- role="option" inside role="listbox" is the correct ARIA pattern; Button cannot carry role="option" */}
             <button
               type="button"
               className="suggestion-list-item text-body-regular"
