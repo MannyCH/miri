@@ -1,10 +1,12 @@
 /* ShoppingListView Pattern - Pure Flexbox Layout with Safe Areas */
+/* position: fixed + inset: 0 anchors the view to viewport coordinates,
+   preventing iOS Safari from shifting the layout up when window.scrollY
+   changes on keyboard focus (which would drag the navbar up). */
 .shopping-list-view {
-  position: relative;
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100svh;
   background: var(--color-background-base);
   max-width: 390px;
   margin: 0 auto;
