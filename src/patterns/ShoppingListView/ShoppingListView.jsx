@@ -51,23 +51,8 @@ export const ShoppingListView = ({
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const MAX_SUGGESTIONS = 3;
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => {
-      setKeyboardHeight(Math.max(0, window.innerHeight - vv.offsetTop - vv.height));
-    };
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
-    return () => {
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
-    };
-  }, []);
 
   const handleAddSuggestion = (name) => {
     onAddIngredient?.(name);
@@ -88,6 +73,11 @@ export const ShoppingListView = ({
         .filter(s => s.toLowerCase().startsWith(trimmedQuery.toLowerCase()))
         .slice(0, MAX_SUGGESTIONS)
     : [];
+
+  const showOverlay = suggestions.length > 0;
+  useEffect(() => {
+    searchInputRef.current?.focus();
+  }, [showOverlay]);
 
   const getRecipeGroupKey = (group, index) =>
     group.recipeId ?? group.id ?? group.recipeName ?? `group-${index}`;
@@ -174,7 +164,6 @@ export const ShoppingListView = ({
   return (
     <div
       className="shopping-list-view"
-      style={{ '--keyboard-height': `${keyboardHeight}px` }}
       {...props}
     >
       {/* Header */}

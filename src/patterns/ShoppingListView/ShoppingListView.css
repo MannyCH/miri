@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  height: 100dvh;
+  height: 100svh;
   background: var(--color-background-base);
   max-width: 390px;
   margin: 0 auto;
@@ -151,6 +151,8 @@
   padding: var(--spacing-16);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to bottom, black calc(100% - 56px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 56px), transparent 100%);
 }
 
 .shopping-list-clear {
@@ -354,7 +356,6 @@
 .shopping-list-add-bar {
   flex-shrink: 0;
   padding: var(--spacing-8) var(--spacing-16);
-  border-top: 1px solid var(--color-stroke-weak);
   background: var(--color-background-base);
 }
 
@@ -371,6 +372,7 @@
   border: 1px solid var(--color-stroke-brand-weak);
   border-radius: var(--corner-radius-card);
   box-shadow: var(--elevation-raised);
+  overflow: hidden; /* clips SearchBar corners to the card radius */
 }
 
 /* Strip SuggestionList's own card — the overlay provides card styling. */
@@ -386,10 +388,19 @@
   min-height: calc(3 * 56px + 2 * 1px);
 }
 
-/* Search bar row — flush at the bottom of the overlay card */
+/* Search bar row — flush at the bottom of the overlay card, no extra padding */
+/* Divider at the end of SuggestionList provides the separator above the search bar */
 .shopping-list-input-overlay-bar {
-  padding: var(--spacing-inset-xs);
-  border-top: 1px solid var(--color-stroke-brand-weak);
+}
+
+/* In overlay context: outer card border and overflow:hidden handle left/right/bottom edges.
+   Remove only those three sides to avoid double borders; top stays as SearchBar's own separator.
+   Radius on bottom corners matches the outer card. Background keeps the SearchBar's own token. */
+.shopping-list-input-overlay-bar .search-bar-container {
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 0 0 var(--corner-radius-card) var(--corner-radius-card);
 }
 
 
