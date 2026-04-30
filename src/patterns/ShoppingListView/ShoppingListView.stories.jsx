@@ -106,6 +106,22 @@ export const ListView = {
   },
 };
 
+export const WithSuggestions = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the unified overlay card — suggestion list and search bar connected as one card, matching Figma node 604-2577. The card height is fixed to always accommodate 3 items even when fewer match.',
+      },
+    },
+  },
+  args: {
+    viewMode: 'list',
+    items: sampleListItems,
+    checkedItems: {},
+    initialSearchQuery: 'Car',
+  },
+};
+
 export const RecipeView = {
   parameters: {
     docs: {

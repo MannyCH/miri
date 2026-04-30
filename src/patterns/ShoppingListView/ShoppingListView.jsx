@@ -44,29 +44,15 @@ export const ShoppingListView = ({
   onSwitchList,
   onMenuTap,
   onAddIngredient,
+  initialSearchQuery = '',
   ...props
 }) => {
   const PURCHASED_SECTION_TITLE = 'Eingekauft';
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const MAX_SUGGESTIONS = 3;
-  const [searchQuery, setSearchQuery] = useState('');
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => {
-      setKeyboardHeight(Math.max(0, window.innerHeight - vv.offsetTop - vv.height));
-    };
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
-    return () => {
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
-    };
-  }, []);
 
   const handleAddSuggestion = (name) => {
     onAddIngredient?.(name);
@@ -87,6 +73,11 @@ export const ShoppingListView = ({
         .filter(s => s.toLowerCase().startsWith(trimmedQuery.toLowerCase()))
         .slice(0, MAX_SUGGESTIONS)
     : [];
+
+  const showOverlay = suggestions.length > 0;
+  useEffect(() => {
+    searchInputRef.current?.focus();
+  }, [showOverlay]);
 
   const getRecipeGroupKey = (group, index) =>
     group.recipeId ?? group.id ?? group.recipeName ?? `group-${index}`;
@@ -173,7 +164,6 @@ export const ShoppingListView = ({
   return (
     <div
       className="shopping-list-view"
-      style={{ '--keyboard-height': `${keyboardHeight}px` }}
       {...props}
     >
       {/* Header */}
@@ -389,29 +379,40 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Suggestion list — floating card above add bar, visible while typing */}
-      {suggestions.length > 0 && (
-        <div className="shopping-list-suggestions-container">
+      {/* Input area — unified overlay card when typing, plain bar when idle */}
+      {suggestions.length > 0 ? (
+        <div className="shopping-list-input-overlay">
           <SuggestionList
             suggestions={suggestions}
             onSelect={handleAddSuggestion}
           />
+          <div className="shopping-list-input-overlay-bar">
+            <SearchBar
+              inputRef={searchInputRef}
+              placeholder="Ich brauche..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleAddBarKeyDown}
+              showTrailingIcon={false}
+              inputMode="text"
+              enterKeyHint="done"
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="shopping-list-add-bar">
+          <SearchBar
+            inputRef={searchInputRef}
+            placeholder="Ich brauche..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleAddBarKeyDown}
+            showTrailingIcon={false}
+            inputMode="text"
+            enterKeyHint="done"
+          />
         </div>
       )}
-
-      {/* Add ingredient bar — always visible above nav */}
-      <div className="shopping-list-add-bar">
-        <SearchBar
-          inputRef={searchInputRef}
-          placeholder="Ich brauche..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleAddBarKeyDown}
-          showTrailingIcon={false}
-          inputMode="text"
-          enterKeyHint="done"
-        />
-      </div>
 
       {/* Bottom Navigation */}
       <NavigationBarConnected activeItem="shopping-list" />
