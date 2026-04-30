@@ -1,10 +1,17 @@
 /* ShoppingListView Pattern - Pure Flexbox Layout with Safe Areas */
-/* position: fixed + inset: 0 anchors the view to viewport coordinates,
-   preventing iOS Safari from shifting the layout up when window.scrollY
-   changes on keyboard focus (which would drag the navbar up). */
+/* position:fixed + top:0 prevents iOS Safari from shifting the view when
+   window.scrollY changes on keyboard focus. height:100svh (not bottom:0)
+   locks the container to the layout viewport height — with
+   interactive-widget=resizes-visual, Chrome anchors position:fixed bottom:0
+   to the visual viewport (which shrinks with keyboard), so using an explicit
+   height avoids that trap and keeps the navbar from floating upward. */
 .shopping-list-view {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   background: var(--color-background-base);
