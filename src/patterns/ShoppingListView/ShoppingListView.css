@@ -395,7 +395,7 @@
 
 /* In overlay context: outer card border and overflow:hidden handle left/right/bottom edges.
    Remove only those three sides to avoid double borders; top stays as SearchBar's own separator.
-   Radius on bottom corners matches the outer card. Background keeps the SearchBar's own token. */
+   Radius on bottom corners matches the outer card. */
 .shopping-list-input-overlay-bar .search-bar-container {
   border-left: none;
   border-right: none;

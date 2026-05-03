@@ -68,9 +68,13 @@ export const ShoppingListView = ({
   };
 
   const trimmedQuery = searchQuery.trim();
-  const suggestions = trimmedQuery.length > 0
+  // Strip a leading quantity+unit (e.g. "500g ", "2 l ", "1.5kg ") so that
+  // "500g po" still matches "Potatoes".
+  const ingredientPart = trimmedQuery.replace(/^\d[\d.,]*\s*[a-zA-Z]*\s*/, '').trim();
+  const matchQuery = ingredientPart.length > 0 ? ingredientPart : trimmedQuery;
+  const suggestions = matchQuery.length > 0
     ? INGREDIENT_SUGGESTIONS
-        .filter(s => s.toLowerCase().startsWith(trimmedQuery.toLowerCase()))
+        .filter(s => s.toLowerCase().startsWith(matchQuery.toLowerCase()))
         .slice(0, MAX_SUGGESTIONS)
     : [];
 
