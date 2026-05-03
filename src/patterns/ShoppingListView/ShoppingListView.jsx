@@ -53,6 +53,28 @@ export const ShoppingListView = ({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
+  const viewRef = useRef(null);
+
+  // With interactive-widget=resizes-visual the layout viewport never shrinks
+  // when the iOS keyboard opens, so position:fixed elements stay at full height
+  // and the nav bar hides under the keyboard. Tracking visualViewport height
+  // directly and applying it as an inline style is the only reliable fix.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      if (viewRef.current) {
+        viewRef.current.style.height = `${vv.height}px`;
+        viewRef.current.style.top = `${vv.offsetTop}px`;
+      }
+    };
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, []);
 
   const handleAddSuggestion = (name) => {
     onAddIngredient?.(name);
@@ -167,6 +189,7 @@ export const ShoppingListView = ({
 
   return (
     <div
+      ref={viewRef}
       className="shopping-list-view"
       {...props}
     >
