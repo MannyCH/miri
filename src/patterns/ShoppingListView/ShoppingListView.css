@@ -393,6 +393,17 @@
   animation: search-slide-down 0.2s ease;
 }
 
+.shopping-list-search-overlay::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--spacing-32);
+  background: linear-gradient(to bottom, var(--color-background-base), transparent);
+  pointer-events: none;
+}
+
 .shopping-list-search-row {
   display: flex;
   align-items: center;
