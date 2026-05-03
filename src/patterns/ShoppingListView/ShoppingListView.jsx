@@ -76,9 +76,13 @@ export const ShoppingListView = ({
   };
 
   const handleAddBarKeyDown = (e) => {
-    if (e.key === 'Enter' && trimmedQuery.length > 0) {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      handleAddSuggestion(trimmedQuery);
+      if (trimmedQuery.length > 0) {
+        handleAddSuggestion(trimmedQuery);
+      } else {
+        handleCancel();
+      }
     }
   };
 
