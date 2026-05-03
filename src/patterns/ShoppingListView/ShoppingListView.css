@@ -1,14 +1,14 @@
 /* ShoppingListView Pattern - Pure Flexbox Layout with Safe Areas */
-/* Anchored to the layout viewport (height:100vh, not svh/dvh) so the nav bar
-   stays pinned to the bottom of the screen when the iOS keyboard opens.
-   The keyboard simply covers the nav bar — desired behaviour while typing
-   in the search bar. */
+/* height:100svh sits inside iOS Safari's bottom chrome so the nav bar is
+   visible. With interactive-widget=resizes-visual the layout viewport does
+   not shrink when the keyboard opens, so the nav bar stays pinned and the
+   keyboard simply covers it while the search bar is focused. */
 .shopping-list-view {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 100vh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   background: var(--color-background-base);
