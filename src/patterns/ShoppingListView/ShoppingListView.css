@@ -1,17 +1,14 @@
 /* ShoppingListView Pattern - Pure Flexbox Layout with Safe Areas */
-/* position:fixed + top:0 prevents iOS Safari from shifting the view when
-   window.scrollY changes on keyboard focus. height:100svh (not bottom:0)
-   locks the container to the layout viewport height — with
-   interactive-widget=resizes-visual, Chrome anchors position:fixed bottom:0
-   to the visual viewport (which shrinks with keyboard), so using an explicit
-   height avoids that trap and keeps the navbar from floating upward. */
+/* Anchored to the layout viewport (height:100vh, not svh/dvh) so the nav bar
+   stays pinned to the bottom of the screen when the iOS keyboard opens.
+   The keyboard simply covers the nav bar — desired behaviour while typing
+   in the search bar. */
 .shopping-list-view {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 100vh;
-  height: 100svh;
   display: flex;
   flex-direction: column;
   background: var(--color-background-base);
