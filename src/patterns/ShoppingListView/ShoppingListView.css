@@ -10,7 +10,9 @@
   top: 0;
   left: 0;
   right: 0;
-  height: calc(var(--inner-height, 100svh) - var(--keyboard-height, 0px));
+  /* Subtract navbar height normally; when keyboard opens it's taller than the
+     navbar so max() lets it take over — no gap, no double-subtraction. */
+  height: calc(var(--inner-height, 100svh) - max(var(--shopping-list-navbar-height, 64px), var(--keyboard-height, 0px)));
   display: flex;
   flex-direction: column;
   background: var(--color-background-base);
