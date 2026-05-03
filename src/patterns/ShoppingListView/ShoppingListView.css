@@ -8,10 +8,7 @@
   top: 0;
   left: 0;
   right: 0;
-  /* Reserve space for the nav bar OR the keyboard, whichever is taller. When
-     the keyboard is open it covers the nav bar, so the nav-bar reservation
-     would otherwise leave a visible gap above the keyboard. */
-  height: calc(100svh - max(var(--shopping-list-navbar-height, 64px), var(--keyboard-inset-height, 0px)));
+  height: calc(100svh - var(--shopping-list-navbar-height, 64px) - var(--keyboard-inset-height, 0px));
   display: flex;
   flex-direction: column;
   background: var(--color-background-base);
