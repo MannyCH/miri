@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { RotateCcw, Grid, List, Trash2, MoreVertical, Check, Home, Zap } from 'react-feather';
 import { Divider } from '../../components/Divider';
@@ -8,6 +8,7 @@ import { Button } from '../../components/Button';
 import { ListSwitcher } from '../../components/ListSwitcher';
 import { AvatarRow } from '../../components/AvatarRow';
 import { SuggestionList } from '../../components/SuggestionList';
+import { SearchFab } from '../../components/SearchFab/SearchFab';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './ShoppingListView.css';
 
@@ -51,8 +52,22 @@ export const ShoppingListView = ({
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const MAX_SUGGESTIONS = 3;
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
+
+  const handleFabClick = () => {
+    if (isSearchOpen) {
+      searchInputRef.current?.focus();
+    } else {
+      setIsSearchOpen(true);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
 
   const handleAddSuggestion = (name) => {
     onAddIngredient?.(name);
@@ -77,11 +92,6 @@ export const ShoppingListView = ({
         .filter(s => s.toLowerCase().startsWith(matchQuery.toLowerCase()))
         .slice(0, MAX_SUGGESTIONS)
     : [];
-
-  const showOverlay = suggestions.length > 0;
-  useEffect(() => {
-    searchInputRef.current?.focus();
-  }, [showOverlay]);
 
   const getRecipeGroupKey = (group, index) =>
     group.recipeId ?? group.id ?? group.recipeName ?? `group-${index}`;
@@ -384,15 +394,12 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Input area — unified overlay card when typing, plain bar when idle */}
-      {suggestions.length > 0 ? (
-        <div className="shopping-list-input-overlay">
-          <SuggestionList
-            suggestions={suggestions}
-            onSelect={handleAddSuggestion}
-          />
-          <div className="shopping-list-input-overlay-bar">
+      {/* Search overlay — slides down from top */}
+      {isSearchOpen && (
+        <div className="shopping-list-search-overlay">
+          <div className="shopping-list-search-row">
             <SearchBar
+              autoFocus
               inputRef={searchInputRef}
               placeholder="Ich brauche..."
               value={searchQuery}
@@ -402,25 +409,22 @@ export const ShoppingListView = ({
               inputMode="text"
               enterKeyHint="done"
             />
+            <Button variant="ghost" onClick={handleCancel} style={{ flexShrink: 0 }}>
+              Cancel
+            </Button>
           </div>
-        </div>
-      ) : (
-        <div className="shopping-list-add-bar">
-          <SearchBar
-            inputRef={searchInputRef}
-            placeholder="Ich brauche..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleAddBarKeyDown}
-            showTrailingIcon={false}
-            inputMode="text"
-            enterKeyHint="done"
-          />
+          {suggestions.length > 0 && (
+            <SuggestionList
+              suggestions={suggestions}
+              onSelect={handleAddSuggestion}
+            />
+          )}
         </div>
       )}
 
     </div>
     <div className="shopping-list-navbar-sheet">
+      <SearchFab onClick={handleFabClick} aria-label="Add ingredient" className="shopping-list-search-fab" />
       <NavigationBarConnected activeItem="shopping-list" />
     </div>
     </>

@@ -377,55 +377,49 @@
   color: var(--color-icon-brand);
 }
 
-/* Add ingredient bar — always visible above navigation */
-.shopping-list-add-bar {
-  flex-shrink: 0;
-  padding: var(--spacing-8) var(--spacing-16);
+/* Search overlay — slides down from top, covers the header */
+.shopping-list-search-overlay {
+  position: absolute;
+  top: var(--safe-area-inset-top);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+  padding: var(--spacing-12) var(--spacing-16);
   background: var(--color-background-base);
+  border-bottom: 1px solid var(--color-stroke-weak);
+  animation: search-slide-down 0.2s ease;
 }
 
-.shopping-list-add-bar .search-bar {
-  width: 100%;
+.shopping-list-search-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-8);
 }
 
-/* Unified overlay card — matches Figma node 604:2577 "Search Suggestion Overlay" */
-/* Suggestion list sits above, search bar sits below, no gap between them.        */
-.shopping-list-input-overlay {
-  flex-shrink: 0;
-  margin: 0 var(--spacing-inset-md) var(--spacing-gap-sm);
-  background: var(--color-background-sunken);
-  border: 1px solid var(--color-stroke-brand-weak);
-  border-radius: var(--corner-radius-card);
-  box-shadow: var(--elevation-raised);
-  overflow: hidden; /* clips SearchBar corners to the card radius */
+.shopping-list-search-row .search-bar {
+  flex: 1;
 }
 
-/* Strip SuggestionList's own card — the overlay provides card styling. */
-.shopping-list-input-overlay .suggestion-list {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
+@keyframes search-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Fixed height = 3 items (56px each) + 2 dividers (1px each), regardless of count */
-.shopping-list-input-overlay .suggestion-list-items {
-  min-height: calc(3 * 56px + 2 * 1px);
-}
-
-/* Search bar row — flush at the bottom of the overlay card, no extra padding */
-/* Divider at the end of SuggestionList provides the separator above the search bar */
-.shopping-list-input-overlay-bar {
-}
-
-/* In overlay context: outer card border and overflow:hidden handle left/right/bottom edges.
-   Remove only those three sides to avoid double borders; top stays as SearchBar's own separator.
-   Radius on bottom corners matches the outer card. */
-.shopping-list-input-overlay-bar .search-bar-container {
-  border-left: none;
-  border-right: none;
-  border-bottom: none;
-  border-radius: 0 0 var(--corner-radius-card) var(--corner-radius-card);
+/* FAB — positioned above the navbar sheet */
+.shopping-list-search-fab {
+  position: absolute;
+  bottom: calc(100% + var(--spacing-16));
+  right: var(--spacing-16);
+  z-index: 10;
 }
 
 
