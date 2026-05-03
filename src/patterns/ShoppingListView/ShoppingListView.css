@@ -1,14 +1,16 @@
 /* ShoppingListView Pattern - Pure Flexbox Layout with Safe Areas */
-/* height:100svh sits inside iOS Safari's bottom chrome so the nav bar is
-   visible. With interactive-widget=resizes-visual the layout viewport does
-   not shrink when the keyboard opens, so the nav bar stays pinned and the
-   keyboard simply covers it while the search bar is focused. */
+/* Container uses window.innerHeight (--inner-height) as the height base so the
+   measurement matches the keyboard-height calculation exactly — avoiding the
+   ~44px gap that 100svh causes on iOS Safari (browser chrome excluded from svh).
+   When the keyboard opens, --keyboard-height shrinks the container so the search
+   bar stays visible. The nav bar is a sibling sheet outside this container,
+   pinned to the layout-viewport bottom and covered by the keyboard. */
 .shopping-list-view {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 100svh;
+  height: calc(var(--inner-height, 100svh) - var(--keyboard-height, 0px));
   display: flex;
   flex-direction: column;
   background: var(--color-background-base);
@@ -16,7 +18,22 @@
   margin: 0 auto;
   overflow: hidden;
   padding-top: var(--safe-area-inset-top);
-  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* Nav bar sheet — sibling to .shopping-list-view, pinned to layout-viewport
+   bottom so the keyboard slides over it.
+   translateY(--vv-offset-top) counters iOS Safari shifting the layout viewport
+   upward on input focus — keeping the sheet at screen bottom. */
+.shopping-list-navbar-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 390px;
+  margin: 0 auto;
+  background: var(--color-background-base);
+  transform: translateY(var(--vv-offset-top, 0px));
+  z-index: 10;
 }
 
 /* Header */

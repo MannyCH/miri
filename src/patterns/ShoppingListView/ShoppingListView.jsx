@@ -166,6 +166,7 @@ export const ShoppingListView = ({
     .filter(Boolean);
 
   return (
+    <>
     <div
       className="shopping-list-view"
       {...props}
@@ -418,9 +419,11 @@ export const ShoppingListView = ({
         </div>
       )}
 
-      {/* Bottom Navigation */}
+    </div>
+    <div className="shopping-list-navbar-sheet">
       <NavigationBarConnected activeItem="shopping-list" />
     </div>
+    </>
   );
 };
 
