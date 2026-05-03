@@ -5,7 +5,6 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { PusherProvider } from './context/PusherContext';
 import { PreferencesProvider, usePreferences } from './context/PreferencesContext';
 import { ToastContainer } from './components/ToastContainer';
-import { useVisualViewportInsets } from './hooks/useVisualViewportInsets';
 import './index.css';
 
 const MealPlanningPage = lazy(() => import('./pages/MealPlanningPage').then((module) => ({ default: module.MealPlanningPage })));
@@ -48,7 +47,6 @@ function useNeedsOnboarding() {
 }
 
 function AppContent() {
-  useVisualViewportInsets();
   const { toasts, dismissToast } = useApp();
   const { isAuthenticated, isAuthReady, user } = useAuth();
   const needsOnboarding = useNeedsOnboarding();

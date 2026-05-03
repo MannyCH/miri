@@ -166,7 +166,6 @@ export const ShoppingListView = ({
     .filter(Boolean);
 
   return (
-    <>
     <div
       className="shopping-list-view"
       {...props}
@@ -418,15 +417,10 @@ export const ShoppingListView = ({
           />
         </div>
       )}
-    </div>
 
-      {/* Bottom Navigation — sibling sheet pinned to layout-viewport bottom,
-          rendered outside .shopping-list-view so it does not get pulled up
-          when iOS Safari shifts the layout viewport on input focus. */}
-      <div className="shopping-list-navbar-sheet">
-        <NavigationBarConnected activeItem="shopping-list" />
-      </div>
-    </>
+      {/* Bottom Navigation */}
+      <NavigationBarConnected activeItem="shopping-list" />
+    </div>
   );
 };
 
