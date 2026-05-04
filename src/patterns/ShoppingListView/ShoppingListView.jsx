@@ -398,9 +398,15 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Search overlay — slides down from top */}
+      {/* Search overlay — slides up from bottom, above keyboard */}
       {isSearchOpen && (
         <div className="shopping-list-search-overlay">
+          {suggestions.length > 0 && (
+            <SuggestionList
+              suggestions={suggestions}
+              onSelect={handleAddSuggestion}
+            />
+          )}
           <div className="shopping-list-search-row">
             <SearchBar
               autoFocus
@@ -417,12 +423,6 @@ export const ShoppingListView = ({
               Cancel
             </Button>
           </div>
-          {suggestions.length > 0 && (
-            <SuggestionList
-              suggestions={suggestions}
-              onSelect={handleAddSuggestion}
-            />
-          )}
         </div>
       )}
 
