@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { RotateCcw, Grid, List, Trash2, MoreVertical, Check, Home, Zap } from 'react-feather';
+import { RotateCcw, Grid, List, Trash2, MoreVertical, Check, Home, Zap, X } from 'react-feather';
 import { Divider } from '../../components/Divider';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
@@ -401,22 +401,19 @@ export const ShoppingListView = ({
       {/* Search overlay — slides down from top */}
       {isSearchOpen && (
         <div className="shopping-list-search-overlay">
-          <div className="shopping-list-search-row">
-            <SearchBar
-              autoFocus
-              inputRef={searchInputRef}
-              placeholder="Ich brauche..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleAddBarKeyDown}
-              showTrailingIcon={false}
-              inputMode="text"
-              enterKeyHint="done"
-            />
-            <Button variant="ghost" onClick={handleCancel} style={{ flexShrink: 0 }}>
-              Cancel
-            </Button>
-          </div>
+          <SearchBar
+            autoFocus
+            inputRef={searchInputRef}
+            placeholder="Ich brauche..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleAddBarKeyDown}
+            trailingIcon={<X size={18} />}
+            onTrailingIconClick={handleCancel}
+            trailingIconLabel="Close search"
+            inputMode="text"
+            enterKeyHint="done"
+          />
           {suggestions.length > 0 && (
             <SuggestionList
               suggestions={suggestions}

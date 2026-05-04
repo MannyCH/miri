@@ -386,11 +386,14 @@
   z-index: 20;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-8);
-  padding: var(--spacing-12) var(--spacing-16);
   background: var(--color-background-base);
   border-bottom: 1px solid var(--color-stroke-weak);
   animation: search-slide-down 0.2s ease;
+  padding: var(--spacing-12) var(--spacing-16) 0;
+}
+
+.shopping-list-search-overlay .suggestion-list {
+  padding-top: var(--spacing-16);
 }
 
 .shopping-list-search-overlay::after {
@@ -402,16 +405,6 @@
   height: var(--spacing-32);
   background: linear-gradient(to bottom, var(--color-background-base), transparent);
   pointer-events: none;
-}
-
-.shopping-list-search-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-8);
-}
-
-.shopping-list-search-row .search-bar {
-  flex: 1;
 }
 
 @keyframes search-slide-down {

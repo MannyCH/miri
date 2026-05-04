@@ -5,14 +5,16 @@ import './SearchBar.css';
  * SearchBar component - Matches Figma search bar design
  * Plain input with trailing search icon
  */
-export const SearchBar = ({ 
+export const SearchBar = ({
   placeholder = 'Ich brauche...',
   value,
   onChange,
   inputRef,
   trailingIcon,
   showTrailingIcon = true,
-  ...props 
+  onTrailingIconClick,
+  trailingIconLabel = 'Clear',
+  ...props
 }) => {
   return (
     <div className="search-bar">
@@ -28,11 +30,22 @@ export const SearchBar = ({
           onChange={onChange}
           {...props}
         />
-        
+
         {showTrailingIcon && trailingIcon && (
-          <span className="search-bar-icon-button" aria-hidden="true">
-            {trailingIcon}
-          </span>
+          onTrailingIconClick ? (
+            <button
+              type="button"
+              className="search-bar-icon-button"
+              onClick={onTrailingIconClick}
+              aria-label={trailingIconLabel}
+            >
+              {trailingIcon}
+            </button>
+          ) : (
+            <span className="search-bar-icon-button" aria-hidden="true">
+              {trailingIcon}
+            </span>
+          )
         )}
       </div>
     </div>
