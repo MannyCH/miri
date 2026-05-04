@@ -379,11 +379,7 @@
 
 /* Search overlay — slides down from top, covers the header */
 .shopping-list-search-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-8);
@@ -391,6 +387,7 @@
   background: var(--color-background-base);
   border-top: 1px solid var(--color-stroke-weak);
   animation: search-slide-up 0.2s ease;
+  position: relative;
 }
 
 .shopping-list-search-overlay::before {
