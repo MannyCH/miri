@@ -380,7 +380,7 @@
 /* Search overlay — slides down from top, covers the header */
 .shopping-list-search-overlay {
   position: absolute;
-  bottom: 0;
+  top: var(--safe-area-inset-top);
   left: 0;
   right: 0;
   z-index: 20;
@@ -389,18 +389,18 @@
   gap: var(--spacing-8);
   padding: var(--spacing-12) var(--spacing-16);
   background: var(--color-background-base);
-  border-top: 1px solid var(--color-stroke-weak);
-  animation: search-slide-up 0.2s ease;
+  border-bottom: 1px solid var(--color-stroke-weak);
+  animation: search-slide-down 0.2s ease;
 }
 
-.shopping-list-search-overlay::before {
+.shopping-list-search-overlay::after {
   content: '';
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 0;
   right: 0;
   height: var(--spacing-32);
-  background: linear-gradient(to top, var(--color-background-base), transparent);
+  background: linear-gradient(to bottom, var(--color-background-base), transparent);
   pointer-events: none;
 }
 
@@ -414,10 +414,10 @@
   flex: 1;
 }
 
-@keyframes search-slide-up {
+@keyframes search-slide-down {
   from {
     opacity: 0;
-    transform: translateY(100%);
+    transform: translateY(-100%);
   }
   to {
     opacity: 1;
