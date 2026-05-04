@@ -401,25 +401,27 @@ export const ShoppingListView = ({
       {/* Search overlay — slides down from top */}
       {isSearchOpen && (
         <div className="shopping-list-search-overlay">
-          <SearchBar
-            autoFocus
-            inputRef={searchInputRef}
-            placeholder="Ich brauche..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleAddBarKeyDown}
-            trailingIcon={<X size={18} />}
-            onTrailingIconClick={handleCancel}
-            trailingIconLabel="Close search"
-            inputMode="text"
-            enterKeyHint="done"
-          />
-          {suggestions.length > 0 && (
-            <SuggestionList
-              suggestions={suggestions}
-              onSelect={handleAddSuggestion}
+          <div className="shopping-list-search-card">
+            <SearchBar
+              autoFocus
+              inputRef={searchInputRef}
+              placeholder="Ich brauche..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleAddBarKeyDown}
+              trailingIcon={<X size={18} />}
+              onTrailingIconClick={handleCancel}
+              trailingIconLabel="Close search"
+              inputMode="text"
+              enterKeyHint="done"
             />
-          )}
+            {suggestions.length > 0 && (
+              <SuggestionList
+                suggestions={suggestions}
+                onSelect={handleAddSuggestion}
+              />
+            )}
+          </div>
         </div>
       )}
 
