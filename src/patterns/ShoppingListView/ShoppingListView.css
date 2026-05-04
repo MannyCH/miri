@@ -403,7 +403,8 @@
 
 /* Card: provides border, radius and clips children — same pattern as old bottom overlay */
 .shopping-list-search-card {
-  border: 1px solid var(--color-stroke-weak);
+  background: var(--color-background-sunken);
+  border: 1px solid var(--color-stroke-brand-weak);
   border-radius: var(--corner-radius-card);
   box-shadow: var(--elevation-raised);
   overflow: hidden;

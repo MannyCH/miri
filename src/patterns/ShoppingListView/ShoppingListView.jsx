@@ -70,7 +70,11 @@ export const ShoppingListView = ({
   };
 
   const handleAddSuggestion = (name) => {
-    onAddIngredient?.(name);
+    // Preserve any quantity+unit prefix the user typed (e.g. "40g" from "40g ban")
+    const q = searchQuery.trim();
+    const prefixMatch = /^\d[\d.,]*(?:\s*[a-zA-Z]{1,4})?\s+/.exec(q);
+    const prefix = prefixMatch ? prefixMatch[0].trim() : '';
+    onAddIngredient?.(prefix ? `${prefix} ${name}` : name);
     setSearchQuery('');
     searchInputRef.current?.focus();
   };
@@ -88,8 +92,9 @@ export const ShoppingListView = ({
 
   const trimmedQuery = searchQuery.trim();
   // Strip a leading quantity+unit (e.g. "500g ", "2 l ", "1.5kg ") so that
-  // "500g po" still matches "Potatoes".
-  const ingredientPart = trimmedQuery.replace(/^\d[\d.,]*\s*[a-zA-Z]*\s*/, '').trim();
+  // "500g po" still matches "Potatoes" — but stop at the unit, not the ingredient start.
+  const prefixMatch = /^\d[\d.,]*(?:\s*[a-zA-Z]{1,4})?\s+/.exec(trimmedQuery);
+  const ingredientPart = prefixMatch ? trimmedQuery.slice(prefixMatch[0].length) : '';
   const matchQuery = ingredientPart.length > 0 ? ingredientPart : trimmedQuery;
   const suggestions = matchQuery.length > 0
     ? INGREDIENT_SUGGESTIONS
