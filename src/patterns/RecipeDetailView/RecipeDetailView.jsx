@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Coffee, ShoppingCart, Check } from 'react-feather';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { Stepper } from '../../components/Stepper/Stepper';
@@ -18,6 +19,7 @@ export const RecipeDetailView = ({
   },
   onAddToList,
   isAdded = false,
+  onCook,
   ...props
 }) => {
   const originalServings = (() => {
@@ -213,17 +215,29 @@ export const RecipeDetailView = ({
           </ol>
         </div>
 
-        {/* Add to list button — at bottom after all content */}
-        {onAddToList && (
-          <div className="recipe-detail-add-button">
-            <Button
-              variant="primary"
-              icon={isAdded ? <CheckIcon /> : <CartIcon />}
-              onClick={onAddToList}
-              disabled={isAdded}
-            >
-              {isAdded ? 'Added' : 'Add to list'}
-            </Button>
+        {/* CTA buttons — "Add to list" (primary) + "Cook" (secondary) side by side */}
+        {(onAddToList || (onCook && recipe.directions?.length > 0)) && (
+          <div className="recipe-detail-actions">
+            {onAddToList && (
+              <Button
+                variant="primary"
+                icon={isAdded ? <Check size={20} /> : <ShoppingCart size={20} />}
+                onClick={onAddToList}
+                disabled={isAdded}
+              >
+                {isAdded ? 'Added' : 'Add to list'}
+              </Button>
+            )}
+            {onCook && recipe.directions?.length > 0 && (
+              <Button
+                variant="secondary"
+                icon={<Coffee size={20} />}
+                showIcon
+                onClick={onCook}
+              >
+                Cook
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -234,19 +248,6 @@ export const RecipeDetailView = ({
   );
 };
 
-const CartIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="9" cy="21" r="1"/>
-    <circle cx="20" cy="21" r="1"/>
-    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-);
 
 const RecipeDetailPlaceholder = () => (
   <svg

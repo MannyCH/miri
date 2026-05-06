@@ -1,0 +1,50 @@
+.cooking-step-card {
+  background: var(--color-fill-brand-weak);
+  border-radius: var(--corner-radius-card);
+  padding: var(--spacing-inset-md);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header: emoji + verb ───────────────────────────────────── */
+
+.cooking-step-card__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-gap-sm);
+  padding-bottom: var(--spacing-stack-sm);
+}
+
+.cooking-step-card__emoji,
+.cooking-step-card__verb {
+  color: var(--color-text-weak);
+}
+
+/* ── Ingredient items ───────────────────────────────────────── */
+
+.cooking-step-card__items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gap-md);
+}
+
+.cooking-step-card__item {
+  display: flex;
+  flex-direction: column;
+}
+
+.cooking-step-card__item-primary,
+.cooking-step-card__item-note {
+  color: var(--color-text-weak);
+}
+
+/* ── Duration ────────────────────────────────────────────────── */
+
+.cooking-step-card__duration {
+  color: var(--color-text-weak);
+  margin: var(--spacing-gap-md) 0 0;
+}

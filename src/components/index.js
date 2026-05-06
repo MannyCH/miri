@@ -12,3 +12,4 @@ export { IngredientListItem } from './IngredientListItem';
 export { IngredientList } from './IngredientList';
 export { RecipeListItem } from './RecipeListItem';
 export { RecipeList } from './RecipeList';
+export { CookingStepCard } from './CookingStepCard';

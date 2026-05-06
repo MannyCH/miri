@@ -138,17 +138,19 @@
    ADD TO LIST BUTTON — full width at bottom
    ============================================ */
 
-.recipe-detail-add-button {
-  padding-top: 0;
+.recipe-detail-actions {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-gap-md);
 }
 
-.recipe-detail-add-button .button {
-  width: 100%;
+.recipe-detail-actions .button {
+  flex: 1;
   transition: background 0.2s ease, opacity 0.2s ease;
 }
 
 /* Added confirmation — same button design, content swaps with a pop */
-.recipe-detail-add-button .button[disabled] {
+.recipe-detail-actions .button[disabled] {
   opacity: 1;
   animation: button-added-pop 0.25s ease;
 }
