@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CookingModeView } from './CookingModeView';
+import { Button } from '../../components/Button/Button';
 
 const lentilSoupSteps = [
   {
@@ -223,19 +224,9 @@ export const Interactive = () => {
         <p className="text-h3-bold" style={{ color: 'var(--color-text-strong)', margin: 0 }}>
           Cooking cancelled.
         </p>
-        <button
-          onClick={handleRestart}
-          className="text-body-small-bold"
-          style={{
-            color: 'var(--color-text-brand)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-          }}
-        >
+        <Button variant="tertiary" onClick={handleRestart}>
           Start over
-        </button>
+        </Button>
       </div>
     );
   }
@@ -254,19 +245,9 @@ export const Interactive = () => {
         <p className="text-h3-bold" style={{ color: 'var(--color-text-strong)', margin: 0 }}>
           You're done! Enjoy your meal. 🎉
         </p>
-        <button
-          onClick={handleRestart}
-          className="text-body-small-bold"
-          style={{
-            color: 'var(--color-text-brand)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-          }}
-        >
+        <Button variant="tertiary" onClick={handleRestart}>
           Back to recipe
-        </button>
+        </Button>
       </div>
     );
   }
