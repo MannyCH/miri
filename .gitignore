@@ -29,6 +29,9 @@ yarn-error.log*
 .vscode/
 .idea/
 
+# Claude Code agent worktrees
+.claude/worktrees/
+
 # Storybook
 build-storybook.log
 debug-storybook.log
