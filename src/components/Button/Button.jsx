@@ -9,6 +9,7 @@ import './Button.css';
 export const Button = ({
   variant = 'primary',
   icon,
+  iconRight,
   showIcon = true,
   iconOnly = false,
   fullWidth = false,
@@ -29,6 +30,11 @@ export const Button = ({
         </span>
       )}
       {!iconOnly && <span className="button-text text-body-small-bold">{children}</span>}
+      {showIcon && iconRight && (
+        <span className="button-icon" aria-hidden="true">
+          {iconRight}
+        </span>
+      )}
     </BaseButton>
   );
 };

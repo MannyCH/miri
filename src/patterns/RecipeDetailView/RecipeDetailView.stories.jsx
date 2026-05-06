@@ -77,6 +77,7 @@ export const Default = {
   args: {
     recipe: sampleRecipe,
     onAddToList: () => console.log('Added to list'),
+    onCook: () => console.log('Cook tapped'),
   },
 };
 
@@ -97,6 +98,7 @@ export const WithoutImage = {
       image: null,
     },
     onAddToList: () => console.log('Added to list'),
+    onCook: () => console.log('Cook tapped'),
   },
 };
 
@@ -127,5 +129,6 @@ export const ShortRecipe = {
       ],
     },
     onAddToList: () => console.log('Added to list'),
+    onCook: () => console.log('Cook tapped'),
   },
 };

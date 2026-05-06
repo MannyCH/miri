@@ -1,0 +1,62 @@
+.cooking-mode-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--color-grey-slate-solid-0);
+}
+
+/* ── Scrollable content area ──────────────────────────────── */
+
+.cooking-mode-view__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-inset-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-gap-md);
+}
+
+.cooking-mode-view__title {
+  color: var(--color-text-strong);
+  margin: 0;
+}
+
+/* ── Card stack ───────────────────────────────────────────── */
+
+.cooking-mode-view__card-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.cooking-mode-view__card-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.cooking-mode-view__step-counter {
+  color: var(--color-text-weak);
+  margin: 0;
+  padding: var(--spacing-inset-md) 0;
+}
+
+/* ── Footer navigation ───────────────────────────────────── */
+
+.cooking-mode-view__footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-gap-md);
+  padding: var(--spacing-inset-md);
+  border-top: 1px solid var(--color-stroke-weak);
+  background: var(--color-grey-slate-solid-0);
+}
+
+.cooking-mode-view__nav-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-gap-md);
+}
+
