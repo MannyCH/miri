@@ -48,16 +48,23 @@ export const RecipeDetailView = ({
     const scaled = num * factor;
     const whole = Math.floor(scaled);
     const dec = scaled - whole;
-    const snapFracs = [[1,2],[1,3],[2,3],[1,4],[3,4],[1,8],[3,8],[5,8],[7,8]];
-    const snap = snapFracs.find(([n, d]) => Math.abs(dec - n / d) < 0.02);
     let formatted;
-    if (dec < 0.02) {
+    if (dec < 0.03) {
       formatted = String(whole || Math.round(scaled));
-    } else if (snap) {
-      const fracStr = `${snap[0]}/${snap[1]}`;
-      formatted = whole > 0 ? `${whole} ${fracStr}` : fracStr;
+    } else if (dec > 0.97) {
+      formatted = String(whole + 1);
     } else {
-      formatted = parseFloat(scaled.toFixed(2)).toString();
+      // Always snap decimal part to nearest standard cooking fraction.
+      // List is ascending so ties (equidistant) resolve to the larger fraction — safer for cooking.
+      const cookingFracs = [[1,8],[1,4],[1,3],[1,2],[2,3],[3,4],[7,8]];
+      let bestFrac = cookingFracs[0];
+      let bestDist = Infinity;
+      for (const [n, d] of cookingFracs) {
+        const dist = Math.abs(dec - n / d);
+        if (dist <= bestDist) { bestDist = dist; bestFrac = [n, d]; }
+      }
+      const fracStr = `${bestFrac[0]}/${bestFrac[1]}`;
+      formatted = whole > 0 ? `${whole} ${fracStr}` : fracStr;
     }
     return formatFractions(formatted) + rest;
   };
