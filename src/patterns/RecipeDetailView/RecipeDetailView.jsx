@@ -58,14 +58,33 @@ export const RecipeDetailView = ({
       value
     );
 
+  // Normalize Unicode fraction glyphs back to ASCII so the parser can handle them.
+  // Also inserts a space for runs like "1½" → "1 1/2".
+  const normalizeFractions = (value = '') => {
+    const reverseMap = Object.fromEntries(
+      Object.entries(fractionMap).map(([raw, glyph]) => [glyph, raw])
+    );
+    return Object.entries(reverseMap).reduce((acc, [glyph, raw]) => {
+      return acc
+        .replace(new RegExp(`(\\d)(${glyph})`, 'g'), `$1 ${raw}`)
+        .replaceAll(glyph, raw);
+    }, value);
+  };
+
   const splitIngredient = (ingredient) => {
     if (typeof ingredient !== 'string') {
-      const quantity = ingredient?.quantity ? formatFractions(String(ingredient.quantity)) : '';
-      const name = ingredient?.name ? formatFractions(String(ingredient.name)) : '';
-      return { amount: quantity, name };
+      const quantityRaw = ingredient?.amount || ingredient?.quantity;
+      if (quantityRaw) {
+        const unit = ingredient?.unit ? ` ${ingredient.unit}` : '';
+        const quantity = formatFractions(String(quantityRaw)) + unit;
+        const name = ingredient?.name ? formatFractions(String(ingredient.name)) : '';
+        return { amount: quantity.trim(), name };
+      }
+      // No structured amount — parse the name string
+      return splitIngredient(ingredient?.name ?? '');
     }
 
-    const text = ingredient.trim();
+    const text = normalizeFractions(ingredient.trim());
     const knownUnits = new Set([
       'g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'lbs',
       'cup', 'cups', 'tbsp', 'tsp',
