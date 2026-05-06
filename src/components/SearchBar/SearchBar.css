@@ -8,7 +8,7 @@
   align-items: center;
   gap: var(--spacing-8);
   padding: var(--spacing-16);
-  background: var(--color-fill-brand-weak); /* Brown 5% */
+  background: var(--color-background-brand-weak);
   border: 1px solid var(--color-stroke-weak);
   border-radius: var(--corner-radius-16);
 }

@@ -1,17 +1,18 @@
 /* ShoppingListView Pattern - Pure Flexbox Layout with Safe Areas */
-/* position:fixed + top:0 prevents iOS Safari from shifting the view when
-   window.scrollY changes on keyboard focus. height:100svh (not bottom:0)
-   locks the container to the layout viewport height — with
-   interactive-widget=resizes-visual, Chrome anchors position:fixed bottom:0
-   to the visual viewport (which shrinks with keyboard), so using an explicit
-   height avoids that trap and keeps the navbar from floating upward. */
+/* Container uses window.innerHeight (--inner-height) as the height base so the
+   measurement matches the keyboard-height calculation exactly — avoiding the
+   ~44px gap that 100svh causes on iOS Safari (browser chrome excluded from svh).
+   When the keyboard opens, --keyboard-height shrinks the container so the search
+   bar stays visible. The nav bar is a sibling sheet outside this container,
+   pinned to the layout-viewport bottom and covered by the keyboard. */
 .shopping-list-view {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 100vh;
-  height: 100svh;
+  /* Subtract navbar height normally; when keyboard opens it's taller than the
+     navbar so max() lets it take over — no gap, no double-subtraction. */
+  height: calc(var(--inner-height, 100svh) - max(var(--shopping-list-navbar-height, 64px), var(--keyboard-height, 0px)));
   display: flex;
   flex-direction: column;
   background: var(--color-background-base);
@@ -19,7 +20,22 @@
   margin: 0 auto;
   overflow: hidden;
   padding-top: var(--safe-area-inset-top);
-  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* Nav bar sheet — sibling to .shopping-list-view, pinned to layout-viewport
+   bottom so the keyboard slides over it.
+   translateY(--vv-offset-top) counters iOS Safari shifting the layout viewport
+   upward on input focus — keeping the sheet at screen bottom. */
+.shopping-list-navbar-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 390px;
+  margin: 0 auto;
+  background: var(--color-background-base);
+  transform: translateY(var(--vv-offset-top, 0px));
+  z-index: 10;
 }
 
 /* Header */
@@ -361,55 +377,72 @@
   color: var(--color-icon-brand);
 }
 
-/* Add ingredient bar — always visible above navigation */
-.shopping-list-add-bar {
-  flex-shrink: 0;
-  padding: var(--spacing-8) var(--spacing-16);
+/* Search overlay — slides down from top, covers the header */
+.shopping-list-search-overlay {
+  position: absolute;
+  top: var(--safe-area-inset-top);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: var(--spacing-12) var(--spacing-16) var(--spacing-16);
   background: var(--color-background-base);
+  border-bottom: 1px solid var(--color-stroke-weak);
+  animation: search-slide-down 0.2s ease;
 }
 
-.shopping-list-add-bar .search-bar {
-  width: 100%;
+.shopping-list-search-overlay::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--spacing-32);
+  background: linear-gradient(to bottom, var(--color-background-base), transparent);
+  pointer-events: none;
 }
 
-/* Unified overlay card — matches Figma node 604:2577 "Search Suggestion Overlay" */
-/* Suggestion list sits above, search bar sits below, no gap between them.        */
-.shopping-list-input-overlay {
-  flex-shrink: 0;
-  margin: 0 var(--spacing-inset-md) var(--spacing-gap-sm);
+/* Card: provides border, radius and clips children — same pattern as old bottom overlay */
+.shopping-list-search-card {
   background: var(--color-background-sunken);
   border: 1px solid var(--color-stroke-brand-weak);
   border-radius: var(--corner-radius-card);
   box-shadow: var(--elevation-raised);
-  overflow: hidden; /* clips SearchBar corners to the card radius */
+  overflow: hidden;
 }
 
-/* Strip SuggestionList's own card — the overlay provides card styling. */
-.shopping-list-input-overlay .suggestion-list {
+/* SearchBar inside card: card handles outer border/radius; keep bottom as divider */
+.shopping-list-search-card .search-bar-container {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+}
+
+/* SuggestionList inside card: strip its own card styling */
+.shopping-list-search-card .suggestion-list {
   background: transparent;
   border: none;
   box-shadow: none;
   border-radius: 0;
 }
 
-/* Fixed height = 3 items (56px each) + 2 dividers (1px each), regardless of count */
-.shopping-list-input-overlay .suggestion-list-items {
-  min-height: calc(3 * 56px + 2 * 1px);
+@keyframes search-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Search bar row — flush at the bottom of the overlay card, no extra padding */
-/* Divider at the end of SuggestionList provides the separator above the search bar */
-.shopping-list-input-overlay-bar {
-}
-
-/* In overlay context: outer card border and overflow:hidden handle left/right/bottom edges.
-   Remove only those three sides to avoid double borders; top stays as SearchBar's own separator.
-   Radius on bottom corners matches the outer card. Background keeps the SearchBar's own token. */
-.shopping-list-input-overlay-bar .search-bar-container {
-  border-left: none;
-  border-right: none;
-  border-bottom: none;
-  border-radius: 0 0 var(--corner-radius-card) var(--corner-radius-card);
+/* FAB — positioned above the navbar sheet */
+.shopping-list-search-fab {
+  position: absolute;
+  bottom: calc(100% + var(--spacing-16));
+  right: var(--spacing-16);
+  z-index: 10;
 }
 
 

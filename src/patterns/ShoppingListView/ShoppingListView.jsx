@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { RotateCcw, Grid, List, Trash2, MoreVertical, Check, Home, Zap } from 'react-feather';
+import { RotateCcw, Grid, List, Trash2, MoreVertical, Check, Home, Zap, X } from 'react-feather';
 import { Divider } from '../../components/Divider';
 import { IngredientList } from '../../components/IngredientList';
 import { SearchBar } from '../../components/SearchBar';
@@ -8,6 +8,7 @@ import { Button } from '../../components/Button';
 import { ListSwitcher } from '../../components/ListSwitcher';
 import { AvatarRow } from '../../components/AvatarRow';
 import { SuggestionList } from '../../components/SuggestionList';
+import { SearchFab } from '../../components/SearchFab/SearchFab';
 import { NavigationBarConnected } from '../../components/NavigationBar/NavigationBarConnected';
 import './ShoppingListView.css';
 
@@ -51,33 +52,55 @@ export const ShoppingListView = ({
   const RECIPE_REMOVE_ANIMATION_MS = 320;
   const MAX_SUGGESTIONS = 3;
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [removingRecipeKeys, setRemovingRecipeKeys] = useState({});
   const searchInputRef = useRef(null);
 
+  const handleFabClick = () => {
+    if (isSearchOpen) {
+      searchInputRef.current?.focus();
+    } else {
+      setIsSearchOpen(true);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
+
   const handleAddSuggestion = (name) => {
-    onAddIngredient?.(name);
+    // Preserve any quantity+unit prefix the user typed (e.g. "40g" from "40g ban")
+    const q = searchQuery.trim();
+    const prefixMatch = /^\d[\d.,]*(?:\s*[a-zA-Z]{1,4})?\s+/.exec(q);
+    const prefix = prefixMatch ? prefixMatch[0].trim() : '';
+    onAddIngredient?.(prefix ? `${prefix} ${name}` : name);
     setSearchQuery('');
     searchInputRef.current?.focus();
   };
 
   const handleAddBarKeyDown = (e) => {
-    if (e.key === 'Enter' && trimmedQuery.length > 0) {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      handleAddSuggestion(trimmedQuery);
+      if (trimmedQuery.length > 0) {
+        handleAddSuggestion(trimmedQuery);
+      } else {
+        handleCancel();
+      }
     }
   };
 
   const trimmedQuery = searchQuery.trim();
-  const suggestions = trimmedQuery.length > 0
+  // Strip a leading quantity+unit (e.g. "500g ", "2 l ", "1.5kg ") so that
+  // "500g po" still matches "Potatoes" — but stop at the unit, not the ingredient start.
+  const prefixMatch = /^\d[\d.,]*(?:\s*[a-zA-Z]{1,4})?\s+/.exec(trimmedQuery);
+  const ingredientPart = prefixMatch ? trimmedQuery.slice(prefixMatch[0].length) : '';
+  const matchQuery = ingredientPart.length > 0 ? ingredientPart : trimmedQuery;
+  const suggestions = matchQuery.length > 0
     ? INGREDIENT_SUGGESTIONS
-        .filter(s => s.toLowerCase().startsWith(trimmedQuery.toLowerCase()))
+        .filter(s => s.toLowerCase().startsWith(matchQuery.toLowerCase()))
         .slice(0, MAX_SUGGESTIONS)
     : [];
-
-  const showOverlay = suggestions.length > 0;
-  useEffect(() => {
-    searchInputRef.current?.focus();
-  }, [showOverlay]);
 
   const getRecipeGroupKey = (group, index) =>
     group.recipeId ?? group.id ?? group.recipeName ?? `group-${index}`;
@@ -162,6 +185,7 @@ export const ShoppingListView = ({
     .filter(Boolean);
 
   return (
+    <>
     <div
       className="shopping-list-view"
       {...props}
@@ -379,44 +403,39 @@ export const ShoppingListView = ({
         )}
       </div>
 
-      {/* Input area — unified overlay card when typing, plain bar when idle */}
-      {suggestions.length > 0 ? (
-        <div className="shopping-list-input-overlay">
-          <SuggestionList
-            suggestions={suggestions}
-            onSelect={handleAddSuggestion}
-          />
-          <div className="shopping-list-input-overlay-bar">
+      {/* Search overlay — slides down from top */}
+      {isSearchOpen && (
+        <div className="shopping-list-search-overlay">
+          <div className="shopping-list-search-card">
             <SearchBar
+              autoFocus
               inputRef={searchInputRef}
               placeholder="Ich brauche..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleAddBarKeyDown}
-              showTrailingIcon={false}
+              trailingIcon={<X size={18} />}
+              onTrailingIconClick={handleCancel}
+              trailingIconLabel="Close search"
               inputMode="text"
               enterKeyHint="done"
             />
+            {suggestions.length > 0 && (
+              <SuggestionList
+                suggestions={suggestions}
+                onSelect={handleAddSuggestion}
+              />
+            )}
           </div>
-        </div>
-      ) : (
-        <div className="shopping-list-add-bar">
-          <SearchBar
-            inputRef={searchInputRef}
-            placeholder="Ich brauche..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleAddBarKeyDown}
-            showTrailingIcon={false}
-            inputMode="text"
-            enterKeyHint="done"
-          />
         </div>
       )}
 
-      {/* Bottom Navigation */}
+    </div>
+    <div className="shopping-list-navbar-sheet">
+      <SearchFab onClick={handleFabClick} aria-label="Add ingredient" className="shopping-list-search-fab" />
       <NavigationBarConnected activeItem="shopping-list" />
     </div>
+    </>
   );
 };
 
