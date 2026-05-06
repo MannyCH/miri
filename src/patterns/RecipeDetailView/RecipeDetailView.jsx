@@ -28,16 +28,38 @@ export const RecipeDetailView = ({
 
   const scaleQuantity = (quantityStr, factor) => {
     if (!quantityStr || factor === 1) return quantityStr;
-    const match = quantityStr.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)(\s*.*)$/);
+    // normalizeFractions is defined below but called at render time — safe to reference here
+    const normalized = normalizeFractions(quantityStr);
+    const match = normalized.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:[.,]\d+)?)(\s*.*)$/);
     if (!match) return quantityStr;
     const [, numStr, rest] = match;
-    const num = numStr.includes('/')
-      ? (() => { const [a, b] = numStr.split('/'); return parseFloat(a) / parseFloat(b); })()
-      : parseFloat(numStr.replace(',', '.'));
+    let num;
+    if (numStr.includes(' ')) {
+      const [whole, frac] = numStr.split(' ');
+      const [a, b] = frac.split('/');
+      num = parseFloat(whole) + parseFloat(a) / parseFloat(b);
+    } else if (numStr.includes('/')) {
+      const [a, b] = numStr.split('/');
+      num = parseFloat(a) / parseFloat(b);
+    } else {
+      num = parseFloat(numStr.replace(',', '.'));
+    }
     if (isNaN(num) || num === 0) return quantityStr;
     const scaled = num * factor;
-    const formatted = Number.isInteger(scaled) ? String(scaled) : parseFloat(scaled.toFixed(2)).toString();
-    return formatted + rest;
+    const whole = Math.floor(scaled);
+    const dec = scaled - whole;
+    const snapFracs = [[1,2],[1,3],[2,3],[1,4],[3,4],[1,8],[3,8],[5,8],[7,8]];
+    const snap = snapFracs.find(([n, d]) => Math.abs(dec - n / d) < 0.02);
+    let formatted;
+    if (dec < 0.02) {
+      formatted = String(whole || Math.round(scaled));
+    } else if (snap) {
+      const fracStr = `${snap[0]}/${snap[1]}`;
+      formatted = whole > 0 ? `${whole} ${fracStr}` : fracStr;
+    } else {
+      formatted = parseFloat(scaled.toFixed(2)).toString();
+    }
+    return formatFractions(formatted) + rest;
   };
 
   const fractionMap = {
