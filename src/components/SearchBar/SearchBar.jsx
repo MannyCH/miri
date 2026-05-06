@@ -6,7 +6,7 @@ import './SearchBar.css';
  * Plain input with trailing search icon
  */
 export const SearchBar = ({
-  placeholder = 'Ich brauche...',
+  placeholder = 'I need...',
   value,
   onChange,
   inputRef,

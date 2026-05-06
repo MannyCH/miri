@@ -59,6 +59,7 @@
 .recipe-detail-section {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-8);
 }
 
 /* Section titles (INGREDIENTS, DIRECTIONS) — Figma: Tiny/Bold with letter-spacing */
@@ -73,7 +74,6 @@
    ============================================ */
 
 .recipe-ingredients-section {
-  gap: 0;
   padding-bottom: var(--spacing-16);
 }
 
@@ -85,7 +85,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-8);
-  margin-top: var(--spacing-8);
 }
 
 .recipe-ingredient-item {
@@ -115,7 +114,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-24);
-  margin-top: var(--spacing-16);
 }
 
 .recipe-direction-item {

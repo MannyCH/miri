@@ -192,7 +192,7 @@ export const ShoppingListView = ({
     >
       {/* Header */}
       <header className="shopping-list-header">
-        <h1 className="text-h1-bold">Einkaufsliste</h1>
+        <h1 className="text-h1-bold">Shopping List</h1>
         <div className="shopping-list-subtitle-row">
           <div className="shopping-list-subtitle-left">
             <ListSwitcher
@@ -410,7 +410,7 @@ export const ShoppingListView = ({
             <SearchBar
               autoFocus
               inputRef={searchInputRef}
-              placeholder="Ich brauche..."
+              placeholder="I need..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleAddBarKeyDown}

@@ -48,11 +48,11 @@ Tappable list name pill in the shopping list header. Shows the active list name,
 };
 
 const singleList = [
-  { id: 'list-1', name: 'Einkaufsliste' },
+  { id: 'list-1', name: 'Shopping List' },
 ];
 
 const multipleLists = [
-  { id: 'list-1', name: 'Einkaufsliste', isShared: true, memberCount: 2 },
+  { id: 'list-1', name: 'Shopping List', isShared: true, memberCount: 2 },
   { id: 'list-2', name: 'Ski Trip' },
   { id: 'list-3', name: 'Christmas Dinner', isShared: true, memberCount: 4 },
 ];

@@ -46,7 +46,7 @@ Search bar input with an optional trailing icon. Matches the Figma search bar de
   argTypes: {
     placeholder: {
       control: 'text',
-      description: 'Placeholder text shown before the user starts typing. Should hint at what to search for (e.g. "Ich brauche..." or "Search recipes...").',
+      description: 'Placeholder text shown before the user starts typing. Should hint at what to search for (e.g. "I need..." or "Search recipes...").',
     },
     showTrailingIcon: {
       control: 'boolean',
@@ -64,7 +64,7 @@ const SearchIcon = () => (
 
 export const Default = {
   args: {
-    placeholder: 'Ich brauche...',
+    placeholder: 'I need...',
     showTrailingIcon: true,
     trailingIcon: <SearchIcon />,
   },
@@ -79,7 +79,7 @@ export const Default = {
 
 export const WithoutIcon = {
   args: {
-    placeholder: 'Ich brauche...',
+    placeholder: 'I need...',
     showTrailingIcon: false,
   },
   parameters: {

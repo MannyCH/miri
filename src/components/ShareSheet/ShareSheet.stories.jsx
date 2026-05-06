@@ -59,7 +59,7 @@ export const Default = {
   name: 'Default (open)',
   args: {
     isOpen: true,
-    listName: 'Einkaufsliste',
+    listName: 'Shopping List',
     members: sampleMembers,
     onClose: () => console.log('close'),
     onCopyLink: () => console.log('copy link'),

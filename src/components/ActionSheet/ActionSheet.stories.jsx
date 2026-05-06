@@ -112,7 +112,7 @@ export const WithIcons = {
   name: 'With Icons',
   args: {
     isOpen: true,
-    title: 'Share "Einkaufsliste"',
+    title: 'Share "Shopping List"',
     items: [
       {
         label: 'Copy link',
